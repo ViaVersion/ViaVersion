@@ -36,6 +36,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.BitSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -319,6 +320,15 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
 
         for (final CompoundTag itemTag : container) {
             handleShowItem(connection, itemTag, itemTag.getCompoundTag("components"));
+        }
+    }
+
+    protected void removeDataComponents(final CompoundTag tag, final String... keys) {
+        for (final String key : keys) {
+            // Check overrides too... continue once one is found
+            final boolean removed = TagUtil.removeNamespaced(tag, key)
+                || tag.remove("!" + Key.namespaced(key)) != null
+                || tag.remove("!" + Key.stripMinecraftNamespace(key)) != null;
         }
     }
 

@@ -70,8 +70,7 @@ public final class ComponentRewriter1_21_2 extends JsonNBTComponentRewriter<Clie
             levels.entrySet().removeIf(entry -> ((NumberTag) entry.getValue()).asInt() == 0);
         }
 
-        TagUtil.removeNamespaced(componentsTag, "fire_resistant");
-        TagUtil.removeNamespaced(componentsTag, "lock");
+        removeDataComponents(componentsTag, "fire_resistant", "lock");
 
         final StringTag customName = TagUtil.getNamespacedStringTag(componentsTag, "custom_name");
         final StringTag itemName = TagUtil.getNamespacedStringTag(componentsTag, "item_name");
