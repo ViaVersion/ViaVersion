@@ -197,16 +197,21 @@ public interface ViaPlatform<T> {
     File getDataFolder();
 
     /**
-     * Called when a reload happens
+     * Called when ViaVersion is initialized twice during the same process, this happens on platforms where ViaVersion
+     * is loaded as a plugin which can be reloaded.
      */
-    void onReload();
+    default void onReload() {
+    }
 
     /**
-     * Get the JSON data required for /viaversion dump
+     * Gets optional platform specific data for /viaversion dump. This can be a specific version or a list of installed
+     * plugins on the platform.
      *
      * @return The json data
      */
-    JsonObject getDump();
+    default JsonObject getDump() {
+        return new JsonObject();
+    }
 
     /**
      * Returns an immutable collection of classes to be checked as unsupported software with their software name.
