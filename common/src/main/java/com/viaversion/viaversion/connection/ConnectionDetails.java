@@ -33,8 +33,8 @@ import java.util.UUID;
  */
 public final class ConnectionDetails {
 
-    public static final String VELOCITY_CHANNEL = "vv:velocity_details";
-    public static final String FABRIC_CHANNEL = "vv:fabric_details";
+    public static final String PROXY_CHANNEL = "vv:proxy_details";
+    public static final String MOD_CHANNEL = "vv:mod_details";
 
     public static void sendConnectionDetails(final UserConnection connection, final String channel) {
         final ProtocolInfo protocolInfo = connection.getProtocolInfo();

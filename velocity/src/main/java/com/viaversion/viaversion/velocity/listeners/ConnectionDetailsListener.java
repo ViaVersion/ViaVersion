@@ -28,12 +28,12 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.connection.ConnectionDetails;
 
 public class ConnectionDetailsListener {
-    private static final MinecraftChannelIdentifier CHANNEL = MinecraftChannelIdentifier.from(ConnectionDetails.VELOCITY_CHANNEL);
+    private static final MinecraftChannelIdentifier CHANNEL = MinecraftChannelIdentifier.from(ConnectionDetails.PROXY_CHANNEL);
 
     @Subscribe
     public void onPostServerJoin(final ServerPostConnectEvent event) {
         final UserConnection connection = Via.getAPI().getConnection(event.getPlayer().getUniqueId());
-        ConnectionDetails.sendConnectionDetails(connection, ConnectionDetails.VELOCITY_CHANNEL);
+        ConnectionDetails.sendConnectionDetails(connection, ConnectionDetails.PROXY_CHANNEL);
     }
 
     @Subscribe
