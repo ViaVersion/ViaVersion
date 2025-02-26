@@ -35,6 +35,7 @@ public final class ConnectionDetails {
 
     public static final String PROXY_CHANNEL = "vv:proxy_details";
     public static final String MOD_CHANNEL = "vv:mod_details";
+    public static final String APP_CHANNEL = "vv:app_details";
 
     public static void sendConnectionDetails(final UserConnection connection, final String channel) {
         final ProtocolInfo protocolInfo = connection.getProtocolInfo();
