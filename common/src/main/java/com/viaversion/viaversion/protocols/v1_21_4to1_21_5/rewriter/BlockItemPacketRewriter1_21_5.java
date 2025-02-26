@@ -17,7 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter;
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.LongArrayTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
@@ -25,6 +28,7 @@ import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.EitherHolder;
 import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_21_5;
 import com.viaversion.viaversion.api.minecraft.chunks.Heightmap;
@@ -77,6 +81,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         StructuredDataKey.WRITTEN_BOOK_CONTENT
     );
     private static final Heightmap[] EMPTY_HEIGHTMAPS = new Heightmap[0];
+    private static final int SIGN_BOCK_ENTITY_ID = 7;
 
     public BlockItemPacketRewriter1_21_5(final Protocol1_21_4To1_21_5 protocol) {
         super(protocol,
@@ -92,7 +97,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         blockRewriter.registerBlockUpdate(ClientboundPackets1_21_2.BLOCK_UPDATE);
         blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_21_2.SECTION_BLOCKS_UPDATE);
         blockRewriter.registerLevelEvent1_21(ClientboundPackets1_21_2.LEVEL_EVENT, 2001);
-        blockRewriter.registerBlockEntityData(ClientboundPackets1_21_2.BLOCK_ENTITY_DATA);
+        blockRewriter.registerBlockEntityData(ClientboundPackets1_21_2.BLOCK_ENTITY_DATA, this::handleBlockEntity);
 
         protocol.registerClientbound(ClientboundPackets1_21_2.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
@@ -116,6 +121,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             }
 
             final Chunk mappedChunk = new Chunk1_21_5(chunk.getX(), chunk.getZ(), chunk.getSections(), heightmaps.toArray(EMPTY_HEIGHTMAPS), chunk.blockEntities());
+            blockRewriter.handleBlockEntities(this::handleBlockEntity, chunk, wrapper.user());
             wrapper.write(newChunkType, mappedChunk);
         });
 
@@ -165,6 +171,28 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_2.UPDATE_RECIPES);
         recipeRewriter.registerRecipeBookAdd(ClientboundPackets1_21_2.RECIPE_BOOK_ADD);
         recipeRewriter.registerPlaceGhostRecipe(ClientboundPackets1_21_2.PLACE_GHOST_RECIPE);
+    }
+
+    private void handleBlockEntity(final UserConnection connection, final BlockEntity blockEntity) {
+        final CompoundTag tag = blockEntity.tag();
+        if (tag != null && blockEntity.typeId() == SIGN_BOCK_ENTITY_ID) {
+            updateSignMessages(connection, tag.getCompoundTag("front_text"));
+            updateSignMessages(connection, tag.getCompoundTag("back_text"));
+        }
+    }
+
+    private void updateSignMessages(final UserConnection connection, final CompoundTag tag) {
+        if (tag == null) {
+            return;
+        }
+
+        final ListTag<StringTag> messages = tag.getListTag("messages", StringTag.class);
+        tag.put("messages", protocol.getComponentRewriter().updateComponentList(connection, messages));
+
+        final ListTag<StringTag> filteredMessages = tag.getListTag("filtered_messages", StringTag.class);
+        if (filteredMessages != null) {
+            tag.put("filtered_messages", protocol.getComponentRewriter().updateComponentList(connection, filteredMessages));
+        }
     }
 
     private int heightmapType(final String id) {

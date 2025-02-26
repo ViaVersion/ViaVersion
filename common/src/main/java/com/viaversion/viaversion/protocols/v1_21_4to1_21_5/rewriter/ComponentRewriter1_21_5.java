@@ -217,16 +217,21 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
             return;
         }
 
-        final ListTag<CompoundTag> updatedLore = new ListTag<>(CompoundTag.class);
+        final ListTag<CompoundTag> updatedLore = updateComponentList(connection, lore);
         componentsTag.put(loreKey, updatedLore);
-        for (final StringTag line : lore) {
+    }
+
+    public ListTag<CompoundTag> updateComponentList(final UserConnection connection, final ListTag<StringTag> messages) {
+        final ListTag<CompoundTag> updatedMessages = new ListTag<>(CompoundTag.class);
+        for (final StringTag message : messages) {
             // Convert and make sure they're all of the same type
-            final Tag output = uglyJsonToTag(connection, line.getValue());
+            final Tag output = uglyJsonToTag(connection, message.getValue());
             final CompoundTag wrappedComponent = new CompoundTag();
             wrappedComponent.putString("text", "");
             wrappedComponent.put("extra", new ListTag<>(List.of(output)));
-            updatedLore.add(wrappedComponent);
+            updatedMessages.add(wrappedComponent);
         }
+        return updatedMessages;
     }
 
     private void updateUglyJson(final CompoundTag componentsTag, final String key, final UserConnection connection) {
@@ -269,7 +274,7 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
         }
     }
 
-    private Tag uglyJsonToTag(final UserConnection connection, final String value) {
+    public Tag uglyJsonToTag(final UserConnection connection, final String value) {
         final Tag contents = SerializerVersion.V1_21_4.toTag(SerializerVersion.V1_21_4.toComponent(value));
         processTag(connection, contents);
         return contents;

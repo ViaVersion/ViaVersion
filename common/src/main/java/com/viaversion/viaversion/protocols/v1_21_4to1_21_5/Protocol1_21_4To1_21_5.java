@@ -49,7 +49,6 @@ import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
-import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
@@ -60,7 +59,7 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
     private final BlockItemPacketRewriter1_21_5 itemRewriter = new BlockItemPacketRewriter1_21_5(this);
     private final ParticleRewriter<ClientboundPacket1_21_2> particleRewriter = new ParticleRewriter<>(this, Types1_21_4.PARTICLE, Types1_21_5.PARTICLE);
     private final TagRewriter<ClientboundPacket1_21_2> tagRewriter = new TagRewriter<>(this);
-    private final JsonNBTComponentRewriter<ClientboundPacket1_21_2> componentRewriter = new ComponentRewriter1_21_5(this);
+    private final ComponentRewriter1_21_5 componentRewriter = new ComponentRewriter1_21_5(this);
 
     public Protocol1_21_4To1_21_5() {
         super(ClientboundPacket1_21_2.class, ClientboundPacket1_21_5.class, ServerboundPacket1_21_4.class, ServerboundPacket1_21_5.class);
@@ -181,7 +180,7 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
     }
 
     @Override
-    public JsonNBTComponentRewriter<ClientboundPacket1_21_2> getComponentRewriter() {
+    public ComponentRewriter1_21_5 getComponentRewriter() {
         return componentRewriter;
     }
 

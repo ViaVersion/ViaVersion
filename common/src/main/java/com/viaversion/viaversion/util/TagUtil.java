@@ -65,7 +65,7 @@ public final class TagUtil {
         return tag.contains(Key.namespaced(key)) || tag.contains(Key.stripMinecraftNamespace(key));
     }
 
-    public static @Nullable Tag getnamespacedTag(final CompoundTag tag, final String key) {
+    public static @Nullable Tag getNamespacedTag(final CompoundTag tag, final String key) {
         final Tag value = tag.get(Key.namespaced(key));
         return value != null ? value : tag.get(Key.stripMinecraftNamespace(key));
     }

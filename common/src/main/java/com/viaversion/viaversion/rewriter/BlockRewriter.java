@@ -251,10 +251,14 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerBlockEntityData(C packetType) {
-        registerBlockEntityData(packetType, null);
+        registerBlockEntityData(packetType, (BiConsumer<UserConnection, BlockEntity>) null);
     }
 
     public void registerBlockEntityData(C packetType, @Nullable Consumer<BlockEntity> blockEntityHandler) {
+        registerBlockEntityData(packetType, blockEntityHandler != null ? (connection, blockEntity) -> blockEntityHandler.accept(blockEntity) : null);
+    }
+
+    public void registerBlockEntityData(C packetType, @Nullable BiConsumer<UserConnection, BlockEntity> blockEntityHandler) {
         protocol.registerClientbound(packetType, wrapper -> {
             final BlockPosition position = wrapper.passthrough(positionType);
 
@@ -269,7 +273,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             final CompoundTag tag;
             if (blockEntityHandler != null && (tag = wrapper.passthrough(compoundTagType)) != null) {
                 final BlockEntity blockEntity = new BlockEntityImpl(BlockEntity.pack(position.x(), position.z()), (short) position.y(), blockEntityId, tag);
-                blockEntityHandler.accept(blockEntity);
+                blockEntityHandler.accept(wrapper.user(), blockEntity);
             }
         });
     }
