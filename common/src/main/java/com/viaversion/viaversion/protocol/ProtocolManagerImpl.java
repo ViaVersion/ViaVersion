@@ -40,6 +40,7 @@ import com.viaversion.viaversion.api.protocol.version.VersionType;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocol.packet.VersionedPacketTransformerImpl;
 import com.viaversion.viaversion.protocols.base.InitialBaseProtocol;
+import com.viaversion.viaversion.protocols.base.v1_16.ClientboundBaseProtocol1_16;
 import com.viaversion.viaversion.protocols.base.v1_7.ClientboundBaseProtocol1_7;
 import com.viaversion.viaversion.protocols.base.v1_7.ServerboundBaseProtocol1_7;
 import com.viaversion.viaversion.protocols.v1_10to1_11.Protocol1_10To1_11;
@@ -141,7 +142,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
         // Base Protocol
         BASE_PROTOCOL.initialize();
         BASE_PROTOCOL.register(Via.getManager().getProviders());
-        registerBaseProtocol(Direction.CLIENTBOUND, new ClientboundBaseProtocol1_7(), Range.atLeast(ProtocolVersion.v1_7_2));
+        registerBaseProtocol(Direction.CLIENTBOUND, new ClientboundBaseProtocol1_7(), Range.closedOpen(ProtocolVersion.v1_7_2, ProtocolVersion.v1_16));
+        registerBaseProtocol(Direction.CLIENTBOUND, new ClientboundBaseProtocol1_16(), Range.atLeast(ProtocolVersion.v1_16));
         registerBaseProtocol(Direction.SERVERBOUND, new ServerboundBaseProtocol1_7(), Range.atLeast(ProtocolVersion.v1_7_2));
 
         registerProtocol(new Protocol1_8To1_9(), ProtocolVersion.v1_9, ProtocolVersion.v1_8);
