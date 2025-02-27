@@ -213,12 +213,9 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
 
         final String loreKey = componentsTag.contains("lore") ? "lore" : "minecraft:lore";
         final ListTag<StringTag> lore = componentsTag.getListTag(loreKey, StringTag.class);
-        if (lore == null) {
-            return;
+        if (lore != null) {
+            componentsTag.put(loreKey, updateComponentList(connection, lore));
         }
-
-        final ListTag<CompoundTag> updatedLore = updateComponentList(connection, lore);
-        componentsTag.put(loreKey, updatedLore);
     }
 
     public ListTag<CompoundTag> updateComponentList(final UserConnection connection, final ListTag<StringTag> messages) {
