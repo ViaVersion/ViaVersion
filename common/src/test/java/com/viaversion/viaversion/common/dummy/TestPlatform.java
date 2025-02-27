@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.common.dummy;
 
-import com.google.gson.JsonObject;
 import com.viaversion.viaversion.ViaAPIBase;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
@@ -99,15 +98,6 @@ public final class TestPlatform implements ViaPlatform {
 
     @Override
     public File getDataFolder() {
-        return null;
-    }
-
-    @Override
-    public void onReload() {
-    }
-
-    @Override
-    public JsonObject getDump() {
         return null;
     }
 

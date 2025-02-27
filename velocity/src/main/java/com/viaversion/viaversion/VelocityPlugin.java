@@ -204,11 +204,6 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     }
 
     @Override
-    public void onReload() {
-
-    }
-
-    @Override
     public JsonObject getDump() {
         JsonObject extra = new JsonObject();
         List<PluginInfo> plugins = new ArrayList<>();
