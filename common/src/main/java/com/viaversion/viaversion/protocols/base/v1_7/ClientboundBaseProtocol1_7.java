@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -131,17 +132,8 @@ public class ClientboundBaseProtocol1_7 extends AbstractProtocol<BaseClientbound
         registerClientbound(ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
             final ProtocolInfo info = wrapper.user().getProtocolInfo();
 
-            if (info.serverProtocolVersion().olderThan(ProtocolVersion.v1_16)) {
-                String uuidString = wrapper.passthrough(Types.STRING);
-                if (uuidString.length() == 32) { // Trimmed UUIDs are 32 characters
-                    // Trimmed
-                    uuidString = addDashes(uuidString);
-                }
-                info.setUuid(UUID.fromString(uuidString));
-            } else {
-                final UUID uuid = wrapper.passthrough(Types.UUID);
-                info.setUuid(uuid);
-            }
+            final UUID uuid = passthroughUUID(wrapper);
+            info.setUuid(uuid);
 
             final String username = wrapper.passthrough(Types.STRING);
             info.setUsername(username);
@@ -154,6 +146,15 @@ public class ClientboundBaseProtocol1_7 extends AbstractProtocol<BaseClientbound
     @Override
     public boolean isBaseProtocol() {
         return true;
+    }
+
+    public UUID passthroughUUID(final PacketWrapper wrapper) {
+        String uuidString = wrapper.passthrough(Types.STRING);
+        if (uuidString.length() == 32) { // Trimmed UUIDs are 32 characters
+            // Trimmed
+            uuidString = addDashes(uuidString);
+        }
+        return UUID.fromString(uuidString);
     }
 
     public static String addDashes(String trimmedUUID) {
