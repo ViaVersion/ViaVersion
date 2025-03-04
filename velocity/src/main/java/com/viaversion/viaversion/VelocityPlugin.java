@@ -27,6 +27,7 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.platform.PlatformTask;
@@ -178,6 +179,11 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     @Override
     public void sendMessage(UUID uuid, String message) {
         PROXY.getPlayer(uuid).ifPresent(player -> player.sendMessage(COMPONENT_SERIALIZER.deserialize(message)));
+    }
+
+    @Override
+    public void sendCustomPayload(final UUID uuid, final String channel, final String message) {
+        PROXY.getPlayer(uuid).flatMap(Player::getCurrentServer).ifPresent(server -> server.sendPluginMessage(MinecraftChannelIdentifier.from(channel), message.getBytes()));
     }
 
     @Override
