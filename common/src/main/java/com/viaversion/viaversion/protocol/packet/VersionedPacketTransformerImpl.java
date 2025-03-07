@@ -102,7 +102,7 @@ public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S e
 
     private void validatePacket(PacketWrapper packet) {
         if (packet.user() == null) {
-            throw new IllegalArgumentException("PacketWrapper does not have a targetted UserConnection");
+            throw new IllegalArgumentException("PacketWrapper does not have a targeted UserConnection");
         }
         if (packet.getPacketType() == null) {
             throw new IllegalArgumentException("PacketWrapper does not have a valid packet type");

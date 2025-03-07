@@ -335,7 +335,7 @@ public interface UserConnection {
 
     /**
      * Returns a newly generated uuid that will let a packet be passed through without
-     * transformig its contents if used together with {@link PacketWrapper#PASSTHROUGH_ID}.
+     * transforming its contents if used together with {@link PacketWrapper#PASSTHROUGH_ID}.
      *
      * @return generated passthrough token
      */

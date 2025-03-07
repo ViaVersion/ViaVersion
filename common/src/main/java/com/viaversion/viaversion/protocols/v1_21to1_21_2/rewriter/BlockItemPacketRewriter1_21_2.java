@@ -521,7 +521,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
     private void updateContainerId(final PacketWrapper wrapper) {
         // Container id handling was always a bit whack with most reading them as unsigned bytes, some as bytes, some already as var ints.
-        // In VV they're generally read as unsigned bytes to not have to look the type up every time, but we need to make sure they're
+        // In VV, they're generally read as unsigned bytes to not have to look the type up every time, but we need to make sure they're
         // properly converted to ints when used
         final short containerId = wrapper.read(Types.UNSIGNED_BYTE);
         final int intId = (byte) containerId;

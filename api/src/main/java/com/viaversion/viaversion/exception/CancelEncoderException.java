@@ -56,7 +56,7 @@ public class CancelEncoderException extends EncoderException implements CancelCo
     /**
      * Returns a cached CancelEncoderException or a new instance when {@link ViaManager#isDebug()} is true.
      *
-     * @param cause cause for being used when a new instance is creeated
+     * @param cause cause for being used when a new instance is created
      * @return a CancelEncoderException instance
      */
     public static CancelEncoderException generate(Throwable cause) {

@@ -56,7 +56,7 @@ public class CancelDecoderException extends DecoderException implements CancelCo
     /**
      * Returns a cached CancelDecoderException or a new instance when {@link ViaManager#isDebug()} is true.
      *
-     * @param cause cause for being used when a new instance is creeated
+     * @param cause cause for being used when a new instance is created
      * @return a CancelDecoderException instance
      */
     public static CancelDecoderException generate(Throwable cause) {
