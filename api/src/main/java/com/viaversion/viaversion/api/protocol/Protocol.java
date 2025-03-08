@@ -46,7 +46,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Abstract protocol class handling packet transformation between two protocol versions.
- * Clientbound and serverbount packet types can be set to enforce correct usage of them.
+ * Clientbound and Serverbound packet types can be set to enforce correct usage of them.
  *
  * @param <CU> unmapped clientbound packet types
  * @param <CM> mapped clientbound packet types
@@ -305,7 +305,7 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * Returns true if this Protocol's {@link #loadMappingData()} method should be called.
      * <p>
      * This does *not* necessarily mean that {@link #getMappingData()} is non-null, since this may be
-     * overriden, depending on special cases.
+     * overridden, depending on special cases.
      *
      * @return true if this Protocol's {@link #loadMappingData()} method should be called
      */

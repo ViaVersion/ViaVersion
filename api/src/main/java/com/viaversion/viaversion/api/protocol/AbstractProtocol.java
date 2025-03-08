@@ -213,7 +213,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     }
 
     /**
-     * Register the packets for this protocol. To be overriden.
+     * Register the packets for this protocol. To be overridden.
      */
     protected void registerPackets() {
         callRegister(getEntityRewriter());

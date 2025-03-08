@@ -71,7 +71,7 @@ public final class SynchronizedListWrapper<E> implements List<E> {
 
     @Override
     public @NonNull Iterator<E> iterator() {
-        // Has to be manually synched
+        // Has to be manually synced
         return listIterator();
     }
 
@@ -168,13 +168,13 @@ public final class SynchronizedListWrapper<E> implements List<E> {
 
     @Override
     public @NonNull ListIterator<E> listIterator() {
-        // Has to be manually synched
+        // Has to be manually synced
         return this.list.listIterator();
     }
 
     @Override
     public @NonNull ListIterator<E> listIterator(final int index) {
-        // Has to be manually synched
+        // Has to be manually synced
         return this.list.listIterator(index);
     }
 

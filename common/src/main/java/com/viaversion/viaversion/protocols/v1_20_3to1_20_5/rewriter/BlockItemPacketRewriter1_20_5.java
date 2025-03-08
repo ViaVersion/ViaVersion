@@ -604,7 +604,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
         }
 
-        // Only for VB, but kept here for simplicity; In VV we backup the original tag and later restore it, in VB
+        // Only for VB, but kept here for simplicity; In VV we back up the original tag and later restore it, in VB
         // we use the converted data and manually restore what broke during the conversion
         final CompoundTag backupTag = StructuredDataConverter.removeBackupTag(tag);
         if (backupTag != null) {

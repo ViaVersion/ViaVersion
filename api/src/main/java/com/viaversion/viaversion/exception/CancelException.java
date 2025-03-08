@@ -28,7 +28,7 @@ import io.netty.handler.codec.CodecException;
 
 /**
  * Thrown during packet transformation to cancel the packet.
- * Internally catched to then throw the appropriate {@link CodecException} for Netty's handler.
+ * Internally caught to then throw the appropriate {@link CodecException} for Netty's handler.
  */
 public class CancelException extends Exception {
     public static final CancelException CACHED = new CancelException("This packet is supposed to be cancelled; If you have debug enabled, you can ignore these") {

@@ -38,7 +38,7 @@ public interface PacketHandler {
     /**
      * Returns a new packet handler that runs the provided handler after this one.
      *
-     * @param handler packet handler to run aftet this one
+     * @param handler packet handler to run after this one
      * @return a new packet handler that runs the provided handler after this one
      */
     default PacketHandler then(final PacketHandler handler) {

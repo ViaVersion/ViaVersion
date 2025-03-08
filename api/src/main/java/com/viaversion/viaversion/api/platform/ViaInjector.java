@@ -58,7 +58,7 @@ public interface ViaInjector {
      * For proxies, this returns the lowest supported protocol version.
      *
      * @return server protocol version
-     * @throws Exception if there is an error with getting this info, e.g. not binded
+     * @throws Exception if there is an error with getting this info, e.g. not bound
      * @see ViaPlatform#isProxy()
      */
     ProtocolVersion getServerProtocolVersion() throws Exception;
@@ -67,7 +67,7 @@ public interface ViaInjector {
      * Returns the supported server protocol versions.
      *
      * @return server protocol versions
-     * @throws Exception if there is an error with getting this info, e.g. not binded
+     * @throws Exception if there is an error with getting this info, e.g. not bound
      * @see ViaPlatform#isProxy()
      */
     default SortedSet<ProtocolVersion> getServerProtocolVersions() throws Exception {

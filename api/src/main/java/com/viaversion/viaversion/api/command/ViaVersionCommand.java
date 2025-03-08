@@ -30,7 +30,7 @@ public interface ViaVersionCommand {
      * Register your own subcommand inside ViaVersion
      *
      * @param command Your own SubCommand instance to handle it.
-     * @throws IllegalArgumentException throws an exception when the subcommand already exists or if it's not valid, example: spacee
+     * @throws IllegalArgumentException throws an exception when the subcommand already exists or if it's not valid, example: space
      */
     void registerSubCommand(ViaSubCommand command);
 

@@ -48,8 +48,8 @@ public final class PipelineUtil {
      * @param ctx     current context
      * @param input   packet to decode
      * @return a list of the decoders output
-     * @throws Exception                 prapagated exception from the underlying method if thrown
-     * @throws InvocationTargetException wrapped throwable if a given throwable is not an exeption or error
+     * @throws Exception                 propagated exception from the underlying method if thrown
+     * @throws InvocationTargetException wrapped throwable if a given throwable is not an exception or error
      */
     public static List<Object> callDecode(ByteToMessageDecoder decoder, ChannelHandlerContext ctx, Object input) throws Exception {
         List<Object> output = new ArrayList<>();
@@ -69,8 +69,8 @@ public final class PipelineUtil {
      * @param encoder encoder
      * @param ctx     current context
      * @param msg     packet to encode
-     * @throws Exception                 prapagated exception from the underlying method if thrown
-     * @throws InvocationTargetException wrapped throwable if a given throwable is not an exeption or error
+     * @throws Exception                 propagated exception from the underlying method if thrown
+     * @throws InvocationTargetException wrapped throwable if a given throwable is not an exception or error
      */
     public static void callEncode(MessageToByteEncoder encoder, ChannelHandlerContext ctx, Object msg, ByteBuf output) throws Exception {
         try {
@@ -89,8 +89,8 @@ public final class PipelineUtil {
      * @param ctx     current context
      * @param msg     packet to decode
      * @return a list of the decoders output
-     * @throws Exception                 prapagated exception from the underlying method if thrown
-     * @throws InvocationTargetException wrapped throwable if a given throwable is not an exeption or error
+     * @throws Exception                 propagated exception from the underlying method if thrown
+     * @throws InvocationTargetException wrapped throwable if a given throwable is not an exception or error
      */
     public static List<Object> callDecode(MessageToMessageDecoder decoder, ChannelHandlerContext ctx, Object msg) throws Exception {
         List<Object> output = new ArrayList<>();

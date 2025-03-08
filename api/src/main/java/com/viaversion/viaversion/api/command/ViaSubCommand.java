@@ -66,7 +66,7 @@ public interface ViaSubCommand {
      *
      * @param sender Command sender
      * @param args   Arguments
-     * @return commands executed succesfully if false, show usage
+     * @return commands executed successfully if false, show usage
      */
     boolean execute(ViaCommandSender sender, String[] args);
 

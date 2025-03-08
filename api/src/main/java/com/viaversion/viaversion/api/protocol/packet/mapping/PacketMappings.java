@@ -34,7 +34,7 @@ public interface PacketMappings {
     /**
      * Returns a packet mapping for the given packet.
      *
-     * @param state      protocol stae
+     * @param state      protocol state
      * @param unmappedId unmapped packet id
      * @return packet mapping if present
      */

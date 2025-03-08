@@ -38,13 +38,13 @@ public abstract class RewriterBase<T extends Protocol<?, ?, ?, ?>> implements Re
     }
 
     /**
-     * To be overriden. Called when registering the rewriter.
+     * To be overridden. Called when registering the rewriter.
      */
     protected void registerPackets() {
     }
 
     /**
-     * To be overriden. Called when registering the rewriter.
+     * To be overridden. Called when registering the rewriter.
      */
     protected void registerRewrites() {
     }
