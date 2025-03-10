@@ -229,7 +229,11 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             }
         }
 
-        toRemove.forEach(blockEntities::remove);
+        if (!toRemove.isEmpty()) {
+            for (int i = toRemove.size() - 1; i >= 0; i--) {
+                blockEntities.remove(toRemove.getInt(i));
+            }
+        }
     }
 
     public Chunk handleChunk1_19(PacketWrapper wrapper, ChunkTypeSupplier chunkTypeSupplier) {
