@@ -22,7 +22,9 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
@@ -36,29 +38,37 @@ public record AdventureModePredicate(BlockPredicate[] predicates, boolean showIn
     public static final Type<AdventureModePredicate> TYPE1_20_5 = new Type<>(AdventureModePredicate.class) {
         @Override
         public AdventureModePredicate read(final ByteBuf buffer) {
-            final BlockPredicate[] predicates = BlockPredicate.ARRAY_TYPE.read(buffer);
+            final BlockPredicate[] predicates = BlockPredicate.ARRAY_TYPE1_20_5.read(buffer);
             final boolean showInTooltip = buffer.readBoolean();
             return new AdventureModePredicate(predicates, showInTooltip);
         }
 
         @Override
         public void write(final ByteBuf buffer, final AdventureModePredicate value) {
-            BlockPredicate.ARRAY_TYPE.write(buffer, value.predicates);
+            BlockPredicate.ARRAY_TYPE1_20_5.write(buffer, value.predicates);
             buffer.writeBoolean(value.showInTooltip);
         }
     };
-    public static final Type<AdventureModePredicate> TYPE1_21_5 = new Type<>(AdventureModePredicate.class) {
+
+    public static final class AdventureModePredicateType1_21_5 extends Type<AdventureModePredicate> {
+        private final Type<BlockPredicate[]> blockPredicateType;
+
+        public AdventureModePredicateType1_21_5(final Type<StructuredData<?>[]> dataArrayType) {
+            super(AdventureModePredicate.class);
+            this.blockPredicateType = new ArrayType<>(new BlockPredicate.BlockPredicateType1_21_5(dataArrayType));
+        }
+
         @Override
         public AdventureModePredicate read(final ByteBuf buffer) {
-            final BlockPredicate[] predicates = BlockPredicate.ARRAY_TYPE.read(buffer);
+            final BlockPredicate[] predicates = blockPredicateType.read(buffer);
             return new AdventureModePredicate(predicates);
         }
 
         @Override
         public void write(final ByteBuf buffer, final AdventureModePredicate value) {
-            BlockPredicate.ARRAY_TYPE.write(buffer, value.predicates);
+            blockPredicateType.write(buffer, value.predicates);
         }
-    };
+    }
 
     public AdventureModePredicate rewrite(final Int2IntFunction blockIdRewriter) {
         final BlockPredicate[] predicates = new BlockPredicate[this.predicates.length];

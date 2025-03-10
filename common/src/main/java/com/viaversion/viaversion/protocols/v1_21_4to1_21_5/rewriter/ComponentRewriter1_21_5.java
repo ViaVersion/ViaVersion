@@ -95,13 +95,27 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
             componentsTag.put("dyed_color", dyedColor.get("rgb"));
         }
 
+        handleAdventureModePredicate(componentsTag, "can_break");
+        handleAdventureModePredicate(componentsTag, "can_place_on");
         handleEnchantments(componentsTag, "enchantments");
         handleEnchantments(componentsTag, "stored_enchantments");
+
         removeDataComponents(componentsTag, "instrument", "jukebox_playable", "hide_tooltip", "hide_additional_tooltip");
 
         if (!tooltipDisplay.isEmpty()) {
             componentsTag.put("tooltip_display", tooltipDisplay);
         }
+    }
+
+    private void handleAdventureModePredicate(final CompoundTag componentsTag, final String key) {
+        final CompoundTag predicate = getNamespacedCompoundTag(componentsTag, key);
+        if (predicate == null) {
+            return;
+        }
+
+        final ListTag<CompoundTag> blockPredicates = predicate.getListTag("predicates", CompoundTag.class);
+        removeDataComponents(componentsTag, key);
+        componentsTag.put(key, blockPredicates);
     }
 
     private void handleEnchantments(final CompoundTag componentsTag, final String key) {

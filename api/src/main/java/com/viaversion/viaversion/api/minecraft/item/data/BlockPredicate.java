@@ -24,6 +24,9 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
+import com.viaversion.viaversion.api.minecraft.data.StructuredData;
+import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentMatchers;
+import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentMatchers.DataComponentMatchersType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
@@ -33,15 +36,19 @@ import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher @Nullable [] propertyMatchers,
-                             @Nullable CompoundTag tag) implements Copyable {
+                             @Nullable CompoundTag tag, DataComponentMatchers dataMatchers) implements Copyable {
 
-    public static final Type<BlockPredicate> TYPE = new Type<>(BlockPredicate.class) {
+    public BlockPredicate(@Nullable final HolderSet holderSet, final StatePropertyMatcher @Nullable [] propertyMatchers, @Nullable final CompoundTag tag) {
+        this(holderSet, propertyMatchers, tag, null);
+    }
+
+    public static final Type<BlockPredicate> TYPE1_20_5 = new Type<>(BlockPredicate.class) {
         @Override
         public BlockPredicate read(final ByteBuf buffer) {
             final HolderSet holders = Types.OPTIONAL_HOLDER_SET.read(buffer);
             final StatePropertyMatcher[] propertyMatchers = buffer.readBoolean() ? StatePropertyMatcher.ARRAY_TYPE.read(buffer) : null;
             final CompoundTag tag = Types.OPTIONAL_COMPOUND_TAG.read(buffer);
-            return new BlockPredicate(holders, propertyMatchers, tag);
+            return new BlockPredicate(holders, propertyMatchers, tag, null);
         }
 
         @Override
@@ -56,7 +63,38 @@ public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher
             Types.OPTIONAL_COMPOUND_TAG.write(buffer, value.tag);
         }
     };
-    public static final Type<BlockPredicate[]> ARRAY_TYPE = new ArrayType<>(TYPE);
+    public static final Type<BlockPredicate[]> ARRAY_TYPE1_20_5 = new ArrayType<>(TYPE1_20_5);
+
+    public static final class BlockPredicateType1_21_5 extends Type<BlockPredicate> {
+        private final Type<DataComponentMatchers> matchersType;
+
+        public BlockPredicateType1_21_5(final Type<StructuredData<?>[]> dataArrayType) {
+            super(BlockPredicate.class);
+            this.matchersType = new DataComponentMatchersType(dataArrayType);
+        }
+
+        @Override
+        public BlockPredicate read(final ByteBuf buffer) {
+            final HolderSet holders = Types.OPTIONAL_HOLDER_SET.read(buffer);
+            final StatePropertyMatcher[] propertyMatchers = buffer.readBoolean() ? StatePropertyMatcher.ARRAY_TYPE.read(buffer) : null;
+            final CompoundTag tag = Types.OPTIONAL_COMPOUND_TAG.read(buffer);
+            final DataComponentMatchers matchers = matchersType.read(buffer);
+            return new BlockPredicate(holders, propertyMatchers, tag);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final BlockPredicate value) {
+            Types.OPTIONAL_HOLDER_SET.write(buffer, value.holderSet);
+
+            buffer.writeBoolean(value.propertyMatchers != null);
+            if (value.propertyMatchers != null) {
+                StatePropertyMatcher.ARRAY_TYPE.write(buffer, value.propertyMatchers);
+            }
+
+            Types.OPTIONAL_COMPOUND_TAG.write(buffer, value.tag);
+            matchersType.write(buffer, value.dataMatchers);
+        }
+    }
 
     public BlockPredicate rewrite(final Int2IntFunction blockIdRewriter) {
         if (holderSet == null || holderSet.hasTagKey()) {

@@ -121,8 +121,8 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
             .reader("item", ParticleType.Readers.item(itemRewriter.mappedItemType()));
         Types1_21_5.STRUCTURED_DATA.filler(this).add(StructuredDataKey.CUSTOM_DATA, StructuredDataKey.MAX_STACK_SIZE, StructuredDataKey.MAX_DAMAGE,
             StructuredDataKey.UNBREAKABLE1_21_5, StructuredDataKey.RARITY, StructuredDataKey.TOOLTIP_DISPLAY, StructuredDataKey.DAMAGE_RESISTANT,
-            StructuredDataKey.CUSTOM_NAME, StructuredDataKey.LORE, StructuredDataKey.ENCHANTMENTS1_21_5, StructuredDataKey.CAN_PLACE_ON1_21_5,
-            StructuredDataKey.CAN_BREAK1_21_5, StructuredDataKey.CUSTOM_MODEL_DATA1_21_4, StructuredDataKey.BLOCKS_ATTACKS,
+            StructuredDataKey.CUSTOM_NAME, StructuredDataKey.LORE, StructuredDataKey.ENCHANTMENTS1_21_5,
+            StructuredDataKey.CUSTOM_MODEL_DATA1_21_4, StructuredDataKey.BLOCKS_ATTACKS,
             StructuredDataKey.REPAIR_COST, StructuredDataKey.CREATIVE_SLOT_LOCK, StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE,
             StructuredDataKey.INTANGIBLE_PROJECTILE, StructuredDataKey.STORED_ENCHANTMENTS1_21_5, StructuredDataKey.DYED_COLOR1_21_5,
             StructuredDataKey.MAP_COLOR, StructuredDataKey.MAP_ID, StructuredDataKey.MAP_DECORATIONS, StructuredDataKey.MAP_POST_PROCESSING,
@@ -144,8 +144,9 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
             StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.LLAMA_VARIANT, StructuredDataKey.AXOLOTL_VARIANT, StructuredDataKey.CAT_VARIANT,
             StructuredDataKey.CAT_COLLAR, StructuredDataKey.SHEEP_COLOR, StructuredDataKey.SHULKER_COLOR, StructuredDataKey.PROVIDES_TRIM_MATERIAL,
             StructuredDataKey.BREAK_SOUND, StructuredDataKey.COW_VARIANT, StructuredDataKey.CHICKEN_VARIANT, StructuredDataKey.WOLF_SOUND_VARIANT,
-            // Volatile thanks to containing item
-            StructuredDataKey.CHARGED_PROJECTILES1_21_5, StructuredDataKey.BUNDLE_CONTENTS1_21_5, StructuredDataKey.CONTAINER1_21_5, StructuredDataKey.USE_REMAINDER1_21_5);
+            // Volatile thanks to containing items/full data predicates
+            StructuredDataKey.CHARGED_PROJECTILES1_21_5, StructuredDataKey.BUNDLE_CONTENTS1_21_5, StructuredDataKey.CONTAINER1_21_5, StructuredDataKey.USE_REMAINDER1_21_5,
+            StructuredDataKey.CAN_PLACE_ON1_21_5, StructuredDataKey.CAN_BREAK1_21_5);
         super.onMappingDataLoaded();
     }
 

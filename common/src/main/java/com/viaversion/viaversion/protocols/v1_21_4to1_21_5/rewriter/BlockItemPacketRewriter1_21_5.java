@@ -40,11 +40,14 @@ import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_21;
+import com.viaversion.viaversion.api.minecraft.item.data.BlockPredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.JukeboxPlayable;
 import com.viaversion.viaversion.api.minecraft.item.data.TooltipDisplay;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
+import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentMatchers;
+import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentPredicate;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -80,6 +83,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.POT_DECORATIONS, StructuredDataKey.POTION_CONTENTS1_21_2, StructuredDataKey.TROPICAL_FISH_PATTERN,
         StructuredDataKey.WRITTEN_BOOK_CONTENT
     );
+    private static final DataComponentMatchers EMPTY_DATA_MATCHERS = new DataComponentMatchers(new StructuredData[0], new DataComponentPredicate[0]);
     private static final Heightmap[] EMPTY_HEIGHTMAPS = new Heightmap[0];
     private static final int SIGN_BOCK_ENTITY_ID = 7;
 
@@ -292,8 +296,8 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         }
 
         dataContainer.replace(StructuredDataKey.UNBREAKABLE1_20_5, StructuredDataKey.UNBREAKABLE1_21_5, unbreakable -> Unit.INSTANCE);
-        dataContainer.replaceKey(StructuredDataKey.CAN_PLACE_ON1_20_5, StructuredDataKey.CAN_PLACE_ON1_21_5);
-        dataContainer.replaceKey(StructuredDataKey.CAN_BREAK1_20_5, StructuredDataKey.CAN_BREAK1_21_5);
+        dataContainer.replace(StructuredDataKey.CAN_PLACE_ON1_20_5, StructuredDataKey.CAN_PLACE_ON1_21_5, BlockItemPacketRewriter1_21_5::updateAdventureModePredicate);
+        dataContainer.replace(StructuredDataKey.CAN_BREAK1_20_5, StructuredDataKey.CAN_BREAK1_21_5, BlockItemPacketRewriter1_21_5::updateAdventureModePredicate);
         dataContainer.replaceKey(StructuredDataKey.JUKEBOX_PLAYABLE1_21, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5);
         dataContainer.replaceKey(StructuredDataKey.DYED_COLOR1_20_5, StructuredDataKey.DYED_COLOR1_21_5);
         dataContainer.replaceKey(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5);
@@ -302,6 +306,15 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         dataContainer.replaceKey(StructuredDataKey.STORED_ENCHANTMENTS1_20_5, StructuredDataKey.STORED_ENCHANTMENTS1_21_5);
         dataContainer.remove(StructuredDataKey.HIDE_TOOLTIP);
         dataContainer.remove(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP);
+    }
+
+    private static AdventureModePredicate updateAdventureModePredicate(final AdventureModePredicate predicate) {
+        final BlockPredicate[] blockPredicates = new BlockPredicate[predicate.predicates().length];
+        for (int i = 0; i < predicate.predicates().length; i++) {
+            final BlockPredicate blockPredicate = predicate.predicates()[i];
+            blockPredicates[i] = new BlockPredicate(blockPredicate.holderSet(), blockPredicate.propertyMatchers(), blockPredicate.tag(), EMPTY_DATA_MATCHERS);
+        }
+        return new AdventureModePredicate(blockPredicates);
     }
 
     public static void downgradeItemData(final Item item) {
