@@ -70,17 +70,27 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
         }
 
         // Some of the tooltip hiding handling
-        // TODO
         final CompoundTag tooltipDisplay = new CompoundTag();
-        if (removeNamespaced(componentsTag, "hide_tooltip")) {
-            tooltipDisplay.putBoolean("hide_tooltip", true);
-        }
+        final boolean hideTooltip = removeNamespaced(componentsTag, "hide_tooltip");
+        final ListTag<StringTag> hiddenComponents = new ListTag<>(StringTag.class);
         if (removeNamespaced(componentsTag, "hide_additional_tooltip")) {
-            final ListTag<StringTag> hiddenComponents = new ListTag<>(StringTag.class);
             for (final StructuredDataKey<?> key : BlockItemPacketRewriter1_21_5.HIDE_ADDITIONAL_KEYS) {
                 hiddenComponents.add(new StringTag(key.identifier()));
             }
+        }
+        updateHiddenComponents(componentsTag, "unbreakable", hiddenComponents);
+        updateHiddenComponents(componentsTag, "can_place_on", hiddenComponents);
+        updateHiddenComponents(componentsTag, "can_break", hiddenComponents);
+        updateHiddenComponents(componentsTag, "dyed_color", hiddenComponents);
+        updateHiddenComponents(componentsTag, "attribute_modifiers", hiddenComponents);
+        updateHiddenComponents(componentsTag, "trim", hiddenComponents);
+        updateHiddenComponents(componentsTag, "enchantments", hiddenComponents);
+        updateHiddenComponents(componentsTag, "stored_enchantments", hiddenComponents);
+        updateHiddenComponents(componentsTag, "jukebox_playable", hiddenComponents);
+        if (hideTooltip || !hiddenComponents.isEmpty()) {
+            tooltipDisplay.putBoolean("hide_tooltip", hideTooltip);
             tooltipDisplay.put("hidden_components", hiddenComponents);
+            componentsTag.put("tooltip_display", tooltipDisplay);
         }
 
         final CompoundTag attributeModifiers = getNamespacedCompoundTag(componentsTag, "attribute_modifiers");
@@ -100,10 +110,18 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
         handleEnchantments(componentsTag, "enchantments");
         handleEnchantments(componentsTag, "stored_enchantments");
 
-        removeDataComponents(componentsTag, "instrument", "jukebox_playable", "hide_tooltip", "hide_additional_tooltip");
+        removeDataComponents(componentsTag, "instrument", "jukebox_playable");
+    }
 
-        if (!tooltipDisplay.isEmpty()) {
-            componentsTag.put("tooltip_display", tooltipDisplay);
+    private void updateHiddenComponents(final CompoundTag componentsTag, final String key, final ListTag<StringTag> hiddenComponents) {
+        final CompoundTag component = getNamespacedCompoundTag(componentsTag, key);
+        if (component == null) {
+            return;
+        }
+
+        final boolean showInTooltip = component.getBoolean("show_in_tooltip", true);
+        if (!showInTooltip) {
+            hiddenComponents.add(new StringTag(key));
         }
     }
 
