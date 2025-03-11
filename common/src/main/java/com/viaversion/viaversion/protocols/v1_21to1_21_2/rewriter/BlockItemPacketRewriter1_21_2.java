@@ -77,6 +77,12 @@ import java.util.Set;
 
 public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<ClientboundPacket1_21, ServerboundPacket1_21_2, Protocol1_21To1_21_2> {
 
+    public static final List<StructuredDataKey<?>> NEW_DATA_TO_REMOVE = List.of(
+        StructuredDataKey.REPAIRABLE, StructuredDataKey.ENCHANTABLE, StructuredDataKey.CONSUMABLE1_21_2,
+        StructuredDataKey.USE_REMAINDER1_21_2, StructuredDataKey.USE_COOLDOWN, StructuredDataKey.ITEM_MODEL,
+        StructuredDataKey.EQUIPPABLE1_21_2, StructuredDataKey.GLIDER, StructuredDataKey.TOOLTIP_STYLE,
+        StructuredDataKey.DEATH_PROTECTION
+    );
     private static final int RECIPE_NOTIFICATION_FLAG = 1 << 0;
     private static final int RECIPE_HIGHLIGHT_FLAG = 1 << 1;
     private static final int RECIPE_INIT = 0;
@@ -633,15 +639,6 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             }
             return null;
         });
-        dataContainer.remove(StructuredDataKey.REPAIRABLE);
-        dataContainer.remove(StructuredDataKey.ENCHANTABLE);
-        dataContainer.remove(StructuredDataKey.CONSUMABLE1_21_2);
-        dataContainer.remove(StructuredDataKey.USE_REMAINDER1_21_2);
-        dataContainer.remove(StructuredDataKey.USE_COOLDOWN);
-        dataContainer.remove(StructuredDataKey.ITEM_MODEL);
-        dataContainer.remove(StructuredDataKey.EQUIPPABLE1_21_2);
-        dataContainer.remove(StructuredDataKey.GLIDER);
-        dataContainer.remove(StructuredDataKey.TOOLTIP_STYLE);
-        dataContainer.remove(StructuredDataKey.DEATH_PROTECTION);
+        dataContainer.remove(NEW_DATA_TO_REMOVE);
     }
 }

@@ -77,11 +77,24 @@ import static com.viaversion.viaversion.util.MathUtil.ceilLog2;
 
 public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_5, Protocol1_21_4To1_21_5> {
 
-    public static final List<StructuredDataKey<?>> HIDE_ADDITIONAL_KEYS = List.of(StructuredDataKey.BANNER_PATTERNS, StructuredDataKey.BEES, StructuredDataKey.BLOCK_ENTITY_DATA,
+    public static final List<StructuredDataKey<?>> HIDE_ADDITIONAL_KEYS = List.of(
+        StructuredDataKey.BANNER_PATTERNS, StructuredDataKey.BEES, StructuredDataKey.BLOCK_ENTITY_DATA,
         StructuredDataKey.BLOCK_STATE, StructuredDataKey.BUNDLE_CONTENTS1_21_5, StructuredDataKey.CHARGED_PROJECTILES1_21_5, StructuredDataKey.CONTAINER1_21_5,
         StructuredDataKey.CONTAINER_LOOT, StructuredDataKey.FIREWORK_EXPLOSION, StructuredDataKey.FIREWORKS, StructuredDataKey.INSTRUMENT1_21_5, StructuredDataKey.MAP_ID,
         StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.POT_DECORATIONS, StructuredDataKey.POTION_CONTENTS1_21_2, StructuredDataKey.TROPICAL_FISH_PATTERN,
         StructuredDataKey.WRITTEN_BOOK_CONTENT
+    );
+    public static final List<StructuredDataKey<?>> NEW_DATA_TO_REMOVE = List.of(
+        StructuredDataKey.TOOLTIP_DISPLAY, StructuredDataKey.POTION_DURATION_SCALE, StructuredDataKey.WEAPON,
+        StructuredDataKey.VILLAGER_VARIANT, StructuredDataKey.WOLF_VARIANT, StructuredDataKey.WOLF_COLLAR,
+        StructuredDataKey.FOX_VARIANT, StructuredDataKey.SALMON_SIZE, StructuredDataKey.PARROT_VARIANT,
+        StructuredDataKey.TROPICAL_FISH_PATTERN, StructuredDataKey.TROPICAL_FISH_BASE_COLOR, StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR,
+        StructuredDataKey.MOOSHROOM_VARIANT, StructuredDataKey.RABBIT_VARIANT, StructuredDataKey.COW_VARIANT,
+        StructuredDataKey.PIG_VARIANT, StructuredDataKey.CHICKEN_VARIANT, StructuredDataKey.FROG_VARIANT,
+        StructuredDataKey.HORSE_VARIANT, StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.LLAMA_VARIANT,
+        StructuredDataKey.AXOLOTL_VARIANT, StructuredDataKey.CAT_VARIANT, StructuredDataKey.CAT_COLLAR,
+        StructuredDataKey.SHEEP_COLOR, StructuredDataKey.SHULKER_COLOR, StructuredDataKey.BLOCKS_ATTACKS,
+        StructuredDataKey.PROVIDES_TRIM_MATERIAL, StructuredDataKey.BREAK_SOUND, StructuredDataKey.WOLF_SOUND_VARIANT
     );
     private static final DataComponentMatchers EMPTY_DATA_MATCHERS = new DataComponentMatchers(new StructuredData[0], new DataComponentPredicate[0]);
     private static final Heightmap[] EMPTY_HEIGHTMAPS = new Heightmap[0];
@@ -343,36 +356,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.CAN_BREAK1_21_5, StructuredDataKey.CAN_BREAK1_20_5, canBreak -> new AdventureModePredicate(canBreak.predicates(), false));
         updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.JUKEBOX_PLAYABLE1_21, playable -> new JukeboxPlayable(playable.song(), false));
 
-        dataContainer.remove(StructuredDataKey.TOOLTIP_DISPLAY);
-        dataContainer.remove(StructuredDataKey.POTION_DURATION_SCALE);
-        dataContainer.remove(StructuredDataKey.WEAPON);
-        dataContainer.remove(StructuredDataKey.VILLAGER_VARIANT);
-        dataContainer.remove(StructuredDataKey.WOLF_VARIANT);
-        dataContainer.remove(StructuredDataKey.WOLF_COLLAR);
-        dataContainer.remove(StructuredDataKey.FOX_VARIANT);
-        dataContainer.remove(StructuredDataKey.SALMON_SIZE);
-        dataContainer.remove(StructuredDataKey.PARROT_VARIANT);
-        dataContainer.remove(StructuredDataKey.TROPICAL_FISH_PATTERN);
-        dataContainer.remove(StructuredDataKey.TROPICAL_FISH_BASE_COLOR);
-        dataContainer.remove(StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR);
-        dataContainer.remove(StructuredDataKey.MOOSHROOM_VARIANT);
-        dataContainer.remove(StructuredDataKey.RABBIT_VARIANT);
-        dataContainer.remove(StructuredDataKey.COW_VARIANT);
-        dataContainer.remove(StructuredDataKey.PIG_VARIANT);
-        dataContainer.remove(StructuredDataKey.CHICKEN_VARIANT);
-        dataContainer.remove(StructuredDataKey.FROG_VARIANT);
-        dataContainer.remove(StructuredDataKey.HORSE_VARIANT);
-        dataContainer.remove(StructuredDataKey.PAINTING_VARIANT);
-        dataContainer.remove(StructuredDataKey.LLAMA_VARIANT);
-        dataContainer.remove(StructuredDataKey.AXOLOTL_VARIANT);
-        dataContainer.remove(StructuredDataKey.CAT_VARIANT);
-        dataContainer.remove(StructuredDataKey.CAT_COLLAR);
-        dataContainer.remove(StructuredDataKey.SHEEP_COLOR);
-        dataContainer.remove(StructuredDataKey.SHULKER_COLOR);
-        dataContainer.remove(StructuredDataKey.BLOCKS_ATTACKS);
-        dataContainer.remove(StructuredDataKey.PROVIDES_TRIM_MATERIAL);
-        dataContainer.remove(StructuredDataKey.BREAK_SOUND);
-        dataContainer.remove(StructuredDataKey.WOLF_SOUND_VARIANT);
+        dataContainer.remove(NEW_DATA_TO_REMOVE);
     }
 
     private static <T> void updateShowInTooltip(final StructuredDataContainer container, @Nullable final TooltipDisplay display, final StructuredDataKey<T> key, final StructuredDataKey<T> mappedKey, final Function<T, T> function) {

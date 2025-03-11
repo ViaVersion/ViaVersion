@@ -24,6 +24,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
@@ -70,7 +71,7 @@ public final class ComponentRewriter1_21_2 extends JsonNBTComponentRewriter<Clie
             levels.entrySet().removeIf(entry -> ((NumberTag) entry.getValue()).asInt() == 0);
         }
 
-        removeDataComponents(componentsTag, "fire_resistant", "lock");
+        removeDataComponents(componentsTag, StructuredDataKey.FIRE_RESISTANT, StructuredDataKey.LOCK);
 
         final StringTag customName = TagUtil.getNamespacedStringTag(componentsTag, "custom_name");
         final StringTag itemName = TagUtil.getNamespacedStringTag(componentsTag, "item_name");

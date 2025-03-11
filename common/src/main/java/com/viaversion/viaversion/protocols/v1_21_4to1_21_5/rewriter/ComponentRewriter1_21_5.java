@@ -110,7 +110,7 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
         handleEnchantments(componentsTag, "enchantments");
         handleEnchantments(componentsTag, "stored_enchantments");
 
-        removeDataComponents(componentsTag, "instrument", "jukebox_playable");
+        removeDataComponents(componentsTag, StructuredDataKey.INSTRUMENT1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE1_21);
     }
 
     private void updateHiddenComponents(final CompoundTag componentsTag, final String key, final ListTag<StringTag> hiddenComponents) {

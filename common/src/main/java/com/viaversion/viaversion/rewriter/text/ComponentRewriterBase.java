@@ -29,6 +29,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -39,6 +40,7 @@ import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.BitSet;
+import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -323,13 +325,30 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
         }
     }
 
+    protected void removeDataComponents(final CompoundTag tag, final Collection<StructuredDataKey<?>> keys) {
+        for (final StructuredDataKey<?> key : keys) {
+            removeDataComponent(tag, key.identifier());
+        }
+    }
+
+    protected void removeDataComponents(final CompoundTag tag, final StructuredDataKey<?>... keys) {
+        for (final StructuredDataKey<?> key : keys) {
+            removeDataComponent(tag, key.identifier());
+        }
+    }
+
     protected void removeDataComponents(final CompoundTag tag, final String... keys) {
         for (final String key : keys) {
-            // Check overrides too... continue once one is found
-            final boolean removed = TagUtil.removeNamespaced(tag, key)
-                || tag.remove("!" + Key.namespaced(key)) != null
-                || tag.remove("!" + Key.stripMinecraftNamespace(key)) != null;
+            removeDataComponent(tag, key);
         }
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    private boolean removeDataComponent(final CompoundTag tag, final String key) {
+        // Check overrides too... continue once one is found
+        return TagUtil.removeNamespaced(tag, key)
+            || tag.remove("!" + Key.namespaced(key)) != null
+            || tag.remove("!" + Key.stripMinecraftNamespace(key)) != null;
     }
 
     protected abstract void handleNestedComponent(UserConnection connection, CompoundTag parent, String key);

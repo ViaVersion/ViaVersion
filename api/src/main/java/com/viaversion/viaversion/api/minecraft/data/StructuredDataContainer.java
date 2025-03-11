@@ -30,6 +30,7 @@ import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -187,6 +188,20 @@ public final class StructuredDataContainer implements Copyable {
      */
     public void remove(final StructuredDataKey<?> key) {
         this.data.remove(key);
+    }
+
+    /**
+     * Removes data by the given keys.
+     *
+     * @param keys data keys
+     * @see #replace(StructuredDataKey, Function)
+     * @see #replace(StructuredDataKey, StructuredDataKey, Function)
+     * @see #replaceKey(StructuredDataKey, StructuredDataKey)
+     */
+    public void remove(final Collection<StructuredDataKey<?>> keys) {
+        for (final StructuredDataKey<?> key : keys) {
+            this.data.remove(key);
+        }
     }
 
     /**
