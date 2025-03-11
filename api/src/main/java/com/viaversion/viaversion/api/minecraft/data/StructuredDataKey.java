@@ -24,14 +24,12 @@ package com.viaversion.viaversion.api.minecraft.data;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.Tag;
-import com.viaversion.viaversion.api.minecraft.AnimalVariant;
 import com.viaversion.viaversion.api.minecraft.EitherHolder;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.PaintingVariant;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
-import com.viaversion.viaversion.api.minecraft.WolfVariant;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate.AdventureModePredicateType1_21_5;
@@ -71,11 +69,13 @@ import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.api.type.types.EitherType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
+import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Unit;
 
 public record StructuredDataKey<T>(String identifier, Type<T> type) {
@@ -169,6 +169,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> OMINOUS_BOTTLE_AMPLIFIER = new StructuredDataKey<>("ominous_bottle_amplifier", Types.VAR_INT);
     public static final StructuredDataKey<JukeboxPlayable> JUKEBOX_PLAYABLE1_21 = new StructuredDataKey<>("jukebox_playable", JukeboxPlayable.TYPE1_21);
     public static final StructuredDataKey<JukeboxPlayable> JUKEBOX_PLAYABLE1_21_5 = new StructuredDataKey<>("jukebox_playable", JukeboxPlayable.TYPE1_21_5);
+    public static final StructuredDataKey<String> PROVIDES_BANNER_PATTERNS = new StructuredDataKey<>("provides_banner_patterns", Types.STRING);
     public static final StructuredDataKey<Tag> RECIPES = new StructuredDataKey<>("recipes", Types.TAG);
     public static final StructuredDataKey<LodestoneTracker> LODESTONE_TRACKER = new StructuredDataKey<>("lodestone_tracker", LodestoneTracker.TYPE);
     public static final StructuredDataKey<FireworkExplosion> FIREWORK_EXPLOSION = new StructuredDataKey<>("firework_explosion", FireworkExplosion.TYPE);
@@ -188,8 +189,9 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Tag> LOCK = new StructuredDataKey<>("lock", Types.TAG);
     public static final StructuredDataKey<CompoundTag> CONTAINER_LOOT = new StructuredDataKey<>("container_loot", Types.COMPOUND_TAG);
     public static final StructuredDataKey<Holder<SoundEvent>> BREAK_SOUND = new StructuredDataKey<>("break_sound", Types.SOUND_EVENT);
+
     public static final StructuredDataKey<Integer> VILLAGER_VARIANT = new StructuredDataKey<>("villager/variant", Types.VAR_INT);
-    public static final StructuredDataKey<Holder<WolfVariant>> WOLF_VARIANT = new StructuredDataKey<>("wolf/variant", WolfVariant.TYPE);
+    public static final StructuredDataKey<Integer> WOLF_VARIANT = new StructuredDataKey<>("wolf/variant", Types.VAR_INT);
     public static final StructuredDataKey<Integer> WOLF_SOUND_VARIANT = new StructuredDataKey<>("wolf/sound_variant", Types.VAR_INT);
     public static final StructuredDataKey<Integer> WOLF_COLLAR = new StructuredDataKey<>("wolf/collar", Types.VAR_INT);
     public static final StructuredDataKey<Integer> FOX_VARIANT = new StructuredDataKey<>("fox/variant", Types.VAR_INT);
@@ -200,9 +202,9 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> TROPICAL_FISH_PATTERN_COLOR = new StructuredDataKey<>("tropical_fish/pattern_color", Types.VAR_INT);
     public static final StructuredDataKey<Integer> MOOSHROOM_VARIANT = new StructuredDataKey<>("mooshroom/variant", Types.VAR_INT);
     public static final StructuredDataKey<Integer> RABBIT_VARIANT = new StructuredDataKey<>("rabbit/variant", Types.VAR_INT);
-    public static final StructuredDataKey<Holder<AnimalVariant>> PIG_VARIANT = new StructuredDataKey<>("pig/variant", AnimalVariant.TYPE);
-    public static final StructuredDataKey<Holder<AnimalVariant>> COW_VARIANT = new StructuredDataKey<>("cow/variant", AnimalVariant.TYPE);
-    public static final StructuredDataKey<Holder<AnimalVariant>> CHICKEN_VARIANT = new StructuredDataKey<>("chicken/variant", AnimalVariant.TYPE);
+    public static final StructuredDataKey<Integer> PIG_VARIANT = new StructuredDataKey<>("pig/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> COW_VARIANT = new StructuredDataKey<>("cow/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Either<Integer, String>> CHICKEN_VARIANT = new StructuredDataKey<>("chicken/variant", new EitherType<>(Types.VAR_INT, Types.STRING)); // ???
     public static final StructuredDataKey<Integer> FROG_VARIANT = new StructuredDataKey<>("frog/variant", Types.VAR_INT);
     public static final StructuredDataKey<Integer> HORSE_VARIANT = new StructuredDataKey<>("horse/variant", Types.VAR_INT);
     public static final StructuredDataKey<Holder<PaintingVariant>> PAINTING_VARIANT = new StructuredDataKey<>("painting/variant", PaintingVariant.TYPE1_21_2);

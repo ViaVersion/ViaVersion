@@ -94,7 +94,8 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         StructuredDataKey.HORSE_VARIANT, StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.LLAMA_VARIANT,
         StructuredDataKey.AXOLOTL_VARIANT, StructuredDataKey.CAT_VARIANT, StructuredDataKey.CAT_COLLAR,
         StructuredDataKey.SHEEP_COLOR, StructuredDataKey.SHULKER_COLOR, StructuredDataKey.BLOCKS_ATTACKS,
-        StructuredDataKey.PROVIDES_TRIM_MATERIAL, StructuredDataKey.BREAK_SOUND, StructuredDataKey.WOLF_SOUND_VARIANT
+        StructuredDataKey.PROVIDES_TRIM_MATERIAL, StructuredDataKey.BREAK_SOUND, StructuredDataKey.WOLF_SOUND_VARIANT,
+        StructuredDataKey.PROVIDES_BANNER_PATTERNS
     );
     private static final DataComponentMatchers EMPTY_DATA_MATCHERS = new DataComponentMatchers(new StructuredData[0], new DataComponentPredicate[0]);
     private static final Heightmap[] EMPTY_HEIGHTMAPS = new Heightmap[0];
