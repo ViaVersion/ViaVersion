@@ -22,59 +22,46 @@
  */
 package com.viaversion.viaversion.api.minecraft.item;
 
-import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
-import com.viaversion.viaversion.util.Copyable;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-public interface Item extends ItemBase, Copyable {
+/**
+ * @see Item
+ * @see HashedItem
+ */
+public interface ItemBase {
 
     /**
-     * Returns the item data. Always 0 for 1.13+ items.
+     * Returns the item identifier.
      *
-     * @return item data
+     * @return item identifier
      */
-    default short data() {
-        return 0;
+    int identifier();
+
+    /**
+     * Sets the item identifier.
+     *
+     * @param identifier item identifier
+     */
+    void setIdentifier(int identifier);
+
+    /**
+     * Returns the item amount.
+     *
+     * @return item amount
+     */
+    int amount();
+
+    /**
+     * Returns the item amount.
+     *
+     * @param amount item amount
+     */
+    void setAmount(int amount);
+
+    /**
+     * Returns true if the item is empty.
+     *
+     * @return true if the item is empty
+     */
+    default boolean isEmpty() {
+        return identifier() == 0 || amount() <= 0;
     }
-
-    /**
-     * Sets the item data used in versions before 1.13.
-     *
-     * @param data item data
-     * @throws UnsupportedOperationException if the item implementation does not store data
-     */
-    default void setData(short data) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Returns the item compound tag if present.
-     *
-     * @return item tag
-     */
-    @Nullable
-    CompoundTag tag();
-
-    /**
-     * Sets the item compound tag.
-     *
-     * @param tag item tag
-     */
-    void setTag(@Nullable CompoundTag tag);
-
-    /**
-     * Returns the data container for item data components.
-     *
-     * @return the data container
-     */
-    StructuredDataContainer dataContainer();
-
-    /**
-     * Returns a copy of the item.
-     *
-     * @return copy of the item
-     */
-    @Override
-    Item copy();
 }

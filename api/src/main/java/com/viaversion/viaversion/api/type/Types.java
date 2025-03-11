@@ -42,6 +42,7 @@ import com.viaversion.viaversion.api.minecraft.Vector3f;
 import com.viaversion.viaversion.api.minecraft.VillagerData;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.chunks.Heightmap;
+import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.type.types.ArrayType;
@@ -76,6 +77,7 @@ import com.viaversion.viaversion.api.type.types.block.BlockEntityType1_18;
 import com.viaversion.viaversion.api.type.types.block.BlockEntityType1_20_2;
 import com.viaversion.viaversion.api.type.types.block.VarLongBlockChangeRecordType;
 import com.viaversion.viaversion.api.type.types.chunk.HeightmapType;
+import com.viaversion.viaversion.api.type.types.item.HashedItemType1_21_5;
 import com.viaversion.viaversion.api.type.types.item.ItemShortArrayType1_13;
 import com.viaversion.viaversion.api.type.types.item.ItemShortArrayType1_13_2;
 import com.viaversion.viaversion.api.type.types.item.ItemShortArrayType1_8;
@@ -220,6 +222,7 @@ public final class Types {
     public static final Type<Heightmap> HEIGHTMAP = new HeightmapType();
     public static final Type<Heightmap[]> HEIGHTMAP_ARRAY = new ArrayType<>(HEIGHTMAP);
 
+    // No longer used past 1.20.2
     public static final Type<Item> ITEM1_8 = new ItemType1_8();
     public static final Type<Item> ITEM1_13 = new ItemType1_13();
     public static final Type<Item> ITEM1_13_2 = new ItemType1_13_2();
@@ -230,4 +233,6 @@ public final class Types {
     public static final Type<Item[]> ITEM1_13_ARRAY = new ArrayType<>(ITEM1_13);
     public static final Type<Item[]> ITEM1_13_2_ARRAY = new ArrayType<>(ITEM1_13_2);
     public static final Type<Item[]> ITEM1_20_2_ARRAY = new ArrayType<>(ITEM1_20_2);
+
+    public static final Type<HashedItem> HASHED_ITEM = new HashedItemType1_21_5();
 }

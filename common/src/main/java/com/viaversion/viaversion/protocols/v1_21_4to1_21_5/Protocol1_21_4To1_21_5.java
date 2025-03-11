@@ -17,6 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_4to1_21_5;
 
+import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
+
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
@@ -26,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_5;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
@@ -42,6 +45,7 @@ import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.BlockItemPacketRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.ComponentRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.EntityPacketRewriter1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.storage.MessageIndexStorage;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
@@ -49,8 +53,6 @@ import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
-
-import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
 public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPacket1_21_2, ClientboundPacket1_21_5, ServerboundPacket1_21_4, ServerboundPacket1_21_5> {
 
@@ -99,6 +101,33 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
 
         cancelServerbound(ServerboundPackets1_21_5.TEST_INSTANCE_BLOCK_ACTION);
         cancelServerbound(ServerboundPackets1_21_5.SET_TEST_BLOCK);
+
+        registerClientbound(ClientboundPackets1_21_2.PLAYER_CHAT, wrapper -> {
+            final MessageIndexStorage messageIndexStorage = wrapper.user().get(MessageIndexStorage.class);
+            wrapper.write(Types.VAR_INT, messageIndexStorage.getAndIncrease());
+        });
+        registerServerbound(ServerboundPackets1_21_5.CHAT_COMMAND_SIGNED, wrapper -> {
+            wrapper.passthrough(Types.STRING); // Command
+            wrapper.passthrough(Types.LONG); // Timestamp
+            wrapper.passthrough(Types.LONG); // Salt
+            final int signatures = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < signatures; i++) {
+                wrapper.passthrough(Types.STRING); // Argument name
+                wrapper.passthrough(Types.SIGNATURE_BYTES); // Signature
+            }
+            wrapper.passthrough(Types.VAR_INT); // Offset
+            wrapper.passthrough(Types.ACKNOWLEDGED_BIT_SET); // Acknowledged
+            wrapper.read(Types.BYTE); // Checksum
+        });
+        registerServerbound(ServerboundPackets1_21_5.CHAT, wrapper -> {
+            wrapper.passthrough(Types.STRING); // Message
+            wrapper.passthrough(Types.LONG); // Timestamp
+            wrapper.passthrough(Types.LONG); // Salt
+            wrapper.passthrough(Types.OPTIONAL_SIGNATURE_BYTES); // Signature
+            wrapper.passthrough(Types.VAR_INT); // Offset
+            wrapper.passthrough(Types.ACKNOWLEDGED_BIT_SET); // Acknowledged
+            wrapper.read(Types.BYTE); // Checksum
+        });
     }
 
     @Override
@@ -153,6 +182,7 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_4.PLAYER));
+        connection.put(new MessageIndexStorage());
     }
 
     @Override

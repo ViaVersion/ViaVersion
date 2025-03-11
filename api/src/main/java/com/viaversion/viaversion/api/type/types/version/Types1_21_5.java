@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.type.types.entitydata.EntityDataListType;
 import com.viaversion.viaversion.api.type.types.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.type.types.item.ItemCostType1_20_5;
 import com.viaversion.viaversion.api.type.types.item.ItemType1_20_5;
+import com.viaversion.viaversion.api.type.types.item.LengthPrefixedStructuredDataType;
 import com.viaversion.viaversion.api.type.types.item.StructuredDataType;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import java.util.List;
@@ -41,8 +42,10 @@ import java.util.List;
 public final class Types1_21_5 {
 
     public static final StructuredDataType STRUCTURED_DATA = new StructuredDataType();
+    public static final LengthPrefixedStructuredDataType LENGTH_PREFIXED_STRUCTURED_DATA = new LengthPrefixedStructuredDataType(STRUCTURED_DATA);
     public static final Type<StructuredData<?>[]> STRUCTURED_DATA_ARRAY = new ArrayType<>(STRUCTURED_DATA);
     public static final ItemType1_20_5 ITEM = new ItemType1_20_5(STRUCTURED_DATA);
+    public static final ItemType1_20_5 LENGTH_PREFIXED_ITEM = new ItemType1_20_5(LENGTH_PREFIXED_STRUCTURED_DATA);
     public static final Type<Item[]> ITEM_ARRAY = new ArrayType<>(ITEM);
     public static final Type<Item> ITEM_COST = new ItemCostType1_20_5(STRUCTURED_DATA_ARRAY);
     public static final Type<Item> OPTIONAL_ITEM_COST = new ItemCostType1_20_5.OptionalItemCostType(ITEM_COST);

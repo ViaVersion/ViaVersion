@@ -17,6 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter;
 
+import static com.viaversion.viaversion.util.MathUtil.ceilLog2;
+
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.LongArrayTag;
@@ -35,7 +37,11 @@ import com.viaversion.viaversion.api.minecraft.chunks.Heightmap;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentMatchers;
+import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentPredicate;
+import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
@@ -46,8 +52,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.JukeboxPlayable;
 import com.viaversion.viaversion.api.minecraft.item.data.TooltipDisplay;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
-import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentMatchers;
-import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentPredicate;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -64,6 +68,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacke
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
+import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
@@ -72,8 +77,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import static com.viaversion.viaversion.util.MathUtil.ceilLog2;
 
 public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_5, Protocol1_21_4To1_21_5> {
 
@@ -150,8 +153,36 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         registerSetSlot1_21_2(ClientboundPackets1_21_2.CONTAINER_SET_SLOT);
         registerSetEquipment(ClientboundPackets1_21_2.SET_EQUIPMENT);
         registerMerchantOffers1_20_5(ClientboundPackets1_21_2.MERCHANT_OFFERS);
-        registerContainerClick1_21_2(ServerboundPackets1_21_5.CONTAINER_CLICK);
-        registerSetCreativeModeSlot(ServerboundPackets1_21_5.SET_CREATIVE_MODE_SLOT);
+
+        protocol.registerServerbound(ServerboundPackets1_21_5.SET_CREATIVE_MODE_SLOT, wrapper -> {
+            wrapper.passthrough(Types.SHORT); // Slot
+
+            final Item item = handleItemToServer(wrapper.user(), wrapper.read(Types1_21_5.LENGTH_PREFIXED_ITEM));
+            wrapper.write(itemType(), item);
+        });
+
+        protocol.registerServerbound(ServerboundPackets1_21_5.CONTAINER_CLICK, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Container id
+            wrapper.passthrough(Types.VAR_INT); // State id
+            wrapper.passthrough(Types.SHORT); // Slot
+            wrapper.passthrough(Types.BYTE); // Button
+            wrapper.passthrough(Types.VAR_INT); // Mode
+
+            // On a protocol level, there is no sane way for us to reconstruct the original item here if it has any extra data.
+            // Send them with just their id and amount, which simply forces the server to re-sync it if there is extra data.
+
+            final int affectedItems = Limit.max(wrapper.passthrough(Types.VAR_INT), 128);
+            for (int i = 0; i < affectedItems; i++) {
+                wrapper.passthrough(Types.SHORT); // Slot
+                final HashedItem item = wrapper.read(Types.HASHED_ITEM);
+                final StructuredItem mappedItem = new StructuredItem(item.identifier(), item.amount());
+                wrapper.write(Types1_21_5.ITEM, handleItemToServer(wrapper.user(), mappedItem));
+            }
+
+            final HashedItem carriedItem = wrapper.read(Types.HASHED_ITEM);
+            final StructuredItem mappedItem = new StructuredItem(carriedItem.identifier(), carriedItem.amount());
+            wrapper.write(Types1_21_5.ITEM, handleItemToServer(wrapper.user(), mappedItem));
+        });
 
         registerAdvancements1_20_3(ClientboundPackets1_21_2.UPDATE_ADVANCEMENTS);
         protocol.appendClientbound(ClientboundPackets1_21_2.UPDATE_ADVANCEMENTS, wrapper -> {
@@ -228,6 +259,14 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
     @Override
     public Item handleItemToClient(final UserConnection connection, final Item item) {
         super.handleItemToClient(connection, item);
+
+        final StructuredDataContainer dataContainer = item.dataContainer();
+        if (dataContainer.hasValue(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP)) {
+            final CompoundTag backupTag = new CompoundTag();
+            backupTag.putBoolean("hide_additional_tooltip", true);
+            saveTag(createCustomTag(item), backupTag, "backup");
+        }
+
         updateItemData(item);
         return item;
     }
@@ -235,6 +274,16 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
     @Override
     public Item handleItemToServer(final UserConnection connection, final Item item) {
         super.handleItemToServer(connection, item);
+
+        final StructuredDataContainer dataContainer = item.dataContainer();
+        final CompoundTag customData = dataContainer.get(StructuredDataKey.CUSTOM_DATA);
+        if (customData != null && customData.remove(nbtTagName("backup")) instanceof final CompoundTag backupTag) {
+            if (backupTag.getBoolean("hide_additional_tooltip")) {
+                dataContainer.set(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP);
+            }
+            removeCustomTag(dataContainer, customData);
+        }
+
         downgradeItemData(item);
         return item;
     }

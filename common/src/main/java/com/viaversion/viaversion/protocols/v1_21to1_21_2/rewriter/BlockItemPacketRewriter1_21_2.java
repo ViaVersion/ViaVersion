@@ -162,9 +162,9 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             final int length = Limit.max(wrapper.passthrough(Types.VAR_INT), 128);
             for (int i = 0; i < length; i++) {
                 wrapper.passthrough(Types.SHORT); // Slot
-                passthroughServerboundItem(wrapper);
+                wrapper.write(itemType(), handleItemToServer(wrapper.user(), wrapper.read(mappedItemType())));
             }
-            passthroughServerboundItem(wrapper);
+            wrapper.write(itemType(), handleItemToServer(wrapper.user(), wrapper.read(mappedItemType())));
         });
         protocol.registerClientbound(ClientboundPackets1_21.PLACE_GHOST_RECIPE, wrapper -> {
             this.byteToVarInt(wrapper);

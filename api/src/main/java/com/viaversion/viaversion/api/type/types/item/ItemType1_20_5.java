@@ -37,9 +37,9 @@ import java.util.Map;
 
 public class ItemType1_20_5 extends Type<Item> {
 
-    private final StructuredDataType dataType;
+    private final StructuredDataTypeBase dataType;
 
-    public ItemType1_20_5(final StructuredDataType dataType) {
+    public ItemType1_20_5(final StructuredDataTypeBase dataType) {
         super(Item.class);
         this.dataType = dataType;
     }

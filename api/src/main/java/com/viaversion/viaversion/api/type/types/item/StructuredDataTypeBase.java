@@ -20,61 +20,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item;
+package com.viaversion.viaversion.api.type.types.item;
 
-import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
-import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.api.minecraft.data.StructuredData;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface Item extends ItemBase, Copyable {
+public interface StructuredDataTypeBase {
 
-    /**
-     * Returns the item data. Always 0 for 1.13+ items.
-     *
-     * @return item data
-     */
-    default short data() {
-        return 0;
-    }
+    StructuredData<?> read(ByteBuf buffer);
 
-    /**
-     * Sets the item data used in versions before 1.13.
-     *
-     * @param data item data
-     * @throws UnsupportedOperationException if the item implementation does not store data
-     */
-    default void setData(short data) {
-        throw new UnsupportedOperationException();
-    }
+    void write(ByteBuf buffer, StructuredData<?> value);
 
-    /**
-     * Returns the item compound tag if present.
-     *
-     * @return item tag
-     */
-    @Nullable
-    CompoundTag tag();
-
-    /**
-     * Sets the item compound tag.
-     *
-     * @param tag item tag
-     */
-    void setTag(@Nullable CompoundTag tag);
-
-    /**
-     * Returns the data container for item data components.
-     *
-     * @return the data container
-     */
-    StructuredDataContainer dataContainer();
-
-    /**
-     * Returns a copy of the item.
-     *
-     * @return copy of the item
-     */
-    @Override
-    Item copy();
+    @Nullable StructuredDataKey<?> key(int id);
 }

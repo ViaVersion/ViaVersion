@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.storage.MessageIndexStorage;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
@@ -108,6 +109,8 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         });
 
         protocol.registerClientbound(ClientboundPackets1_21_2.LOGIN, wrapper -> {
+            wrapper.user().get(MessageIndexStorage.class).setIndex(0);
+
             final int entityId = wrapper.passthrough(Types.INT); // Entity id
             wrapper.passthrough(Types.BOOLEAN); // Hardcore
             wrapper.passthrough(Types.STRING_ARRAY); // World List
