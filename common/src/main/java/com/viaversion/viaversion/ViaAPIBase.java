@@ -42,7 +42,7 @@ public abstract class ViaAPIBase<T> implements ViaAPI<T> {
 
     @Override
     public ProtocolVersion getPlayerProtocolVersion(UUID uuid) {
-        UserConnection connection = Via.getManager().getConnectionManager().getConnectedClient(uuid);
+        UserConnection connection = Via.getManager().getConnectionManager().getServerConnection(uuid);
         return connection != null ? connection.getProtocolInfo().protocolVersion() : ProtocolVersion.unknown;
     }
 
@@ -53,12 +53,12 @@ public abstract class ViaAPIBase<T> implements ViaAPI<T> {
 
     @Override
     public boolean isInjected(UUID uuid) {
-        return Via.getManager().getConnectionManager().isClientConnected(uuid);
+        return Via.getManager().getConnectionManager().hasServerConnection(uuid);
     }
 
     @Override
     public @Nullable UserConnection getConnection(final UUID uuid) {
-        return Via.getManager().getConnectionManager().getConnectedClient(uuid);
+        return Via.getManager().getConnectionManager().getServerConnection(uuid);
     }
 
     @Override
@@ -67,7 +67,7 @@ public abstract class ViaAPIBase<T> implements ViaAPI<T> {
             throw new IllegalArgumentException("This player is not controlled by ViaVersion!");
         }
 
-        UserConnection user = Via.getManager().getConnectionManager().getConnectedClient(uuid);
+        UserConnection user = Via.getManager().getConnectionManager().getServerConnection(uuid);
         user.scheduleSendRawPacket(packet);
     }
 

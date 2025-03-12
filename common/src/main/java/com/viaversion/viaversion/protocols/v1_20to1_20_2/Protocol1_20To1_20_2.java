@@ -96,7 +96,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         });
 
         registerClientbound(ClientboundPackets1_19_4.SYSTEM_CHAT, wrapper -> {
-            if (wrapper.user().isClientSide() || Via.getPlatform().isProxy()) {
+            if (wrapper.user().isClient() || Via.getPlatform().isProxy()) {
                 return;
             }
 
@@ -282,7 +282,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             }
 
             if (configurationBridge.queuedOrSentJoinGame()) {
-                if (!packetWrapper.user().isClientSide() && !Via.getPlatform().isProxy() && unmappedId == ClientboundPackets1_19_4.SYSTEM_CHAT.getId()) {
+                if (!packetWrapper.user().isClient() && !Via.getPlatform().isProxy() && unmappedId == ClientboundPackets1_19_4.SYSTEM_CHAT.getId()) {
                     // Cancelling this on the Vanilla server will cause it to exceptionally resend a message
                     // Assume that we have already sent the login packet and just let it through
                     super.transform(direction, State.PLAY, packetWrapper);

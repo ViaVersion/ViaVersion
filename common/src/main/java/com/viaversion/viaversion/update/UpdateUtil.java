@@ -20,6 +20,7 @@ package com.viaversion.viaversion.update;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.Pair;
 import java.io.BufferedReader;
@@ -28,7 +29,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Locale;
-import java.util.UUID;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -38,11 +38,11 @@ public final class UpdateUtil {
     private static final String URL = "https://update.viaversion.com/";
     private static final String PLUGIN = "ViaVersion/";
 
-    public static void sendUpdateMessage(final UUID uuid) {
+    public static void sendUpdateMessage(final UserConnection connection) {
         Via.getPlatform().runAsync(() -> {
             final Pair<Level, String> message = getUpdateMessage(false);
             if (message != null) {
-                Via.getPlatform().runSync(() -> Via.getPlatform().sendMessage(uuid, PREFIX + message.value()));
+                Via.getPlatform().runSync(() -> Via.getPlatform().sendMessage(connection, PREFIX + message.value()));
             }
         });
     }

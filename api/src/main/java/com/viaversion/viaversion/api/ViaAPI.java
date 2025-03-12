@@ -114,7 +114,8 @@ public interface ViaAPI<T> {
     ProtocolVersion getPlayerProtocolVersion(UUID uuid);
 
     /**
-     * Returns whether Via injected into this player connection.
+     * Returns whether Via injected into this player connection. Note that this method may not work on
+     * clientside implementations and is generally not recommended to be used. Use {@link ConnectionManager} instead.
      *
      * @param uuid uuid of the player
      * @return whether Via has a cached a UserConnection for this player
@@ -122,7 +123,8 @@ public interface ViaAPI<T> {
     boolean isInjected(UUID uuid);
 
     /**
-     * Returns the Via injected UserConnection if present.
+     * Returns whether Via injected into this player connection. Note that this method may not work on
+     * clientside implementations and is generally not recommended to be used. Use {@link ConnectionManager} instead.
      *
      * @param uuid uuid of the player
      * @return user connection if present

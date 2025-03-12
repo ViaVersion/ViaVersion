@@ -20,12 +20,11 @@ package com.viaversion.viaversion;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
-import com.viaversion.viaversion.api.command.ViaCommandSender;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.bukkit.commands.BukkitCommandHandler;
-import com.viaversion.viaversion.bukkit.commands.BukkitCommandSender;
 import com.viaversion.viaversion.bukkit.listeners.JoinListener;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaAPI;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaConfig;
@@ -209,17 +208,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     }
 
     @Override
-    public ViaCommandSender[] getOnlinePlayers() {
-        ViaCommandSender[] array = new ViaCommandSender[Bukkit.getOnlinePlayers().size()];
-        int i = 0;
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            array[i++] = new BukkitCommandSender(player);
-        }
-        return array;
-    }
-
-    @Override
-    public void sendMessage(UUID uuid, String message) {
+    public void sendMessage(UserConnection connection, String message) {
+        UUID uuid = connection.getProtocolInfo().getUuid();
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             player.sendMessage(message);
@@ -227,7 +217,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     }
 
     @Override
-    public boolean kickPlayer(UUID uuid, String message) {
+    public boolean kickPlayer(UserConnection connection, String message) {
+        UUID uuid = connection.getProtocolInfo().getUuid();
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
             player.kickPlayer(message);
@@ -235,11 +226,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         } else {
             return false;
         }
-    }
-
-    @Override
-    public boolean isPluginEnabled() {
-        return Bukkit.getPluginManager().getPlugin("ViaVersion").isEnabled();
     }
 
     @Override

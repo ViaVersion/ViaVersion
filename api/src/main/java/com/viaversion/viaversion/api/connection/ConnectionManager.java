@@ -28,51 +28,92 @@ import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Handles injected UserConnections
+ * Handles injected UserConnections.
+ * Check {@link UserConnection#isServer()} and {@link UserConnection#isClient()} to determine the connection type.
  */
 public interface ConnectionManager {
 
     /**
-     * Returns if Via injected into this player connection.
+     * Returns if Via has injected. See above for the connection types.
      *
-     * @param playerId player uuid
+     * @param uuid player uuid
      * @return true if the player is handled by Via
      */
-    boolean isClientConnected(UUID playerId);
+    boolean hasServerConnection(UUID uuid);
 
     /**
-     * Frontend connections will have the UUID stored. Override this if your platform isn't always frontend.
-     * UUIDs can't be duplicate between frontend connections.
+     * Returns if Via has injected. See above for the connection types.
      *
-     * @return true if the user is a frontend connection
+     * @param uuid player uuid
+     * @return true if the player is handled by Via
      */
-    default boolean isFrontEnd(UserConnection connection) {
-        return !connection.isClientSide();
-    }
+    boolean hasClientConnection(UUID uuid);
 
     /**
-     * Returns the frontend UserConnection from the player connected to this proxy server
-     * Returns null when there isn't a server or connection was not found
+     * Returns the server UserConnection. See above for the connection types.
      * When ViaVersion is reloaded, this method may not return some players.
      * <p>
      * Note that connections are removed as soon as their channel is closed,
      * so avoid using this method during player quits for example.
      *
-     * @return frontend UserConnection of the player connected to this proxy server
+     * @return server UserConnection of the player or null
      */
-    @Nullable UserConnection getConnectedClient(UUID clientIdentifier);
+    @Nullable
+    UserConnection getServerConnection(UUID uuid);
 
     /**
-     * Returns the UUID from the frontend connection to this proxy server
-     * Returns null when there isn't a server or this connection isn't frontend, or it doesn't have an id
+     * Returns the client UserConnection. See above for the connection types.
      * When ViaVersion is reloaded, this method may not return some players.
      * <p>
      * Note that connections are removed as soon as their channel is closed,
      * so avoid using this method during player quits for example.
      *
-     * @return UUID of the frontend connection to this proxy server
+     * @return client UserConnection of the player or null
      */
-    @Nullable UUID getConnectedClientId(UserConnection connection);
+    @Nullable
+    UserConnection getClientConnection(UUID uuid);
+
+    /**
+     * Returns the UUID from the server connection. See above for the connection types.
+     * Returns null when there isn't a server or this connection isn't a server connection, or it doesn't have an id
+     * When ViaVersion is reloaded, this method may not return some players.
+     * <p>
+     * Note that connections are removed as soon as their channel is closed,
+     * so avoid using this method during player quits for example.
+     *
+     * @return UUID of the server connection to this proxy server
+     */
+    @Nullable
+    UUID getServerConnectionId(UserConnection connection);
+
+    /**
+     * Returns the UUID from the client connection. See above for the connection types.
+     * Returns null when there isn't a client or this connection isn't a client connection, or it doesn't have an id
+     * When ViaVersion is reloaded, this method may not return some players.
+     * <p>
+     * Note that connections are removed as soon as their channel is closed,
+     * so avoid using this method during player quits for example.
+     *
+     * @return UUID of the client connection to this proxy server
+     */
+    @Nullable
+    UUID getClientConnectionId(UserConnection connection);
+
+    /**
+     * Returns a map containing the UUIDs and server UserConnections
+     * When ViaVersion is reloaded, this method may not return some players.
+     *
+     * @return map containing the UUIDs and frontend UserConnections
+     */
+    Map<UUID, UserConnection> getServerConnections();
+
+    /**
+     * Returns a map containing the UUIDs and client UserConnections
+     * When ViaVersion is reloaded, this method may not return some players.
+     *
+     * @return map containing the UUIDs and client UserConnections
+     */
+    Map<UUID, UserConnection> getClientConnections();
 
     /**
      * Returns all UserConnections which are registered
@@ -83,15 +124,6 @@ public interface ConnectionManager {
      * @return connected UserConnections
      */
     Set<UserConnection> getConnections();
-
-    /**
-     * Returns a map containing the UUIDs and frontend UserConnections from players connected to this proxy server
-     * Returns empty list when there isn't a server
-     * When ViaVersion is reloaded, this method may not return some players.
-     *
-     * @return map containing the UUIDs and frontend UserConnections from players connected to this proxy server
-     */
-    Map<UUID, UserConnection> getConnectedClients();
 
     void onLoginSuccess(UserConnection connection);
 

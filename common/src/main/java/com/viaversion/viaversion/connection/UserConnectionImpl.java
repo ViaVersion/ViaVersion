@@ -67,7 +67,7 @@ public class UserConnectionImpl implements UserConnection {
         .<UUID, Boolean>build().asMap());
     private final ProtocolInfo protocolInfo = new ProtocolInfoImpl();
     private final Channel channel;
-    private final boolean clientSide;
+    private final boolean client;
     private boolean active = true;
     private boolean pendingDisconnect;
 
@@ -75,11 +75,11 @@ public class UserConnectionImpl implements UserConnection {
      * Creates an UserConnection. When it's a client-side connection, some method behaviors are modified.
      *
      * @param channel    netty channel.
-     * @param clientSide true if it's a client-side connection
+     * @param client true if it's a client-side connection
      */
-    public UserConnectionImpl(@Nullable Channel channel, boolean clientSide) {
+    public UserConnectionImpl(@Nullable Channel channel, boolean client) {
         this.channel = channel;
-        this.clientSide = clientSide;
+        this.client = client;
     }
 
     /**
@@ -190,7 +190,7 @@ public class UserConnectionImpl implements UserConnection {
     private void sendRawPacketNow(final ByteBuf buf) {
         final ChannelPipeline pipeline = getChannel().pipeline();
         final ViaInjector injector = Via.getManager().getInjector();
-        if (clientSide) {
+        if (client) {
             // We'll just assume that Via decoder isn't wrapping the original decoder
             pipeline.context(injector.getDecoderName()).fireChannelRead(buf);
         } else {
@@ -200,7 +200,7 @@ public class UserConnectionImpl implements UserConnection {
 
     @Override
     public ChannelFuture sendRawPacketFuture(final ByteBuf packet) {
-        if (clientSide) {
+        if (client) {
             // Assume that decoder isn't wrapping
             getChannel().pipeline().context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(packet);
             return getChannel().newSucceededFuture();
@@ -216,11 +216,13 @@ public class UserConnectionImpl implements UserConnection {
 
     @Override
     public void disconnect(String reason) {
-        if (!channel.isOpen() || pendingDisconnect) return;
+        if (!channel.isOpen() || isClient() || pendingDisconnect) {
+            return;
+        }
 
         pendingDisconnect = true;
         Via.getPlatform().runSync(() -> {
-            if (!Via.getPlatform().disconnect(this, ChatColorUtil.translateAlternateColorCodes(reason))) {
+            if (!Via.getPlatform().kickPlayer(this, ChatColorUtil.translateAlternateColorCodes(reason))) {
                 channel.close(); // =)
             }
         });
@@ -228,7 +230,7 @@ public class UserConnectionImpl implements UserConnection {
 
     @Override
     public void sendRawPacketToServer(ByteBuf packet) {
-        if (clientSide) {
+        if (client) {
             sendRawPacketToServerClientSide(packet, true);
         } else {
             sendRawPacketToServerServerSide(packet, true);
@@ -237,7 +239,7 @@ public class UserConnectionImpl implements UserConnection {
 
     @Override
     public void scheduleSendRawPacketToServer(ByteBuf packet) {
-        if (clientSide) {
+        if (client) {
             sendRawPacketToServerClientSide(packet, false);
         } else {
             sendRawPacketToServerServerSide(packet, false);
@@ -428,13 +430,8 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public boolean isClientSide() {
-        return clientSide;
-    }
-
-    @Override
-    public boolean shouldApplyBlockProtocol() {
-        return !clientSide; // Don't apply protocol blocking on client-side
+    public boolean isClient() {
+        return client;
     }
 
     @Override

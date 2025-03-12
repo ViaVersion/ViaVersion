@@ -202,7 +202,7 @@ public interface UserConnection {
      * @see #checkServerboundPacket()
      */
     default boolean checkIncomingPacket() {
-        return isClientSide() ? checkClientboundPacket() : checkServerboundPacket();
+        return isClient() ? checkClientboundPacket() : checkServerboundPacket();
     }
 
     /**
@@ -210,7 +210,7 @@ public interface UserConnection {
      * @see #checkServerboundPacket()
      */
     default boolean checkOutgoingPacket() {
-        return isClientSide() ? checkServerboundPacket() : checkClientboundPacket();
+        return isClient() ? checkServerboundPacket() : checkClientboundPacket();
     }
 
     /**
@@ -248,7 +248,7 @@ public interface UserConnection {
      * @see #transformServerbound(ByteBuf, Function)
      */
     default void transformOutgoing(ByteBuf buf, Function<Throwable, CodecException> cancelSupplier) throws InformativeException {
-        if (isClientSide()) {
+        if (isClient()) {
             transformServerbound(buf, cancelSupplier);
         } else {
             transformClientbound(buf, cancelSupplier);
@@ -262,7 +262,7 @@ public interface UserConnection {
      * @see #transformServerbound(ByteBuf, Function)
      */
     default void transformIncoming(ByteBuf buf, Function<Throwable, CodecException> cancelSupplier) throws InformativeException {
-        if (isClientSide()) {
+        if (isClient()) {
             transformClientbound(buf, cancelSupplier);
         } else {
             transformServerbound(buf, cancelSupplier);
@@ -319,19 +319,36 @@ public interface UserConnection {
     void setPendingDisconnect(boolean pendingDisconnect);
 
     /**
-     * Returns whether this is a client-side connection.
-     * This is a mod integrated into the client itself, or for example a backend Velocity connection.
+     * Returns whether this is a backend connection.
+     * This is a mod integrated into the client, or for example a backend Velocity connection.
      *
-     * @return whether this is a client-side connection
+     * @return whether this is a backend connection
      */
-    boolean isClientSide();
+    boolean isClient();
+
+    /**
+     * Returns whether this is a frontend connection.
+     * This is a plugin integrated into the server, or for example a frontend Velocity connection.
+     *
+     * @return whether this is a frontend connection
+     */
+    default boolean isServer() {
+        return !isClient();
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default boolean isClientSide() {
+        return isClient();
+    }
 
     /**
      * Returns whether {@link ViaVersionConfig#blockedProtocolVersions()} should be checked for this connection.
      *
      * @return whether blocked protocols should be applied
      */
-    boolean shouldApplyBlockProtocol();
+    default boolean shouldApplyBlockProtocol() {
+        return isServer();
+    }
 
     /**
      * Returns a newly generated uuid that will let a packet be passed through without

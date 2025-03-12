@@ -24,13 +24,11 @@ package com.viaversion.viaversion.api.platform;
 
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.ViaAPI;
-import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -121,69 +119,35 @@ public interface ViaPlatform<T> {
     PlatformTask runRepeatingSync(Runnable runnable, long period);
 
     /**
-     * Get the online players
-     *
-     * @return Array of ViaCommandSender
-     */
-    @Deprecated(forRemoval = true)
-    default ViaCommandSender[] getOnlinePlayers() {
-        return new ViaCommandSender[0];
-    }
-
-    /**
      * Send a message to a player
      *
-     * @param uuid    The player's UUID
-     * @param message The message to send
+     * @param connection The UserConnection
+     * @param message    The message to send
      */
-    default void sendMessage(UUID uuid, String message) {
+    default void sendMessage(UserConnection connection, String message) {
         throw new UnsupportedOperationException("ViaPlatform#sendMessage is not implemented on this platform.");
     }
 
     /**
      * Kick a player for a reason
      *
-     * @param uuid    The player's UUID
-     * @param message The message to kick them with
-     * @return True if it was successful
-     */
-    default boolean kickPlayer(UUID uuid, String message) {
-        throw new UnsupportedOperationException("ViaPlatform#kickPlayer is not implemented on this platform.");
-    }
-
-    /**
-     * Send a custom payload to a player.
-     *
-     * @param uuid    The player's UUID
-     * @param channel The channel to send the payload on
-     * @param message The data to send
-     */
-    default void sendCustomPayload(UUID uuid, String channel, String message) {
-        throw new UnsupportedOperationException("ViaPlatform#sendCustomPayload is not implemented on this platform.");
-    }
-
-    /**
-     * Disconnects an UserConnection for a reason
-     *
      * @param connection The UserConnection
      * @param message    The message to kick them with
      * @return True if it was successful
      */
-    default boolean disconnect(UserConnection connection, String message) {
-        if (connection.isClientSide()) return false;
-        UUID uuid = connection.getProtocolInfo().getUuid();
-        if (uuid == null) return false;
-        return kickPlayer(uuid, message);
+    default boolean kickPlayer(UserConnection connection, String message) {
+        throw new UnsupportedOperationException("ViaPlatform#kickPlayer is not implemented on this platform.");
     }
 
     /**
-     * Check if the plugin is enabled.
+     * Send a custom payload to from a player to the server.
      *
-     * @return True if it is enabled
+     * @param connection The UserConnection
+     * @param channel    The channel to send the payload on
+     * @param message    The data to send
      */
-    @Deprecated(forRemoval = true)
-    default boolean isPluginEnabled() {
-        return true;
+    default void sendCustomPayload(UserConnection connection, String channel, byte[] message) {
+        throw new UnsupportedOperationException("ViaPlatform#sendCustomPayload is not implemented on this platform.");
     }
 
     /**
