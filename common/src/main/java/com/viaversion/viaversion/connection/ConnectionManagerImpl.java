@@ -49,7 +49,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
         boolean newlyAdded = connections.add(connection);
 
         UUID id = connection.getProtocolInfo().getUuid();
-        if (connection.isServer()) {
+        if (connection.isServerSide()) {
             UserConnection previous = serverConnections.put(id, connection);
             if (previous != null && previous != connection) {
                 Via.getPlatform().getLogger().warning("Duplicate UUID on frontend connection! (" + id + ")");
@@ -75,7 +75,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
         connections.remove(connection);
 
         UUID id = connection.getProtocolInfo().getUuid();
-        if (connection.isServer()) {
+        if (connection.isServerSide()) {
             serverConnections.remove(id);
         } else {
             clientConnections.remove(id);
@@ -102,36 +102,6 @@ public class ConnectionManagerImpl implements ConnectionManager {
     @Override
     public @Nullable UserConnection getClientConnection(final UUID uuid) {
         return clientConnections.get(uuid);
-    }
-
-    @Override
-    public @Nullable UUID getServerConnectionId(UserConnection connection) {
-        if (connection.getProtocolInfo() == null) {
-            return null;
-        }
-
-        UUID uuid = connection.getProtocolInfo().getUuid();
-        UserConnection client = serverConnections.get(uuid);
-        if (connection.equals(client)) {
-            // This is frontend
-            return uuid;
-        }
-        return null;
-    }
-
-    @Override
-    public @Nullable UUID getClientConnectionId(final UserConnection connection) {
-        if (connection.getProtocolInfo() == null) {
-            return null;
-        }
-
-        UUID uuid = connection.getProtocolInfo().getUuid();
-        UserConnection client = clientConnections.get(uuid);
-        if (connection.equals(client)) {
-            // This is backend
-            return uuid;
-        }
-        return null;
     }
 
     @Override

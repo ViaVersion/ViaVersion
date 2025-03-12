@@ -202,7 +202,7 @@ public interface UserConnection {
      * @see #checkServerboundPacket()
      */
     default boolean checkIncomingPacket() {
-        return isClient() ? checkClientboundPacket() : checkServerboundPacket();
+        return isClientSide() ? checkClientboundPacket() : checkServerboundPacket();
     }
 
     /**
@@ -210,7 +210,7 @@ public interface UserConnection {
      * @see #checkServerboundPacket()
      */
     default boolean checkOutgoingPacket() {
-        return isClient() ? checkServerboundPacket() : checkClientboundPacket();
+        return isClientSide() ? checkServerboundPacket() : checkClientboundPacket();
     }
 
     /**
@@ -248,7 +248,7 @@ public interface UserConnection {
      * @see #transformServerbound(ByteBuf, Function)
      */
     default void transformOutgoing(ByteBuf buf, Function<Throwable, CodecException> cancelSupplier) throws InformativeException {
-        if (isClient()) {
+        if (isClientSide()) {
             transformServerbound(buf, cancelSupplier);
         } else {
             transformClientbound(buf, cancelSupplier);
@@ -262,7 +262,7 @@ public interface UserConnection {
      * @see #transformServerbound(ByteBuf, Function)
      */
     default void transformIncoming(ByteBuf buf, Function<Throwable, CodecException> cancelSupplier) throws InformativeException {
-        if (isClient()) {
+        if (isClientSide()) {
             transformClientbound(buf, cancelSupplier);
         } else {
             transformServerbound(buf, cancelSupplier);
@@ -324,7 +324,7 @@ public interface UserConnection {
      *
      * @return whether this is a backend connection
      */
-    boolean isClient();
+    boolean isClientSide();
 
     /**
      * Returns whether this is a frontend connection.
@@ -332,13 +332,8 @@ public interface UserConnection {
      *
      * @return whether this is a frontend connection
      */
-    default boolean isServer() {
-        return !isClient();
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default boolean isClientSide() {
-        return isClient();
+    default boolean isServerSide() {
+        return !isClientSide();
     }
 
     /**
@@ -347,7 +342,7 @@ public interface UserConnection {
      * @return whether blocked protocols should be applied
      */
     default boolean shouldApplyBlockProtocol() {
-        return isServer();
+        return isServerSide();
     }
 
     /**

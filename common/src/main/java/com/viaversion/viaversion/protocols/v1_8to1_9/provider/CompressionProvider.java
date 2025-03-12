@@ -34,7 +34,7 @@ import java.util.zip.Inflater;
 
 public class CompressionProvider implements Provider {
     public void handlePlayCompression(UserConnection user, int threshold) {
-        if (!user.isClient()) throw new IllegalStateException("PLAY state Compression packet is unsupported");
+        if (!user.isClientSide()) throw new IllegalStateException("PLAY state Compression packet is unsupported");
 
         ChannelPipeline pipe = user.getChannel().pipeline();
 

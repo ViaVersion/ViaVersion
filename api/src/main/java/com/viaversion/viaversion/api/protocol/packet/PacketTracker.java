@@ -79,7 +79,7 @@ public class PacketTracker {
      * @see #incrementReceived()
      */
     public boolean exceedsMaxPPS() {
-        if (connection.isClient()) return false; // Don't apply PPS limiting for client-side
+        if (connection.isClientSide()) return false; // Don't apply PPS limiting for client-side
         ViaVersionConfig conf = Via.getConfig();
         // Max PPS Checker
         if (conf.getMaxPPS() > 0 && packetsPerSecond >= conf.getMaxPPS()) {

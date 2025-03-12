@@ -29,7 +29,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Handles injected UserConnections.
- * Check {@link UserConnection#isServer()} and {@link UserConnection#isClient()} to determine the connection type.
+ * Check {@link UserConnection#isServerSide()} and {@link UserConnection#isClientSide()} to determine the connection type.
  */
 public interface ConnectionManager {
 
@@ -40,6 +40,11 @@ public interface ConnectionManager {
      * @return true if the player is handled by Via
      */
     boolean hasServerConnection(UUID uuid);
+
+    @Deprecated
+    default boolean isClientConnected(UUID uuid) {
+        return hasServerConnection(uuid);
+    }
 
     /**
      * Returns if Via has injected. See above for the connection types.
@@ -61,6 +66,11 @@ public interface ConnectionManager {
     @Nullable
     UserConnection getServerConnection(UUID uuid);
 
+    @Deprecated
+    @Nullable default UserConnection getConnectedClient(UUID uuid) {
+        return getServerConnection(uuid);
+    }
+
     /**
      * Returns the client UserConnection. See above for the connection types.
      * When ViaVersion is reloaded, this method may not return some players.
@@ -74,38 +84,17 @@ public interface ConnectionManager {
     UserConnection getClientConnection(UUID uuid);
 
     /**
-     * Returns the UUID from the server connection. See above for the connection types.
-     * Returns null when there isn't a server or this connection isn't a server connection, or it doesn't have an id
-     * When ViaVersion is reloaded, this method may not return some players.
-     * <p>
-     * Note that connections are removed as soon as their channel is closed,
-     * so avoid using this method during player quits for example.
-     *
-     * @return UUID of the server connection to this proxy server
-     */
-    @Nullable
-    UUID getServerConnectionId(UserConnection connection);
-
-    /**
-     * Returns the UUID from the client connection. See above for the connection types.
-     * Returns null when there isn't a client or this connection isn't a client connection, or it doesn't have an id
-     * When ViaVersion is reloaded, this method may not return some players.
-     * <p>
-     * Note that connections are removed as soon as their channel is closed,
-     * so avoid using this method during player quits for example.
-     *
-     * @return UUID of the client connection to this proxy server
-     */
-    @Nullable
-    UUID getClientConnectionId(UserConnection connection);
-
-    /**
      * Returns a map containing the UUIDs and server UserConnections
      * When ViaVersion is reloaded, this method may not return some players.
      *
      * @return map containing the UUIDs and frontend UserConnections
      */
     Map<UUID, UserConnection> getServerConnections();
+
+    @Deprecated
+    default Map<UUID, UserConnection> getConnectedClients() {
+        return getServerConnections();
+    }
 
     /**
      * Returns a map containing the UUIDs and client UserConnections
