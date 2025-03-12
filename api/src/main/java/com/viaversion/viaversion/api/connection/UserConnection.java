@@ -319,19 +319,31 @@ public interface UserConnection {
     void setPendingDisconnect(boolean pendingDisconnect);
 
     /**
-     * Returns whether this is a client-side connection.
-     * This is a mod integrated into the client itself, or for example a backend Velocity connection.
+     * Returns whether this is a backend connection.
+     * This is a mod integrated into the client, or for example a backend Velocity connection.
      *
-     * @return whether this is a client-side connection
+     * @return whether this is a backend connection
      */
     boolean isClientSide();
+
+    /**
+     * Returns whether this is a frontend connection.
+     * This is a plugin integrated into the server, or for example a frontend Velocity connection.
+     *
+     * @return whether this is a frontend connection
+     */
+    default boolean isServerSide() {
+        return !isClientSide();
+    }
 
     /**
      * Returns whether {@link ViaVersionConfig#blockedProtocolVersions()} should be checked for this connection.
      *
      * @return whether blocked protocols should be applied
      */
-    boolean shouldApplyBlockProtocol();
+    default boolean shouldApplyBlockProtocol() {
+        return isServerSide();
+    }
 
     /**
      * Returns a newly generated uuid that will let a packet be passed through without

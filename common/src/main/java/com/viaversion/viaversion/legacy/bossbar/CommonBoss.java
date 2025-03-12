@@ -103,7 +103,7 @@ public class CommonBoss implements BossBar {
 
     @Override
     public BossBar addPlayer(UUID player) {
-        UserConnection client = Via.getManager().getConnectionManager().getConnectedClient(player);
+        UserConnection client = Via.getManager().getConnectionManager().getServerConnection(player);
         if (client != null) {
             addConnection(client);
         }

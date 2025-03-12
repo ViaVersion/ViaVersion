@@ -85,7 +85,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
             updateTasks.put(uuid, updateTask);
         }
         updateTask.addItem(windowId, slotId, actionId);
-        if (!registered && Via.getPlatform().isPluginEnabled()) {
+        if (!registered) {
             Via.getPlatform().runSync(updateTask);
         }
         return true;

@@ -216,14 +216,20 @@ public class UserConnectionImpl implements UserConnection {
 
     @Override
     public void disconnect(String reason) {
-        if (!channel.isOpen() || pendingDisconnect) return;
+        if (!channel.isOpen() || pendingDisconnect) {
+            return;
+        }
 
         pendingDisconnect = true;
-        Via.getPlatform().runSync(() -> {
-            if (!Via.getPlatform().disconnect(this, ChatColorUtil.translateAlternateColorCodes(reason))) {
-                channel.close(); // =)
-            }
-        });
+        if (isServerSide()) {
+            Via.getPlatform().runSync(() -> {
+                if (!Via.getPlatform().kickPlayer(this, ChatColorUtil.translateAlternateColorCodes(reason))) {
+                    channel.close();
+                }
+            });
+        } else {
+            channel.close();
+        }
     }
 
     @Override
@@ -430,11 +436,6 @@ public class UserConnectionImpl implements UserConnection {
     @Override
     public boolean isClientSide() {
         return clientSide;
-    }
-
-    @Override
-    public boolean shouldApplyBlockProtocol() {
-        return !clientSide; // Don't apply protocol blocking on client-side
     }
 
     @Override

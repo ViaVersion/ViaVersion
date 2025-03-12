@@ -52,7 +52,7 @@ public class PlayerSubCmd implements ViaSubCommand {
         for (final UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
             final ProtocolInfo info = connection.getProtocolInfo();
             if (args[0].equalsIgnoreCase(info.getUsername()) || all) {
-                sendMessage(sender, "&7[&6" + info.getUsername() + "&7] UUID: &2" + info.getUuid() + " &7Client protocol: &2" + info.protocolVersion().getName() + " &7Server protocol: &2" + info.serverProtocolVersion().getName() + " &7Clientside: &2" + connection.isClientSide());
+                sendMessage(sender, "&7[&6" + info.getUsername() + "&7] UUID: &2" + info.getUuid() + " &7Client protocol: &2" + info.protocolVersion().getName() + " &7Server protocol: &2" + info.serverProtocolVersion().getName() + " &7Client: &2" + connection.isClientSide());
                 any = true;
             }
         }

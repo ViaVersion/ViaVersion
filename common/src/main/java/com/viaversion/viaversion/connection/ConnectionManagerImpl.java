@@ -31,7 +31,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ConnectionManagerImpl implements ConnectionManager {
-    protected final Map<UUID, UserConnection> clients = new ConcurrentHashMap<>();
+
+    protected final Map<UUID, UserConnection> serverConnections = new ConcurrentHashMap<>();
+    protected final Map<UUID, UserConnection> clientConnections = new ConcurrentHashMap<>();
     protected final Set<UserConnection> connections = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     @Override
@@ -40,16 +42,20 @@ public class ConnectionManagerImpl implements ConnectionManager {
         Channel channel = connection.getChannel();
 
         // This user has already disconnected...
-        if (channel != null && !channel.isOpen()) return;
+        if (channel != null && !channel.isOpen()) {
+            return;
+        }
 
         boolean newlyAdded = connections.add(connection);
 
-        if (isFrontEnd(connection)) {
-            UUID id = connection.getProtocolInfo().getUuid();
-            UserConnection previous = clients.put(id, connection);
+        UUID id = connection.getProtocolInfo().getUuid();
+        if (connection.isServerSide()) {
+            UserConnection previous = serverConnections.put(id, connection);
             if (previous != null && previous != connection) {
                 Via.getPlatform().getLogger().warning("Duplicate UUID on frontend connection! (" + id + ")");
             }
+        } else {
+            clientConnections.put(id, connection);
         }
 
         if (channel != null) {
@@ -68,34 +74,44 @@ public class ConnectionManagerImpl implements ConnectionManager {
         Objects.requireNonNull(connection, "connection is null!");
         connections.remove(connection);
 
-        if (isFrontEnd(connection)) {
-            UUID id = connection.getProtocolInfo().getUuid();
-            clients.remove(id);
+        UUID id = connection.getProtocolInfo().getUuid();
+        if (connection.isServerSide()) {
+            serverConnections.remove(id);
+        } else {
+            clientConnections.remove(id);
         }
 
         connection.clearStoredObjects();
     }
 
     @Override
-    public Map<UUID, UserConnection> getConnectedClients() {
-        return Collections.unmodifiableMap(clients);
+    public boolean hasServerConnection(UUID playerId) {
+        return serverConnections.containsKey(playerId);
     }
 
     @Override
-    public @Nullable UserConnection getConnectedClient(UUID clientIdentifier) {
-        return clients.get(clientIdentifier);
+    public @Nullable UserConnection getServerConnection(UUID uuid) {
+        return serverConnections.get(uuid);
     }
 
     @Override
-    public @Nullable UUID getConnectedClientId(UserConnection connection) {
-        if (connection.getProtocolInfo() == null) return null;
-        UUID uuid = connection.getProtocolInfo().getUuid();
-        UserConnection client = clients.get(uuid);
-        if (connection.equals(client)) {
-            // This is frontend
-            return uuid;
-        }
-        return null;
+    public boolean hasClientConnection(final UUID uuid) {
+        return clientConnections.containsKey(uuid);
+    }
+
+    @Override
+    public @Nullable UserConnection getClientConnection(final UUID uuid) {
+        return clientConnections.get(uuid);
+    }
+
+    @Override
+    public Map<UUID, UserConnection> getServerConnections() {
+        return Collections.unmodifiableMap(serverConnections);
+    }
+
+    @Override
+    public Map<UUID, UserConnection> getClientConnections() {
+        return Collections.unmodifiableMap(clientConnections);
     }
 
     @Override
@@ -103,8 +119,4 @@ public class ConnectionManagerImpl implements ConnectionManager {
         return Collections.unmodifiableSet(connections);
     }
 
-    @Override
-    public boolean isClientConnected(UUID playerId) {
-        return clients.containsKey(playerId);
-    }
 }
