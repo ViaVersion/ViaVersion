@@ -260,7 +260,7 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         }));
 
         // Removed saddles
-        filter().type(EntityTypes1_21_5.PIG).cancel(17);
+        filter().type(EntityTypes1_21_5.PIG).removeIndex(17);
         filter().type(EntityTypes1_21_5.STRIDER).cancel(19);
 
         filter().type(EntityTypes1_21_5.DOLPHIN).removeIndex(17); // Treasure pos
