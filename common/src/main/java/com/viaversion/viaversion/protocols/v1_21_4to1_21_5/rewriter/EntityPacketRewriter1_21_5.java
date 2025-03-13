@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.WolfVariant;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_5;
+import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
@@ -36,9 +37,12 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
+import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
 import java.util.UUID;
 
 public final class EntityPacketRewriter1_21_5 extends EntityRewriter<ClientboundPacket1_21_2, Protocol1_21_4To1_21_5> {
+    private static final int SADDLE_ITEM_ID = 800;
+    private static final byte SADDLE_EQUIPMENT_SLOT = 7;
 
     public EntityPacketRewriter1_21_5(final Protocol1_21_4To1_21_5 protocol) {
         super(protocol);
@@ -260,8 +264,16 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         }));
 
         // Removed saddles
+        filter().type(EntityTypes1_21_5.PIG).index(17).handler((event, data) -> {
+            final boolean saddled = data.value();
+            sendSaddleEquipment(event, saddled);
+        });
         filter().type(EntityTypes1_21_5.PIG).removeIndex(17);
-        filter().type(EntityTypes1_21_5.STRIDER).cancel(19);
+        filter().type(EntityTypes1_21_5.STRIDER).index(19).handler((event, data) -> {
+            event.cancel();
+            final boolean saddled = data.value();
+            sendSaddleEquipment(event, saddled);
+        });
 
         filter().type(EntityTypes1_21_5.DOLPHIN).removeIndex(17); // Treasure pos
 
@@ -269,6 +281,14 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         filter().type(EntityTypes1_21_5.TURTLE).cancel(21); // Going home
         filter().type(EntityTypes1_21_5.TURTLE).cancel(20); // Travel pos
         filter().type(EntityTypes1_21_5.TURTLE).removeIndex(17); // Home pos
+    }
+
+    private void sendSaddleEquipment(final EntityDataHandlerEvent event, final boolean saddled) {
+        final PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_21_5.SET_EQUIPMENT, event.user());
+        equipmentPacket.write(Types.VAR_INT, event.entityId());
+        equipmentPacket.write(Types.BYTE, SADDLE_EQUIPMENT_SLOT);
+        equipmentPacket.write(Types1_21_5.ITEM, saddled ? new StructuredItem(SADDLE_ITEM_ID, 1) : StructuredItem.empty());
+        equipmentPacket.send(Protocol1_21_4To1_21_5.class);
     }
 
     @Override
