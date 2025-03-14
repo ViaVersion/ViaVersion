@@ -17,8 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter;
 
-import static com.viaversion.viaversion.util.MathUtil.ceilLog2;
-
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.LongArrayTag;
@@ -47,12 +45,14 @@ import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_21;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockPredicate;
+import com.viaversion.viaversion.api.minecraft.item.data.BlocksAttacks;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.JukeboxPlayable;
 import com.viaversion.viaversion.api.minecraft.item.data.TooltipDisplay;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
@@ -77,6 +77,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import static com.viaversion.viaversion.util.MathUtil.ceilLog2;
 
 public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_5, Protocol1_21_4To1_21_5> {
 
@@ -268,6 +270,9 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         }
 
         updateItemData(item);
+
+        // Add data components to fix issues in older protocols
+        appendItemDataFixComponents(connection, item);
         return item;
     }
 
@@ -407,6 +412,26 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.JUKEBOX_PLAYABLE1_21, playable -> new JukeboxPlayable(playable.song(), false));
 
         dataContainer.remove(NEW_DATA_TO_REMOVE);
+    }
+
+    private void appendItemDataFixComponents(final UserConnection connection, final Item item) {
+        final ProtocolVersion serverVersion = connection.getProtocolInfo().serverProtocolVersion();
+        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+            if (item.identifier() == 858 || item.identifier() == 863 || item.identifier() == 873 || item.identifier() == 868 || item.identifier() == 878) { // swords
+                item.dataContainer().remove(StructuredDataKey.CONSUMABLE1_21_2);
+                item.dataContainer().set(StructuredDataKey.BLOCKS_ATTACKS,
+                    new BlocksAttacks(
+                        0F,
+                        0F,
+                        new BlocksAttacks.DamageReduction[]{new BlocksAttacks.DamageReduction(90F, null, -0.5F, 0.5F)},
+                        new BlocksAttacks.ItemDamageFunction(0F, 0F, 0F),
+                        null,
+                        null,
+                        null
+                    )
+                );
+            }
+        }
     }
 
     private static <T> void updateShowInTooltip(final StructuredDataContainer container, @Nullable final TooltipDisplay display, final StructuredDataKey<T> key, final StructuredDataKey<T> mappedKey, final Function<T, T> function) {
