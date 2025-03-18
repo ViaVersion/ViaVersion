@@ -79,7 +79,7 @@ public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher
             final StatePropertyMatcher[] propertyMatchers = buffer.readBoolean() ? StatePropertyMatcher.ARRAY_TYPE.read(buffer) : null;
             final CompoundTag tag = Types.OPTIONAL_COMPOUND_TAG.read(buffer);
             final DataComponentMatchers matchers = matchersType.read(buffer);
-            return new BlockPredicate(holders, propertyMatchers, tag);
+            return new BlockPredicate(holders, propertyMatchers, tag, matchers);
         }
 
         @Override
