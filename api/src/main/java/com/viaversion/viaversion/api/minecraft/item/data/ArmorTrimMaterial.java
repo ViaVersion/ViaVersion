@@ -52,7 +52,7 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             final float itemModelIndex = buffer.readFloat();
 
             final int overrideArmorMaterialsSize = Types.VAR_INT.readPrimitive(buffer);
-            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>(overrideArmorMaterialsSize);
+            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
             for (int i = 0; i < overrideArmorMaterialsSize; i++) {
                 final int key = Types.VAR_INT.readPrimitive(buffer);
                 final String value = Types.STRING.read(buffer);
@@ -86,7 +86,7 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             final float itemModelIndex = buffer.readFloat();
 
             final int overrideArmorMaterialsSize = Types.VAR_INT.readPrimitive(buffer);
-            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>(overrideArmorMaterialsSize);
+            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
             for (int i = 0; i < overrideArmorMaterialsSize; i++) {
                 final String key = Types.STRING.read(buffer);
                 final String value = Types.STRING.read(buffer);
@@ -119,7 +119,7 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             final int item = Types.VAR_INT.readPrimitive(buffer);
 
             final int overrideArmorMaterialsSize = Types.VAR_INT.readPrimitive(buffer);
-            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>(overrideArmorMaterialsSize);
+            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
             for (int i = 0; i < overrideArmorMaterialsSize; i++) {
                 final String key = Types.STRING.read(buffer);
                 final String value = Types.STRING.read(buffer);

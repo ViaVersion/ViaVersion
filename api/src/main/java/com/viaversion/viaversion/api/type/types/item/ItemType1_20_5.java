@@ -60,7 +60,7 @@ public class ItemType1_20_5 extends Type<Item> {
         final int valuesSize = Types.VAR_INT.readPrimitive(buffer);
         final int markersSize = Types.VAR_INT.readPrimitive(buffer);
         if (valuesSize == 0 && markersSize == 0) {
-            return new Reference2ObjectOpenHashMap<>();
+            return new Reference2ObjectOpenHashMap<>(0);
         }
 
         final Map<StructuredDataKey<?>, StructuredData<?>> map = new Reference2ObjectOpenHashMap<>(Math.min(valuesSize + markersSize, 128));

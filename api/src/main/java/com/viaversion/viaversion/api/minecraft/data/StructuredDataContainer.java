@@ -73,7 +73,7 @@ public final class StructuredDataContainer implements Copyable {
     }
 
     public StructuredDataContainer() {
-        this(new Reference2ObjectOpenHashMap<>());
+        this(new Reference2ObjectOpenHashMap<>(0));
     }
 
     /**

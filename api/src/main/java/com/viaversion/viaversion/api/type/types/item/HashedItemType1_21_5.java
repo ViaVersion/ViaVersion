@@ -29,6 +29,9 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Limit;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 
 public class HashedItemType1_21_5 extends Type<HashedItem> {
 
@@ -44,21 +47,22 @@ public class HashedItemType1_21_5 extends Type<HashedItem> {
 
         final int id = Types.VAR_INT.readPrimitive(buffer);
         final int amount = Types.VAR_INT.readPrimitive(buffer);
-        final HashedStructuredItem item = new HashedStructuredItem(id, amount);
 
         final int addedComponentsSize = Limit.max(Types.VAR_INT.readPrimitive(buffer), 256);
+        final Int2IntMap dataHashes = new Int2IntOpenHashMap(addedComponentsSize);
         for (int i = 0; i < addedComponentsSize; i++) {
             final int dataType = Types.VAR_INT.readPrimitive(buffer);
             final int hash = Types.INT.readPrimitive(buffer);
-            item.dataHashesById().put(dataType, hash);
+            dataHashes.put(dataType, hash);
         }
 
         final int removedComponentsSize = Limit.max(Types.VAR_INT.readPrimitive(buffer), 256);
+        final IntSet removedData = new IntOpenHashSet(removedComponentsSize);
         for (int i = 0; i < removedComponentsSize; i++) {
             final int dataType = Types.VAR_INT.readPrimitive(buffer);
-            item.removedDataIds().add(dataType);
+            removedData.add(dataType);
         }
-        return item;
+        return new HashedStructuredItem(id, amount, dataHashes, removedData);
     }
 
     @Override

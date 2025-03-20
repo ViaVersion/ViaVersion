@@ -28,14 +28,20 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
 public class HashedStructuredItem implements HashedItem {
-    private final Int2IntMap dataHashes = new Int2IntOpenHashMap();
-    private final IntSet removedData = new IntOpenHashSet();
+    private final Int2IntMap dataHashes;
+    private final IntSet removedData;
     private int identifier;
     private int amount;
 
     public HashedStructuredItem(final int identifier, final int amount) {
+        this(identifier, amount, new Int2IntOpenHashMap(0), new IntOpenHashSet(0));
+    }
+
+    public HashedStructuredItem(final int identifier, final int amount, final Int2IntMap dataHashes, final IntSet removedData) {
         this.identifier = identifier;
         this.amount = amount;
+        this.dataHashes = dataHashes;
+        this.removedData = removedData;
     }
 
     public static HashedStructuredItem empty() {

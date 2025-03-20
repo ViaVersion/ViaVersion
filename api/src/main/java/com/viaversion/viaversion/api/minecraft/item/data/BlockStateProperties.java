@@ -35,7 +35,7 @@ public record BlockStateProperties(Map<String, String> properties) implements Co
         @Override
         public BlockStateProperties read(final ByteBuf buffer) {
             final int size = Types.VAR_INT.readPrimitive(buffer);
-            final Map<String, String> properties = new Object2ObjectOpenHashMap<>(size);
+            final Map<String, String> properties = new Object2ObjectOpenHashMap<>();
             for (int i = 0; i < size; i++) {
                 properties.put(Types.STRING.read(buffer), Types.STRING.read(buffer));
             }

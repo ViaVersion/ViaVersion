@@ -207,7 +207,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         }
 
         final List<BlockEntity> blockEntities = chunk.blockEntities();
-        final IntList toRemove = new IntArrayList();
+        final IntList toRemove = new IntArrayList(0);
         for (int i = 0; i < blockEntities.size(); i++) {
             final BlockEntity blockEntity = blockEntities.get(i);
             if (blockEntityMappings != null) {
