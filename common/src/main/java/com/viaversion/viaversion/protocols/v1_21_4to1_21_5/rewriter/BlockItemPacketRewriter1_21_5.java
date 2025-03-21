@@ -177,13 +177,11 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             for (int i = 0; i < affectedItems; i++) {
                 wrapper.passthrough(Types.SHORT); // Slot
                 final HashedItem item = wrapper.read(Types.HASHED_ITEM);
-                final StructuredItem mappedItem = new StructuredItem(item.identifier(), item.amount());
-                wrapper.write(Types1_21_5.ITEM, handleItemToServer(wrapper.user(), mappedItem));
+                wrapper.write(Types1_21_5.ITEM, handleItemToServer(wrapper.user(), this.convertHashedItemToStructuredItem(wrapper.user(), item)));
             }
 
             final HashedItem carriedItem = wrapper.read(Types.HASHED_ITEM);
-            final StructuredItem mappedItem = new StructuredItem(carriedItem.identifier(), carriedItem.amount());
-            wrapper.write(Types1_21_5.ITEM, handleItemToServer(wrapper.user(), mappedItem));
+            wrapper.write(Types1_21_5.ITEM, handleItemToServer(wrapper.user(), this.convertHashedItemToStructuredItem(wrapper.user(), carriedItem)));
         });
 
         registerAdvancements1_20_3(ClientboundPackets1_21_2.UPDATE_ADVANCEMENTS);
@@ -412,6 +410,10 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.JUKEBOX_PLAYABLE1_21, playable -> new JukeboxPlayable(playable.song(), false));
 
         dataContainer.remove(NEW_DATA_TO_REMOVE);
+    }
+
+    private StructuredItem convertHashedItemToStructuredItem(final UserConnection connection, final HashedItem hashedItem) {
+        return new StructuredItem(hashedItem.identifier(), hashedItem.amount());
     }
 
     private void appendItemDataFixComponents(final UserConnection connection, final Item item) {
