@@ -21,6 +21,7 @@ import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
+import com.viaversion.viaversion.bukkit.util.LegacyBlockToItem;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.provider.PickItemProvider;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -31,6 +32,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -40,6 +43,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class BukkitPickItemProvider extends PickItemProvider {
     private static final boolean HAS_PLACEMENT_MATERIAL_METHOD = PaperViaInjector.hasMethod("org.bukkit.block.data.BlockData", "getPlacementMaterial");
     private static final boolean HAS_SPAWN_EGG_METHOD = PaperViaInjector.hasMethod(ItemFactory.class, "getSpawnEgg", EntityType.class);
+    private static final boolean HAS_IS_ITEM = PaperViaInjector.hasMethod(Material.class, "isItem");
+    private static final boolean HAS_STORAGE_CONTENTS = PaperViaInjector.hasMethod(Inventory.class, "getStorageContents");
+    private static final LegacyBlockToItem LEGACY_BLOCK_TO_ITEM = !HAS_IS_ITEM ? LegacyBlockToItem.getInstance() : null;
     private static final double BLOCK_RANGE = 4.5 + 1;
     private static final double BLOCK_RANGE_SQUARED = BLOCK_RANGE * BLOCK_RANGE;
     private static final double ENTITY_RANGE = 3 + 3;
@@ -69,7 +75,7 @@ public final class BukkitPickItemProvider extends PickItemProvider {
             }
 
             final ItemStack item = blockToItem(block, includeData && player.getGameMode() == GameMode.CREATIVE);
-            if (item != null) {
+            if (item != null && item.getType() != Material.AIR) {
                 pickItem(player, item);
             }
         }, player);
@@ -83,8 +89,10 @@ public final class BukkitPickItemProvider extends PickItemProvider {
                 item.setItemMeta(blockStateMeta);
             }
             return item;
-        } else if (block.getType().isItem()) {
+        } else if (HAS_IS_ITEM && block.getType().isItem()) {
             return new ItemStack(block.getType(), 1);
+        } else if (LEGACY_BLOCK_TO_ITEM != null) {
+            return LEGACY_BLOCK_TO_ITEM.blockToItem(block);
         }
         return null;
     }
@@ -120,7 +128,8 @@ public final class BukkitPickItemProvider extends PickItemProvider {
     private void pickItem(final Player player, final ItemStack item) {
         // Find matching item
         final PlayerInventory inventory = player.getInventory();
-        final ItemStack[] contents = inventory.getStorageContents();
+        // Prior to getStorageContents, getContents worked the same (it ignored armor)
+        final ItemStack[] contents = HAS_STORAGE_CONTENTS ? inventory.getStorageContents() : inventory.getContents();
         int sourceSlot = -1;
         for (int i = 0; i < contents.length; i++) {
             final ItemStack content = contents[i];
@@ -155,7 +164,7 @@ public final class BukkitPickItemProvider extends PickItemProvider {
         }
 
         inventory.setItem(emptySlot, heldItem);
-        inventory.setItemInMainHand(item);
+        inventory.setItem(EquipmentSlot.HAND, item);
     }
 
     private void moveToHotbar(final PlayerInventory inventory, final int sourceSlot, final ItemStack[] contents) {
@@ -168,7 +177,7 @@ public final class BukkitPickItemProvider extends PickItemProvider {
         final int targetSlot = findEmptyHotbarSlot(inventory, heldSlot);
         inventory.setHeldItemSlot(targetSlot);
         final ItemStack heldItem = inventory.getItem(targetSlot);
-        inventory.setItemInMainHand(contents[sourceSlot]);
+        inventory.setItem(EquipmentSlot.HAND, contents[sourceSlot]);
         inventory.setItem(sourceSlot, heldItem);
     }
 
