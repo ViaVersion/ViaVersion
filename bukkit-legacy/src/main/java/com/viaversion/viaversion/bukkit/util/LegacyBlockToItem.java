@@ -103,10 +103,7 @@ public class LegacyBlockToItem {
 
             // Couldn't find an item for the block (eg: redstone dust, sugarcane, doors, etc.), use the drop instead
             Object nmsItem = GET_DROP_TYPE.invoke(nmsBlock, blockData, RANDOM, 0);
-            if (nmsItem == null) return null;
-            stack = (ItemStack) NEW_BUKKIT_ITEM_STACK.invoke(null, nmsItem);
-
-            return stack.getType() == Material.AIR ? null : stack;
+            return (ItemStack) NEW_BUKKIT_ITEM_STACK.invoke(null, nmsItem);
         } catch (ReflectiveOperationException ex) {
             Via.getPlatform().getLogger().log(
                 Level.WARNING, "Failed when trying to find the right item for pick-block.", ex);
