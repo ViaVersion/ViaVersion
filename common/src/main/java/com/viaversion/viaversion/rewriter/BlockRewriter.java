@@ -213,15 +213,14 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             if (blockEntityMappings != null) {
                 final int id = blockEntity.typeId();
                 final int mappedId = blockEntityMappings.getNewId(id);
-                if (id == mappedId) {
-                    continue;
-                }
                 if (mappedId == -1) {
                     toRemove.add(i);
                     continue;
                 }
 
-                blockEntities.set(i, blockEntity.withTypeId(mappedId));
+                if (id != mappedId) {
+                    blockEntities.set(i, blockEntity.withTypeId(mappedId));
+                }
             }
 
             if (blockEntityHandler != null && blockEntity.tag() != null) {
