@@ -39,8 +39,11 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class EntityPacketRewriter1_21_5 extends EntityRewriter<ClientboundPacket1_21_2, Protocol1_21_4To1_21_5> {
+    private static final int ATTACK_BLOCKED_ENTITY_EVENT = 29;
+    private static final int SHIELD_DISABLED_ENTITY_EVENT = 30;
     private static final int SADDLE_ITEM_ID = 800;
     private static final byte SADDLE_EQUIPMENT_SLOT = 7;
 
@@ -155,6 +158,32 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
                 wrapper.passthrough(Types.TAG); // Suffix
             }
         });
+
+        protocol.registerClientbound(ClientboundPackets1_21_2.ENTITY_EVENT, wrapper -> {
+            final int entityId = wrapper.read(Types.INT);
+            final byte event = wrapper.read(Types.BYTE);
+            if (event == ATTACK_BLOCKED_ENTITY_EVENT) {
+                playShieldSound(wrapper, entityId, 1273, 1F);
+                return;
+            } else if (event == SHIELD_DISABLED_ENTITY_EVENT) {
+                playShieldSound(wrapper, entityId, 1274, 0.8F);
+                return;
+            }
+
+            wrapper.write(Types.INT, entityId);
+            wrapper.write(Types.BYTE, event);
+        });
+    }
+
+    private void playShieldSound(final PacketWrapper wrapper, final int entityId, final int soundId, final float volume) {
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
+        wrapper.setPacketType(ClientboundPackets1_21_5.SOUND_ENTITY);
+        wrapper.write(Types.SOUND_EVENT, Holder.of(soundId));
+        wrapper.write(Types.VAR_INT, 7); // Assume player sound source
+        wrapper.write(Types.VAR_INT, entityId);
+        wrapper.write(Types.FLOAT, volume); // Volume
+        wrapper.write(Types.FLOAT, 0.8F + random.nextFloat() * 0.4F); // Pitch
+        wrapper.write(Types.LONG, random.nextLong()); // Seed
     }
 
     private RegistryEntry wolfSoundVariant() {
