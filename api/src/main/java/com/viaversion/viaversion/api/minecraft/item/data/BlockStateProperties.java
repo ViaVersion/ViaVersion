@@ -24,11 +24,12 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 
-public record BlockStateProperties(Map<String, String> properties) {
+public record BlockStateProperties(Map<String, String> properties) implements Copyable {
 
     public static final Type<BlockStateProperties> TYPE = new Type<>(BlockStateProperties.class) {
         @Override
@@ -51,4 +52,8 @@ public record BlockStateProperties(Map<String, String> properties) {
         }
     };
 
+    @Override
+    public BlockStateProperties copy() {
+        return new BlockStateProperties(new Object2ObjectOpenHashMap<>(properties));
+    }
 }

@@ -27,11 +27,12 @@ import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<SoundEvent> sound,
-                               boolean hasConsumeParticles, ConsumeEffect<?>[] consumeEffects) {
+                               boolean hasConsumeParticles, ConsumeEffect<?>[] consumeEffects) implements Copyable {
 
     public static final Type<?>[] EFFECT_TYPES = {
         ApplyStatusEffects.TYPE,
@@ -113,5 +114,10 @@ public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<S
     public Consumable1_21_2 rewrite(final Int2IntFunction soundIdRewriteFunction) {
         final Holder<SoundEvent> soundHolder = this.sound.updateId(soundIdRewriteFunction);
         return soundHolder == this.sound ? this : new Consumable1_21_2(consumeSeconds, animationType, soundHolder, hasConsumeParticles, consumeEffects);
+    }
+
+    @Override
+    public Consumable1_21_2 copy() {
+        return new Consumable1_21_2(consumeSeconds, animationType, sound, hasConsumeParticles, copy(consumeEffects));
     }
 }

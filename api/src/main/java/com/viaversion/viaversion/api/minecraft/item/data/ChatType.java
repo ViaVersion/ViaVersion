@@ -26,9 +26,10 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 
-public record ChatType(ChatTypeDecoration chatDecoration, ChatTypeDecoration narrationDecoration) {
+public record ChatType(ChatTypeDecoration chatDecoration, ChatTypeDecoration narrationDecoration) implements Copyable {
 
     public static final HolderType<ChatType> TYPE = new HolderType<>() {
         @Override
@@ -45,7 +46,12 @@ public record ChatType(ChatTypeDecoration chatDecoration, ChatTypeDecoration nar
         }
     };
 
-    public record ChatTypeDecoration(String translationKey, int[] parameters, Tag style) {
+    @Override
+    public ChatType copy() {
+        return new ChatType(chatDecoration.copy(), narrationDecoration.copy());
+    }
+
+    public record ChatTypeDecoration(String translationKey, int[] parameters, Tag style) implements Copyable {
 
         public static final Type<ChatTypeDecoration> TYPE = new Type<>(ChatTypeDecoration.class) {
 
@@ -64,5 +70,10 @@ public record ChatType(ChatTypeDecoration chatDecoration, ChatTypeDecoration nar
                 Types.TAG.write(buffer, value.style());
             }
         };
+
+        @Override
+        public ChatTypeDecoration copy() {
+            return new ChatTypeDecoration(translationKey, parameters.clone(), style.copy());
+        }
     }
 }

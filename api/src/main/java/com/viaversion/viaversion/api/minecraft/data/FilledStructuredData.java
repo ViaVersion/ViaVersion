@@ -60,6 +60,11 @@ final class FilledStructuredData<T> implements StructuredData<T> {
     }
 
     @Override
+    public StructuredData<T> copy() {
+        return new FilledStructuredData<>(this.key, this.copy(this.value), this.id);
+    }
+
+    @Override
     public T value() {
         return value;
     }

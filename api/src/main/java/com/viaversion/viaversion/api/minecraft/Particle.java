@@ -22,15 +22,15 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.IdHolder;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Particle implements IdHolder {
+public final class Particle implements IdHolder, Copyable {
     private final List<ParticleData<?>> arguments = new ArrayList<>(4);
     private int id;
 
@@ -73,6 +73,7 @@ public final class Particle implements IdHolder {
         arguments.set(index, new ParticleData<>(type, value));
     }
 
+    @Override
     public Particle copy() {
         final Particle particle = new Particle(id);
         for (ParticleData<?> argument : arguments) {
@@ -89,7 +90,7 @@ public final class Particle implements IdHolder {
             '}';
     }
 
-    public static final class ParticleData<T> {
+    public static final class ParticleData<T> implements Copyable {
         private final Type<T> type;
         private T value;
 
@@ -118,12 +119,9 @@ public final class Particle implements IdHolder {
             wrapper.write(type, value);
         }
 
+        @Override
         public ParticleData<T> copy() {
-            if (value instanceof Item item) {
-                return new ParticleData<>(type, (T) item.copy());
-            } else {
-                return new ParticleData<>(type, value);
-            }
+            return new ParticleData<>(type, copy(value));
         }
 
         @Override

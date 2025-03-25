@@ -24,9 +24,10 @@ package com.viaversion.viaversion.api.minecraft.item;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
+import com.viaversion.viaversion.util.Copyable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface Item {
+public interface Item extends Copyable {
 
     /**
      * Returns the item identifier.
@@ -102,6 +103,7 @@ public interface Item {
      *
      * @return copy of the item
      */
+    @Override
     Item copy();
 
     /**

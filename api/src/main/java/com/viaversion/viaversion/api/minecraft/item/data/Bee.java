@@ -26,9 +26,10 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 
-public record Bee(CompoundTag entityData, int ticksInHive, int minTicksInHive) {
+public record Bee(CompoundTag entityData, int ticksInHive, int minTicksInHive) implements Copyable {
 
     public static final Type<Bee> TYPE = new Type<>(Bee.class) {
         @Override
@@ -48,4 +49,8 @@ public record Bee(CompoundTag entityData, int ticksInHive, int minTicksInHive) {
     };
     public static final Type<Bee[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
+    @Override
+    public Bee copy() {
+        return new Bee(entityData.copy(), ticksInHive, minTicksInHive);
+    }
 }

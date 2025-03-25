@@ -24,10 +24,11 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 
 public record WrittenBook(FilterableString title, String author, int generation, FilterableComponent[] pages,
-                          boolean resolved) {
+                          boolean resolved) implements Copyable {
 
     public static final Type<WrittenBook> TYPE = new Type<>(WrittenBook.class) {
         @Override
@@ -50,4 +51,8 @@ public record WrittenBook(FilterableString title, String author, int generation,
         }
     };
 
+    @Override
+    public WrittenBook copy() {
+        return new WrittenBook(title, author, generation, copy(pages), resolved);
+    }
 }

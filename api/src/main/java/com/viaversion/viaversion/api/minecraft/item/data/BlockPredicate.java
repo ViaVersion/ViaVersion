@@ -27,12 +27,13 @@ import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher @Nullable [] propertyMatchers,
-                             @Nullable CompoundTag tag) {
+                             @Nullable CompoundTag tag) implements Copyable {
 
     public static final Type<BlockPredicate> TYPE = new Type<>(BlockPredicate.class) {
         @Override
@@ -64,5 +65,10 @@ public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher
 
         final HolderSet updatedHolders = holderSet.rewrite(blockIdRewriter);
         return new BlockPredicate(updatedHolders, propertyMatchers, tag);
+    }
+
+    @Override
+    public BlockPredicate copy() {
+        return new BlockPredicate(holderSet, copy(propertyMatchers), tag == null ? null : tag.copy());
     }
 }
