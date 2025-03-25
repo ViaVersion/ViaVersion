@@ -25,9 +25,10 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 
-public record FireworkExplosion(int shape, int[] colors, int[] fadeColors, boolean hasTrail, boolean hasTwinkle) {
+public record FireworkExplosion(int shape, int[] colors, int[] fadeColors, boolean hasTrail, boolean hasTwinkle) implements Copyable {
     public static final Type<FireworkExplosion> TYPE = new Type<>(FireworkExplosion.class) {
         @Override
         public FireworkExplosion read(final ByteBuf buffer) {
@@ -50,4 +51,8 @@ public record FireworkExplosion(int shape, int[] colors, int[] fadeColors, boole
     };
     public static final Type<FireworkExplosion[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
+    @Override
+    public FireworkExplosion copy() {
+        return new FireworkExplosion(shape, copy(colors), copy(fadeColors), hasTrail, hasTwinkle);
+    }
 }

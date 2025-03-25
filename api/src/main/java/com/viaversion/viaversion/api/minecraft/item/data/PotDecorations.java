@@ -24,10 +24,11 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public final class PotDecorations {
+public final class PotDecorations implements Copyable {
 
     public static final Type<PotDecorations> TYPE = new Type<>(PotDecorations.class) {
         @Override
@@ -81,5 +82,10 @@ public final class PotDecorations {
             newItems[i] = idRewriteFunction.applyAsInt(itemIds[i]);
         }
         return new PotDecorations(newItems);
+    }
+
+    @Override
+    public PotDecorations copy() {
+        return new PotDecorations(copy(itemIds));
     }
 }

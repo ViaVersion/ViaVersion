@@ -25,13 +25,14 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.Map;
 
 public record ArmorTrimMaterial(String assetName, int itemId, float itemModelIndex,
-                                Map<String, String> overrideArmorMaterials, Tag description) {
+                                Map<String, String> overrideArmorMaterials, Tag description) implements Copyable {
 
     public ArmorTrimMaterial(final String assetName, final int itemId, final Map<String, String> overrideArmorMaterials, final Tag description) {
         this(assetName, itemId, 0F, overrideArmorMaterials, description);
@@ -144,5 +145,10 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
 
     public ArmorTrimMaterial rewrite(final Int2IntFunction idRewriteFunction) {
         return new ArmorTrimMaterial(assetName, idRewriteFunction.applyAsInt(itemId), itemModelIndex, overrideArmorMaterials, description);
+    }
+
+    @Override
+    public ArmorTrimMaterial copy() {
+        return new ArmorTrimMaterial(assetName, itemId, itemModelIndex, new Object2ObjectArrayMap<>(overrideArmorMaterials), description);
     }
 }

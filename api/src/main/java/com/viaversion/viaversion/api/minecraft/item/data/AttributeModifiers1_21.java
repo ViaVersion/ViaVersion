@@ -25,10 +25,11 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean showInTooltip) {
+public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean showInTooltip) implements Copyable {
 
     public static final Type<AttributeModifiers1_21> TYPE = new Type<>(AttributeModifiers1_21.class) {
         @Override
@@ -52,6 +53,11 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
             modifiers[i] = new AttributeModifier(rewriteFunction.applyAsInt(modifier.attribute()), modifier.modifier(), modifier.slotType());
         }
         return new AttributeModifiers1_21(modifiers, showInTooltip);
+    }
+
+    @Override
+    public AttributeModifiers1_21 copy() {
+        return new AttributeModifiers1_21(copy(modifiers), showInTooltip);
     }
 
     public record AttributeModifier(int attribute, ModifierData modifier, int slotType) {

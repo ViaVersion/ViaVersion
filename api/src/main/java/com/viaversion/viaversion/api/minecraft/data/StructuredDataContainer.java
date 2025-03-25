@@ -26,6 +26,7 @@ import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -53,7 +54,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * </ul>
  * Other methods (e.g. {@link #getData(StructuredDataKey)} and {@link #has(StructuredDataKey)}) will handle both empty and non-empty data.
  */
-public final class StructuredDataContainer {
+public final class StructuredDataContainer implements Copyable {
 
     private final Map<StructuredDataKey<?>, StructuredData<?>> data;
     private FullMappings lookup;
@@ -245,6 +246,7 @@ public final class StructuredDataContainer {
         }
     }
 
+    @Override
     public StructuredDataContainer copy() {
         final Reference2ObjectOpenHashMap<StructuredDataKey<?>, StructuredData<?>> map = new Reference2ObjectOpenHashMap<>();
         for (final StructuredData<?> value : data.values()) {

@@ -27,11 +27,12 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record FoodProperties1_20_5(int nutrition, float saturationModifier, boolean canAlwaysEat, float eatSeconds,
-                                   @Nullable Item usingConvertsTo, FoodEffect[] possibleEffects) {
+                                   @Nullable Item usingConvertsTo, FoodEffect[] possibleEffects) implements Copyable {
 
     public static final Type<FoodProperties1_20_5> TYPE1_20_5 = new Type<>(FoodProperties1_20_5.class) {
         @Override
@@ -75,6 +76,11 @@ public record FoodProperties1_20_5(int nutrition, float saturationModifier, bool
             FoodEffect.ARRAY_TYPE.write(buffer, value.possibleEffects);
         }
     };
+
+    @Override
+    public FoodProperties1_20_5 copy() {
+        return new FoodProperties1_20_5(nutrition, saturationModifier, canAlwaysEat, eatSeconds, usingConvertsTo == null ? null : usingConvertsTo.copy(), copy(possibleEffects));
+    }
 
     public record FoodEffect(PotionEffect effect, float probability) {
 

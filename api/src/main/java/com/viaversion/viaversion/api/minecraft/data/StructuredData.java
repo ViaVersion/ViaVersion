@@ -22,11 +22,12 @@
  */
 package com.viaversion.viaversion.api.minecraft.data;
 
+import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.IdHolder;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface StructuredData<T> extends IdHolder {
+public interface StructuredData<T> extends IdHolder, Copyable {
 
     /**
      * Returns filled structured data, equivalent to an Optional with a value in vanilla.
@@ -52,7 +53,8 @@ public interface StructuredData<T> extends IdHolder {
         return new EmptyStructuredData<>(key, id);
     }
 
-    @Nullable T value();
+    @Nullable
+    T value();
 
     void setValue(final T value);
 
@@ -60,6 +62,7 @@ public interface StructuredData<T> extends IdHolder {
 
     StructuredDataKey<T> key();
 
+    @Override
     StructuredData<T> copy();
 
     /**

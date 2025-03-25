@@ -23,10 +23,11 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record AdventureModePredicate(BlockPredicate[] predicates, boolean showInTooltip) {
+public record AdventureModePredicate(BlockPredicate[] predicates, boolean showInTooltip) implements Copyable {
 
     public static final Type<AdventureModePredicate> TYPE = new Type<>(AdventureModePredicate.class) {
         @Override
@@ -49,5 +50,10 @@ public record AdventureModePredicate(BlockPredicate[] predicates, boolean showIn
             predicates[i] = this.predicates[i].rewrite(blockIdRewriter);
         }
         return new AdventureModePredicate(predicates, showInTooltip);
+    }
+
+    @Override
+    public AdventureModePredicate copy() {
+        return new AdventureModePredicate(copy(predicates), showInTooltip);
     }
 }

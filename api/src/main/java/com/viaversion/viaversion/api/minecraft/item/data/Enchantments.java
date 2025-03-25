@@ -24,11 +24,12 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
-public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) {
+public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) implements Copyable {
 
     public static final Type<Enchantments> TYPE = new Type<>(Enchantments.class) {
         @Override
@@ -77,5 +78,10 @@ public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) {
 
     public int getLevel(final int id) {
         return enchantments.getOrDefault(id, -1);
+    }
+
+    @Override
+    public Enchantments copy() {
+        return new Enchantments(new Int2IntOpenHashMap(enchantments), showInTooltip);
     }
 }

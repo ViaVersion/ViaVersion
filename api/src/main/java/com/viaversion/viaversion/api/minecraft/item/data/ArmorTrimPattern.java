@@ -25,10 +25,11 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record ArmorTrimPattern(String assetName, int itemId, Tag description, boolean decal) {
+public record ArmorTrimPattern(String assetName, int itemId, Tag description, boolean decal) implements Copyable {
 
     public static final HolderType<ArmorTrimPattern> TYPE = new HolderType<>() {
         @Override
@@ -51,5 +52,10 @@ public record ArmorTrimPattern(String assetName, int itemId, Tag description, bo
 
     public ArmorTrimPattern rewrite(final Int2IntFunction idRewriteFunction) {
         return new ArmorTrimPattern(assetName, idRewriteFunction.applyAsInt(itemId), description, decal);
+    }
+
+    @Override
+    public ArmorTrimPattern copy() {
+        return new ArmorTrimPattern(assetName, itemId, description.copy(), decal);
     }
 }

@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft;
 
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.util.Copyable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -31,12 +32,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param key key of the registry entry
  * @param tag data of the registry entry, or null if the client should use its default
  */
-public record RegistryEntry(String key, @Nullable Tag tag) {
+public record RegistryEntry(String key, @Nullable Tag tag) implements Copyable {
 
     public RegistryEntry withKey(final String key) {
         return new RegistryEntry(key, tag != null ? tag.copy() : null);
     }
 
+    @Override
     public RegistryEntry copy() {
         return new RegistryEntry(key, tag != null ? tag.copy() : null);
     }
