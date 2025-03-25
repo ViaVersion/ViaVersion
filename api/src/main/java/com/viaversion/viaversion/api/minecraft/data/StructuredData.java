@@ -60,6 +60,8 @@ public interface StructuredData<T> extends IdHolder {
 
     StructuredDataKey<T> key();
 
+    StructuredData<T> copy();
+
     /**
      * Returns whether the structured data is present. Even if true, the value may be null.
      *

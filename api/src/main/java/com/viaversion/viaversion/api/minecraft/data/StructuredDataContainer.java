@@ -246,7 +246,11 @@ public final class StructuredDataContainer {
     }
 
     public StructuredDataContainer copy() {
-        final StructuredDataContainer copy = new StructuredDataContainer(new Reference2ObjectOpenHashMap<>(data));
+        final Reference2ObjectOpenHashMap<StructuredDataKey<?>, StructuredData<?>> map = new Reference2ObjectOpenHashMap<>();
+        for (final StructuredData<?> value : data.values()) {
+            map.put(value.key(), value.copy());
+        }
+        final StructuredDataContainer copy = new StructuredDataContainer(map);
         copy.lookup = this.lookup;
         return copy;
     }

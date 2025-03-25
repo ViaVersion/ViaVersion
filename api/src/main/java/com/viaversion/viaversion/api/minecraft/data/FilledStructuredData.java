@@ -23,7 +23,10 @@
 package com.viaversion.viaversion.api.minecraft.data;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import io.netty.buffer.ByteBuf;
+import java.lang.reflect.Array;
 import java.util.Objects;
 
 final class FilledStructuredData<T> implements StructuredData<T> {
@@ -57,6 +60,28 @@ final class FilledStructuredData<T> implements StructuredData<T> {
     @Override
     public StructuredDataKey<T> key() {
         return key;
+    }
+
+    @Override
+    public StructuredData<T> copy() {
+        return new FilledStructuredData<>(this.key, this.copyValue(this.value), this.id);
+    }
+
+    private T copyValue(final T object) {
+        if (object instanceof Tag tag) {
+            return (T) tag.copy();
+        } else if (object instanceof StructuredItem structuredItem) {
+            return (T) structuredItem.copy();
+        } else if (object.getClass().isArray()) {
+            final Object[] array = (Object[]) object;
+            final Object[] copy = (Object[]) Array.newInstance(array.getClass().getComponentType(), array.length);
+            for (int i = 0; i < array.length; i++) {
+                copy[i] = copyValue((T) array[i]);
+            }
+            return (T) copy;
+        } else {
+            return object;
+        }
     }
 
     @Override

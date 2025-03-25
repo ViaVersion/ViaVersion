@@ -54,6 +54,11 @@ final class EmptyStructuredData<T> implements StructuredData<T> {
     }
 
     @Override
+    public StructuredData<T> copy() {
+        return new EmptyStructuredData<>(this.key, this.id);
+    }
+
+    @Override
     public T value() {
         return null;
     }
