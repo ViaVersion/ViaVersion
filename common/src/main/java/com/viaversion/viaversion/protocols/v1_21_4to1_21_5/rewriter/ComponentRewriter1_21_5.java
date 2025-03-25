@@ -123,6 +123,7 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
         if (!showInTooltip) {
             hiddenComponents.add(new StringTag(key));
         }
+        component.remove("show_in_tooltip");
     }
 
     private void handleAdventureModePredicate(final CompoundTag componentsTag, final String key) {

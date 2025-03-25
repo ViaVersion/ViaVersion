@@ -53,6 +53,7 @@ import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.util.Limit;
 
 public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPacket1_21_2, ClientboundPacket1_21_5, ServerboundPacket1_21_4, ServerboundPacket1_21_5> {
 
@@ -110,7 +111,7 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
             wrapper.passthrough(Types.STRING); // Command
             wrapper.passthrough(Types.LONG); // Timestamp
             wrapper.passthrough(Types.LONG); // Salt
-            final int signatures = wrapper.passthrough(Types.VAR_INT);
+            final int signatures = Limit.max(wrapper.passthrough(Types.VAR_INT), 8);
             for (int i = 0; i < signatures; i++) {
                 wrapper.passthrough(Types.STRING); // Argument name
                 wrapper.passthrough(Types.SIGNATURE_BYTES); // Signature
