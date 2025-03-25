@@ -47,7 +47,7 @@ public record ChatType(ChatTypeDecoration chatDecoration, ChatTypeDecoration nar
     };
 
     @Override
-    public Object copy() {
+    public ChatType copy() {
         return new ChatType(chatDecoration.copy(), narrationDecoration.copy());
     }
 
