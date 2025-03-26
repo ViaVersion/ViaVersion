@@ -145,10 +145,9 @@ public class ViaManagerImpl implements ViaManager {
 
             if (!protocolManager.isWorkingPipe()) {
                 platform.getLogger().warning("ViaVersion does not have any compatible versions for this server version!");
-                platform.getLogger().warning("Please remember that ViaVersion only adds support for versions newer than the server version.");
-                platform.getLogger().warning("If you need support for older versions you may need to use one or more ViaVersion addons too.");
-                platform.getLogger().warning("In that case please read the ViaVersion resource page carefully or use https://viaversion.com/setup");
-                platform.getLogger().warning("and if you're still unsure, feel free to join our Discord-Server for further assistance.");
+                platform.getLogger().warning("ViaVersion only supports newer client versions. Use ViaBackwards to allow older versions (ViaRewind for 1.7/1.8) to join.");
+                platform.getLogger().warning("Get setup help at https://viaversion.com/setup or download ViaBackwards/ViaRewind directly at https://ci.viaversion.com/");
+                platform.getLogger().warning("Need more help? Join our Discord at https://viaversion.com/discord");
             } else if (protocolVersion.highestSupportedProtocolVersion().olderThan(ProtocolVersion.v1_13)) {
                 platform.getLogger().warning("This version of Minecraft is extremely outdated and support for it has reached its end of life. "
                     + "You will still be able to run Via on this Minecraft version, but we will prioritize issues with legacy Minecraft versions less. "
