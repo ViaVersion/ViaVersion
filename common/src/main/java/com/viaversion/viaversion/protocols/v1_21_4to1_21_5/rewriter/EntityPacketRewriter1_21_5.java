@@ -303,6 +303,10 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             final boolean saddled = data.value();
             sendSaddleEquipment(event, saddled);
         });
+        filter().type(EntityTypes1_21_5.ABSTRACT_HORSE).index(17).handler((event, data) -> {
+            final byte flags = data.value();
+            sendSaddleEquipment(event, (flags & 0x04) != 0);
+        });
 
         filter().type(EntityTypes1_21_5.DOLPHIN).removeIndex(17); // Treasure pos
 
