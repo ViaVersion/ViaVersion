@@ -94,7 +94,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_3.AWARD_STATS);
 
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SYSTEM_CHAT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.DISGUISED_CHAT);
+        componentRewriter.registerDisguisedChat(ClientboundPackets1_20_3.DISGUISED_CHAT);
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_20_3.PLAYER_COMBAT_KILL);
 
         // People add item hovers to all sorts of weird places...

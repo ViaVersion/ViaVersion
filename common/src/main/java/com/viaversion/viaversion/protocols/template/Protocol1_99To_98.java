@@ -80,7 +80,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, 
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21_2.PLAYER_COMBAT_KILL);
         componentRewriter.registerPlayerInfoUpdate1_21_4(ClientboundPackets1_21_2.PLAYER_INFO_UPDATE);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SYSTEM_CHAT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.DISGUISED_CHAT);
+        componentRewriter.registerDisguisedChat(ClientboundPackets1_21_2.DISGUISED_CHAT);
         componentRewriter.registerPlayerChat1_21_5(ClientboundPackets1_21_2.PLAYER_CHAT);
         componentRewriter.registerPing();
 

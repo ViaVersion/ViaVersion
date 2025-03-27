@@ -30,6 +30,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -152,10 +153,26 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
         });
     }
 
+    public void registerDisguisedChat(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            passthroughAndProcess(wrapper); // Message
+            wrapper.passthrough(ChatType.TYPE); // Chat Type
+            passthroughAndProcess(wrapper); // Name
+            passthroughAndProcessOptional(wrapper); // Target Name
+        });
+    }
+
     public void passthroughAndProcess(final PacketWrapper wrapper) {
         switch (type) {
             case JSON -> processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
             case NBT -> processTag(wrapper.user(), wrapper.passthrough(Types.TAG));
+        }
+    }
+
+    public void passthroughAndProcessOptional(final PacketWrapper wrapper) {
+        switch (type) {
+            case JSON -> processText(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_COMPONENT));
+            case NBT -> processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
         }
     }
 
