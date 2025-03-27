@@ -22,6 +22,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.type.Types;
@@ -111,6 +112,15 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
             }
 
             processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
+
+            final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
+            if (filterMaskType == 2) { // Partially filtered
+                wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE); // Mask
+            }
+
+            wrapper.passthrough(ChatType.TYPE); // Chat Type
+            processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Name
+            processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Target Name
         });
     }
 }

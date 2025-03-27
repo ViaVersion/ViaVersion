@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_4;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_5;
+import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
@@ -123,6 +124,15 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
             }
 
             componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
+
+            final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
+            if (filterMaskType == 2) { // Partially filtered
+                wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE); // Mask
+            }
+
+            wrapper.passthrough(ChatType.TYPE); // Chat Type
+            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Name
+            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Target Name
         });
         registerServerbound(ServerboundPackets1_21_5.CHAT_COMMAND_SIGNED, wrapper -> {
             wrapper.passthrough(Types.STRING); // Command
