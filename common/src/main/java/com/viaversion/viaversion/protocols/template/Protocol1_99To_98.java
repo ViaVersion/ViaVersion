@@ -78,9 +78,10 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, 
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.DISCONNECT);
         componentRewriter.registerTabList(ClientboundPackets1_21_2.TAB_LIST);
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21_2.PLAYER_COMBAT_KILL);
+        componentRewriter.registerPlayerInfoUpdate1_21_4(ClientboundPackets1_21_2.PLAYER_INFO_UPDATE);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SYSTEM_CHAT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.DISGUISED_CHAT);
-        componentRewriter.registerPlayerInfoUpdate1_21_4(ClientboundPackets1_21_2.PLAYER_INFO_UPDATE);
+        componentRewriter.registerPlayerChat1_21_5(ClientboundPackets1_21_2.PLAYER_CHAT);
         componentRewriter.registerPing();
 
         // If needed for any particle, item, or block changes. Extend ParticleRewriter for particle serializer changes

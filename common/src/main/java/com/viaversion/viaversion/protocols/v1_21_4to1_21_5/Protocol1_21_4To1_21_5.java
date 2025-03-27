@@ -17,8 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_4to1_21_5;
 
-import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
-
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
@@ -54,6 +52,8 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.Limit;
+
+import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
 public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPacket1_21_2, ClientboundPacket1_21_5, ServerboundPacket1_21_4, ServerboundPacket1_21_5> {
 
@@ -106,6 +106,23 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
         registerClientbound(ClientboundPackets1_21_2.PLAYER_CHAT, wrapper -> {
             final MessageIndexStorage messageIndexStorage = wrapper.user().get(MessageIndexStorage.class);
             wrapper.write(Types.VAR_INT, messageIndexStorage.getAndIncrease());
+
+            wrapper.passthrough(Types.UUID); // Sender
+            wrapper.passthrough(Types.VAR_INT); // Index
+            wrapper.passthrough(Types.OPTIONAL_SIGNATURE_BYTES); // Signature
+            wrapper.passthrough(Types.STRING); // Plain content
+            wrapper.passthrough(Types.LONG); // Timestamp
+            wrapper.passthrough(Types.LONG); // Salt
+
+            final int lastSeen = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < lastSeen; i++) {
+                final int index = wrapper.passthrough(Types.VAR_INT);
+                if (index == 0) {
+                    wrapper.passthrough(Types.SIGNATURE_BYTES);
+                }
+            }
+
+            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
         });
         registerServerbound(ServerboundPackets1_21_5.CHAT_COMMAND_SIGNED, wrapper -> {
             wrapper.passthrough(Types.STRING); // Command

@@ -24,6 +24,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.TagUtil;
 
 /**
@@ -89,5 +90,27 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
     @Override
     protected String hoverEventKey() {
         return "hover_event";
+    }
+
+    public void registerPlayerChat1_21_5(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Index
+            wrapper.passthrough(Types.UUID); // Sender
+            wrapper.passthrough(Types.VAR_INT); // Index
+            wrapper.passthrough(Types.OPTIONAL_SIGNATURE_BYTES); // Signature
+            wrapper.passthrough(Types.STRING); // Plain content
+            wrapper.passthrough(Types.LONG); // Timestamp
+            wrapper.passthrough(Types.LONG); // Salt
+
+            final int lastSeen = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < lastSeen; i++) {
+                final int index = wrapper.passthrough(Types.VAR_INT);
+                if (index == 0) {
+                    wrapper.passthrough(Types.SIGNATURE_BYTES);
+                }
+            }
+
+            processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
+        });
     }
 }
