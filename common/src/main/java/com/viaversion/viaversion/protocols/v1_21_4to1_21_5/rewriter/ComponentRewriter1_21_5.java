@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
-import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
 import java.net.URI;
@@ -244,7 +243,7 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
         updateUglyJson(componentsTag, "item_name", connection);
         updateUglyJson(componentsTag, "custom_name", connection);
 
-        final String loreKey = componentsTag.contains("lore") ? "lore" : "minecraft:lore";
+        final String loreKey = TagUtil.getNamespacedTagKey(componentsTag, "lore");
         final ListTag<StringTag> lore = componentsTag.getListTag(loreKey, StringTag.class);
         if (lore != null) {
             componentsTag.put(loreKey, updateComponentList(connection, lore));
@@ -265,15 +264,10 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
     }
 
     private void updateUglyJson(final CompoundTag componentsTag, final String key, final UserConnection connection) {
-        String actualKey = Key.namespaced(key);
-        String json = componentsTag.getString(actualKey);
+        final String actualKey = TagUtil.getNamespacedTagKey(componentsTag, key);
+        final String json = componentsTag.getString(actualKey);
         if (json == null) {
-            actualKey = Key.stripMinecraftNamespace(key);
-            json = componentsTag.getString(actualKey);
-
-            if (json == null) {
-                return;
-            }
+           return;
         }
 
         componentsTag.put(actualKey, uglyJsonToTag(connection, json));
