@@ -105,6 +105,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
     private static final DataComponentMatchers EMPTY_DATA_MATCHERS = new DataComponentMatchers(new StructuredData[0], new DataComponentPredicate[0]);
     private static final Heightmap[] EMPTY_HEIGHTMAPS = new Heightmap[0];
     private static final int SIGN_BOCK_ENTITY_ID = 7;
+    private static final int HANGING_SIGN_BOCK_ENTITY_ID = 8;
 
     public BlockItemPacketRewriter1_21_5(final Protocol1_21_4To1_21_5 protocol) {
         super(protocol,
@@ -224,7 +225,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
 
     private void handleBlockEntity(final UserConnection connection, final BlockEntity blockEntity) {
         final CompoundTag tag = blockEntity.tag();
-        if (tag != null && blockEntity.typeId() == SIGN_BOCK_ENTITY_ID) {
+        if (tag != null && (blockEntity.typeId() == SIGN_BOCK_ENTITY_ID || blockEntity.typeId() == HANGING_SIGN_BOCK_ENTITY_ID)) {
             updateSignMessages(connection, tag.getCompoundTag("front_text"));
             updateSignMessages(connection, tag.getCompoundTag("back_text"));
         }
