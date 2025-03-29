@@ -2,6 +2,8 @@ dependencies {
     api(projects.viaversionApi)
     api(rootProject.libs.text) {
         exclude("com.google.code.gson", "gson")
+        exclude("com.google.guava", "guava")
+        exclude("com.viaversion", "nbt")
     }
 
     // Note: If manually starting tests doesn't work for you in IJ, change 'Gradle -> Run Tests Using' to 'IntelliJ IDEA'

@@ -24,6 +24,7 @@ dependencies {
     }
     implementation(rootProject.libs.text) {
         exclude("com.google.code.gson", "gson")
+        exclude("com.google.guava", "guava")
         exclude("com.viaversion", "nbt")
     }
     api(libs.snakeYaml)
