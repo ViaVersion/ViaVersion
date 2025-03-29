@@ -26,7 +26,7 @@ jobs:
       run: ./gradlew build
     - name: Upload Artifacts to GitHub
       # Only upload on the preview repository as there is no CI job for it.
-      if: ${{ github.repository == 'ViaVersionDev' && github.ref_name == 'preview' }}
+      if: ${{ github.repository == 'ViaVersion/ViaVersionDev' && github.ref_name == 'preview' }}
       uses: actions/upload-artifact@v4
       with:
         name: Artifacts
