@@ -44,8 +44,8 @@ public class ChunkBiomesType1_19_4 extends Type<DataPalette[]> {
 
     @Override
     public DataPalette[] read(final ByteBuf buffer) {
-        ByteBuf data = buffer.readSlice(Types.VAR_INT.readPrimitive(buffer));
-        DataPalette[] sections = new DataPalette[ySectionCount];
+        final ByteBuf data = buffer.readSlice(Types.VAR_INT.readPrimitive(buffer));
+        final DataPalette[] sections = new DataPalette[ySectionCount];
         for (int i = 0; i < ySectionCount; i++) {
             sections[i] = paletteType.read(data);
         }

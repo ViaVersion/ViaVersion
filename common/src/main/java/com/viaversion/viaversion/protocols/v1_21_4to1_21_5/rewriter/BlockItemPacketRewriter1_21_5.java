@@ -154,13 +154,14 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
 
         protocol.registerClientbound(ClientboundPackets1_21_2.CHUNKS_BIOMES, wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
-            int globalPaletteBiomeBits = ceilLog2(tracker.biomesSent());
-            Type<DataPalette[]> biomesType = new ChunkBiomesType1_19_4(tracker.currentWorldSectionHeight(), globalPaletteBiomeBits);
-            Type<DataPalette[]> newBomesType = new ChunkBiomesType1_21_5(tracker.currentWorldSectionHeight(), globalPaletteBiomeBits);
-            int size = wrapper.passthrough(Types.VAR_INT);
+            final int globalPaletteBiomeBits = ceilLog2(tracker.biomesSent());
+            final Type<DataPalette[]> biomesType = new ChunkBiomesType1_19_4(tracker.currentWorldSectionHeight(), globalPaletteBiomeBits);
+            final Type<DataPalette[]> newBiomesType = new ChunkBiomesType1_21_5(tracker.currentWorldSectionHeight(), globalPaletteBiomeBits);
+
+            final int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
                 wrapper.passthrough(Types.CHUNK_POSITION);
-                wrapper.passthroughAndMap(biomesType, newBomesType);
+                wrapper.passthroughAndMap(biomesType, newBiomesType);
             }
         });
 
