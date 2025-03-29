@@ -5,7 +5,7 @@ metadata.format.version = "1.1"
 gson = "2.12.1"
 fastutil = "8.5.15"
 vianbt = "5.1.0"
-mcstructs = "5-2.5.5-SNAPSHOT"
+mcstructs = "5-3.0.0"
 
 # Common provided
 netty = "4.0.20.Final"

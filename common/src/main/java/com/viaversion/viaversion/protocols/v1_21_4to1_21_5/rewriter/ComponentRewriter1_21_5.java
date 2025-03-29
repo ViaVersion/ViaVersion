@@ -299,7 +299,7 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
     }
 
     public Tag uglyJsonToTag(final UserConnection connection, final String value) {
-        final Tag contents = SerializerVersion.V1_21_4.toTag(SerializerVersion.V1_21_4.toComponent(value));
+        final Tag contents = SerializerVersion.V1_21_5.toTag(SerializerVersion.V1_21_4.toComponent(value));
         processTag(connection, contents);
         return contents;
     }

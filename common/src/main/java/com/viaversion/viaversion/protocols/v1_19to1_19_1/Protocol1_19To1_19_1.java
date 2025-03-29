@@ -55,9 +55,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import net.lenni0451.mcstructs.core.TextFormatting;
-import net.lenni0451.mcstructs.text.ATextComponent;
 import net.lenni0451.mcstructs.text.Style;
+import net.lenni0451.mcstructs.text.TextComponent;
+import net.lenni0451.mcstructs.text.TextFormatting;
 import net.lenni0451.mcstructs.text.components.TranslationComponent;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -394,7 +394,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
 
         // Add the replacements
         final ListTag<StringTag> parameters = tag.getListTag("parameters", StringTag.class);
-        final List<ATextComponent> arguments = new ArrayList<>();
+        final List<TextComponent> arguments = new ArrayList<>();
         if (parameters != null) {
             for (final StringTag element : parameters) {
                 JsonElement argument = null;

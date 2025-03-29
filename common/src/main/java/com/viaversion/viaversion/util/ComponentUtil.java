@@ -25,12 +25,12 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
-import net.lenni0451.mcstructs.text.ATextComponent;
 import net.lenni0451.mcstructs.text.Style;
-import net.lenni0451.mcstructs.text.events.hover.AHoverEvent;
-import net.lenni0451.mcstructs.text.events.hover.impl.TextHoverEvent;
-import net.lenni0451.mcstructs.text.serializer.LegacyStringDeserializer;
+import net.lenni0451.mcstructs.text.TextComponent;
 import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
+import net.lenni0451.mcstructs.text.stringformat.StringFormat;
+import net.lenni0451.mcstructs.text.stringformat.handling.ColorHandling;
+import net.lenni0451.mcstructs.text.stringformat.handling.DeserializerUnknownHandling;
 import net.lenni0451.mcstructs.text.utils.TextUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -57,7 +57,7 @@ public final class ComponentUtil {
 
     public static @Nullable JsonElement tagToJson(@Nullable final Tag tag) {
         try {
-            final ATextComponent component = SerializerVersion.V1_20_3.toComponent(tag);
+            final TextComponent component = SerializerVersion.V1_20_3.toComponent(tag);
             return component != null ? SerializerVersion.V1_19_4.toJson(component) : null;
         } catch (final Exception e) {
             if (!Via.getConfig().isSuppressConversionWarnings()) {
@@ -73,7 +73,7 @@ public final class ComponentUtil {
         }
 
         try {
-            final ATextComponent component = SerializerVersion.V1_19_4.toComponent(element);
+            final TextComponent component = SerializerVersion.V1_19_4.toComponent(element);
             return trimStrings(SerializerVersion.V1_20_3.toTag(component));
         } catch (final Exception e) {
             if (!Via.getConfig().isSuppressConversionWarnings()) {
@@ -102,7 +102,7 @@ public final class ComponentUtil {
 
     public static @Nullable String tagToJsonString(@Nullable final Tag tag) {
         try {
-            final ATextComponent component = SerializerVersion.V1_20_5.toComponent(tag);
+            final TextComponent component = SerializerVersion.V1_20_5.toComponent(tag);
             return component != null ? SerializerVersion.V1_20_3.toString(component) : null;
         } catch (final Exception e) {
             if (!Via.getConfig().isSuppressConversionWarnings()) {
@@ -124,35 +124,23 @@ public final class ComponentUtil {
     }
 
     public static @Nullable JsonElement convertJson(@Nullable final JsonElement element, final SerializerVersion from, final SerializerVersion to) {
-        return element != null ? convert(from, to, from.toComponent(element)) : null;
+        return element != null ? to.toJson(from.toComponent(element)) : null;
     }
 
     public static @Nullable JsonElement convertJson(@Nullable final String json, final SerializerVersion from, final SerializerVersion to) {
-        return json != null ? convert(from, to, from.toComponent(json)) : null;
+        return json != null ? to.toJson(from.toComponent(json)) : null;
     }
 
     public static @Nullable JsonElement convertJsonOrEmpty(@Nullable final String json, final SerializerVersion from, final SerializerVersion to) {
-        final ATextComponent component = from.toComponent(json);
+        final TextComponent component = from.toComponent(json);
         if (component == null) {
             return emptyJsonComponent();
         }
         return to.toJson(component);
     }
 
-    private static JsonElement convert(final SerializerVersion from, final SerializerVersion to, final ATextComponent component) {
-        if (from.ordinal() >= SerializerVersion.V1_16.ordinal() && to.ordinal() < SerializerVersion.V1_16.ordinal()) {
-            // Convert hover event to legacy format
-            final Style style = component.getStyle();
-            final AHoverEvent hoverEvent = style.getHoverEvent();
-            if (hoverEvent != null && !(hoverEvent instanceof TextHoverEvent)) {
-                style.setHoverEvent(hoverEvent.toLegacy(to.jsonSerializer, to.snbtSerializer));
-            }
-        }
-        return to.toJson(component);
-    }
-
     public static JsonElement legacyToJson(final String message) {
-        return SerializerVersion.V1_12.toJson(LegacyStringDeserializer.parse(message, true));
+        return SerializerVersion.V1_12.toJson(StringFormat.vanilla().fromString(message, ColorHandling.RESET, DeserializerUnknownHandling.WHITE));
     }
 
     public static String legacyToJsonString(final String message) {
@@ -160,7 +148,7 @@ public final class ComponentUtil {
     }
 
     public static String legacyToJsonString(final String message, final boolean itemData) {
-        final ATextComponent component = LegacyStringDeserializer.parse(message, true);
+        final TextComponent component = StringFormat.vanilla().fromString(message, ColorHandling.RESET, DeserializerUnknownHandling.WHITE);
         if (itemData) {
             TextUtils.iterateAll(component, c -> {
                 if (!c.getStyle().isEmpty()) {
