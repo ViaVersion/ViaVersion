@@ -192,9 +192,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             }
         }
         if (serverProtocolVersion.olderThan(ProtocolVersion.v1_21_4)) {
-            if (PaperViaInjector.hasMethod(Material.class, "isItem")) {
-                Via.getManager().getProviders().use(PickItemProvider.class, new BukkitPickItemProvider(plugin));
-            }
+            Via.getManager().getProviders().use(PickItemProvider.class, new BukkitPickItemProvider(plugin));
         }
 
         // Needs to be enabled on any version with the updated item desync check
