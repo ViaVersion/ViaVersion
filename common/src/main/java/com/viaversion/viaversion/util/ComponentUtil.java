@@ -27,6 +27,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import net.lenni0451.mcstructs.text.Style;
 import net.lenni0451.mcstructs.text.TextComponent;
+import net.lenni0451.mcstructs.text.components.StringComponent;
+import net.lenni0451.mcstructs.text.events.hover.HoverEvent;
+import net.lenni0451.mcstructs.text.events.hover.impl.EntityHoverEvent;
+import net.lenni0451.mcstructs.text.events.hover.impl.ItemHoverEvent;
 import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
 import net.lenni0451.mcstructs.text.stringformat.StringFormat;
 import net.lenni0451.mcstructs.text.stringformat.handling.ColorHandling;
@@ -124,17 +128,43 @@ public final class ComponentUtil {
     }
 
     public static @Nullable JsonElement convertJson(@Nullable final JsonElement element, final SerializerVersion from, final SerializerVersion to) {
-        return element != null ? to.toJson(from.toComponent(element)) : null;
+        return element != null ? convert(from, to, from.toComponent(element)) : null;
     }
 
     public static @Nullable JsonElement convertJson(@Nullable final String json, final SerializerVersion from, final SerializerVersion to) {
-        return json != null ? to.toJson(from.toComponent(json)) : null;
+        return json != null ? convert(from, to, from.toComponent(json)) : null;
     }
 
     public static @Nullable JsonElement convertJsonOrEmpty(@Nullable final String json, final SerializerVersion from, final SerializerVersion to) {
         final TextComponent component = from.toComponent(json);
         if (component == null) {
             return emptyJsonComponent();
+        }
+        return to.toJson(component);
+    }
+
+    private static JsonElement convert(final SerializerVersion from, final SerializerVersion to, final TextComponent component) {
+        if (from.ordinal() >= SerializerVersion.V1_16.ordinal() && to.ordinal() < SerializerVersion.V1_16.ordinal()) {
+            // Convert hover event to legacy format
+            final Style style = component.getStyle();
+            final HoverEvent hoverEvent = style.getHoverEvent();
+            if (hoverEvent instanceof EntityHoverEvent entityHoverEvent && entityHoverEvent.isModern()) {
+                final EntityHoverEvent.ModernHolder entityData = entityHoverEvent.asModern();
+                final CompoundTag tag = new CompoundTag();
+                tag.putString("type", entityData.getType().get());
+                tag.putString("id", entityData.getUuid().toString());
+                tag.putString("name", to.toString(entityData.getName() != null ? entityData.getName() : new StringComponent("")));
+                entityHoverEvent.setLegacyData(new StringComponent(to.toSNBT(tag)));
+            } else if (hoverEvent instanceof ItemHoverEvent itemHoverEvent && itemHoverEvent.isModern()) {
+                final ItemHoverEvent.ModernHolder itemData = itemHoverEvent.asModern();
+                final CompoundTag tag = new CompoundTag();
+                tag.putString("id", itemData.getId().get());
+                tag.putByte("Count", (byte) itemData.getCount());
+                if (itemData.getTag() != null) {
+                    tag.put("tag", itemData.getTag());
+                }
+                itemHoverEvent.setLegacyData(to.toSNBT(tag));
+            }
         }
         return to.toJson(component);
     }
