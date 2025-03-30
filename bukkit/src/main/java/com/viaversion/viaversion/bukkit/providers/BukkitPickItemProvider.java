@@ -173,6 +173,7 @@ public class BukkitPickItemProvider extends PickItemProvider {
         return heldSlot;
     }
 
+    @FunctionalInterface
     private interface BlockToItem {
         ItemStack apply(final Block block, final boolean includeData);
 
@@ -196,6 +197,7 @@ public class BukkitPickItemProvider extends PickItemProvider {
 
     }
 
+    @FunctionalInterface
     private interface GetStorageContents {
         ItemStack[] apply(final PlayerInventory inv);
 
@@ -208,6 +210,8 @@ public class BukkitPickItemProvider extends PickItemProvider {
         }
 
     }
+
+    @FunctionalInterface
     private interface SetInHand {
         void apply(final PlayerInventory inv, final ItemStack stack);
 
@@ -220,6 +224,4 @@ public class BukkitPickItemProvider extends PickItemProvider {
             }
         }
     }
-
-
 }

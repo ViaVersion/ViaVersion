@@ -178,7 +178,7 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
                 // and consume time really high, so the eating animation doesn't play
                 item.dataContainer().set(StructuredDataKey.CONSUMABLE1_21_2,
                     new Consumable1_21_2(
-                        3600, 
+                        3600,
                         3,
                         Holder.of(new SoundEvent("minecraft:intentionally_empty", null)),
                         false,
