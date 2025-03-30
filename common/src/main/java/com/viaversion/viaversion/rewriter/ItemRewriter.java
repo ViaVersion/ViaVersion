@@ -198,6 +198,12 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     public void registerSetCreativeModeSlot1_21_5(S packetType, Type<Item> lengthPrefixedItemType, Type<Item> mappedLengthPrefixedItemType) {
         protocol.registerServerbound(packetType, wrapper -> {
+            if (!protocol.getEntityRewriter().tracker(wrapper.user()).canInstaBuild()) {
+                // Mimic server/client behavior
+                wrapper.cancel();
+                return;
+            }
+
             wrapper.passthrough(Types.SHORT); // Slot
             passthroughLengthPrefixedItem(wrapper, lengthPrefixedItemType, mappedLengthPrefixedItemType);
         });

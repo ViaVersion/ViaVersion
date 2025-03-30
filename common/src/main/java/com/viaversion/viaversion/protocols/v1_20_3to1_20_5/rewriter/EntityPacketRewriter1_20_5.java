@@ -24,6 +24,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
+import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
@@ -64,7 +65,6 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
     private static final UUID CREATIVE_BLOCK_INTERACTION_RANGE = UUID.fromString("736565d2-e1a7-403d-a3f8-1aeb3e302542");
     private static final UUID CREATIVE_ENTITY_INTERACTION_RANGE = UUID.fromString("98491ef6-97b1-4584-ae82-71a8cc85cf73");
-    private static final int CREATIVE_MODE_ID = 1;
 
     public EntityPacketRewriter1_20_5(final Protocol1_20_3To1_20_5 protocol) {
         super(protocol);
@@ -279,7 +279,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
                     // Handle creative interaction range
                     final byte gamemode = wrapper.get(Types.BYTE, 0);
-                    if (gamemode == CREATIVE_MODE_ID) {
+                    if (gamemode == GameMode.CREATIVE.id()) {
                         sendRangeAttributes(wrapper.user(), true);
                     }
                 });
@@ -296,7 +296,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             wrapper.passthrough(Types.LONG); // Seed
 
             final byte gamemode = wrapper.passthrough(Types.BYTE);
-            sendRangeAttributes(wrapper.user(), gamemode == CREATIVE_MODE_ID);
+            sendRangeAttributes(wrapper.user(), gamemode == GameMode.CREATIVE.id());
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_MOB_EFFECT, wrapper -> {
@@ -338,8 +338,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             }
 
             // Resend attributes either with their original list or with the creative range modifier added
-            final float value = wrapper.passthrough(Types.FLOAT);
-            sendRangeAttributes(wrapper.user(), value == CREATIVE_MODE_ID);
+            final int value = (int) Math.floor(wrapper.passthrough(Types.FLOAT) + 0.5F);
+            sendRangeAttributes(wrapper.user(), value == GameMode.CREATIVE.id());
         });
     }
 

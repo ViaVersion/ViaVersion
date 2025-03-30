@@ -115,30 +115,10 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             wolfSoundVariantsPacket.send(Protocol1_21_4To1_21_5.class);
         });
 
-        protocol.registerClientbound(ClientboundPackets1_21_2.LOGIN, wrapper -> {
+        registerRespawn1_20_5(ClientboundPackets1_21_2.RESPAWN);
+        registerLogin1_20_5(ClientboundPackets1_21_2.LOGIN);
+        protocol.appendClientbound(ClientboundPackets1_21_2.LOGIN, wrapper -> {
             wrapper.user().get(MessageIndexStorage.class).setIndex(0);
-
-            final int entityId = wrapper.passthrough(Types.INT); // Entity id
-            wrapper.passthrough(Types.BOOLEAN); // Hardcore
-            wrapper.passthrough(Types.STRING_ARRAY); // World List
-            wrapper.passthrough(Types.VAR_INT); // Max players
-            wrapper.passthrough(Types.VAR_INT); // View distance
-            wrapper.passthrough(Types.VAR_INT); // Simulation distance
-            wrapper.passthrough(Types.BOOLEAN); // Reduced debug info
-            wrapper.passthrough(Types.BOOLEAN); // Show death screen
-            wrapper.passthrough(Types.BOOLEAN); // Limited crafting
-
-            final int dimensionId = wrapper.passthrough(Types.VAR_INT);
-            final String world = wrapper.passthrough(Types.STRING);
-            trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world);
-
-            trackPlayer(wrapper.user(), entityId);
-        });
-
-        protocol.registerClientbound(ClientboundPackets1_21_2.RESPAWN, wrapper -> {
-            final int dimensionId = wrapper.passthrough(Types.VAR_INT);
-            final String world = wrapper.passthrough(Types.STRING);
-            trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world);
         });
 
         protocol.registerClientbound(ClientboundPackets1_21_2.SET_PLAYER_TEAM, wrapper -> {

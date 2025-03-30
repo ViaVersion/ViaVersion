@@ -124,6 +124,20 @@ public interface EntityTracker {
     void setClientEntityId(int clientEntityId);
 
     /**
+     * Returns whether the client player has the "insta build" ability, usually from creative mode.
+     *
+     * @return whether the client player can insta build
+     */
+    boolean canInstaBuild();
+
+    /**
+     * Sets whether the client player has the "insta build" ability, usually from creative mode.
+     *
+     * @param instaBuild whether the client player can insta build
+     */
+    void setInstaBuild(boolean instaBuild);
+
+    /**
      * Returns the current world section height (block height / 16).
      * This is always 16 for sub 1.17 worlds.
      *
