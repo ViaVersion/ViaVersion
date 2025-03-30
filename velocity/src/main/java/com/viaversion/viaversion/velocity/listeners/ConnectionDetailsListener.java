@@ -32,7 +32,7 @@ public class ConnectionDetailsListener {
 
     @Subscribe
     public void onPostServerJoin(final ServerPostConnectEvent event) {
-        final UserConnection connection = Via.getAPI().getConnection(event.getPlayer().getUniqueId());
+        final UserConnection connection = Via.getManager().getConnectionManager().getClientConnection(event.getPlayer().getUniqueId());
         ConnectionDetails.sendConnectionDetails(connection, ConnectionDetails.PROXY_CHANNEL);
     }
 

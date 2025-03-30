@@ -19,6 +19,7 @@ package com.viaversion.viaversion.connection;
 
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
@@ -37,7 +38,14 @@ public final class ConnectionDetails {
     public static final String APP_CHANNEL = "vv:app_details";
 
     public static void sendConnectionDetails(final UserConnection connection, final String channel) {
-        final ProtocolVersion nativeVersion = connection.getProtocolInfo().protocolVersion();
+        final ProtocolInfo protocolInfo = connection.getProtocolInfo();
+        final ProtocolVersion nativeVersion = protocolInfo.protocolVersion();
+        final ProtocolVersion serverVersion = protocolInfo.serverProtocolVersion();
+        if (serverVersion.equals(nativeVersion)) {
+            // No need to send details if the native version is the same as the server version
+            return;
+        }
+
         final String platformName = Via.getPlatform().getPlatformName();
         final String platformVersion = Via.getPlatform().getPlatformVersion();
 
