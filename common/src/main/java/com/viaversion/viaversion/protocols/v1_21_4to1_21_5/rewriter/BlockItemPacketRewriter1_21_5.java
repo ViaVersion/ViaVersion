@@ -174,6 +174,11 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         registerMerchantOffers1_20_5(ClientboundPackets1_21_2.MERCHANT_OFFERS);
 
         protocol.registerServerbound(ServerboundPackets1_21_5.SET_CREATIVE_MODE_SLOT, wrapper -> {
+            if (!protocol.getEntityRewriter().tracker(wrapper.user()).canInstaBuild()) {
+                wrapper.cancel();
+                return;
+            }
+
             wrapper.passthrough(Types.SHORT); // Slot
 
             final Item item = handleItemToServer(wrapper.user(), wrapper.read(Types1_21_5.LENGTH_PREFIXED_ITEM));

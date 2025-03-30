@@ -56,6 +56,8 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         registerTrackerWithData1_19(ClientboundPackets1_21_2.ADD_ENTITY, EntityTypes1_21_5.FALLING_BLOCK);
         registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA, Types1_21_4.ENTITY_DATA_LIST, Types1_21_5.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_21_2.REMOVE_ENTITIES);
+        registerPlayerAbilities(ClientboundPackets1_21_2.PLAYER_ABILITIES);
+        registerGameEvent(ClientboundPackets1_21_2.GAME_EVENT);
 
         // No more special experience orb add packet
         protocol.registerClientbound(ClientboundPackets1_21_2.ADD_EXPERIENCE_ORB, ClientboundPackets1_21_5.ADD_ENTITY, wrapper -> {
