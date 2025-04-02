@@ -255,12 +255,12 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             wrapper.passthrough(Types.SHORT); // Slot
             wrapper.passthrough(Types.BYTE); // Button
             wrapper.passthrough(Types.VAR_INT); // Mode
-            passthroughHashedItem(wrapper); // Carried item
             final int affectedItems = Limit.max(wrapper.passthrough(Types.VAR_INT), 128);
             for (int i = 0; i < affectedItems; i++) {
                 wrapper.passthrough(Types.SHORT); // Slot
                 passthroughHashedItem(wrapper);
             }
+            passthroughHashedItem(wrapper); // Carried item
         });
     }
 
