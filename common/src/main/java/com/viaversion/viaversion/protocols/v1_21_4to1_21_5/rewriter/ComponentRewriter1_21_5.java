@@ -109,6 +109,19 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
         handleEnchantments(componentsTag, "enchantments");
         handleEnchantments(componentsTag, "stored_enchantments");
 
+        // Usual item handling
+        final CompoundTag useRemainder = TagUtil.getNamespacedCompoundTag(componentsTag, "use_remainder");
+        if (useRemainder != null) {
+            handleShowItem(connection, useRemainder);
+        }
+        handleContainerContents(connection, componentsTag);
+        handleItemArrayContents(connection, componentsTag, "bundle_contents");
+        handleItemArrayContents(connection, componentsTag, "charged_projectiles");
+        handleWrittenBookContents(connection, componentsTag);
+
+        // NO MORE SNBT IN TEXT COMPONENTS
+        updateUglyJson(componentsTag, connection);
+
         removeDataComponents(componentsTag, StructuredDataKey.INSTRUMENT1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE1_21);
     }
 
@@ -218,22 +231,9 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
             final CompoundTag componentsTag = compoundContents.getCompoundTag("components");
             handleShowItem(connection, compoundContents, componentsTag);
 
-            if (componentsTag == null) {
-                return;
+            if (componentsTag != null) {
+                hoverEventTag.put("components", componentsTag);
             }
-
-            hoverEventTag.put("components", componentsTag);
-
-            final CompoundTag useRemainder = TagUtil.getNamespacedCompoundTag(componentsTag, "use_remainder");
-            if (useRemainder != null) {
-                handleShowItem(connection, useRemainder);
-            }
-            handleContainerContents(connection, componentsTag);
-            handleItemArrayContents(connection, componentsTag, "bundle_contents");
-            handleItemArrayContents(connection, componentsTag, "charged_projectiles");
-            handleWrittenBookContents(connection, componentsTag);
-
-            updateUglyJson(componentsTag, connection);
         } else if (contentsTag instanceof final StringTag inlinedContents) {
             hoverEventTag.put("id", inlinedContents);
         }
@@ -267,7 +267,7 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
         final String actualKey = TagUtil.getNamespacedTagKey(componentsTag, key);
         final String json = componentsTag.getString(actualKey);
         if (json == null) {
-           return;
+            return;
         }
 
         componentsTag.put(actualKey, uglyJsonToTag(connection, json));
