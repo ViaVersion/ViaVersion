@@ -470,22 +470,18 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         CompoundTag entityTag = tag.getCompoundTag("EntityTag");
         if (entityTag != null) {
-            entityTag = entityTag.copy();
-            if (entityTag.contains("variant")) {
-                entityTag.putString("id", "minecraft:painting");
-            } else if (entityTag.contains("ShowArms")) {
-                entityTag.putString("id", "minecraft:armor_stand");
+            if (entityTag.contains("id")) {
+                // Only set when a 1.20.4 client would also parse the data
+                data.set(StructuredDataKey.ENTITY_DATA, entityTag);
             }
-            data.set(StructuredDataKey.ENTITY_DATA, entityTag);
         }
 
         final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
         if (blockEntityTag != null) {
-            final CompoundTag clonedTag = blockEntityTag.copy();
-            updateBlockEntityTag(connection, data, clonedTag);
-
-            // Not always needed, e.g. shields that had the base color in a block entity tag before
             if (blockEntityTag.contains("id")) {
+                // Only set when a 1.20.4 client would also parse the data
+                final CompoundTag clonedTag = blockEntityTag.copy();
+                updateBlockEntityTag(connection, data, clonedTag);
                 item.dataContainer().set(StructuredDataKey.BLOCK_ENTITY_DATA, clonedTag);
             }
         }
@@ -1424,18 +1420,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
     }
 
-    private void addBlockEntityId(final CompoundTag tag, final String id) {
-        if (!tag.contains("id")) {
-            tag.putString("id", id);
-        }
-    }
-
     private boolean isUnknownBlockEntity(final int id) {
         return id < 0 || id > 42;
     }
 
     private void updateBlockEntityTag(final UserConnection connection, @Nullable final StructuredDataContainer data, final CompoundTag tag) {
-        if (tag == null) {
+        if (tag == null || !tag.contains("id")) {
             return;
         }
 
@@ -1448,7 +1438,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final ListTag<CompoundTag> beesTag = tag.getListTag("Bees", CompoundTag.class);
             if (beesTag != null) {
                 updateBees(data, beesTag);
-                addBlockEntityId(tag, "beehive");
             }
 
             final ListTag<StringTag> sherdsTag = tag.getListTag("sherds", StringTag.class);
@@ -1464,13 +1453,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     toMappedItemId(rightSherd),
                     toMappedItemId(frontSherd)
                 ));
-                addBlockEntityId(tag, "decorated_pot");
             }
 
             final StringTag noteBlockSoundTag = tag.getStringTag("note_block_sound");
             if (noteBlockSoundTag != null) {
                 data.set(StructuredDataKey.NOTE_BLOCK_SOUND, noteBlockSoundTag.getValue());
-                addBlockEntityId(tag, "player_head");
             }
 
             final StringTag lootTableTag = tag.getStringTag("LootTable");
@@ -1518,7 +1505,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 }
 
                 data.set(StructuredDataKey.CONTAINER1_20_5, filteredItems);
-                addBlockEntityId(tag, "shulker_box"); // Won't happen to the others and doesn't actually have to be correct otherwise
             }
         }
 
@@ -1552,7 +1538,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }).filter(Objects::nonNull).toArray(BannerPatternLayer[]::new);
             tag.remove("Patterns");
             tag.put("patterns", patternsTag);
-            addBlockEntityId(tag, "banner");
 
             if (data != null) {
                 data.set(StructuredDataKey.BANNER_PATTERNS, layers);
