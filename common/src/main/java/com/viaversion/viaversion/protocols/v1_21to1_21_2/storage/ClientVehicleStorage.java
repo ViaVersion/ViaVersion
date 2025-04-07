@@ -19,5 +19,38 @@ package com.viaversion.viaversion.protocols.v1_21to1_21_2.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
 
-public record ClientVehicleStorage(int vehicleId) implements StorableObject {
+public final class ClientVehicleStorage implements StorableObject {
+    
+    private final int vehicleId;
+
+    private float sidewaysMovement;
+    private float forwardMovement;
+    private byte flags;
+
+    public ClientVehicleStorage(final int vehicleId) {
+        this.vehicleId = vehicleId;
+    }
+
+    public void storeMovement(final float sidewaysMovement, final float forwardMovement, final byte flags) {
+        this.sidewaysMovement = sidewaysMovement;
+        this.forwardMovement = forwardMovement;
+        this.flags = flags;
+    }
+
+    public int vehicleId() {
+        return vehicleId;
+    }
+
+    public float sidewaysMovement() {
+        return sidewaysMovement;
+    }
+
+    public float forwardMovement() {
+        return forwardMovement;
+    }
+
+    public byte flags() {
+        return flags;
+    }
+
 }
