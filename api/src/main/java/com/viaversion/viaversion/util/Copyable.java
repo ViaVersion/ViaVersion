@@ -30,10 +30,18 @@ public interface Copyable {
         } else if (object instanceof Copyable copyable) {
             return (T) copyable.copy();
         } else if (object.getClass().isArray()) {
-            final Object[] array = (Object[]) object;
-            final Object[] copy = (Object[]) Array.newInstance(array.getClass().getComponentType(), array.length);
-            for (int i = 0; i < array.length; i++) {
-                copy[i] = copy(array[i]);
+            final Class<?> componentType = object.getClass().getComponentType();
+            final int length = Array.getLength(object);
+            final Object copy = Array.newInstance(componentType, length);
+            if (componentType.isPrimitive()) {
+                for (int i = 0; i < length; i++) {
+                    Array.set(copy, i, Array.get(object, i));
+                }
+            } else {
+                // See if we need to copy elements, too
+                for (int i = 0; i < length; i++) {
+                    Array.set(copy, i, copy(Array.get(object, i)));
+                }
             }
             return (T) copy;
         } else {
