@@ -47,14 +47,14 @@ import com.viaversion.viaversion.util.SerializerVersion;
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
 // Placeholders to replace (in the entire package):
-//   Protocol1_99To_98, EntityPacketRewriter1_99, BlockItemPacketRewriter1_99 - move the latter two to a rewriter package
+//   Protocol1_98To1_99, EntityPacketRewriter1_99, BlockItemPacketRewriter1_99 - move the latter two to a rewriter package
 //   ClientboundPacket1_21_2
 //   ServerboundPacket1_21_4
 //   EntityTypes1_21_4 (MAPPED type)
 //   VersionedTypes.V1_21_5
 //   SerializerVersion.V1_21_5
 //   1.99, 1.98
-final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, ClientboundPacket1_21_2, ServerboundPacket1_21_4, ServerboundPacket1_21_4> {
+final class Protocol1_98To1_99 extends AbstractProtocol<ClientboundPacket1_21_2, ClientboundPacket1_21_2, ServerboundPacket1_21_4, ServerboundPacket1_21_4> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.98", "1.99");
     private final EntityPacketRewriter1_99 entityRewriter = new EntityPacketRewriter1_99(this);
@@ -63,7 +63,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, 
     private final TagRewriter<ClientboundPacket1_21_2> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket1_21_2> componentRewriter = new ComponentRewriter1_99(this);
 
-    public Protocol1_99To_98() {
+    public Protocol1_98To1_99() {
         // Passing the class types into the super constructor is needed for automatic packet type id remapping, but can otherwise be omitted
         super(ClientboundPacket1_21_2.class, ClientboundPacket1_21_2.class, ServerboundPacket1_21_4.class, ServerboundPacket1_21_4.class);
     }

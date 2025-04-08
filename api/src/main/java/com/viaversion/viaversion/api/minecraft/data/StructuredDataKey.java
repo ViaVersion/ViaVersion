@@ -108,6 +108,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<AttributeModifiers1_20_5> ATTRIBUTE_MODIFIERS1_20_5 = new StructuredDataKey<>("attribute_modifiers", AttributeModifiers1_20_5.TYPE);
     public static final StructuredDataKey<AttributeModifiers1_21> ATTRIBUTE_MODIFIERS1_21 = new StructuredDataKey<>("attribute_modifiers", AttributeModifiers1_21.TYPE1_21);
     public static final StructuredDataKey<AttributeModifiers1_21> ATTRIBUTE_MODIFIERS1_21_5 = new StructuredDataKey<>("attribute_modifiers", AttributeModifiers1_21.TYPE1_21_5);
+    public static final StructuredDataKey<AttributeModifiers1_21> ATTRIBUTE_MODIFIERS1_22 = new StructuredDataKey<>("attribute_modifiers", AttributeModifiers1_21.TYPE1_22);
     public static final StructuredDataKey<Integer> CUSTOM_MODEL_DATA1_20_5 = new StructuredDataKey<>("custom_model_data", Types.VAR_INT);
     public static final StructuredDataKey<CustomModelData1_21_4> CUSTOM_MODEL_DATA1_21_4 = new StructuredDataKey<>("custom_model_data", CustomModelData1_21_4.TYPE);
     public static final StructuredDataKey<Unit> HIDE_ADDITIONAL_TOOLTIP = new StructuredDataKey<>("hide_additional_tooltip", Types.EMPTY);
@@ -211,6 +212,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKeys1_21_2 V1_21_2 = VersionedTypes.V1_21_2.structuredDataKeys();
     public static final StructuredDataKeys1_21_2 V1_21_4 = VersionedTypes.V1_21_4.structuredDataKeys();
     public static final StructuredDataKeys1_21_5 V1_21_5 = VersionedTypes.V1_21_5.structuredDataKeys();
+    public static final StructuredDataKeys1_21_5 V1_22 = VersionedTypes.V1_22.structuredDataKeys();
 
     @Override
     public String toString() {

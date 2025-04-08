@@ -34,9 +34,10 @@ import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 // To replace if needed:
 //   ChunkType1_21_5
 //   RecipeDisplayRewriter
-final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_4, Protocol1_99To_98> {
+//   Types1_21_4, Types1_OLD
+final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_4, Protocol1_98To1_99> {
 
-    public BlockItemPacketRewriter1_99(final Protocol1_99To_98 protocol) {
+    public BlockItemPacketRewriter1_99(final Protocol1_98To1_99 protocol) {
         super(protocol);
     }
 

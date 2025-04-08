@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -31,10 +32,19 @@ import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean showInTooltip) implements Copyable {
+public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean showInTooltip,
+                                     Display display) implements Copyable {
 
     public AttributeModifiers1_21(final AttributeModifier[] modifiers) {
         this(modifiers, true);
+    }
+
+    public AttributeModifiers1_21(final AttributeModifier[] modifiers, final boolean showInTooltip) {
+        this(modifiers, showInTooltip, Display.DEFAULT);
+    }
+
+    public AttributeModifiers1_21(final AttributeModifier[] modifiers, final Display display) {
+        this(modifiers, true, display);
     }
 
     public static final Type<AttributeModifiers1_21> TYPE1_21 = new Type<>(AttributeModifiers1_21.class) {
@@ -68,6 +78,21 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
             ops.write(AttributeModifier.ARRAY_TYPE, value.modifiers);
         }
     };
+    public static final Type<AttributeModifiers1_21> TYPE1_22 = new Type<>(AttributeModifiers1_21.class) {
+        @Override
+        public AttributeModifiers1_21 read(final ByteBuf buffer) {
+            final AttributeModifier[] modifiers = AttributeModifier.ARRAY_TYPE.read(buffer);
+            final int displayType = Types.VAR_INT.readPrimitive(buffer);
+            final Display display = displayType == OverrideText.ID ? new OverrideText(Types.TAG.read(buffer)) : new Display(displayType);
+            return new AttributeModifiers1_21(modifiers, display);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final AttributeModifiers1_21 value) {
+            AttributeModifier.ARRAY_TYPE.write(buffer, value.modifiers());
+            value.display.write(buffer);
+        }
+    };
 
     public AttributeModifiers1_21 rewrite(final Int2IntFunction rewriteFunction) {
         final AttributeModifier[] modifiers = new AttributeModifier[this.modifiers.length];
@@ -80,7 +105,7 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
 
     @Override
     public AttributeModifiers1_21 copy() {
-        return new AttributeModifiers1_21(Copyable.copy(modifiers), showInTooltip);
+        return new AttributeModifiers1_21(Copyable.copy(modifiers), showInTooltip, display.copy());
     }
 
     public record AttributeModifier(int attribute, ModifierData modifier, int slotType) {
@@ -137,4 +162,50 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
         };
     }
 
+    public static class Display implements Copyable {
+        public static final Display DEFAULT = new Display(0);
+        private final int id;
+
+        public Display(final int id) {
+            this.id = id;
+        }
+
+        public int id() {
+            return this.id;
+        }
+
+        public void write(final ByteBuf buf) {
+            Types.VAR_INT.writePrimitive(buf, this.id);
+        }
+
+        @Override
+        public Display copy() {
+            return this;
+        }
+    }
+
+    public static final class OverrideText extends Display {
+        public static final int ID = 2;
+        private final Tag component;
+
+        public OverrideText(final Tag component) {
+            super(ID);
+            this.component = component;
+        }
+
+        public Tag component() {
+            return this.component;
+        }
+
+        @Override
+        public void write(final ByteBuf buf) {
+            super.write(buf);
+            Types.TAG.write(buf, this.component);
+        }
+
+        @Override
+        public OverrideText copy() {
+            return new OverrideText(this.component.copy());
+        }
+    }
 }

@@ -29,9 +29,10 @@ import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 // Replace if needed
 //  Types1_OLD
 //  VersionedTypes
-final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPacket1_21_2, Protocol1_99To_98> {
+//  EntityTypes1_21_4
+final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPacket1_21_2, Protocol1_98To1_99> {
 
-    public EntityPacketRewriter1_99(final Protocol1_99To_98 protocol) {
+    public EntityPacketRewriter1_99(final Protocol1_98To1_99 protocol) {
         super(protocol);
     }
 
