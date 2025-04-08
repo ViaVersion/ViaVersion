@@ -37,6 +37,16 @@ public final class Key {
         return identifier.substring(index + 1);
     }
 
+    public static String namespace(final String identifier) {
+        final int index = identifier.indexOf(':');
+        if (index == -1) {
+            return "minecraft";
+        } else if (index == 0) {
+            return "minecraft";
+        }
+        return identifier.substring(0, index);
+    }
+
     public static String stripMinecraftNamespace(final String identifier) {
         if (identifier.startsWith("minecraft:")) {
             return identifier.substring(MINECRAFT_NAMESPACE_LENGTH);

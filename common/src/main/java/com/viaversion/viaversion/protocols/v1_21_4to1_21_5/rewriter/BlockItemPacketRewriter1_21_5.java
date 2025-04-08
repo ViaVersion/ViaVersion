@@ -229,13 +229,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
                     wrapper.passthrough(Types.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Types.INT); // Flags
                     if ((flags & 1) != 0) {
-                        String backgroundTexture = Key.namespaced(wrapper.read(Types.STRING));
-                        // remove "textures/" prefix and ".png" suffix, if applicable
-                        if (backgroundTexture.startsWith("minecraft:textures/") && backgroundTexture.endsWith(".png")) {
-                            backgroundTexture = backgroundTexture.substring("minecraft:textures/".length(),
-                                backgroundTexture.length() - ".png".length());
-                        }
-                        wrapper.write(Types.STRING, backgroundTexture);
+                        convertClientAsset(wrapper);
                     }
                     wrapper.passthrough(Types.FLOAT); // X
                     wrapper.passthrough(Types.FLOAT); // Y
@@ -283,6 +277,18 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_2.UPDATE_RECIPES);
         recipeRewriter.registerRecipeBookAdd(ClientboundPackets1_21_2.RECIPE_BOOK_ADD);
         recipeRewriter.registerPlaceGhostRecipe(ClientboundPackets1_21_2.PLACE_GHOST_RECIPE);
+    }
+
+    private void convertClientAsset(final PacketWrapper wrapper) {
+        final String background = wrapper.read(Types.STRING);
+        final String namespace = Key.namespace(background);
+        final String path = Key.stripNamespace(background);
+        if (path.startsWith("textures/") && path.endsWith(".png")) {
+            final String stripped = path.substring("textures/".length(), path.length() - ".png".length());
+            wrapper.write(Types.STRING, namespace + ":" + stripped);
+        } else {
+            wrapper.write(Types.STRING, namespace + ":" + path);
+        }
     }
 
     private void handleBlockEntity(final UserConnection connection, final BlockEntity blockEntity) {
