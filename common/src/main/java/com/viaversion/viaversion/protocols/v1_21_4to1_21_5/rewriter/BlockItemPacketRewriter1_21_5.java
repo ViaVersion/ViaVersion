@@ -54,6 +54,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.TooltipDisplay;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkBiomesType1_19_4;
@@ -71,6 +72,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacke
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
@@ -206,8 +208,47 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             wrapper.write(Types1_21_5.ITEM, handleItemToServer(wrapper.user(), this.convertHashedItemToStructuredItem(wrapper.user(), carriedItem)));
         });
 
-        registerAdvancements1_20_3(ClientboundPackets1_21_2.UPDATE_ADVANCEMENTS);
-        protocol.appendClientbound(ClientboundPackets1_21_2.UPDATE_ADVANCEMENTS, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_21_2.UPDATE_ADVANCEMENTS, wrapper -> {
+            wrapper.passthrough(Types.BOOLEAN); // Reset/clear
+            int size = wrapper.passthrough(Types.VAR_INT); // Mapping size
+            for (int i = 0; i < size; i++) {
+                wrapper.passthrough(Types.STRING); // Identifier
+                wrapper.passthrough(Types.OPTIONAL_STRING); // Parent
+
+                // Display data
+                if (wrapper.passthrough(Types.BOOLEAN)) {
+                    final Tag title = wrapper.passthrough(Types.TAG);
+                    final Tag description = wrapper.passthrough(Types.TAG);
+                    final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
+                    if (componentRewriter != null) {
+                        componentRewriter.processTag(wrapper.user(), title);
+                        componentRewriter.processTag(wrapper.user(), description);
+                    }
+
+                    passthroughClientboundItem(wrapper); // Icon
+                    wrapper.passthrough(Types.VAR_INT); // Frame type
+                    int flags = wrapper.passthrough(Types.INT); // Flags
+                    if ((flags & 1) != 0) {
+                        String backgroundTexture = Key.namespaced(wrapper.read(Types.STRING));
+                        // remove "textures/" prefix and ".png" suffix, if applicable
+                        if (backgroundTexture.startsWith("minecraft:textures/") && backgroundTexture.endsWith(".png")) {
+                            backgroundTexture = backgroundTexture.substring("minecraft:textures/".length(),
+                                backgroundTexture.length() - ".png".length());
+                        }
+                        wrapper.write(Types.STRING, backgroundTexture);
+                    }
+                    wrapper.passthrough(Types.FLOAT); // X
+                    wrapper.passthrough(Types.FLOAT); // Y
+                }
+
+                int requirements = wrapper.passthrough(Types.VAR_INT);
+                for (int array = 0; array < requirements; array++) {
+                    wrapper.passthrough(Types.STRING_ARRAY);
+                }
+
+                wrapper.passthrough(Types.BOOLEAN); // Send telemetry
+            }
+
             wrapper.passthrough(Types.STRING_ARRAY); // Removed
             final int progressSize = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < progressSize; i++) {
