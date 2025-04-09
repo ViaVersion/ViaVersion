@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
@@ -265,20 +266,21 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.PLAYER_INPUT, wrapper -> {
             // Previously only used while in a vehicle, now always sent
-            // Filter them appropriately
-            if (!wrapper.user().has(ClientVehicleStorage.class)) {
-                wrapper.cancel();
+            // Filter them appropriately and always send them when in a vehicle
+            wrapper.cancel();
+            final ClientVehicleStorage vehicleStorage = wrapper.user().get(ClientVehicleStorage.class);
+            if (vehicleStorage == null) {
                 return;
             }
 
             final byte flags = wrapper.read(Types.BYTE);
             final boolean left = (flags & 1 << 2) != 0;
             final boolean right = (flags & 1 << 3) != 0;
-            wrapper.write(Types.FLOAT, left ? IMPULSE : (right ? -IMPULSE : 0F));
+            final float sidewaysMovement = left ? IMPULSE : (right ? -IMPULSE : 0F);
 
             final boolean forward = (flags & 1 << 0) != 0;
             final boolean backward = (flags & 1 << 1) != 0;
-            wrapper.write(Types.FLOAT, forward ? IMPULSE : (backward ? -IMPULSE : 0F));
+            final float forwardMovement = forward ? IMPULSE : (backward ? -IMPULSE : 0F);
 
             byte updatedFlags = 0;
             if ((flags & 1 << 4) != 0) {
@@ -287,7 +289,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             if ((flags & 1 << 5) != 0) {
                 updatedFlags |= 2;
             }
-            wrapper.write(Types.BYTE, updatedFlags);
+
+            vehicleStorage.storeMovement(sidewaysMovement, forwardMovement, updatedFlags);
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.TELEPORT_ENTITY, ClientboundPackets1_21_2.ENTITY_POSITION_SYNC, wrapper -> {
@@ -346,6 +349,19 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.passthrough(Types.FLOAT); // Yaw
             wrapper.passthrough(Types.FLOAT); // Pitch
             handleOnGround(wrapper);
+
+            final ClientVehicleStorage vehicleStorage = wrapper.user().get(ClientVehicleStorage.class);
+            if (vehicleStorage == null) {
+                return;
+            }
+
+            wrapper.sendToServer(Protocol1_21To1_21_2.class);
+            wrapper.cancel();
+            final PacketWrapper playerInput = wrapper.create(ServerboundPackets1_20_5.PLAYER_INPUT);
+            playerInput.write(Types.FLOAT, vehicleStorage.sidewaysMovement());
+            playerInput.write(Types.FLOAT, vehicleStorage.forwardMovement());
+            playerInput.write(Types.BYTE, vehicleStorage.flags());
+            playerInput.sendToServer(Protocol1_21To1_21_2.class);
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_STATUS_ONLY, wrapper -> {
             final GroundFlagTracker tracker = wrapper.user().get(GroundFlagTracker.class);
