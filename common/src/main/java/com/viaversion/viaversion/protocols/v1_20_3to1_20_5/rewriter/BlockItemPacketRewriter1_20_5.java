@@ -476,7 +476,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             } else if (entityTag.contains("ShowArms")) {
                 entityTag.putString("id", "minecraft:armor_stand");
             }
-            data.set(StructuredDataKey.ENTITY_DATA, entityTag);
+            if (entityTag.contains("id")) {
+                data.set(StructuredDataKey.ENTITY_DATA, entityTag);
+            }
         }
 
         final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
