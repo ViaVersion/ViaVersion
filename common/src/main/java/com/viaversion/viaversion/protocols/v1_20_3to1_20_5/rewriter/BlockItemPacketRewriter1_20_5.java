@@ -471,11 +471,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         CompoundTag entityTag = tag.getCompoundTag("EntityTag");
         if (entityTag != null) {
             entityTag = entityTag.copy();
+            // Additional tooltips of items don't validate the entity id in 1.20.4, add the entity id for these back so
+            // 1.20.5+ parses it correctly (as otherwise not used on the client).
             if (entityTag.contains("variant")) {
                 entityTag.putString("id", "minecraft:painting");
-            } else if (entityTag.contains("ShowArms")) {
-                entityTag.putString("id", "minecraft:armor_stand");
             }
+
             if (entityTag.contains("id")) {
                 data.set(StructuredDataKey.ENTITY_DATA, entityTag);
             }
@@ -484,10 +485,21 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
         if (blockEntityTag != null) {
             final CompoundTag clonedTag = blockEntityTag.copy();
+            // Same as above
             updateBlockEntityTag(connection, data, clonedTag);
+            CompoundTag spawnData = clonedTag.getCompoundTag("SpawnData");
+            if (spawnData == null) {
+                spawnData = clonedTag.getCompoundTag("spawn_data");
+            }
+            if (spawnData != null) {
+                final CompoundTag entity = spawnData.getCompoundTag("entity");
+                if (entity != null && entity.getString("id") != null) {
+                    addBlockEntityId(clonedTag, clonedTag.contains("SpawnData") ? "mob_spawner" : "trial_spawner");
+                }
+            }
 
             // Not always needed, e.g. shields that had the base color in a block entity tag before
-            if (blockEntityTag.contains("id")) {
+            if (clonedTag.contains("id")) {
                 item.dataContainer().set(StructuredDataKey.BLOCK_ENTITY_DATA, clonedTag);
             }
         }
@@ -1520,7 +1532,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 }
 
                 data.set(StructuredDataKey.CONTAINER1_20_5, filteredItems);
-                addBlockEntityId(tag, "shulker_box"); // Won't happen to the others and doesn't actually have to be correct otherwise
+                addBlockEntityId(tag, "shulker_box");
             }
         }
 
