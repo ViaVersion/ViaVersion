@@ -58,7 +58,7 @@ public class BlockChangeRecord1_16_2 implements BlockChangeRecord {
 
     @Override
     public short getY(int chunkSectionY) {
-        Preconditions.checkArgument(chunkSectionY >= 0, "Invalid chunkSectionY: " + chunkSectionY);
+        Preconditions.checkArgument(chunkSectionY >= 0, "Invalid chunkSectionY: %s", chunkSectionY);
         return (short) ((chunkSectionY << 4) + sectionY);
     }
 

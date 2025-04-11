@@ -36,7 +36,7 @@ public class BitSetType extends Type<BitSet> {
     public BitSetType(final int length) {
         super(BitSet.class);
         this.length = length;
-        this.bytesLength = -Math.floorDiv(-length, 8); // Ceiled quotient
+        this.bytesLength = (int) Math.ceil(length / 8D);
     }
 
     @Override
@@ -48,8 +48,8 @@ public class BitSetType extends Type<BitSet> {
 
     @Override
     public void write(ByteBuf buffer, BitSet object) {
-        Preconditions.checkArgument(object.length() <= length, "BitSet of length " + object.length() + " larger than max length " + length);
+        Preconditions.checkArgument(object.length() <= length, "BitSet of length %s larger than max length %s", object.length(), length);
         final byte[] bytes = object.toByteArray();
-        buffer.writeBytes(Arrays.copyOf(bytes, bytesLength));
+        buffer.writeBytes(bytes.length == bytesLength ? bytes : Arrays.copyOf(bytes, bytesLength));
     }
 }
