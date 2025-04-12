@@ -87,7 +87,7 @@ public final class ComponentUtil {
         }
     }
 
-    private static Tag trimStrings(final Tag input) {
+    public static Tag trimStrings(final Tag input) {
         // Dirty fix for https://github.com/ViaVersion/ViaVersion/issues/3650
         // Usually tripped by hover event data being too long, e.g. book or shulker box contents, which have to be held in full as SNBT
         if (input == null) {
