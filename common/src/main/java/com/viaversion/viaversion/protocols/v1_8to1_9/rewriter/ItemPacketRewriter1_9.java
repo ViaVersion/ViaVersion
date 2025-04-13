@@ -321,8 +321,8 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                             w.write(Types.ITEM1_8, null);
                         }).scheduleSend(Protocol1_8To1_9.class);
                         // Finally reset to simulate throwing item
-                        wrapper.set(Types.BYTE, 0, (byte) 0); // Set button to 0
-                        wrapper.set(Types.BYTE, 1, (byte) 0); // Set mode to 0
+                        wrapper.set(Types.BYTE, 1, (byte) 0); // Set button to 0
+                        wrapper.set(Types.BYTE, 2, (byte) 0); // Set mode to 0
                         wrapper.set(Types.SHORT, 0, (short) -999); // Set slot to -999
                     }
                 });
