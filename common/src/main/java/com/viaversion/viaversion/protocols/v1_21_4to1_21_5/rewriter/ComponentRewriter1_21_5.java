@@ -21,6 +21,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
@@ -31,6 +32,7 @@ import com.viaversion.viaversion.util.TagUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static com.viaversion.viaversion.util.TagUtil.getNamespacedCompoundTag;
@@ -300,7 +302,16 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
 
     public Tag uglyJsonToTag(final UserConnection connection, final String value) {
         // Use the same version for deserializing and serializing, as we handle the remaining changes ourselves
-        final Tag contents = SerializerVersion.V1_21_4.toTag(SerializerVersion.V1_21_4.toComponent(value));
+        final Tag contents;
+        try {
+            contents = SerializerVersion.V1_21_4.toTag(SerializerVersion.V1_21_4.toComponent(value));
+        } catch (final Exception e) {
+            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting json text component: " + value, e);
+            }
+            return new StringTag("<error>");
+        }
+
         processTag(connection, contents);
         return contents;
     }
