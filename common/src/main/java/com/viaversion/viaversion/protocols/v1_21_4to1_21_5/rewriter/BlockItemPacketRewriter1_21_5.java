@@ -305,11 +305,11 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         }
 
         final ListTag<StringTag> messages = tag.getListTag("messages", StringTag.class);
-        tag.put("messages", protocol.getComponentRewriter().updateComponentList(connection, messages));
+        tag.put("messages", protocol.getComponentRewriter().updateComponentList(connection, messages, true));
 
         final ListTag<StringTag> filteredMessages = tag.getListTag("filtered_messages", StringTag.class);
         if (filteredMessages != null) {
-            tag.put("filtered_messages", protocol.getComponentRewriter().updateComponentList(connection, filteredMessages));
+            tag.put("filtered_messages", protocol.getComponentRewriter().updateComponentList(connection, filteredMessages, true));
         }
     }
 
