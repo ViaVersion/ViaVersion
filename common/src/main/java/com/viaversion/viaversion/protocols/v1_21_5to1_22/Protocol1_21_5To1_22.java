@@ -41,6 +41,7 @@ import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter.BlockItemPacketRewriter1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter.ComponentRewriter1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter.EntityPacketRewriter1_22;
+import com.viaversion.viaversion.protocols.v1_21_5to1_22.storage.SneakStorage;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -147,6 +148,7 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_22.PLAYER));
+        connection.put(new SneakStorage());
     }
 
     @Override

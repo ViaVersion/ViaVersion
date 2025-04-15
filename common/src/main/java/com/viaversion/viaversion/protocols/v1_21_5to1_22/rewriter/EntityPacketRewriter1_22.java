@@ -19,12 +19,16 @@ package com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter;
 
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_22;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_22;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPacket1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPackets1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.Protocol1_21_5To1_22;
+import com.viaversion.viaversion.protocols.v1_21_5to1_22.storage.SneakStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 
@@ -46,6 +50,29 @@ public final class EntityPacketRewriter1_22 extends EntityRewriter<ClientboundPa
 
         final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
         protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
+
+        protocol.appendClientbound(ClientboundPackets1_21_5.RESPAWN, wrapper -> {
+            wrapper.user().get(SneakStorage.class).setSneaking(false);
+        });
+
+        protocol.registerServerbound(ServerboundPackets1_21_5.PLAYER_COMMAND, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
+            final int action = wrapper.read(Types.VAR_INT);
+            wrapper.write(Types.VAR_INT, action + 2); // press_shift_key and release_shift_key gone
+        });
+
+        protocol.registerServerbound(ServerboundPackets1_21_5.PLAYER_INPUT, wrapper -> {
+            final byte flags = wrapper.passthrough(Types.BYTE);
+            final boolean pressingShift = (flags & 1 << 5) != 0;
+            if (wrapper.user().get(SneakStorage.class).setSneaking(pressingShift)) {
+                // Send the pressing/releasing shift action
+                final PacketWrapper playerCommandPacket = wrapper.create(ServerboundPackets1_21_5.PLAYER_COMMAND);
+                playerCommandPacket.write(Types.VAR_INT, tracker(wrapper.user()).clientEntityId());
+                playerCommandPacket.write(Types.VAR_INT, pressingShift ? 0 : 1);
+                playerCommandPacket.write(Types.VAR_INT, 0); // No data
+                playerCommandPacket.sendToServer(Protocol1_21_5To1_22.class);
+            }
+        });
     }
 
     @Override
