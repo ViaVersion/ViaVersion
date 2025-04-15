@@ -48,7 +48,7 @@ public record AttributeModifiers1_20_5(AttributeModifier[] modifiers, boolean sh
 
     @Override
     public AttributeModifiers1_20_5 copy() {
-        return new AttributeModifiers1_20_5(copy(modifiers), showInTooltip);
+        return new AttributeModifiers1_20_5(Copyable.copy(modifiers), showInTooltip);
     }
 
     public record AttributeModifier(int attribute, ModifierData modifier, int slotType) {

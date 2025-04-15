@@ -73,7 +73,7 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
 
     @Override
     public AttributeModifiers1_21 copy() {
-        return new AttributeModifiers1_21(copy(modifiers), showInTooltip);
+        return new AttributeModifiers1_21(Copyable.copy(modifiers), showInTooltip);
     }
 
     public record AttributeModifier(int attribute, ModifierData modifier, int slotType) {

@@ -53,6 +53,6 @@ public record FireworkExplosion(int shape, int[] colors, int[] fadeColors, boole
 
     @Override
     public FireworkExplosion copy() {
-        return new FireworkExplosion(shape, copy(colors), copy(fadeColors), hasTrail, hasTwinkle);
+        return new FireworkExplosion(shape, Copyable.copy(colors), Copyable.copy(fadeColors), hasTrail, hasTwinkle);
     }
 }

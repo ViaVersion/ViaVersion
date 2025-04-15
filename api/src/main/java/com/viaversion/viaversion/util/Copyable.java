@@ -22,7 +22,7 @@ import java.lang.reflect.Array;
 
 public interface Copyable {
 
-    default <T> T copy(final T object) {
+    static <T> T copy(final T object) {
         if (object == null) {
             return null;
         } else if (object instanceof Tag tag) {

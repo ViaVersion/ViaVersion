@@ -80,6 +80,6 @@ public record AdventureModePredicate(BlockPredicate[] predicates, boolean showIn
 
     @Override
     public AdventureModePredicate copy() {
-        return new AdventureModePredicate(copy(predicates), showInTooltip);
+        return new AdventureModePredicate(Copyable.copy(predicates), showInTooltip);
     }
 }

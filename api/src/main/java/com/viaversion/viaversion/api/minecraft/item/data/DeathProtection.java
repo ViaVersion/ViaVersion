@@ -44,6 +44,6 @@ public record DeathProtection(ConsumeEffect<?>[] deathEffects) implements Copyab
 
     @Override
     public DeathProtection copy() {
-        return new DeathProtection(copy(deathEffects));
+        return new DeathProtection(Copyable.copy(deathEffects));
     }
 }

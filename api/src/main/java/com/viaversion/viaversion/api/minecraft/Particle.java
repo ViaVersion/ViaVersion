@@ -121,7 +121,7 @@ public final class Particle implements IdHolder, Copyable {
 
         @Override
         public ParticleData<T> copy() {
-            return new ParticleData<>(type, copy(value));
+            return new ParticleData<>(type, Copyable.copy(value));
         }
 
         @Override

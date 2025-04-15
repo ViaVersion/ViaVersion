@@ -50,6 +50,6 @@ public record CustomModelData1_21_4(float[] floats, boolean[] booleans, String[]
 
     @Override
     public CustomModelData1_21_4 copy() {
-        return new CustomModelData1_21_4(copy(floats), copy(booleans), copy(strings), copy(colors));
+        return new CustomModelData1_21_4(Copyable.copy(floats), Copyable.copy(booleans), Copyable.copy(strings), Copyable.copy(colors));
     }
 }

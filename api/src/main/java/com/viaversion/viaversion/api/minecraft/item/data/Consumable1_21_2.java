@@ -118,6 +118,6 @@ public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<S
 
     @Override
     public Consumable1_21_2 copy() {
-        return new Consumable1_21_2(consumeSeconds, animationType, sound, hasConsumeParticles, copy(consumeEffects));
+        return new Consumable1_21_2(consumeSeconds, animationType, sound, hasConsumeParticles, Copyable.copy(consumeEffects));
     }
 }

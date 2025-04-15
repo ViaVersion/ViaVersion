@@ -46,6 +46,6 @@ public record Fireworks(int flightDuration, FireworkExplosion[] explosions) impl
 
     @Override
     public Fireworks copy() {
-        return new Fireworks(flightDuration, copy(explosions));
+        return new Fireworks(flightDuration, Copyable.copy(explosions));
     }
 }

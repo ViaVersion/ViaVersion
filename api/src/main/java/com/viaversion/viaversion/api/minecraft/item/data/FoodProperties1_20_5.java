@@ -79,7 +79,7 @@ public record FoodProperties1_20_5(int nutrition, float saturationModifier, bool
 
     @Override
     public FoodProperties1_20_5 copy() {
-        return new FoodProperties1_20_5(nutrition, saturationModifier, canAlwaysEat, eatSeconds, usingConvertsTo == null ? null : usingConvertsTo.copy(), copy(possibleEffects));
+        return new FoodProperties1_20_5(nutrition, saturationModifier, canAlwaysEat, eatSeconds, usingConvertsTo == null ? null : usingConvertsTo.copy(), Copyable.copy(possibleEffects));
     }
 
     public record FoodEffect(PotionEffect effect, float probability) {

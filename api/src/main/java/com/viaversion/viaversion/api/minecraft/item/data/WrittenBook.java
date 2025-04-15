@@ -53,6 +53,6 @@ public record WrittenBook(FilterableString title, String author, int generation,
 
     @Override
     public WrittenBook copy() {
-        return new WrittenBook(title, author, generation, copy(pages), resolved);
+        return new WrittenBook(title, author, generation, Copyable.copy(pages), resolved);
     }
 }

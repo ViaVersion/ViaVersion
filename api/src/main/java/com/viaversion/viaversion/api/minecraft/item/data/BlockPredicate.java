@@ -107,6 +107,6 @@ public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher
 
     @Override
     public BlockPredicate copy() {
-        return new BlockPredicate(holderSet, copy(propertyMatchers), tag == null ? null : tag.copy());
+        return new BlockPredicate(holderSet, Copyable.copy(propertyMatchers), tag == null ? null : tag.copy());
     }
 }

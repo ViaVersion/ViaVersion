@@ -89,6 +89,6 @@ public record PotionContents(@Nullable Integer potion, @Nullable Integer customC
 
     @Override
     public PotionContents copy() {
-        return new PotionContents(potion, customColor, copy(customEffects), customName);
+        return new PotionContents(potion, customColor, Copyable.copy(customEffects), customName);
     }
 }

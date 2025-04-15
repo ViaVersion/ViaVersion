@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.data;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import java.util.Objects;
 
@@ -61,7 +62,7 @@ final class FilledStructuredData<T> implements StructuredData<T> {
 
     @Override
     public StructuredData<T> copy() {
-        return new FilledStructuredData<>(this.key, this.copy(this.value), this.id);
+        return new FilledStructuredData<>(this.key, Copyable.copy(this.value), this.id);
     }
 
     @Override

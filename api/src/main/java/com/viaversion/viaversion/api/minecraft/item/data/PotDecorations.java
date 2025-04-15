@@ -86,6 +86,6 @@ public final class PotDecorations implements Copyable {
 
     @Override
     public PotDecorations copy() {
-        return new PotDecorations(copy(itemIds));
+        return new PotDecorations(Copyable.copy(itemIds));
     }
 }
