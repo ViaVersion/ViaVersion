@@ -34,9 +34,8 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.type.Type;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
+import com.viaversion.viaversion.util.Rewritable;
 import java.util.Map;
-import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StructuredItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
@@ -112,45 +111,11 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         container.updateIds(protocol, dataComponentMappings::getNewId);
     }
 
+    // Casting around Rewritable and especially Holder gets ugly, but the only good alternative is to do everything manually
+    @SuppressWarnings("unchecked")
     protected void updateItemDataComponents(final UserConnection connection, final Item item, final boolean clientbound) {
         // Specific types that need deep handling
         final StructuredDataContainer container = item.dataContainer();
-        final MappingData mappingData = protocol.getMappingData();
-        if (mappingData.getDataComponentSerializerMappings() != null) {
-            container.replace(StructuredDataKey.TOOLTIP_DISPLAY, value -> value.rewrite(mappingData.getDataComponentSerializerMappings()::getNewId));
-        }
-        if (mappingData.getItemMappings() != null) {
-            final Int2IntFunction itemIdRewriter = clientbound ? mappingData::getNewItemId : mappingData::getOldItemId;
-            container.replace(StructuredDataKey.TRIM1_20_5, value -> value.rewrite(itemIdRewriter));
-            container.replace(StructuredDataKey.TRIM1_21_2, value -> value.rewrite(itemIdRewriter));
-            container.replace(StructuredDataKey.TRIM1_21_4, value -> value.rewrite(itemIdRewriter));
-            container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL, value -> value.rewrite(itemIdRewriter));
-            container.replace(StructuredDataKey.POT_DECORATIONS, value -> value.rewrite(itemIdRewriter));
-            container.replace(StructuredDataKey.REPAIRABLE, value -> value.rewrite(itemIdRewriter));
-        }
-        if (mappingData.getFullItemMappings() != null) {
-            final Function<String, String> itemIdRewriter = clientbound ? id -> mappedIdentifier(mappingData.getFullItemMappings(), id) : id -> unmappedIdentifier(mappingData.getFullItemMappings(), id);
-            container.replace(StructuredDataKey.USE_COOLDOWN, value -> value.rewrite(itemIdRewriter));
-        }
-        if (mappingData.getBlockMappings() != null) {
-            final Int2IntFunction blockIdRewriter = clientbound ? mappingData::getNewBlockId : mappingData::getOldBlockId;
-            container.replace(StructuredDataKey.TOOL1_20_5, value -> value.rewrite(blockIdRewriter));
-            container.replace(StructuredDataKey.TOOL1_21_5, value -> value.rewrite(blockIdRewriter));
-            container.replace(StructuredDataKey.CAN_PLACE_ON1_20_5, value -> value.rewrite(blockIdRewriter));
-            container.replace(StructuredDataKey.CAN_BREAK1_20_5, value -> value.rewrite(blockIdRewriter));
-            container.replace(StructuredDataKey.CAN_PLACE_ON1_21_5, value -> value.rewrite(blockIdRewriter));
-            container.replace(StructuredDataKey.CAN_BREAK1_21_5, value -> value.rewrite(blockIdRewriter));
-        }
-        if (mappingData.getSoundMappings() != null) {
-            final Int2IntFunction soundIdRewriter = clientbound ? mappingData::getNewSoundId : mappingData::getOldSoundId;
-            container.replace(StructuredDataKey.INSTRUMENT1_20_5, value -> value.isDirect() ? Holder.of(value.value().rewrite(soundIdRewriter)) : value);
-            container.replace(StructuredDataKey.INSTRUMENT1_21_2, value -> value.isDirect() ? Holder.of(value.value().rewrite(soundIdRewriter)) : value);
-            container.replace(StructuredDataKey.INSTRUMENT1_21_5, value -> value.hasHolder() && value.holder().isDirect() ? EitherHolder.of(Holder.of(value.holder().value().rewrite(soundIdRewriter))) : value); // ok...
-            container.replace(StructuredDataKey.JUKEBOX_PLAYABLE1_21, value -> value.rewrite(soundIdRewriter));
-            container.replace(StructuredDataKey.CONSUMABLE1_21_2, value -> value.rewrite(soundIdRewriter));
-            container.replace(StructuredDataKey.EQUIPPABLE1_21_2, value -> value.rewrite(soundIdRewriter));
-            container.replace(StructuredDataKey.EQUIPPABLE1_21_5, value -> value.rewrite(soundIdRewriter));
-        }
         if (clientbound && protocol.getComponentRewriter() != null) {
             updateComponent(connection, item, StructuredDataKey.ITEM_NAME, "item_name");
             updateComponent(connection, item, StructuredDataKey.CUSTOM_NAME, "custom_name");
@@ -173,7 +138,6 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             }
         }
 
-        // Look for item types
         final ItemHandler itemHandler = clientbound ? this::handleItemToClient : this::handleItemToServer;
         for (final Map.Entry<StructuredDataKey<?>, StructuredData<?>> entry : container.data().entrySet()) {
             final StructuredData<?> data = entry.getValue();
@@ -182,20 +146,41 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             }
 
             final StructuredDataKey<?> key = entry.getKey();
+            final Object value = data.value();
             final Class<?> outputClass = key.type().getOutputClass();
             if (outputClass == Item.class) {
-                //noinspection unchecked
                 final StructuredData<Item> itemData = (StructuredData<Item>) data;
                 itemData.setValue(itemHandler.rewrite(connection, itemData.value()));
             } else if (outputClass == Item[].class) {
-                //noinspection unchecked
                 final StructuredData<Item[]> itemArrayData = (StructuredData<Item[]>) data;
                 final Item[] items = itemArrayData.value();
                 for (int i = 0; i < items.length; i++) {
                     items[i] = itemHandler.rewrite(connection, items[i]);
                 }
+            } else if (value instanceof Rewritable rewritable) {
+                setDataUnchecked(data, rewritable.rewrite(connection, protocol, clientbound));
+            } else if (outputClass == Holder.class) {
+                final StructuredData<Holder<?>> holderData = (StructuredData<Holder<?>>) data;
+                final Holder<?> holder = holderData.value();
+                if (holder.isDirect() && holder.value() instanceof Rewritable) {
+                    holderData.setValue(updateHolderUnchecked(holder, connection, clientbound));
+                }
+            } else if (value instanceof EitherHolder<?> eitherHolder) {
+                if (eitherHolder.hasHolder() && eitherHolder.holder().isDirect() && eitherHolder.holder().value() instanceof Rewritable) {
+                    setDataUnchecked(data, EitherHolder.of(updateHolderUnchecked(eitherHolder.holder(), connection, clientbound)));
+                }
             }
         }
+    }
+
+    private <V> void setDataUnchecked(final StructuredData<V> data, final Object value) {
+        //noinspection unchecked
+        data.setValue((V) value);
+    }
+
+    private <V> Holder<V> updateHolderUnchecked(final Holder<V> holder, final UserConnection connection, final boolean clientbound) {
+        //noinspection unchecked
+        return holder.updateValue(val -> val instanceof Rewritable rewritable ? (V) rewritable.rewrite(connection, protocol, clientbound) : val);
     }
 
     protected void updateComponent(final UserConnection connection, final Item item, final StructuredDataKey<Tag> key, final String backupKey) {

@@ -22,12 +22,15 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int damagePerBlock, boolean canDestroyBlocksInCreative) {
+public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int damagePerBlock,
+                             boolean canDestroyBlocksInCreative) implements Rewritable {
 
     public ToolProperties(final ToolRule[] rules, final float defaultMiningSpeed, final int damagePerBlock) {
         this(rules, defaultMiningSpeed, damagePerBlock, false);
@@ -68,10 +71,11 @@ public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int dam
         }
     };
 
-    public ToolProperties rewrite(final Int2IntFunction blockIdRewriter) {
+    @Override
+    public ToolProperties rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         final ToolRule[] rules = new ToolRule[this.rules.length];
         for (int i = 0; i < rules.length; i++) {
-            rules[i] = this.rules[i].rewrite(blockIdRewriter);
+            rules[i] = this.rules[i].rewrite(connection, protocol, clientbound);
         }
         return new ToolProperties(rules, defaultMiningSpeed, damagePerBlock, canDestroyBlocksInCreative);
     }

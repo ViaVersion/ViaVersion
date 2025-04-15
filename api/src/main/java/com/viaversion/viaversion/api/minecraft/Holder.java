@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft;
 
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
+import java.util.function.Function;
 
 public interface Holder<T> {
 
@@ -89,4 +90,12 @@ public interface Holder<T> {
      * @return a new holder with the id rewritten, or self
      */
     Holder<T> updateId(final Int2IntFunction rewriteFunction);
+
+    /**
+     * Returns a new holder with the value rewritten using the given function, or self if this is an id holder or the value did not change.
+     *
+     * @param rewriteFunction the function to rewrite the value
+     * @return a new holder with the value rewritten, or self
+     */
+    Holder<T> updateValue(final Function<T, T> rewriteFunction);
 }

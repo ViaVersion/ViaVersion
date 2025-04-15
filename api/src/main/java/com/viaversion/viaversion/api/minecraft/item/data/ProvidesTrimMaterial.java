@@ -22,14 +22,16 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.EitherHolder;
 import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.EitherHolderType;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record ProvidesTrimMaterial(EitherHolder<ArmorTrimMaterial> material) {
+public record ProvidesTrimMaterial(EitherHolder<ArmorTrimMaterial> material) implements Rewritable {
 
     public static final Type<ProvidesTrimMaterial> TYPE = new Type<>(ProvidesTrimMaterial.class) {
 
@@ -45,12 +47,13 @@ public record ProvidesTrimMaterial(EitherHolder<ArmorTrimMaterial> material) {
         }
     };
 
-    public ProvidesTrimMaterial rewrite(final Int2IntFunction itemIdRewriter) {
+    @Override
+    public ProvidesTrimMaterial rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         if (material.hasKey() || material.holder().hasId()) {
             return this;
         }
 
         final ArmorTrimMaterial trimMaterial = material.holder().value();
-        return new ProvidesTrimMaterial(EitherHolder.of(Holder.of(trimMaterial.rewrite(itemIdRewriter))));
+        return new ProvidesTrimMaterial(EitherHolder.of(Holder.of(trimMaterial.rewrite(connection, protocol, clientbound))));
     }
 }

@@ -22,14 +22,17 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record AdventureModePredicate(BlockPredicate[] predicates, boolean showInTooltip) implements Copyable {
+public record AdventureModePredicate(BlockPredicate[] predicates,
+                                     boolean showInTooltip) implements Copyable, Rewritable {
 
     public AdventureModePredicate(final BlockPredicate[] predicates) {
         this(predicates, true);
@@ -70,10 +73,11 @@ public record AdventureModePredicate(BlockPredicate[] predicates, boolean showIn
         }
     }
 
-    public AdventureModePredicate rewrite(final Int2IntFunction blockIdRewriter) {
+    @Override
+    public AdventureModePredicate rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         final BlockPredicate[] predicates = new BlockPredicate[this.predicates.length];
         for (int i = 0; i < predicates.length; i++) {
-            predicates[i] = this.predicates[i].rewrite(blockIdRewriter);
+            predicates[i] = this.predicates[i].rewrite(connection, protocol, clientbound);
         }
         return new AdventureModePredicate(predicates, showInTooltip);
     }

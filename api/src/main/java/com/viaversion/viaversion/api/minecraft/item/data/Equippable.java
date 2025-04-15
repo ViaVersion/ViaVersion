@@ -22,18 +22,20 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Nullable String model,
                          @Nullable String cameraOverlay, @Nullable HolderSet allowedEntities, boolean dispensable,
-                         boolean swappable, boolean damageOnHurt, boolean equipOnInteract) {
+                         boolean swappable, boolean damageOnHurt, boolean equipOnInteract) implements Rewritable {
 
     public Equippable(final int equipmentSlot, final Holder<SoundEvent> soundEvent, @Nullable final String model, @Nullable final String cameraOverlay,
                       @Nullable final HolderSet allowedEntities, final boolean dispensable, final boolean swappable, final boolean damageOnHurt) {
@@ -95,8 +97,9 @@ public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Null
         }
     };
 
-    public Equippable rewrite(final Int2IntFunction soundIdRewriter) {
-        final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(soundIdRewriter);
+    @Override
+    public Equippable rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(Rewritable.soundRewriteFunction(protocol, clientbound));
         return soundEvent == this.soundEvent ? this : new Equippable(equipmentSlot, soundEvent, model, cameraOverlay, allowedEntities, dispensable, swappable, damageOnHurt, equipOnInteract);
     }
 }

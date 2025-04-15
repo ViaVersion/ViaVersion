@@ -22,12 +22,15 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record ArmorTrim(Holder<ArmorTrimMaterial> material, Holder<ArmorTrimPattern> pattern, boolean showInTooltip) {
+public record ArmorTrim(Holder<ArmorTrimMaterial> material, Holder<ArmorTrimPattern> pattern,
+                        boolean showInTooltip) implements Rewritable {
 
     public ArmorTrim(Holder<ArmorTrimMaterial> material, Holder<ArmorTrimPattern> pattern) {
         this(material, pattern, true);
@@ -96,15 +99,16 @@ public record ArmorTrim(Holder<ArmorTrimMaterial> material, Holder<ArmorTrimPatt
         }
     };
 
-    public ArmorTrim rewrite(final Int2IntFunction idRewriteFunction) {
+    @Override
+    public ArmorTrim rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         Holder<ArmorTrimMaterial> material = this.material;
         if (material.isDirect()) {
-            material = Holder.of(material.value().rewrite(idRewriteFunction));
+            material = Holder.of(material.value().rewrite(connection, protocol, clientbound));
         }
 
         Holder<ArmorTrimPattern> pattern = this.pattern;
         if (pattern.isDirect()) {
-            pattern = Holder.of(pattern.value().rewrite(idRewriteFunction));
+            pattern = Holder.of(pattern.value().rewrite(connection, protocol, clientbound));
         }
         return new ArmorTrim(material, pattern, showInTooltip);
     }

@@ -22,17 +22,20 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<SoundEvent> sound,
-                               boolean hasConsumeParticles, ConsumeEffect<?>[] consumeEffects) implements Copyable {
+                               boolean hasConsumeParticles,
+                               ConsumeEffect<?>[] consumeEffects) implements Copyable, Rewritable {
 
     public static final Type<?>[] EFFECT_TYPES = {
         ApplyStatusEffects.TYPE,
@@ -111,8 +114,9 @@ public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<S
         };
     }
 
-    public Consumable1_21_2 rewrite(final Int2IntFunction soundIdRewriteFunction) {
-        final Holder<SoundEvent> soundHolder = this.sound.updateId(soundIdRewriteFunction);
+    @Override
+    public Consumable1_21_2 rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        final Holder<SoundEvent> soundHolder = this.sound.updateId(Rewritable.soundRewriteFunction(protocol, clientbound));
         return soundHolder == this.sound ? this : new Consumable1_21_2(consumeSeconds, animationType, soundHolder, hasConsumeParticles, consumeEffects);
     }
 

@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.minecraft;
 
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
+import java.util.function.Function;
 
 record IdHolder<T>(int id) implements Holder<T> {
 
@@ -56,5 +57,10 @@ record IdHolder<T>(int id) implements Holder<T> {
             throw new IllegalArgumentException("Received invalid id in updateId");
         }
         return Holder.of(rewrittenId);
+    }
+
+    @Override
+    public Holder<T> updateValue(final Function<T, T> rewriteFunction) {
+        return this;
     }
 }

@@ -23,20 +23,23 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentMatchers;
 import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentMatchers.DataComponentMatchersType;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher @Nullable [] propertyMatchers,
-                             @Nullable CompoundTag tag, DataComponentMatchers dataMatchers) implements Copyable {
+                             @Nullable CompoundTag tag,
+                             DataComponentMatchers dataMatchers) implements Copyable, Rewritable {
 
     public BlockPredicate(@Nullable final HolderSet holderSet, final StatePropertyMatcher @Nullable [] propertyMatchers, @Nullable final CompoundTag tag) {
         this(holderSet, propertyMatchers, tag, null);
@@ -96,12 +99,13 @@ public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher
         }
     }
 
-    public BlockPredicate rewrite(final Int2IntFunction blockIdRewriter) {
+    @Override
+    public BlockPredicate rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         if (holderSet == null || holderSet.hasTagKey()) {
             return this;
         }
 
-        final HolderSet updatedHolders = holderSet.rewrite(blockIdRewriter);
+        final HolderSet updatedHolders = holderSet.rewrite(Rewritable.blockRewriteFunction(protocol, clientbound));
         return new BlockPredicate(updatedHolders, propertyMatchers, tag);
     }
 

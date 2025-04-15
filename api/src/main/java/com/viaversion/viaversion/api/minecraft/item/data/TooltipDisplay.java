@@ -22,15 +22,17 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
 
 public record TooltipDisplay(boolean hideTooltip,
-                             IntSortedSet hiddenComponents) { // Keeping the ids raw makes this less annoying to deal with...
+                             IntSortedSet hiddenComponents) implements Rewritable { // Keeping the ids raw makes this less annoying to deal with...
 
     public static final Type<TooltipDisplay> TYPE = new Type<>(TooltipDisplay.class) {
 
@@ -55,14 +57,15 @@ public record TooltipDisplay(boolean hideTooltip,
         }
     };
 
-    public TooltipDisplay rewrite(final Int2IntFunction idRewriter) {
+    @Override
+    public TooltipDisplay rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         if (hiddenComponents.isEmpty()) {
             return this;
         }
 
         final IntSortedSet newHiddenComponents = new IntLinkedOpenHashSet();
         for (final int hiddenComponent : hiddenComponents) {
-            newHiddenComponents.add(idRewriter.applyAsInt(hiddenComponent));
+            newHiddenComponents.add(Rewritable.rewriteDataComponentType(protocol, clientbound, hiddenComponent));
         }
         return new TooltipDisplay(hideTooltip, newHiddenComponents);
     }

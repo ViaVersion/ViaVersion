@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Limit;
+import com.viaversion.viaversion.util.Rewritable;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -282,7 +283,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         protocol.registerClientbound(packetType, wrapper -> {
             String itemIdentifier = wrapper.read(Types.STRING);
             if (itemIdentifier != null) {
-                itemIdentifier = mappedIdentifier(protocol.getMappingData().getFullItemMappings(), itemIdentifier);
+                itemIdentifier = Rewritable.mappedIdentifier(protocol.getMappingData().getFullItemMappings(), itemIdentifier);
             }
             wrapper.write(Types.STRING, itemIdentifier);
         });
@@ -546,21 +547,6 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     protected void passthroughLengthPrefixedItem(final PacketWrapper wrapper, final Type<Item> lengthPrefixedItemType, final Type<Item> mappedLengthPrefixedItemType) {
         final Item item = handleItemToServer(wrapper.user(), wrapper.read(mappedLengthPrefixedItemType));
         wrapper.write(lengthPrefixedItemType, item);
-    }
-
-    protected @Nullable String mappedIdentifier(final FullMappings mappings, final String identifier) {
-        // Check if the original exists before mapping
-        if (mappings.id(identifier) == -1) {
-            return identifier;
-        }
-        return mappings.mappedIdentifier(identifier);
-    }
-
-    protected @Nullable String unmappedIdentifier(final FullMappings mappings, final String mappedIdentifier) {
-        if (mappings.mappedId(mappedIdentifier) == -1) {
-            return mappedIdentifier;
-        }
-        return mappings.identifier(mappedIdentifier);
     }
 
     @Override

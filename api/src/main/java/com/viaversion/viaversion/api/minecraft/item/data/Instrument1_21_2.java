@@ -23,16 +23,19 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.EitherHolderType;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration, float range, Tag description) implements Copyable {
+public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration, float range,
+                               Tag description) implements Copyable, Rewritable {
 
     public static final HolderType<Instrument1_21_2> TYPE = new HolderType<>() {
         @Override
@@ -54,8 +57,9 @@ public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration,
     };
     public static final EitherHolderType<Instrument1_21_2> EITHER_HOLDER_TYPE = new EitherHolderType<>(TYPE);
 
-    public Instrument1_21_2 rewrite(final Int2IntFunction soundIdRewriteFunction) {
-        final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(soundIdRewriteFunction);
+    @Override
+    public Instrument1_21_2 rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(Rewritable.soundRewriteFunction(protocol, clientbound));
         return soundEvent == this.soundEvent ? this : new Instrument1_21_2(soundEvent, useDuration, range, description);
     }
 

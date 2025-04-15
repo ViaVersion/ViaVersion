@@ -22,13 +22,15 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public final class PotDecorations implements Copyable {
+public final class PotDecorations implements Copyable, Rewritable {
 
     public static final Type<PotDecorations> TYPE = new Type<>(PotDecorations.class) {
         @Override
@@ -76,10 +78,11 @@ public final class PotDecorations implements Copyable {
         return index < 0 || index >= itemIds.length ? -1 : itemIds[index];
     }
 
-    public PotDecorations rewrite(final Int2IntFunction idRewriteFunction) {
+    @Override
+    public PotDecorations rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         final int[] newItems = new int[itemIds.length];
         for (int i = 0; i < itemIds.length; i++) {
-            newItems[i] = idRewriteFunction.applyAsInt(itemIds[i]);
+            newItems[i] = Rewritable.rewriteItem(protocol, clientbound, itemIds[i]);
         }
         return new PotDecorations(newItems);
     }

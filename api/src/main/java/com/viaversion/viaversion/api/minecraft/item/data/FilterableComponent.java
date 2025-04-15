@@ -23,12 +23,16 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Rewritable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class FilterableComponent extends Filterable<Tag> {
+public final class FilterableComponent extends Filterable<Tag> implements Copyable, Rewritable {
 
     public static final Type<FilterableComponent> TYPE = new FilterableType<>(Types.TAG, Types.OPTIONAL_TAG, FilterableComponent.class) {
         @Override
@@ -40,5 +44,22 @@ public final class FilterableComponent extends Filterable<Tag> {
 
     public FilterableComponent(final Tag raw, @Nullable final Tag filtered) {
         super(raw, filtered);
+    }
+
+    @Override
+    public FilterableComponent rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        if (protocol.getComponentRewriter() == null) {
+            return this;
+        }
+
+        final FilterableComponent copy = copy();
+        protocol.getComponentRewriter().processTag(connection, copy.raw());
+        protocol.getComponentRewriter().processTag(connection, copy.filtered());
+        return copy;
+    }
+
+    @Override
+    public FilterableComponent copy() {
+        return new FilterableComponent(raw().copy(), filtered() != null ? filtered().copy() : null);
     }
 }

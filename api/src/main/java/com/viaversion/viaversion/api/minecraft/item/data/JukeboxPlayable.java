@@ -23,17 +23,19 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.EitherHolder;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.EitherHolderType;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record JukeboxPlayable(EitherHolder<JukeboxSong> song, boolean showInTooltip) {
+public record JukeboxPlayable(EitherHolder<JukeboxSong> song, boolean showInTooltip) implements Rewritable {
 
     public JukeboxPlayable(final Holder<JukeboxSong> song, final boolean showInTooltip) {
         this(EitherHolder.of(song), showInTooltip);
@@ -70,7 +72,8 @@ public record JukeboxPlayable(EitherHolder<JukeboxSong> song, boolean showInTool
         }
     };
 
-    public JukeboxPlayable rewrite(final Int2IntFunction soundIdRewriteFunction) {
+    @Override
+    public JukeboxPlayable rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         if (this.song.hasKey()) {
             return this;
         }
@@ -80,12 +83,12 @@ public record JukeboxPlayable(EitherHolder<JukeboxSong> song, boolean showInTool
             return this;
         }
 
-        final JukeboxSong rewrittenSong = songHolder.value().rewrite(soundIdRewriteFunction);
+        final JukeboxSong rewrittenSong = songHolder.value().rewrite(connection, protocol, clientbound);
         return rewrittenSong == songHolder.value() ? this : new JukeboxPlayable(Holder.of(rewrittenSong), showInTooltip);
     }
 
     public record JukeboxSong(Holder<SoundEvent> soundEvent, Tag description,
-                              float lengthInSeconds, int comparatorOutput) {
+                              float lengthInSeconds, int comparatorOutput) implements Rewritable {
 
         public static final HolderType<JukeboxSong> TYPE = new HolderType<>() {
             @Override
@@ -106,8 +109,9 @@ public record JukeboxPlayable(EitherHolder<JukeboxSong> song, boolean showInTool
             }
         };
 
-        public JukeboxSong rewrite(final Int2IntFunction soundIdRewriteFunction) {
-            final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(soundIdRewriteFunction);
+        @Override
+        public JukeboxSong rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+            final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(Rewritable.soundRewriteFunction(protocol, clientbound));
             return soundEvent == this.soundEvent ? this : new JukeboxSong(soundEvent, description, lengthInSeconds, comparatorOutput);
         }
     }

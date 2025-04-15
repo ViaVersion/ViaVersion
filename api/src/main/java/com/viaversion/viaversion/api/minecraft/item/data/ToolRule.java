@@ -22,15 +22,18 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public record ToolRule(HolderSet blocks, @Nullable Float speed, @Nullable Boolean correctForDrops) {
+public record ToolRule(HolderSet blocks, @Nullable Float speed,
+                       @Nullable Boolean correctForDrops) implements Rewritable {
 
     public static final Type<ToolRule> TYPE = new Type<>(ToolRule.class) {
         @Override
@@ -50,7 +53,8 @@ public record ToolRule(HolderSet blocks, @Nullable Float speed, @Nullable Boolea
     };
     public static final Type<ToolRule[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
-    public ToolRule rewrite(final Int2IntFunction blockIdRewriter) {
-        return blocks.hasIds() ? new ToolRule(blocks.rewrite(blockIdRewriter), speed, correctForDrops) : this;
+    @Override
+    public ToolRule rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        return blocks.hasIds() ? new ToolRule(blocks.rewrite(Rewritable.blockRewriteFunction(protocol, clientbound)), speed, correctForDrops) : this;
     }
 }

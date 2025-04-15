@@ -22,14 +22,16 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record Instrument1_20_5(Holder<SoundEvent> soundEvent, int useDuration, float range) {
+public record Instrument1_20_5(Holder<SoundEvent> soundEvent, int useDuration, float range) implements Rewritable {
 
     public static final HolderType<Instrument1_20_5> TYPE = new HolderType<>() {
         @Override
@@ -48,8 +50,9 @@ public record Instrument1_20_5(Holder<SoundEvent> soundEvent, int useDuration, f
         }
     };
 
-    public Instrument1_20_5 rewrite(final Int2IntFunction soundIdRewriteFunction) {
-        final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(soundIdRewriteFunction);
+    @Override
+    public Instrument1_20_5 rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(Rewritable.soundRewriteFunction(protocol, clientbound));
         return soundEvent == this.soundEvent ? this : new Instrument1_20_5(soundEvent, useDuration, range);
     }
 }
