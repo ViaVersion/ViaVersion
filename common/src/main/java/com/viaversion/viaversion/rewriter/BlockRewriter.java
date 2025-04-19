@@ -268,7 +268,12 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             final int blockEntityId = wrapper.read(Types.VAR_INT);
             final Mappings mappings = protocol.getMappingData().getBlockEntityMappings();
             if (mappings != null) {
-                wrapper.write(Types.VAR_INT, mappings.getNewIdOrDefault(blockEntityId, blockEntityId));
+                final int mappedBlockEntityId = mappings.getNewId(blockEntityId);
+                if (mappedBlockEntityId == -1) {
+                    wrapper.cancel();
+                    return;
+                }
+                wrapper.write(Types.VAR_INT, mappedBlockEntityId);
             } else {
                 wrapper.write(Types.VAR_INT, blockEntityId);
             }
