@@ -114,7 +114,6 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     // Casting around Rewritable and especially Holder gets ugly, but the only good alternative is to do everything manually
     @SuppressWarnings("unchecked")
     protected void updateItemDataComponents(final UserConnection connection, final Item item, final boolean clientbound) {
-        // Specific types that need deep handling
         final StructuredDataContainer container = item.dataContainer();
         if (clientbound && protocol.getComponentRewriter() != null) {
             updateComponent(connection, item, StructuredDataKey.ITEM_NAME, "item_name");
@@ -145,29 +144,25 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
                 continue;
             }
 
-            final StructuredDataKey<?> key = entry.getKey();
             final Object value = data.value();
-            final Class<?> outputClass = key.type().getOutputClass();
-            if (outputClass == Item.class) {
+            if (value instanceof Item itemValue) {
                 final StructuredData<Item> itemData = (StructuredData<Item>) data;
-                itemData.setValue(itemHandler.rewrite(connection, itemData.value()));
-            } else if (outputClass == Item[].class) {
-                final StructuredData<Item[]> itemArrayData = (StructuredData<Item[]>) data;
-                final Item[] items = itemArrayData.value();
+                itemData.setValue(itemHandler.rewrite(connection, itemValue));
+            } else if (value instanceof Item[] items) {
                 for (int i = 0; i < items.length; i++) {
                     items[i] = itemHandler.rewrite(connection, items[i]);
                 }
             } else if (value instanceof Rewritable rewritable) {
                 setDataUnchecked(data, rewritable.rewrite(connection, protocol, clientbound));
-            } else if (outputClass == Holder.class) {
+            } else if (value instanceof Holder<?> holder) {
                 final StructuredData<Holder<?>> holderData = (StructuredData<Holder<?>>) data;
-                final Holder<?> holder = holderData.value();
                 if (holder.isDirect() && holder.value() instanceof Rewritable) {
                     holderData.setValue(updateHolderUnchecked(holder, connection, clientbound));
                 }
             } else if (value instanceof EitherHolder<?> eitherHolder) {
+                final StructuredData<EitherHolder<?>> holderData = (StructuredData<EitherHolder<?>>) data;
                 if (eitherHolder.hasHolder() && eitherHolder.holder().isDirect() && eitherHolder.holder().value() instanceof Rewritable) {
-                    setDataUnchecked(data, EitherHolder.of(updateHolderUnchecked(eitherHolder.holder(), connection, clientbound)));
+                    holderData.setValue(EitherHolder.of(updateHolderUnchecked(eitherHolder.holder(), connection, clientbound)));
                 }
             }
         }

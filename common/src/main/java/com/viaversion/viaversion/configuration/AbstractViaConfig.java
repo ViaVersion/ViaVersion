@@ -71,6 +71,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private String blockedDisconnectMessage;
     private String reloadDisconnectMessage;
     private boolean suppressConversionWarnings;
+    private boolean suppressTextComponentConversionWarnings;
     private boolean disable1_13TabComplete;
     private boolean teamColourFix;
     private boolean serversideBlockConnections;
@@ -138,6 +139,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         reloadDisconnectMessage = getString("reload-disconnect-msg", "Server reload, please rejoin!");
         teamColourFix = getBoolean("team-colour-fix", true);
         suppressConversionWarnings = getBoolean("suppress-conversion-warnings", false);
+        suppressTextComponentConversionWarnings = getBoolean("suppress-text-component-conversion-warnings", true);
         disable1_13TabComplete = getBoolean("disable-1_13-auto-complete", false);
         serversideBlockConnections = getBoolean("serverside-blockconnections", true);
         reduceBlockStorageMemory = getBoolean("reduce-blockstorage-memory", false);
@@ -415,6 +417,11 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean isSuppressConversionWarnings() {
         return suppressConversionWarnings && !Via.getManager().isDebug(); // Debug mode overrules config
+    }
+
+    @Override
+    public boolean isSuppressTextComponentConversionWarnings() {
+        return suppressTextComponentConversionWarnings && !Via.getManager().isDebug(); // Debug mode overrules config
     }
 
     @Override

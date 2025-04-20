@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.SerializerVersion;
+import com.viaversion.viaversion.util.StringUtil;
 import java.util.logging.Level;
 
 public class TranslateRewriter {
@@ -87,7 +88,7 @@ public class TranslateRewriter {
                 hoverEvent.add("value", baseArray);
             } catch (Exception e) {
                 if (!Via.getConfig().isSuppressConversionWarnings()) {
-                    protocol.getLogger().log(Level.WARNING, "Error rewriting show_achievement: " + hoverEvent, e);
+                    protocol.getLogger().log(Level.WARNING, "Error rewriting show_achievement: " + StringUtil.forLogging(hoverEvent), e);
                 }
                 JsonObject invalidText = new JsonObject();
                 invalidText.addProperty("text", "Invalid statistic/achievement!");

@@ -286,6 +286,13 @@ public interface ViaVersionConfig extends Config {
     boolean isSuppressConversionWarnings();
 
     /**
+     * Should we hide errors that occur when trying to convert text components?
+     *
+     * @return true if enabled
+     */
+    boolean isSuppressTextComponentConversionWarnings();
+
+    /**
      * Should we disable the 1.13 auto-complete feature to stop spam kicks? (for any server lower than 1.13)
      *
      * @return true if enabled

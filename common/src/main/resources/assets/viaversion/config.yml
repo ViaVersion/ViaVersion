@@ -27,6 +27,8 @@ block-disconnect-msg: "You are using an unsupported Minecraft version!"
 reload-disconnect-msg: "Server reload, please rejoin!"
 # We warn when there's an error converting item/block or component/nbt data over versions, should we suppress these? (Only suggested if spamming)
 suppress-conversion-warnings: false
+# This can be disabled for debugging purposes if text in chat/entities/items shows an error tag.
+suppress-text-component-conversion-warnings: true
 #
 #----------------------------------------------------------#
 #                    VELOCITY OPTIONS                      #

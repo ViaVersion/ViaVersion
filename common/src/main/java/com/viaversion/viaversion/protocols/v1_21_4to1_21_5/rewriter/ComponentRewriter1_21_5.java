@@ -28,6 +28,7 @@ import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.SerializerVersion;
+import com.viaversion.viaversion.util.StringUtil;
 import com.viaversion.viaversion.util.TagUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -318,8 +319,8 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
         try {
             return uglyJsonToTagUncaught(connection, value);
         } catch (final Exception e) {
-            if (!Via.getConfig().isSuppressConversionWarnings()) {
-                Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting json text component: " + value, e);
+            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+                Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting json text component: " + StringUtil.forLogging(value), e);
             }
             return new StringTag("<error>");
         }

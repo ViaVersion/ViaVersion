@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.exception;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.util.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -74,7 +75,7 @@ public class InformativeException extends RuntimeException {
             if (!Via.getManager().isDebug() && s.length() > 10 && builder.length() + s.length() > MAX_MESSAGE_LENGTH) {
                 s = s.substring(0, MAX_MESSAGE_LENGTH - builder.length()) + "...";
             }
-            builder.append(s.replaceAll("\\s", ""));
+            builder.append(StringUtil.forLogging(s));
         }
         return builder.toString();
     }

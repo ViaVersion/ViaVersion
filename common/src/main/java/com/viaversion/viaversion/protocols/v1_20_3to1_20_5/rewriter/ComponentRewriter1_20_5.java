@@ -91,6 +91,7 @@ import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.MathUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
+import com.viaversion.viaversion.util.StringUtil;
 import com.viaversion.viaversion.util.UUIDUtil;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
@@ -215,8 +216,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         try {
             tagTag = tag != null ? (CompoundTag) inputSerializerVersion().toTag(tag.getValue()) : null;
         } catch (final Exception e) {
-            if (!Via.getConfig().isSuppressConversionWarnings()) {
-                protocol.getLogger().log(Level.WARNING, "Error reading NBT in show_item: " + itemTag, e);
+            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+                protocol.getLogger().log(Level.WARNING, "Error reading NBT in show_item: " + StringUtil.forLogging(itemTag), e);
             }
             return;
         }
@@ -249,7 +250,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
             try {
                 components = toTag(connection, data);
             } catch (final Exception e) {
-                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
                     protocol.getLogger().log(Level.WARNING, "Error writing components in show_item!", e);
                 }
                 return;
