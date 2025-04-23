@@ -304,6 +304,7 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
 
         final StringTag typeTag = contents.getStringTag("type");
         if (typeTag != null) {
+            typeTag.setValue(protocol.getEntityRewriter().mappedEntityIdentifier(typeTag.getValue()));
             hoverEventTag.put("id", typeTag);
         }
     }
@@ -348,5 +349,10 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
                 compoundTag.put("filtered", uglyJsonToTag(connection, filtered));
             }
         }
+    }
+
+    @Override
+    protected SerializerVersion inputSerializerVersion() {
+        return SerializerVersion.V1_21_4;
     }
 }
