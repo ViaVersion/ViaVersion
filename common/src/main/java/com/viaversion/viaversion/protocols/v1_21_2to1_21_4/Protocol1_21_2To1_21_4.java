@@ -86,6 +86,7 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21_2.PLAYER_COMBAT_KILL);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SYSTEM_CHAT);
         componentRewriter.registerDisguisedChat(ClientboundPackets1_21_2.DISGUISED_CHAT);
+        componentRewriter.registerPlayerChat(ClientboundPackets1_21_2.PLAYER_CHAT, ChatType.TYPE);
         componentRewriter.registerPing();
 
         particleRewriter.registerExplode1_21_2(ClientboundPackets1_21_2.EXPLODE);
@@ -112,34 +113,6 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
         new StatisticsRewriter<>(this).register(ClientboundPackets1_21_2.AWARD_STATS);
         new AttributeRewriter<>(this).register1_21(ClientboundPackets1_21_2.UPDATE_ATTRIBUTES);
 
-
-        registerClientbound(ClientboundPackets1_21_2.PLAYER_CHAT, wrapper -> {
-            wrapper.passthrough(Types.UUID); // Sender
-            wrapper.passthrough(Types.VAR_INT); // Index
-            wrapper.passthrough(Types.OPTIONAL_SIGNATURE_BYTES); // Signature
-            wrapper.passthrough(Types.STRING); // Plain content
-            wrapper.passthrough(Types.LONG); // Timestamp
-            wrapper.passthrough(Types.LONG); // Salt
-
-            final int lastSeen = wrapper.passthrough(Types.VAR_INT);
-            for (int i = 0; i < lastSeen; i++) {
-                final int index = wrapper.passthrough(Types.VAR_INT);
-                if (index == 0) {
-                    wrapper.passthrough(Types.SIGNATURE_BYTES);
-                }
-            }
-
-            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
-
-            final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
-            if (filterMaskType == 2) { // Partially filtered
-                wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE); // Mask
-            }
-
-            wrapper.passthrough(ChatType.TYPE); // Chat Type
-            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Name
-            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Target Name
-        });
         registerClientbound(ClientboundPackets1_21_2.PLAYER_INFO_UPDATE, wrapper -> {
             // Added "show hat" - true by default, keep it like that
             final BitSet actions = wrapper.passthroughAndMap(Types.PROFILE_ACTIONS_ENUM1_21_2, Types.PROFILE_ACTIONS_ENUM1_21_4);
