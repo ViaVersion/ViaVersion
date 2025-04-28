@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_2;
+import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -91,6 +92,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21.PLAYER_COMBAT_KILL);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21.SYSTEM_CHAT);
         componentRewriter.registerDisguisedChat(ClientboundPackets1_21.DISGUISED_CHAT);
+        componentRewriter.registerPlayerChat(ClientboundPackets1_21.PLAYER_CHAT, ChatType.TYPE);
         componentRewriter.registerPing();
 
         particleRewriter.registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
