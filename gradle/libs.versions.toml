@@ -13,6 +13,7 @@ guava = "17.0"
 snakeYaml = "2.2"
 
 junit = "5.11.4"
+platformLauncher = "1.12.2"
 checkerQual = "3.49.1"
 
 # Platforms
@@ -35,6 +36,7 @@ snakeYaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeYaml" 
 
 jupiterApi = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
 jupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
+platformLauncher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "platformLauncher" }
 checkerQual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checkerQual" }
 
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
