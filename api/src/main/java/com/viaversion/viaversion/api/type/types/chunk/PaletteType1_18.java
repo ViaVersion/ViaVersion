@@ -48,7 +48,7 @@ public class PaletteType1_18 extends PaletteTypeBase {
             // Single value storage
             palette = new DataPaletteImpl(type.size(), 1);
             palette.addId(Types.VAR_INT.readPrimitive(buffer));
-            readValues(buffer, 0, palette); // Just eat it if not empty - thanks, Hypixel
+            readValues(buffer, 0, palette);
             return palette;
         }
 
@@ -76,13 +76,15 @@ public class PaletteType1_18 extends PaletteTypeBase {
 
     protected void readValues(final ByteBuf buffer, final int bitsPerValue, final DataPaletteImpl palette) {
         final long[] values = Types.LONG_ARRAY_PRIMITIVE.read(buffer);
-        if (values.length > 0) {
-            final int valuesPerLong = (char) (64 / bitsPerValue);
-            final int expectedLength = (type.size() + valuesPerLong - 1) / valuesPerLong;
-            if (values.length == expectedLength) { // Thanks, Hypixel
-                CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerValue, type.size(), values,
-                    bitsPerValue == globalPaletteBits ? palette::setIdAt : palette::setPaletteIndexAt);
-            }
+        if (values.length == 0 || bitsPerValue == 0) {
+            return;
+        }
+
+        final int valuesPerLong = (char) (64 / bitsPerValue);
+        final int expectedLength = (type.size() + valuesPerLong - 1) / valuesPerLong;
+        if (values.length == expectedLength) {
+            CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerValue, type.size(), values,
+                bitsPerValue == globalPaletteBits ? palette::setIdAt : palette::setPaletteIndexAt);
         }
     }
 
