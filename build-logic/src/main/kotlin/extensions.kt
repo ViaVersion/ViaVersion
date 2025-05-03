@@ -15,9 +15,16 @@ fun Project.branchName(): String {
 }
 
 fun Project.runGitCommand(args: List<String>): String {
-    return providers.exec {
-        commandLine = listOf("git") + args
-    }.standardOutput.asBytes.get().toString(Charsets.UTF_8).trim()
+    return try {
+        val output = providers.exec {
+            commandLine = listOf("git") + args
+            isIgnoreExitValue = true
+        }.standardOutput.asBytes.get().toString(Charsets.UTF_8).trim()
+
+        output.takeIf { output.isNotBlank() } ?: "unknown"
+    } catch (e: Exception) {
+        "unknown"
+    }
 }
 
 fun JavaPluginExtension.javaTarget(version: Int) {
