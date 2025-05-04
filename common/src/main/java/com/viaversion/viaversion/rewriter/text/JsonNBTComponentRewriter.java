@@ -26,6 +26,8 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
@@ -120,6 +122,36 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
                 }
                 processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
             }
+        });
+    }
+
+    public void registerPlayerChat(final C packetType, final Type<?> chatType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.UUID); // Sender
+            wrapper.passthrough(Types.VAR_INT); // Index
+            wrapper.passthrough(Types.OPTIONAL_SIGNATURE_BYTES); // Signature
+            wrapper.passthrough(Types.STRING); // Plain content
+            wrapper.passthrough(Types.LONG); // Timestamp
+            wrapper.passthrough(Types.LONG); // Salt
+
+            final int lastSeen = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < lastSeen; i++) {
+                final int index = wrapper.passthrough(Types.VAR_INT);
+                if (index == 0) {
+                    wrapper.passthrough(Types.SIGNATURE_BYTES);
+                }
+            }
+
+            processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
+
+            final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
+            if (filterMaskType == 2) { // Partially filtered
+                wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE); // Mask
+            }
+
+            wrapper.passthrough(chatType); // Chat Type
+            processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Name
+            processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Target Name
         });
     }
 

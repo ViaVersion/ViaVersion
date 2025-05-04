@@ -130,6 +130,8 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
 
             final int chatType = wrapper.read(Types.VAR_INT);
             wrapper.write(ChatType.TYPE, Holder.of(chatType));
+            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Name
+            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Target Name
         });
 
         registerClientbound(ClientboundPackets1_20_5.UPDATE_ATTRIBUTES, wrapper -> {
