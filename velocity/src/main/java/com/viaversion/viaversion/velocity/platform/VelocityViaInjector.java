@@ -22,6 +22,7 @@ import com.viaversion.viaversion.VelocityPlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.VersionType;
 import com.viaversion.viaversion.util.ReflectionUtil;
 import com.viaversion.viaversion.velocity.handlers.VelocityChannelInitializer;
 import io.netty.channel.ChannelInitializer;
@@ -89,7 +90,11 @@ public class VelocityViaInjector implements ViaInjector {
         SortedSet<ProtocolVersion> set = new ObjectLinkedOpenHashSet<>();
         for (com.velocitypowered.api.network.ProtocolVersion version : com.velocitypowered.api.network.ProtocolVersion.SUPPORTED_VERSIONS) {
             if (version.getProtocol() >= lowestSupportedProtocolVersion) {
-                set.add(ProtocolVersion.getProtocol(version.getProtocol()));
+                final ProtocolVersion protocol = ProtocolVersion.getProtocol(version.getProtocol());
+                if (protocol.getVersionType() == VersionType.SPECIAL) {
+                    Via.getPlatform().getLogger().info("Registered special protocol support for version: " + version.name());
+                }
+                set.add(protocol);
             }
         }
         return set;
