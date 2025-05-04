@@ -139,34 +139,36 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     }
 
     public static boolean isRegistered(int version) {
-        return isRegistered(VersionType.RELEASE, version);
+        for (final VersionType versionType : VERSIONS.keySet()) {
+                return isRegistered(versionType, version);
+        }
+        return false;
     }
 
     /**
-     * Returns a ProtocolVersion instance, even if this protocol version
-     * has not been registered. See {@link #isRegistered(VersionType, int)} beforehand or {@link #isKnown()}.
+     * Returns a ProtocolVersion instance, if this protocol version
+     * has been registered. See {@link #isRegistered(VersionType, int)} beforehand or {@link #isKnown()}.
      *
      * @param versionType protocol version type
      * @param version     protocol version
-     * @return registered or unknown ProtocolVersion
+     * @return registered ProtocolVersion or null
      */
-    public static @NonNull ProtocolVersion getProtocol(final VersionType versionType, final int version) {
+    public static ProtocolVersion getProtocol(final VersionType versionType, final int version) {
         final Int2ObjectMap<ProtocolVersion> versions = VERSIONS.get(versionType);
         if (versions != null) {
-            final ProtocolVersion protocolVersion = versions.get(version);
-            if (protocolVersion != null) {
-                return protocolVersion;
-            }
+            return versions.get(version);
         }
-
-        // Will be made nullable instead in the future...
-        final ProtocolVersion unknown = new ProtocolVersion(versionType, version, -1, "Unknown (" + version + ")", null);
-        unknown.known = false;
-        return unknown;
+        return null;
     }
 
     public static @NonNull ProtocolVersion getProtocol(final int version) {
-        return getProtocol(VersionType.RELEASE, version);
+        for (final VersionType versionType : VERSIONS.keySet()) {
+            final ProtocolVersion candidate = getProtocol(versionType, version);
+            if (candidate != null) {
+                return candidate;
+            }
+        }
+        return unknown;
     }
 
     /**
