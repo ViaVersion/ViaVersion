@@ -140,7 +140,9 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
 
     public static boolean isRegistered(int version) {
         for (final VersionType versionType : VERSIONS.keySet()) {
-                return isRegistered(versionType, version);
+                if (isRegistered(versionType, version)) {
+                    return true;
+                }
         }
         return false;
     }
