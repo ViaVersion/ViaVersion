@@ -44,6 +44,15 @@ public class VelocityVersionProvider implements VersionProvider {
     }
 
     @Override
+    public ProtocolVersion getClientProtocol(final UserConnection user) {
+        try {
+            return getFrontProtocol(user);
+        } catch (Exception e) {
+            return VersionProvider.super.getClientProtocol(user);
+        }
+    }
+
+    @Override
     public ProtocolVersion getClosestServerProtocol(UserConnection user) throws Exception {
         return user.isClientSide() ? getBackProtocol(user) : getFrontProtocol(user);
     }
