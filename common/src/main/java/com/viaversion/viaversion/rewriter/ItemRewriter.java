@@ -34,6 +34,7 @@ import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.connection.ProtocolInfoImpl;
 import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Rewritable;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
@@ -117,10 +118,10 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             wrapper.passthrough(Types.VAR_INT); // State id
             Item[] items = wrapper.passthroughAndMap(itemArrayType, mappedItemArrayType);
             for (int i = 0; i < items.length; i++) {
-                items[i] = handleItemToClient(wrapper.user(), items[i]);
+                items[i] = handleItemToClientAndTrackHash(wrapper.user(), items[i]);
             }
 
-            passthroughClientboundItem(wrapper);
+            passthroughClientboundItemAndTrackHash(wrapper);
         });
     }
 
@@ -163,7 +164,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             wrapper.passthrough(containerIdType); // Container id
             wrapper.passthrough(Types.VAR_INT); // State id
             wrapper.passthrough(Types.SHORT); // Slot id
-            passthroughClientboundItem(wrapper);
+            passthroughClientboundItemAndTrackHash(wrapper);
         });
     }
 
@@ -268,7 +269,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     public void registerSetPlayerInventory(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Slot
-            passthroughClientboundItem(wrapper);
+            passthroughClientboundItemAndTrackHash(wrapper);
         });
     }
 
@@ -475,6 +476,10 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
+    public void registerSetCursorItem(C packetType) {
+        protocol.registerClientbound(packetType, this::passthroughClientboundItemAndTrackHash);
+    }
+
     // Pre 1.21 for enchantments
     public void registerContainerSetData(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
@@ -491,6 +496,26 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 wrapper.write(Types.SHORT, enchantmentId);
             }
         });
+    }
+
+    protected @Nullable Item handleItemToClientAndTrackHash(final UserConnection connection, @Nullable Item item) {
+        final ProtocolInfoImpl protocolInfo = (ProtocolInfoImpl) connection.getProtocolInfo();
+        protocolInfo.setProcessingClientboundInventoryPacket(true);
+        try {
+            return this.handleItemToClient(connection, item);
+        } finally {
+            protocolInfo.setProcessingClientboundInventoryPacket(false);
+        }
+    }
+
+    protected void passthroughClientboundItemAndTrackHash(final PacketWrapper wrapper) {
+        final ProtocolInfoImpl protocolInfo = (ProtocolInfoImpl) wrapper.user().getProtocolInfo();
+        protocolInfo.setProcessingClientboundInventoryPacket(true);
+        try {
+            this.passthroughClientboundItem(wrapper);
+        } finally {
+            protocolInfo.setProcessingClientboundInventoryPacket(false);
+        }
     }
 
     protected void passthroughClientboundItem(final PacketWrapper wrapper) {

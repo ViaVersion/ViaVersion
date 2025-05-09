@@ -34,6 +34,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.connection.ProtocolInfoImpl;
 import com.viaversion.viaversion.util.Rewritable;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -111,8 +112,6 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         container.updateIds(protocol, dataComponentMappings::getNewId);
     }
 
-    // Casting around Rewritable and especially Holder gets ugly, but the only good alternative is to do everything manually
-    @SuppressWarnings("unchecked")
     protected void updateItemDataComponents(final UserConnection connection, final Item item, final boolean clientbound) {
         final StructuredDataContainer container = item.dataContainer();
         if (clientbound && protocol.getComponentRewriter() != null) {
@@ -137,7 +136,20 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             }
         }
 
+        final ProtocolInfoImpl protocolInfo = ((ProtocolInfoImpl) connection.getProtocolInfo());
+        final boolean processingClientboundInventoryPacket = protocolInfo.isProcessingClientboundInventoryPacket();
+        protocolInfo.setProcessingClientboundInventoryPacket(false); // Don't track items inside items
         final ItemHandler itemHandler = clientbound ? this::handleItemToClient : this::handleItemToServer;
+        try {
+            updateItemDataComponents(connection, clientbound, container, itemHandler);
+        } finally {
+            protocolInfo.setProcessingClientboundInventoryPacket(processingClientboundInventoryPacket);
+        }
+    }
+
+    // Casting around Rewritable and especially Holder gets ugly, but the only good alternative is to do everything manually
+    @SuppressWarnings("unchecked")
+    private void updateItemDataComponents(UserConnection connection, boolean clientbound, StructuredDataContainer container, ItemHandler itemHandler) {
         for (final Map.Entry<StructuredDataKey<?>, StructuredData<?>> entry : container.data().entrySet()) {
             final StructuredData<?> data = entry.getValue();
             if (data.isEmpty()) {

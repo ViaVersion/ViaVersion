@@ -59,7 +59,7 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         // Registers item id changes
         // Other places using item ids are: Entity data, tags, statistics, effect
         // registerOpenScreen(ClientboundPackets1_21_2.OPEN_SCREEN); If a new container type was added; also remove from the component rewriter registration
-        protocol.registerClientbound(ClientboundPackets1_21_2.SET_CURSOR_ITEM, this::passthroughClientboundItem);
+        registerSetCursorItem(ClientboundPackets1_21_2.SET_CURSOR_ITEM);
         registerSetPlayerInventory(ClientboundPackets1_21_2.SET_PLAYER_INVENTORY);
         registerCooldown1_21_2(ClientboundPackets1_21_2.COOLDOWN);
         registerSetContent1_21_2(ClientboundPackets1_21_2.CONTAINER_SET_CONTENT);
