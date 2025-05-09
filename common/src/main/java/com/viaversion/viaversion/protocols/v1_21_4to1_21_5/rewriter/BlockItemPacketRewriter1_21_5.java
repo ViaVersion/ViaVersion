@@ -67,6 +67,7 @@ import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPacket1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPackets1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.storage.ItemHashStorage1_21_5;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
@@ -75,6 +76,7 @@ import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Unit;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import java.util.ArrayList;
@@ -340,6 +342,12 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
 
         // Add data components to fix issues in older protocols
         appendItemDataFixComponents(connection, item);
+
+        final ItemHashStorage1_21_5 hasher = connection.get(ItemHashStorage1_21_5.class);
+        for (final StructuredData<?> data : dataContainer.data().values()) {
+            hasher.trackStructuredData(data);
+        }
+
         return item;
     }
 
@@ -482,7 +490,20 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
     }
 
     private StructuredItem convertHashedItemToStructuredItem(final UserConnection connection, final HashedItem hashedItem) {
-        return new StructuredItem(hashedItem.identifier(), hashedItem.amount());
+        final StructuredItem item = new StructuredItem(hashedItem.identifier(), hashedItem.amount());
+        final ItemHashStorage1_21_5 hasher = connection.get(ItemHashStorage1_21_5.class);
+        final Map<StructuredDataKey<?>, StructuredData<?>> structuredDataMap = item.dataContainer().data();
+        for (final Int2IntMap.Entry hashEntry : hashedItem.dataHashesById().int2IntEntrySet()) {
+            final StructuredData<?> structuredData = hasher.dataFromHash(hashEntry.getIntKey(), hashEntry.getIntValue());
+            if (structuredData != null) {
+                structuredDataMap.put(structuredData.key(), structuredData);
+            }
+        }
+        for (final int dataId : hashedItem.removedDataIds()) {
+            final StructuredDataKey<?> structuredDataKey = Types1_21_5.STRUCTURED_DATA.key(dataId);
+            structuredDataMap.put(structuredDataKey, StructuredData.empty(structuredDataKey, dataId));
+        }
+        return item;
     }
 
     private void appendItemDataFixComponents(final UserConnection connection, final Item item) {
