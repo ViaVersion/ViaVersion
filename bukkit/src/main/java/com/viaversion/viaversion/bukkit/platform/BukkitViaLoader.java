@@ -30,7 +30,6 @@ import com.viaversion.viaversion.bukkit.listeners.v1_18_2to1_19.BlockBreakListen
 import com.viaversion.viaversion.bukkit.listeners.v1_19_3to1_19_4.ArmorToggleListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_20_5to1_21.LegacyChangeItemListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_20_5to1_21.PaperPlayerChangeItemListener;
-import com.viaversion.viaversion.bukkit.listeners.v1_21_4to1_21_5.ContainerClickDesyncCheck;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.ArmorListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.BlockListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.DeathListener;
@@ -41,7 +40,6 @@ import com.viaversion.viaversion.bukkit.providers.BukkitBlockConnectionProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitPickItemProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitViaMovementTransmitter;
-import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.provider.InventoryQuickMoveProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.ConnectionData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.BlockConnectionProvider;
@@ -193,18 +191,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         }
         if (serverProtocolVersion.olderThan(ProtocolVersion.v1_21_4)) {
             Via.getManager().getProviders().use(PickItemProvider.class, new BukkitPickItemProvider(plugin));
-        }
-
-        // Needs to be enabled on any version with the updated item desync check
-        if (serverProtocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_17)) {
-            try {
-                final Class<?> craftPlayerClass = NMSUtil.obc("entity.CraftPlayer");
-                if (PaperViaInjector.hasMethod(craftPlayerClass, "simplifyContainerDesyncCheck")) {
-                    new ContainerClickDesyncCheck(plugin).register();
-                }
-            } catch (final ClassNotFoundException e) {
-                Via.getPlatform().getLogger().log(Level.WARNING, "Could not find CraftPlayer class", e);
-            }
         }
     }
 

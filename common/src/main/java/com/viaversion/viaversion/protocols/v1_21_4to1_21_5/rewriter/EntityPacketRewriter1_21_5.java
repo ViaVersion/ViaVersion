@@ -32,14 +32,18 @@ import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.storage.ItemHashStorage1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.storage.MessageIndexStorage;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import net.lenni0451.mcstructs.core.Identifier;
 
 public final class EntityPacketRewriter1_21_5 extends EntityRewriter<ClientboundPacket1_21_2, Protocol1_21_4To1_21_5> {
     private static final int ATTACK_BLOCKED_ENTITY_EVENT = 29;
@@ -79,6 +83,14 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol) {
             @Override
             public RegistryEntry[] handle(final UserConnection connection, final String key, final RegistryEntry[] entries) {
+                if (key.equals("enchantment")) {
+                    final List<Identifier> identifiers = new ArrayList<>();
+                    for (final RegistryEntry entry : entries) {
+                        identifiers.add(Identifier.of(entry.key()));
+                    }
+                    connection.get(ItemHashStorage1_21_5.class).setEnchantmentRegistry(identifiers);
+                }
+
                 if (!key.equals("wolf_variant")) {
                     return super.handle(connection, key, entries);
                 }
