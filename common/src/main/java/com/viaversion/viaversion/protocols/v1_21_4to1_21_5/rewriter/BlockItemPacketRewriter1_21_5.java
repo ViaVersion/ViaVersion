@@ -63,6 +63,7 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
+import com.viaversion.viaversion.connection.ProtocolInfoImpl;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPacket1_21_5;
@@ -169,7 +170,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_21_2.SET_CURSOR_ITEM, this::passthroughClientboundItem);
+        registerSetCursorItem(ClientboundPackets1_21_2.SET_CURSOR_ITEM);
         registerSetPlayerInventory(ClientboundPackets1_21_2.SET_PLAYER_INVENTORY);
         registerCooldown1_21_2(ClientboundPackets1_21_2.COOLDOWN);
         registerSetContent1_21_2(ClientboundPackets1_21_2.CONTAINER_SET_CONTENT);
@@ -343,9 +344,12 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         // Add data components to fix issues in older protocols
         appendItemDataFixComponents(connection, item);
 
-        final ItemHashStorage1_21_5 hasher = connection.get(ItemHashStorage1_21_5.class);
-        for (final StructuredData<?> data : dataContainer.data().values()) {
-            hasher.trackStructuredData(data);
+        // Store the data components if necessary for the server, the client only sends data hashes now
+        if (((ProtocolInfoImpl) connection.getProtocolInfo()).isProcessingClientboundInventoryPacket()) {
+            final ItemHashStorage1_21_5 hasher = connection.get(ItemHashStorage1_21_5.class);
+            for (final StructuredData<?> data : dataContainer.data().values()) {
+                hasher.trackStructuredData(data);
+            }
         }
 
         return item;

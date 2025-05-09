@@ -18,317 +18,323 @@
 package com.viaversion.viaversion.rewriter.item;
 
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.item.data.*;
-import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
-import com.viaversion.viaversion.libs.fastutil.objects.Reference2ObjectOpenHashMap;
-import com.viaversion.viaversion.util.Pair;
+import com.viaversion.viaversion.api.minecraft.item.data.Bee;
+import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
+import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
+import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
+import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
+import com.viaversion.viaversion.util.Unit;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.lenni0451.mcstructs.converter.impl.v1_21_5.NbtConverter_v1_21_5;
 import net.lenni0451.mcstructs.core.Identifier;
 import net.lenni0451.mcstructs.itemcomponents.ItemComponent;
 import net.lenni0451.mcstructs.itemcomponents.ItemComponentMap;
 import net.lenni0451.mcstructs.itemcomponents.ItemComponentRegistry;
+import net.lenni0451.mcstructs.itemcomponents.impl.Registries;
 import net.lenni0451.mcstructs.itemcomponents.impl.v1_20_5.Types_v1_20_5;
 import net.lenni0451.mcstructs.itemcomponents.impl.v1_21_2.Types_v1_21_2;
 import net.lenni0451.mcstructs.itemcomponents.impl.v1_21_4.Types_v1_21_4;
 import net.lenni0451.mcstructs.itemcomponents.impl.v1_21_5.Types_v1_21_5;
-import net.lenni0451.mcstructs.nbt.tags.CompoundTag;
+import net.lenni0451.mcstructs.itemcomponents.registry.Registry;
+import net.lenni0451.mcstructs.itemcomponents.registry.RegistryEntry;
+import net.lenni0451.mcstructs.itemcomponents.registry.RegistryTag;
 import net.lenni0451.mcstructs.text.TextComponent;
 import net.lenni0451.mcstructs.text.serializer.TextComponentCodec;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.*;
-import java.util.function.Function;
+public final class ItemDataComponentConverter {
 
-public class ItemDataComponentConverter {
+    private final Map<StructuredDataKey<?>, Converter<?, ?>> converters = new Reference2ObjectOpenHashMap<>();
+    private final RegistryAccess registryAccess;
 
-    private static final Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> NOT_IMPLEMENTED = structuredData -> null;
-
-    private static Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> passthroughValueFunction(final ItemComponent<?> itemComponent) {
-        return structuredData -> new Pair<>(itemComponent, structuredData.value());
+    public ItemDataComponentConverter(final RegistryAccess registryAccess) {
+        this.registryAccess = registryAccess;
+        this.direct(StructuredDataKey.CUSTOM_DATA, ItemComponentRegistry.V1_21_5.CUSTOM_DATA);
+        this.direct(StructuredDataKey.MAX_STACK_SIZE, ItemComponentRegistry.V1_21_5.MAX_STACK_SIZE);
+        this.direct(StructuredDataKey.MAX_DAMAGE, ItemComponentRegistry.V1_21_5.MAX_DAMAGE);
+        this.direct(StructuredDataKey.DAMAGE, ItemComponentRegistry.V1_21_5.DAMAGE);
+        this.unit(StructuredDataKey.UNBREAKABLE1_21_5, ItemComponentRegistry.V1_21_5.UNBREAKABLE);
+        this.textComponent(StructuredDataKey.CUSTOM_NAME, ItemComponentRegistry.V1_21_5.CUSTOM_NAME);
+        this.textComponent(StructuredDataKey.ITEM_NAME, ItemComponentRegistry.V1_21_5.ITEM_NAME);
+        this.identifier(StructuredDataKey.ITEM_MODEL, ItemComponentRegistry.V1_21_5.ITEM_MODEL);
+        this.register(StructuredDataKey.LORE, stringArrayToTextComponentArray(ItemComponentRegistry.V1_21_5.LORE));
+        this.intToEnum(StructuredDataKey.RARITY, ItemComponentRegistry.V1_21_5.RARITY, Types_v1_20_5.Rarity.class);
+        this.register(StructuredDataKey.ENCHANTMENTS1_21_5, this.convertEnchantmentsFunction(ItemComponentRegistry.V1_21_5.ENCHANTMENTS));
+        this.notImplemented(StructuredDataKey.CAN_PLACE_ON1_21_5);
+        this.notImplemented(StructuredDataKey.CAN_BREAK1_21_5);
+        this.notImplemented(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5);
+        this.register(StructuredDataKey.CUSTOM_MODEL_DATA1_21_4, customModelData -> {
+            final List<Float> floats = new ArrayList<>(customModelData.floats().length);
+            for (final float f : customModelData.floats()) {
+                floats.add(f);
+            }
+            final List<Boolean> booleans = new ArrayList<>(customModelData.booleans().length);
+            for (final boolean b : customModelData.booleans()) {
+                booleans.add(b);
+            }
+            return new Result<>(ItemComponentRegistry.V1_21_5.CUSTOM_MODEL_DATA, new Types_v1_21_4.CustomModelData(
+                    floats,
+                    booleans,
+                    Arrays.asList(customModelData.strings()),
+                    intArrayToIntList(customModelData.colors())
+            ));
+        });
+        this.notImplemented(StructuredDataKey.TOOLTIP_DISPLAY);
+        this.direct(StructuredDataKey.REPAIR_COST, ItemComponentRegistry.V1_21_5.REPAIR_COST);
+        this.unit(StructuredDataKey.CREATIVE_SLOT_LOCK, ItemComponentRegistry.V1_21_5.CREATIVE_SLOT_LOCK);
+        this.direct(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, ItemComponentRegistry.V1_21_5.ENCHANTMENT_GLINT_OVERRIDE);
+        this.register(StructuredDataKey.INTANGIBLE_PROJECTILE, value -> new Result<>(ItemComponentRegistry.V1_21_5.INTANGIBLE_PROJECTILE, null));
+        this.register(StructuredDataKey.FOOD1_21_2, foodProperties -> {
+            return new Result<>(ItemComponentRegistry.V1_21_5.FOOD, new Types_v1_21_2.Food(foodProperties.nutrition(), foodProperties.saturationModifier(), foodProperties.canAlwaysEat()));
+        });
+        this.notImplemented(StructuredDataKey.CONSUMABLE1_21_2);
+        this.item(StructuredDataKey.USE_REMAINDER1_21_5, ItemComponentRegistry.V1_21_5.USE_REMAINDER);
+        this.register(StructuredDataKey.USE_COOLDOWN, useCooldown -> {
+            return new Result<>(ItemComponentRegistry.V1_21_5.USE_COOLDOWN, new Types_v1_21_2.UseCooldown(useCooldown.seconds(), Identifier.of(useCooldown.cooldownGroup())));
+        });
+        this.register(StructuredDataKey.DAMAGE_RESISTANT, damageResistant -> {
+            return new Result<>(ItemComponentRegistry.V1_21_5.DAMAGE_RESISTANT, new Types_v1_21_2.DamageResistant(new RegistryTag(registries().damageType, Identifier.of(damageResistant.typesTagKey()))));
+        });
+        this.notImplemented(StructuredDataKey.TOOL1_21_5);
+        this.register(StructuredDataKey.WEAPON, weapon -> {
+            return new Result<>(ItemComponentRegistry.V1_21_5.WEAPON, new Types_v1_21_5.Weapon(weapon.itemDamagePerAttack(), weapon.disableBlockingForSeconds()));
+        });
+        this.register(StructuredDataKey.ENCHANTABLE, structuredData -> {
+            return new Result<>(ItemComponentRegistry.V1_21_5.ENCHANTABLE, new Types_v1_21_2.Enchantable(structuredData));
+        });
+        this.notImplemented(StructuredDataKey.EQUIPPABLE1_21_5);
+        this.notImplemented(StructuredDataKey.REPAIRABLE);
+        this.unit(StructuredDataKey.GLIDER, ItemComponentRegistry.V1_21_5.GLIDER);
+        this.identifier(StructuredDataKey.TOOLTIP_STYLE, ItemComponentRegistry.V1_21_5.TOOLTIP_STYLE);
+        this.notImplemented(StructuredDataKey.DEATH_PROTECTION);
+        this.notImplemented(StructuredDataKey.BLOCKS_ATTACKS);
+        this.register(StructuredDataKey.STORED_ENCHANTMENTS1_21_5, this.convertEnchantmentsFunction(ItemComponentRegistry.V1_21_5.STORED_ENCHANTMENTS));
+        this.register(StructuredDataKey.DYED_COLOR1_21_5, dyedColor -> {
+            return new Result<>(ItemComponentRegistry.V1_21_5.DYED_COLOR, dyedColor.rgb());
+        });
+        this.direct(StructuredDataKey.MAP_COLOR, ItemComponentRegistry.V1_21_5.MAP_COLOR);
+        this.direct(StructuredDataKey.MAP_ID, ItemComponentRegistry.V1_21_5.MAP_ID);
+        this.register(StructuredDataKey.MAP_DECORATIONS, passthroughNbtCodec(ItemComponentRegistry.V1_21_5.MAP_DECORATIONS));
+        this.intToEnum(StructuredDataKey.MAP_POST_PROCESSING, ItemComponentRegistry.V1_21_5.MAP_POST_PROCESSING, Types_v1_20_5.MapPostProcessing.class);
+        this.register(StructuredDataKey.CHARGED_PROJECTILES1_21_5, convertItemArrayFunction(ItemComponentRegistry.V1_21_5.CHARGED_PROJECTILES));
+        this.register(StructuredDataKey.BUNDLE_CONTENTS1_21_5, convertItemArrayFunction(ItemComponentRegistry.V1_21_5.BUNDLE_CONTENTS));
+        this.notImplemented(StructuredDataKey.POTION_CONTENTS1_21_2);
+        this.direct(StructuredDataKey.POTION_DURATION_SCALE, ItemComponentRegistry.V1_21_5.POTION_DURATION_SCALE);
+        this.notImplemented(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS);
+        this.register(StructuredDataKey.WRITABLE_BOOK_CONTENT, pages -> {
+            final List<Types_v1_20_5.RawFilteredPair<String>> resultPages = new ArrayList<>(pages.length);
+            for (final FilterableString page : pages) {
+                resultPages.add(new Types_v1_20_5.RawFilteredPair<>(page.raw(), page.filtered()));
+            }
+            return new Result<>(ItemComponentRegistry.V1_21_5.WRITABLE_BOOK_CONTENT, new Types_v1_20_5.WritableBook(resultPages));
+        });
+        this.register(StructuredDataKey.WRITTEN_BOOK_CONTENT, writtenBook -> {
+            final Types_v1_20_5.RawFilteredPair<String> resultTitle = new Types_v1_20_5.RawFilteredPair<>(writtenBook.title().raw(), writtenBook.title().filtered());
+            final List<Types_v1_20_5.RawFilteredPair<TextComponent>> resultPages = new ArrayList<>(writtenBook.pages().length);
+            for (final FilterableComponent page : writtenBook.pages()) {
+                resultPages.add(new Types_v1_20_5.RawFilteredPair<>(convertTextComponent(page.raw()), convertTextComponent(page.filtered())));
+            }
+            return new Result<>(ItemComponentRegistry.V1_21_5.WRITTEN_BOOK_CONTENT, new Types_v1_20_5.WrittenBook(resultTitle, writtenBook.author(), writtenBook.generation(), resultPages, writtenBook.resolved()));
+        });
+        this.notImplemented(StructuredDataKey.TRIM1_21_5);
+        this.register(StructuredDataKey.DEBUG_STICK_STATE, passthroughNbtCodec(ItemComponentRegistry.V1_21_5.DEBUG_STICK_STATE));
+        this.direct(StructuredDataKey.ENTITY_DATA, ItemComponentRegistry.V1_21_5.ENTITY_DATA);
+        this.direct(StructuredDataKey.BUCKET_ENTITY_DATA, ItemComponentRegistry.V1_21_5.BUCKET_ENTITY_DATA);
+        this.direct(StructuredDataKey.BLOCK_ENTITY_DATA, ItemComponentRegistry.V1_21_5.BLOCK_ENTITY_DATA);
+        this.notImplemented(StructuredDataKey.INSTRUMENT1_21_5);
+        this.notImplemented(StructuredDataKey.PROVIDES_TRIM_MATERIAL);
+        this.direct(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, ItemComponentRegistry.V1_21_5.OMINOUS_BOTTLE_AMPLIFIER);
+        this.notImplemented(StructuredDataKey.JUKEBOX_PLAYABLE1_21_5);
+        this.registryTag(StructuredDataKey.PROVIDES_BANNER_PATTERNS, ItemComponentRegistry.V1_21_5.PROVIDES_BANNER_PATTERNS, registries().bannerPattern);
+        this.register(StructuredDataKey.RECIPES, passthroughNbtCodec(ItemComponentRegistry.V1_21_5.RECIPES));
+        this.register(StructuredDataKey.LODESTONE_TRACKER, lodestoneTracker -> {
+            final Types_v1_20_5.LodestoneTracker.GlobalPos targetGlobalPos;
+            if (lodestoneTracker.position() != null) {
+                final Types_v1_20_5.BlockPos targetPos = new Types_v1_20_5.BlockPos(lodestoneTracker.position().x(), lodestoneTracker.position().y(), lodestoneTracker.position().z());
+                targetGlobalPos = new Types_v1_20_5.LodestoneTracker.GlobalPos(new RegistryEntry(registries().dimension, Identifier.of(lodestoneTracker.position().dimension())), targetPos);
+            } else {
+                targetGlobalPos = null;
+            }
+            return new Result<>(ItemComponentRegistry.V1_21_5.LODESTONE_TRACKER, new Types_v1_20_5.LodestoneTracker(targetGlobalPos, lodestoneTracker.tracked()));
+        });
+        this.register(StructuredDataKey.FIREWORK_EXPLOSION, fireworkExplosion -> {
+            return new Result<>(ItemComponentRegistry.V1_21_5.FIREWORK_EXPLOSION, convertFireworkExplosion(fireworkExplosion));
+        });
+        this.register(StructuredDataKey.FIREWORKS, fireworks -> {
+            final List<Types_v1_20_5.FireworkExplosions> resultExplosions = new ArrayList<>(fireworks.explosions().length);
+            for (final FireworkExplosion explosion : fireworks.explosions()) {
+                resultExplosions.add(convertFireworkExplosion(explosion));
+            }
+            return new Result<>(ItemComponentRegistry.V1_21_5.FIREWORKS, new Types_v1_20_5.Fireworks(fireworks.flightDuration(), resultExplosions));
+        });
+        this.register(StructuredDataKey.PROFILE, profile -> {
+            final Map<String, List<Types_v1_20_5.GameProfile.Property>> resultProperties = new HashMap<>();
+            for (final GameProfile.Property property : profile.properties()) {
+                final List<Types_v1_20_5.GameProfile.Property> propertyList = resultProperties.computeIfAbsent(property.name(), k -> new ArrayList<>());
+                propertyList.add(new Types_v1_20_5.GameProfile.Property(property.name(), property.value(), property.signature()));
+            }
+            return new Result<>(ItemComponentRegistry.V1_21_5.PROFILE, new Types_v1_20_5.GameProfile(profile.name(), profile.id(), resultProperties));
+        });
+        this.identifier(StructuredDataKey.NOTE_BLOCK_SOUND, ItemComponentRegistry.V1_21_5.NOTE_BLOCK_SOUND);
+        this.notImplemented(StructuredDataKey.BANNER_PATTERNS);
+        this.intToEnum(StructuredDataKey.BASE_COLOR, ItemComponentRegistry.V1_21_5.BASE_COLOR, Types_v1_20_5.DyeColor.class);
+        this.notImplemented(StructuredDataKey.POT_DECORATIONS);
+        this.register(StructuredDataKey.CONTAINER1_21_5, items -> {
+            final List<Types_v1_20_5.ContainerSlot> resultSlots = new ArrayList<>();
+            for (int i = 0; i < items.length; i++) {
+                final Item item = items[i];
+                if (!item.isEmpty()) {
+                    resultSlots.add(new Types_v1_20_5.ContainerSlot(i, this.convertItemStack(item)));
+                }
+            }
+            return new Result<>(ItemComponentRegistry.V1_21_5.CONTAINER, resultSlots);
+        });
+        this.register(StructuredDataKey.BLOCK_STATE, blockState -> {
+            return new Result<>(ItemComponentRegistry.V1_21_5.BLOCK_STATE, blockState.properties());
+        });
+        this.register(StructuredDataKey.BEES, bees -> {
+            final List<Types_v1_20_5.BeeData> resultBeeData = new ArrayList<>();
+            for (final Bee bee : bees) {
+                resultBeeData.add(new Types_v1_20_5.BeeData(bee.entityData(), bee.ticksInHive(), bee.minTicksInHive()));
+            }
+            return new Result<>(ItemComponentRegistry.V1_21_5.BEES, resultBeeData);
+        });
+        this.register(StructuredDataKey.LOCK, passthroughNbtCodec(ItemComponentRegistry.V1_21_5.LOCK));
+        this.register(StructuredDataKey.CONTAINER_LOOT, passthroughNbtCodec(ItemComponentRegistry.V1_21_5.CONTAINER_LOOT));
+        this.notImplemented(StructuredDataKey.BREAK_SOUND);
+        this.intToEnum(StructuredDataKey.VILLAGER_VARIANT, ItemComponentRegistry.V1_21_5.VILLAGER_VARIANT, Types_v1_21_5.VillagerVariant.class);
+        this.notImplemented(StructuredDataKey.WOLF_VARIANT);
+        this.notImplemented(StructuredDataKey.WOLF_SOUND_VARIANT);
+        this.intToEnum(StructuredDataKey.WOLF_COLLAR, ItemComponentRegistry.V1_21_5.WOLF_COLLAR, Types_v1_20_5.DyeColor.class);
+        this.intToEnum(StructuredDataKey.FOX_VARIANT, ItemComponentRegistry.V1_21_5.FOX_VARIANT, Types_v1_21_5.FoxVariant.class);
+        this.intToEnum(StructuredDataKey.SALMON_SIZE, ItemComponentRegistry.V1_21_5.SALMON_SIZE, Types_v1_21_5.SalmonSize.class);
+        this.intToEnum(StructuredDataKey.PARROT_VARIANT, ItemComponentRegistry.V1_21_5.PARROT_VARIANT, Types_v1_21_5.ParrotVariant.class);
+        this.intToEnum(StructuredDataKey.TROPICAL_FISH_PATTERN, ItemComponentRegistry.V1_21_5.TROPICAL_FISH_PATTERN, Types_v1_21_5.TropicalFishPattern.class);
+        this.intToEnum(StructuredDataKey.TROPICAL_FISH_BASE_COLOR, ItemComponentRegistry.V1_21_5.TROPICAL_FISH_BASE_COLOR, Types_v1_20_5.DyeColor.class);
+        this.intToEnum(StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR, ItemComponentRegistry.V1_21_5.TROPICAL_FISH_PATTERN_COLOR, Types_v1_20_5.DyeColor.class);
+        this.intToEnum(StructuredDataKey.MOOSHROOM_VARIANT, ItemComponentRegistry.V1_21_5.MOOSHROOM_VARIANT, Types_v1_21_5.MooshroomVariant.class);
+        this.intToEnum(StructuredDataKey.RABBIT_VARIANT, ItemComponentRegistry.V1_21_5.RABBIT_VARIANT, Types_v1_21_5.RabbitVariant.class);
+        this.notImplemented(StructuredDataKey.PIG_VARIANT);
+        this.notImplemented(StructuredDataKey.COW_VARIANT);
+        this.notImplemented(StructuredDataKey.CHICKEN_VARIANT);
+        this.notImplemented(StructuredDataKey.FROG_VARIANT);
+        this.intToEnum(StructuredDataKey.HORSE_VARIANT, ItemComponentRegistry.V1_21_5.HORSE_VARIANT, Types_v1_21_5.HorseVariant.class);
+        this.notImplemented(StructuredDataKey.PAINTING_VARIANT);
+        this.intToEnum(StructuredDataKey.LLAMA_VARIANT, ItemComponentRegistry.V1_21_5.LLAMA_VARIANT, Types_v1_21_5.LlamaVariant.class);
+        this.intToEnum(StructuredDataKey.AXOLOTL_VARIANT, ItemComponentRegistry.V1_21_5.AXOLOTL_VARIANT, Types_v1_21_5.AxolotlVariant.class);
+        this.notImplemented(StructuredDataKey.CAT_VARIANT);
+        this.intToEnum(StructuredDataKey.CAT_COLLAR, ItemComponentRegistry.V1_21_5.CAT_COLLAR, Types_v1_20_5.DyeColor.class);
+        this.intToEnum(StructuredDataKey.SHEEP_COLOR, ItemComponentRegistry.V1_21_5.SHEEP_COLOR, Types_v1_20_5.DyeColor.class);
+        this.intToEnum(StructuredDataKey.SHULKER_COLOR, ItemComponentRegistry.V1_21_5.SHULKER_COLOR, Types_v1_20_5.DyeColor.class);
     }
 
-    private static Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> noValueFunction(final ItemComponent<?> itemComponent) {
-        return structuredData -> new Pair<>(itemComponent, null);
+    public <I> Result<?> viaToMcStructs(final StructuredData<I> structuredData) {
+        final Converter<?, ?> conversionFunction = this.converters.get(structuredData.key());
+        if (conversionFunction == null) {
+            throw new IllegalArgumentException("Unknown structured data key: " + structuredData.key());
+        }
+        //noinspection unchecked
+        return ((Converter<I, ?>) conversionFunction).convert(structuredData.value());
     }
 
-    private static Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> convertNbtFunction(final ItemComponent<?> itemComponent) {
-        return structuredData -> new Pair<>(itemComponent, NbtConverter.viaToMcStructs((Tag) structuredData.value()));
+    private <I, O> void register(final StructuredDataKey<I> key, final Converter<I, O> converter) {
+        this.converters.put(key, converter);
     }
 
-    private static Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> convertTextComponentFunction(final ItemComponent<?> itemComponent) {
-        return structuredData -> new Pair<>(itemComponent, convertTextComponent((Tag) structuredData.value()));
+    private <I> void direct(final StructuredDataKey<I> key, final ItemComponent<I> result) {
+        this.register(key, value -> new Result<>(result, value));
     }
 
-    private static Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> convertTextComponentArrayFunction(final ItemComponent<?> itemComponent) {
-        return structuredData -> {
-            final Tag[] tags = (Tag[]) structuredData.value();
+    private <I> void notImplemented(final StructuredDataKey<I> key) {
+        this.register(key, value -> null);
+    }
+
+    private void unit(final StructuredDataKey<Unit> key, final ItemComponent<?> result) {
+        this.register(key, value -> new Result<>(result, null));
+    }
+
+    private <O extends Enum<O>> void intToEnum(final StructuredDataKey<Integer> key, final ItemComponent<O> result, final Class<O> enumClass) {
+        this.register(key, ordinal -> {
+            final O[] enumConstants = enumClass.getEnumConstants();
+            return new Result<>(result, enumConstants[ordinal]);
+        });
+    }
+
+    private void textComponent(final StructuredDataKey<Tag> key, final ItemComponent<TextComponent> result) {
+        this.register(key, tag -> new Result<>(result, convertTextComponent(tag)));
+    }
+
+    private void item(final StructuredDataKey<Item> key, final ItemComponent<Types_v1_20_5.ItemStack> result) {
+        this.register(key, item -> new Result<>(result, this.convertItemStack(item)));
+    }
+
+    private void identifier(final StructuredDataKey<String> key, final ItemComponent<Identifier> result) {
+        this.register(key, value -> new Result<>(result, Identifier.of(value)));
+    }
+
+    private void registryTag(final StructuredDataKey<String> key, final ItemComponent<RegistryTag> result, final Registry registry) {
+        this.register(key, value -> new Result<>(result, new RegistryTag(registry, Identifier.of(value))));
+    }
+
+    private static Converter<Tag[], List<TextComponent>> stringArrayToTextComponentArray(final ItemComponent<List<TextComponent>> itemComponent) {
+        return tags -> {
             final List<TextComponent> textComponents = new ArrayList<>(tags.length);
-            for (Tag tag : tags) {
+            for (final Tag tag : tags) {
                 textComponents.add(convertTextComponent(tag));
             }
-            return new Pair<>(itemComponent, textComponents);
+            return new Result<>(itemComponent, textComponents);
         };
     }
 
-    private static Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> stringToIdentifierFunction(final ItemComponent<?> itemComponent) {
-        return structuredData -> new Pair<>(itemComponent, Identifier.of((String) structuredData.value()));
+    private static <I extends Tag, O> Converter<I, O> passthroughNbtCodec(final ItemComponent<O> itemComponent) {
+        return tag -> new Result<>(itemComponent, itemComponent.getCodec().deserialize(NbtConverter_v1_21_5.INSTANCE, tag).getOrThrow());
     }
 
-    private static <T extends Enum<?>> Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> intToEnumFunction(final ItemComponent<T> itemComponent, final Class<T> enumClass) {
-        final Enum<?>[] enumConstants = enumClass.getEnumConstants();
-        return structuredData -> new Pair<>(itemComponent, enumConstants[(Integer) structuredData.value()]);
-    }
-
-    private static Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> passthroughNbtCodec(final ItemComponent<?> itemComponent) {
-        return structuredData -> new Pair<>(itemComponent, itemComponent.getCodec().deserialize(NbtConverter_v1_21_5.INSTANCE, NbtConverter.viaToMcStructs((Tag) structuredData.value())).getOrThrow());
-    }
-
-    private static Types_v1_20_5.FireworkExplosions convertFireworkExplosion(final FireworkExplosion viaFireworkExplosion) {
-        final Types_v1_20_5.FireworkExplosions.ExplosionShape explosionShape = Types_v1_20_5.FireworkExplosions.ExplosionShape.values()[viaFireworkExplosion.shape()];
-        return new Types_v1_20_5.FireworkExplosions(explosionShape, intArrayToIntList(viaFireworkExplosion.colors()), intArrayToIntList(viaFireworkExplosion.fadeColors()), viaFireworkExplosion.hasTrail(), viaFireworkExplosion.hasTwinkle());
+    private static Types_v1_20_5.FireworkExplosions convertFireworkExplosion(final FireworkExplosion explosion) {
+        final Types_v1_20_5.FireworkExplosions.ExplosionShape explosionShape = Types_v1_20_5.FireworkExplosions.ExplosionShape.values()[explosion.shape()];
+        return new Types_v1_20_5.FireworkExplosions(explosionShape, intArrayToIntList(explosion.colors()), intArrayToIntList(explosion.fadeColors()), explosion.hasTrail(), explosion.hasTwinkle());
     }
 
     private static TextComponent convertTextComponent(final Tag tag) {
-        if (tag != null) {
-            return TextComponentCodec.V1_21_5.deserialize(NbtConverter.viaToMcStructs(tag));
-        } else {
-            return null;
-        }
+        return tag != null ? TextComponentCodec.V1_21_5.deserialize(tag) : null;
     }
 
     private static List<Integer> intArrayToIntList(final int[] array) {
         final List<Integer> list = new ArrayList<>(array.length);
-        for (int i : array) {
+        for (final int i : array) {
             list.add(i);
         }
         return list;
     }
 
-    private final RegistryAccess registryAccess;
-    private final Map<StructuredDataKey<?>, Function<StructuredData<?>, Pair<ItemComponent<?>, Object>>> conversionFunctions = new Reference2ObjectOpenHashMap<>();
-
-    public ItemDataComponentConverter(final RegistryAccess registryAccess) {
-        this.registryAccess = registryAccess;
-        this.conversionFunctions.put(StructuredDataKey.CUSTOM_DATA, convertNbtFunction(ItemComponentRegistry.V1_21_5.CUSTOM_DATA));
-        this.conversionFunctions.put(StructuredDataKey.MAX_STACK_SIZE, passthroughValueFunction(ItemComponentRegistry.V1_21_5.MAX_STACK_SIZE));
-        this.conversionFunctions.put(StructuredDataKey.MAX_DAMAGE, passthroughValueFunction(ItemComponentRegistry.V1_21_5.MAX_DAMAGE));
-        this.conversionFunctions.put(StructuredDataKey.DAMAGE, passthroughValueFunction(ItemComponentRegistry.V1_21_5.DAMAGE));
-        this.conversionFunctions.put(StructuredDataKey.UNBREAKABLE1_21_5, noValueFunction(ItemComponentRegistry.V1_21_5.UNBREAKABLE));
-        this.conversionFunctions.put(StructuredDataKey.CUSTOM_NAME, convertTextComponentFunction(ItemComponentRegistry.V1_21_5.CUSTOM_NAME));
-        this.conversionFunctions.put(StructuredDataKey.ITEM_NAME, convertTextComponentFunction(ItemComponentRegistry.V1_21_5.ITEM_NAME));
-        this.conversionFunctions.put(StructuredDataKey.ITEM_MODEL, stringToIdentifierFunction(ItemComponentRegistry.V1_21_5.ITEM_MODEL));
-        this.conversionFunctions.put(StructuredDataKey.LORE, convertTextComponentArrayFunction(ItemComponentRegistry.V1_21_5.LORE));
-        this.conversionFunctions.put(StructuredDataKey.RARITY, intToEnumFunction(ItemComponentRegistry.V1_21_5.RARITY, Types_v1_20_5.Rarity.class));
-        this.conversionFunctions.put(StructuredDataKey.ENCHANTMENTS1_21_5, this.convertEnchantmentsFunction(ItemComponentRegistry.V1_21_5.ENCHANTMENTS));
-        this.conversionFunctions.put(StructuredDataKey.CAN_PLACE_ON1_21_5, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.CAN_BREAK1_21_5, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.CUSTOM_MODEL_DATA1_21_4, structuredData -> {
-            final CustomModelData1_21_4 viaCustomModelData = (CustomModelData1_21_4) structuredData.value();
-            final List<Float> floats = new ArrayList<>(viaCustomModelData.floats().length);
-            for (float f : viaCustomModelData.floats()) {
-                floats.add(f);
-            }
-            final List<Boolean> booleans = new ArrayList<>(viaCustomModelData.booleans().length);
-            for (boolean b : viaCustomModelData.booleans()) {
-                booleans.add(b);
-            }
-            return new Pair<>(ItemComponentRegistry.V1_21_5.CUSTOM_MODEL_DATA, new Types_v1_21_4.CustomModelData(floats, booleans, Arrays.asList(viaCustomModelData.strings()), intArrayToIntList(viaCustomModelData.colors())));
-        });
-        this.conversionFunctions.put(StructuredDataKey.TOOLTIP_DISPLAY, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.REPAIR_COST, passthroughValueFunction(ItemComponentRegistry.V1_21_5.REPAIR_COST));
-        this.conversionFunctions.put(StructuredDataKey.CREATIVE_SLOT_LOCK, noValueFunction(ItemComponentRegistry.V1_21_5.CREATIVE_SLOT_LOCK));
-        this.conversionFunctions.put(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, passthroughValueFunction(ItemComponentRegistry.V1_21_5.ENCHANTMENT_GLINT_OVERRIDE));
-        this.conversionFunctions.put(StructuredDataKey.INTANGIBLE_PROJECTILE, noValueFunction(ItemComponentRegistry.V1_21_5.INTANGIBLE_PROJECTILE));
-        this.conversionFunctions.put(StructuredDataKey.FOOD1_21_2, structuredData -> {
-            final FoodProperties1_21_2 viaFoodProperties = (FoodProperties1_21_2) structuredData.value();
-            return new Pair<>(ItemComponentRegistry.V1_21_5.FOOD, new Types_v1_21_2.Food(viaFoodProperties.nutrition(), viaFoodProperties.saturationModifier(), viaFoodProperties.canAlwaysEat()));
-        });
-        this.conversionFunctions.put(StructuredDataKey.CONSUMABLE1_21_2, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.USE_REMAINDER1_21_5, this.convertItemFunction(ItemComponentRegistry.V1_21_5.USE_REMAINDER));
-        this.conversionFunctions.put(StructuredDataKey.USE_COOLDOWN, structuredData -> {
-            final UseCooldown viaUseCooldown = (UseCooldown) structuredData.value();
-            return new Pair<>(ItemComponentRegistry.V1_21_5.USE_COOLDOWN, new Types_v1_21_2.UseCooldown(viaUseCooldown.seconds(), Identifier.of(viaUseCooldown.cooldownGroup())));
-        });
-        this.conversionFunctions.put(StructuredDataKey.DAMAGE_RESISTANT, structuredData -> {
-            final DamageResistant viaDamageResistant = (DamageResistant) structuredData.value();
-            return new Pair<>(ItemComponentRegistry.V1_21_5.DAMAGE_RESISTANT, new Types_v1_21_2.DamageResistant(Identifier.of(viaDamageResistant.typesTagKey())));
-        });
-        this.conversionFunctions.put(StructuredDataKey.TOOL1_21_5, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.WEAPON, structuredData -> {
-            final Weapon viaWeapon = (Weapon) structuredData.value();
-            return new Pair<>(ItemComponentRegistry.V1_21_5.WEAPON, new Types_v1_21_5.Weapon(viaWeapon.itemDamagePerAttack(), viaWeapon.disableBlockingForSeconds()));
-        });
-        this.conversionFunctions.put(StructuredDataKey.ENCHANTABLE, structuredData -> {
-            return new Pair<>(ItemComponentRegistry.V1_21_5.ENCHANTABLE, new Types_v1_21_2.Enchantable((int) structuredData.value()));
-        });
-        this.conversionFunctions.put(StructuredDataKey.EQUIPPABLE1_21_5, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.REPAIRABLE, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.GLIDER, noValueFunction(ItemComponentRegistry.V1_21_5.GLIDER));
-        this.conversionFunctions.put(StructuredDataKey.TOOLTIP_STYLE, stringToIdentifierFunction(ItemComponentRegistry.V1_21_5.TOOLTIP_STYLE));
-        this.conversionFunctions.put(StructuredDataKey.DEATH_PROTECTION, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.BLOCKS_ATTACKS, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.STORED_ENCHANTMENTS1_21_5, this.convertEnchantmentsFunction(ItemComponentRegistry.V1_21_5.STORED_ENCHANTMENTS));
-        this.conversionFunctions.put(StructuredDataKey.DYED_COLOR1_21_5, structuredData -> {
-            return new Pair<>(ItemComponentRegistry.V1_21_5.DYED_COLOR, ((DyedColor) structuredData.value()).rgb());
-        });
-        this.conversionFunctions.put(StructuredDataKey.MAP_COLOR, passthroughValueFunction(ItemComponentRegistry.V1_21_5.MAP_COLOR));
-        this.conversionFunctions.put(StructuredDataKey.MAP_ID, passthroughValueFunction(ItemComponentRegistry.V1_21_5.MAP_ID));
-        this.conversionFunctions.put(StructuredDataKey.MAP_DECORATIONS, passthroughNbtCodec(ItemComponentRegistry.V1_21_5.MAP_DECORATIONS));
-        this.conversionFunctions.put(StructuredDataKey.MAP_POST_PROCESSING, intToEnumFunction(ItemComponentRegistry.V1_21_5.MAP_POST_PROCESSING, Types_v1_20_5.MapPostProcessing.class));
-        this.conversionFunctions.put(StructuredDataKey.CHARGED_PROJECTILES1_21_5, convertItemArrayFunction(ItemComponentRegistry.V1_21_5.CHARGED_PROJECTILES));
-        this.conversionFunctions.put(StructuredDataKey.BUNDLE_CONTENTS1_21_5, convertItemArrayFunction(ItemComponentRegistry.V1_21_5.BUNDLE_CONTENTS));
-        this.conversionFunctions.put(StructuredDataKey.POTION_CONTENTS1_21_2, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.POTION_DURATION_SCALE, passthroughValueFunction(ItemComponentRegistry.V1_21_5.POTION_DURATION_SCALE));
-        this.conversionFunctions.put(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.WRITABLE_BOOK_CONTENT, structuredData -> {
-            final FilterableString[] viaPages = (FilterableString[]) structuredData.value();
-            final List<Types_v1_20_5.RawFilteredPair<String>> pages = new ArrayList<>(viaPages.length);
-            for (FilterableString viaPage : viaPages) {
-                pages.add(new Types_v1_20_5.RawFilteredPair<>(viaPage.raw(), viaPage.filtered()));
-            }
-            return new Pair<>(ItemComponentRegistry.V1_21_5.WRITABLE_BOOK_CONTENT, new Types_v1_20_5.WritableBook(pages));
-        });
-        this.conversionFunctions.put(StructuredDataKey.WRITTEN_BOOK_CONTENT, structuredData -> {
-            final WrittenBook viaWrittenBook = (WrittenBook) structuredData.value();
-            final Types_v1_20_5.RawFilteredPair<String> title = new Types_v1_20_5.RawFilteredPair<>(viaWrittenBook.title().raw(), viaWrittenBook.title().filtered());
-            final List<Types_v1_20_5.RawFilteredPair<TextComponent>> pages = new ArrayList<>(viaWrittenBook.pages().length);
-            for (FilterableComponent viaPage : viaWrittenBook.pages()) {
-                pages.add(new Types_v1_20_5.RawFilteredPair<>(convertTextComponent(viaPage.raw()), convertTextComponent(viaPage.filtered())));
-            }
-            return new Pair<>(ItemComponentRegistry.V1_21_5.WRITTEN_BOOK_CONTENT, new Types_v1_20_5.WrittenBook(title, viaWrittenBook.author(), viaWrittenBook.generation(), pages, viaWrittenBook.resolved()));
-        });
-        this.conversionFunctions.put(StructuredDataKey.TRIM1_21_5, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.DEBUG_STICK_STATE, passthroughNbtCodec(ItemComponentRegistry.V1_21_5.DEBUG_STICK_STATE));
-        this.conversionFunctions.put(StructuredDataKey.ENTITY_DATA, convertNbtFunction(ItemComponentRegistry.V1_21_5.ENTITY_DATA));
-        this.conversionFunctions.put(StructuredDataKey.BUCKET_ENTITY_DATA, convertNbtFunction(ItemComponentRegistry.V1_21_5.BUCKET_ENTITY_DATA));
-        this.conversionFunctions.put(StructuredDataKey.BLOCK_ENTITY_DATA, convertNbtFunction(ItemComponentRegistry.V1_21_5.BLOCK_ENTITY_DATA));
-        this.conversionFunctions.put(StructuredDataKey.INSTRUMENT1_21_5, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.PROVIDES_TRIM_MATERIAL, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, passthroughValueFunction(ItemComponentRegistry.V1_21_5.OMINOUS_BOTTLE_AMPLIFIER));
-        this.conversionFunctions.put(StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.PROVIDES_BANNER_PATTERNS, stringToIdentifierFunction(ItemComponentRegistry.V1_21_5.PROVIDES_BANNER_PATTERNS));
-        this.conversionFunctions.put(StructuredDataKey.RECIPES, passthroughNbtCodec(ItemComponentRegistry.V1_21_5.RECIPES));
-        this.conversionFunctions.put(StructuredDataKey.LODESTONE_TRACKER, structuredData -> {
-            final LodestoneTracker viaLodestoneTracker = (LodestoneTracker) structuredData.value();
-            final Types_v1_20_5.LodestoneTracker.GlobalPos targetGlobalPos;
-            if (viaLodestoneTracker.position() != null) {
-                final Types_v1_20_5.BlockPos targetPos = new Types_v1_20_5.BlockPos(viaLodestoneTracker.position().x(), viaLodestoneTracker.position().y(), viaLodestoneTracker.position().z());
-                targetGlobalPos = new Types_v1_20_5.LodestoneTracker.GlobalPos(Identifier.of(viaLodestoneTracker.position().dimension()), targetPos);
-            } else {
-                targetGlobalPos = null;
-            }
-            return new Pair<>(ItemComponentRegistry.V1_21_5.LODESTONE_TRACKER, new Types_v1_20_5.LodestoneTracker(targetGlobalPos, viaLodestoneTracker.tracked()));
-        });
-        this.conversionFunctions.put(StructuredDataKey.FIREWORK_EXPLOSION, structuredData -> {
-            return new Pair<>(ItemComponentRegistry.V1_21_5.FIREWORK_EXPLOSION, convertFireworkExplosion((FireworkExplosion) structuredData.value()));
-        });
-        this.conversionFunctions.put(StructuredDataKey.FIREWORKS, structuredData -> {
-            final Fireworks viaFireworks = (Fireworks) structuredData.value();
-            final List<Types_v1_20_5.FireworkExplosions> explosions = new ArrayList<>(viaFireworks.explosions().length);
-            for (FireworkExplosion viaFireworkExplosion : viaFireworks.explosions()) {
-                explosions.add(convertFireworkExplosion(viaFireworkExplosion));
-            }
-            return new Pair<>(ItemComponentRegistry.V1_21_5.FIREWORKS, new Types_v1_20_5.Fireworks(viaFireworks.flightDuration(), explosions));
-        });
-        this.conversionFunctions.put(StructuredDataKey.PROFILE, structuredData -> {
-            final GameProfile viaProfile = (GameProfile) structuredData.value();
-            final Map<String, List<Types_v1_20_5.GameProfile.Property>> properties = new HashMap<>();
-            for (GameProfile.Property viaProperty : viaProfile.properties()) {
-                final List<Types_v1_20_5.GameProfile.Property> propertyList = properties.computeIfAbsent(viaProperty.name(), k -> new ArrayList<>());
-                propertyList.add(new Types_v1_20_5.GameProfile.Property(viaProperty.name(), viaProperty.value(), viaProperty.signature()));
-            }
-            return new Pair<>(ItemComponentRegistry.V1_21_5.PROFILE, new Types_v1_20_5.GameProfile(viaProfile.name(), viaProfile.id(), properties));
-        });
-        this.conversionFunctions.put(StructuredDataKey.NOTE_BLOCK_SOUND, stringToIdentifierFunction(ItemComponentRegistry.V1_21_5.NOTE_BLOCK_SOUND));
-        this.conversionFunctions.put(StructuredDataKey.BANNER_PATTERNS, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.BASE_COLOR, intToEnumFunction(ItemComponentRegistry.V1_21_5.BASE_COLOR, Types_v1_20_5.DyeColor.class));
-        this.conversionFunctions.put(StructuredDataKey.POT_DECORATIONS, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.CONTAINER1_21_5, structuredData -> {
-            final Item[] items = (Item[]) structuredData.value();
-            final List<Types_v1_20_5.ContainerSlot> slots = new ArrayList<>();
-            for (int i = 0; i < items.length; i++) {
-                final Item item = items[i];
-                if (!item.isEmpty()) {
-                    slots.add(new Types_v1_20_5.ContainerSlot(i, this.convertItemStack(item)));
-                }
-            }
-            return new Pair<>(ItemComponentRegistry.V1_21_5.CONTAINER, slots);
-        });
-        this.conversionFunctions.put(StructuredDataKey.BLOCK_STATE, structuredData -> {
-            return new Pair<>(ItemComponentRegistry.V1_21_5.BLOCK_STATE, ((BlockStateProperties) structuredData.value()).properties());
-        });
-        this.conversionFunctions.put(StructuredDataKey.BEES, structuredData -> {
-            final Bee[] viaBees = (Bee[]) structuredData.value();
-            final List<Types_v1_20_5.BeeData> beeData = new ArrayList<>();
-            for (Bee viaBee : viaBees) {
-                beeData.add(new Types_v1_20_5.BeeData((CompoundTag) NbtConverter.viaToMcStructs(viaBee.entityData()), viaBee.ticksInHive(), viaBee.minTicksInHive()));
-            }
-            return new Pair<>(ItemComponentRegistry.V1_21_5.BEES, beeData);
-        });
-        this.conversionFunctions.put(StructuredDataKey.LOCK, passthroughNbtCodec(ItemComponentRegistry.V1_21_5.LOCK));
-        this.conversionFunctions.put(StructuredDataKey.CONTAINER_LOOT, passthroughNbtCodec(ItemComponentRegistry.V1_21_5.CONTAINER_LOOT));
-        this.conversionFunctions.put(StructuredDataKey.BREAK_SOUND, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.VILLAGER_VARIANT, intToEnumFunction(ItemComponentRegistry.V1_21_5.VILLAGER_VARIANT, Types_v1_21_5.VillagerVariant.class));
-        this.conversionFunctions.put(StructuredDataKey.WOLF_VARIANT, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.WOLF_SOUND_VARIANT, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.WOLF_COLLAR, intToEnumFunction(ItemComponentRegistry.V1_21_5.WOLF_COLLAR, Types_v1_20_5.DyeColor.class));
-        this.conversionFunctions.put(StructuredDataKey.FOX_VARIANT, intToEnumFunction(ItemComponentRegistry.V1_21_5.FOX_VARIANT, Types_v1_21_5.FoxVariant.class));
-        this.conversionFunctions.put(StructuredDataKey.SALMON_SIZE, intToEnumFunction(ItemComponentRegistry.V1_21_5.SALMON_SIZE, Types_v1_21_5.SalmonSize.class));
-        this.conversionFunctions.put(StructuredDataKey.PARROT_VARIANT, intToEnumFunction(ItemComponentRegistry.V1_21_5.PARROT_VARIANT, Types_v1_21_5.ParrotVariant.class));
-        this.conversionFunctions.put(StructuredDataKey.TROPICAL_FISH_PATTERN, intToEnumFunction(ItemComponentRegistry.V1_21_5.TROPICAL_FISH_PATTERN, Types_v1_21_5.TropicalFishPattern.class));
-        this.conversionFunctions.put(StructuredDataKey.TROPICAL_FISH_BASE_COLOR, intToEnumFunction(ItemComponentRegistry.V1_21_5.TROPICAL_FISH_BASE_COLOR, Types_v1_20_5.DyeColor.class));
-        this.conversionFunctions.put(StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR, intToEnumFunction(ItemComponentRegistry.V1_21_5.TROPICAL_FISH_PATTERN_COLOR, Types_v1_20_5.DyeColor.class));
-        this.conversionFunctions.put(StructuredDataKey.MOOSHROOM_VARIANT, intToEnumFunction(ItemComponentRegistry.V1_21_5.MOOSHROOM_VARIANT, Types_v1_21_5.MooshroomVariant.class));
-        this.conversionFunctions.put(StructuredDataKey.RABBIT_VARIANT, intToEnumFunction(ItemComponentRegistry.V1_21_5.RABBIT_VARIANT, Types_v1_21_5.RabbitVariant.class));
-        this.conversionFunctions.put(StructuredDataKey.PIG_VARIANT, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.COW_VARIANT, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.CHICKEN_VARIANT, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.FROG_VARIANT, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.HORSE_VARIANT, intToEnumFunction(ItemComponentRegistry.V1_21_5.HORSE_VARIANT, Types_v1_21_5.HorseVariant.class));
-        this.conversionFunctions.put(StructuredDataKey.PAINTING_VARIANT, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.LLAMA_VARIANT, intToEnumFunction(ItemComponentRegistry.V1_21_5.LLAMA_VARIANT, Types_v1_21_5.LlamaVariant.class));
-        this.conversionFunctions.put(StructuredDataKey.AXOLOTL_VARIANT, intToEnumFunction(ItemComponentRegistry.V1_21_5.AXOLOTL_VARIANT, Types_v1_21_5.AxolotlVariant.class));
-        this.conversionFunctions.put(StructuredDataKey.CAT_VARIANT, NOT_IMPLEMENTED);
-        this.conversionFunctions.put(StructuredDataKey.CAT_COLLAR, intToEnumFunction(ItemComponentRegistry.V1_21_5.CAT_COLLAR, Types_v1_20_5.DyeColor.class));
-        this.conversionFunctions.put(StructuredDataKey.SHEEP_COLOR, intToEnumFunction(ItemComponentRegistry.V1_21_5.SHEEP_COLOR, Types_v1_20_5.DyeColor.class));
-        this.conversionFunctions.put(StructuredDataKey.SHULKER_COLOR, intToEnumFunction(ItemComponentRegistry.V1_21_5.SHULKER_COLOR, Types_v1_20_5.DyeColor.class));
-    }
-
-    public Pair<ItemComponent<?>, Object> viaToMcStructs(final StructuredData<?> structuredData) {
-        final Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> conversionFunction = this.conversionFunctions.get(structuredData.key());
-        if (conversionFunction == null) {
-            throw new UnsupportedOperationException("Unsupported structured data key: " + structuredData.key());
-        }
-        return conversionFunction.apply(structuredData);
-    }
-
-    private Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> convertItemFunction(final ItemComponent<?> itemComponent) {
-        return structuredData -> new Pair<>(itemComponent, this.convertItemStack((Item) structuredData.value()));
-    }
-
-    private Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> convertItemArrayFunction(final ItemComponent<?> itemComponent) {
-        return structuredData -> {
-            final Item[] items = (Item[]) structuredData.value();
+    private Converter<Item[], List<Types_v1_20_5.ItemStack>> convertItemArrayFunction(final ItemComponent<List<Types_v1_20_5.ItemStack>> itemComponent) {
+        return items -> {
             final List<Types_v1_20_5.ItemStack> itemStacks = new ArrayList<>(items.length);
             for (Item item : items) {
                 itemStacks.add(this.convertItemStack(item));
             }
-            return new Pair<>(itemComponent, itemStacks);
+            return new Result<>(itemComponent, itemStacks);
         };
     }
 
-    private Function<StructuredData<?>, Pair<ItemComponent<?>, Object>> convertEnchantmentsFunction(final ItemComponent<?> itemComponent) {
-        return structuredData -> {
-            final Enchantments viaEnchantments = (Enchantments) structuredData.value();
-            final Map<Identifier, Integer> enchantments = new HashMap<>();
-            for (Int2IntMap.Entry entry : viaEnchantments.enchantments().int2IntEntrySet()) {
-                enchantments.put(this.registryAccess.getEnchantment(entry.getIntKey()), entry.getIntValue());
+    private Converter<Enchantments, Map<RegistryEntry, Integer>> convertEnchantmentsFunction(final ItemComponent<Map<RegistryEntry, Integer>> itemComponent) {
+        return enchantments -> {
+            final Map<RegistryEntry, Integer> enchantmentMap = new HashMap<>();
+            for (final Int2IntMap.Entry entry : enchantments.enchantments().int2IntEntrySet()) {
+                enchantmentMap.put(this.registryAccess.getEnchantment(entry.getIntKey()), entry.getIntValue());
             }
-            return new Pair<>(itemComponent, enchantments);
+            return new Result<>(itemComponent, enchantmentMap);
         };
     }
 
@@ -336,11 +342,11 @@ public class ItemDataComponentConverter {
         final Types_v1_20_5.ItemStack itemStack = new Types_v1_20_5.ItemStack(this.registryAccess.getItem(item.identifier()), item.amount(), new ItemComponentMap(ItemComponentRegistry.V1_21_5));
         final ItemComponentMap itemComponentMap = itemStack.getComponents();
 
-        for (StructuredData<?> structuredData : item.dataContainer().data().values()) {
+        for (final StructuredData<?> structuredData : item.dataContainer().data().values()) {
             if (structuredData.isPresent()) {
-                final Pair<ItemComponent<?>, Object> itemComponent = viaToMcStructs(structuredData);
+                final Result<?> itemComponent = viaToMcStructs(structuredData);
                 if (itemComponent != null) {
-                    itemComponentMap.set(itemComponent.key(), cast(itemComponent.value()));
+                    setGeneric(itemComponentMap, itemComponent);
                 }
             } else {
                 itemComponentMap.markForRemoval(ItemComponentRegistry.V1_21_5.getComponentList().getById(structuredData.id()).get());
@@ -350,8 +356,44 @@ public class ItemDataComponentConverter {
         return itemStack;
     }
 
-    private static <T> T cast(final Object o) {
-        return (T) o;
+    private <O> void setGeneric(final ItemComponentMap map, final Result<O> result) {
+        map.set(result.type(), result.value());
     }
 
+    private Registries registries() {
+        return ItemComponentRegistry.V1_21_5.getRegistries();
+    }
+
+    /**
+     * Converts one of our own data types to MCStructs data types.
+     *
+     * @param <I> input ViaVersion data type
+     * @param <O> output MCStructs data type
+     */
+    @FunctionalInterface
+    public interface Converter<I, O> {
+
+        Result<O> convert(I value);
+    }
+
+    /**
+     * Result of a conversion operation.
+     *
+     * @param type MCStructs data type
+     * @param value resulting value
+     * @param <O> output type
+     */
+    public record Result<O>(ItemComponent<O> type, @Nullable O value) {
+    }
+
+    public interface RegistryAccess {
+
+        RegistryEntry getItem(final int networkId);
+
+        RegistryEntry getEnchantment(final int networkId);
+
+        static RegistryAccess of(final List<Identifier> enchantments, final Registries registries, final MappingData mappingData) {
+            return new RegistryAccessImpl(enchantments, registries, mappingData);
+        }
+    }
 }
