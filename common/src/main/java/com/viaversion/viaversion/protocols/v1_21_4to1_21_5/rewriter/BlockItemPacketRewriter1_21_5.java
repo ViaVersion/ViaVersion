@@ -343,6 +343,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         // Add data components to fix issues in older protocols
         appendItemDataFixComponents(connection, item);
 
+        // Store the data components if necessary for the server, the client only sends data hashes now
         final ItemHashStorage1_21_5 hasher = connection.get(ItemHashStorage1_21_5.class);
         for (final StructuredData<?> data : dataContainer.data().values()) {
             hasher.trackStructuredData(data);

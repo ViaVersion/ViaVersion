@@ -23,44 +23,24 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.rewriter.item.ItemDataComponentConverter;
-import com.viaversion.viaversion.rewriter.item.RegistryAccess;
-import com.viaversion.viaversion.util.Pair;
-import net.lenni0451.mcstructs.converter.impl.v1_21_5.HashConverter_v1_21_5;
-import net.lenni0451.mcstructs.core.Identifier;
-import net.lenni0451.mcstructs.itemcomponents.ItemComponent;
-
+import com.viaversion.viaversion.rewriter.item.ItemDataComponentConverter.RegistryAccess;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import net.lenni0451.mcstructs.converter.impl.v1_21_5.HashConverter_v1_21_5;
+import net.lenni0451.mcstructs.core.Identifier;
+import net.lenni0451.mcstructs.itemcomponents.ItemComponentRegistry;
 
 public class ItemHashStorage1_21_5 extends StoredObject {
 
-    private final Map<Long, StructuredData<?>> hashToStructuredData = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(256).<Long, StructuredData<?>>build().asMap();
+    private final Map<Long, StructuredData<?>> hashToStructuredData = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(512).<Long, StructuredData<?>>build().asMap();
     private final List<Identifier> enchantmentRegistry = new ArrayList<>();
     private final ItemDataComponentConverter itemComponentConverter;
 
-    public ItemHashStorage1_21_5(final UserConnection user, final MappingData mappingData) {
-        super(user);
-        this.itemComponentConverter = new ItemDataComponentConverter(new RegistryAccess() {
-            @Override
-            public Identifier getItem(final int networkId) {
-                final String identifier = mappingData.getFullItemMappings().mappedIdentifier(networkId);
-                if (identifier != null) {
-                    return Identifier.of(identifier);
-                } else {
-                    return Identifier.of("viaproxy", "unknown/item/" + networkId);
-                }
-            }
-
-            @Override
-            public Identifier getEnchantment(final int networkId) {
-                if (networkId >= 0 && networkId < ItemHashStorage1_21_5.this.enchantmentRegistry.size()) {
-                    return ItemHashStorage1_21_5.this.enchantmentRegistry.get(networkId);
-                } else {
-                    return Identifier.of("viaproxy", "unknown/enchantment/" + networkId);
-                }
-            }
-        });
+    public ItemHashStorage1_21_5(final UserConnection connection, final MappingData mappingData) {
+        super(connection);
+        final RegistryAccess registryAccess = RegistryAccess.of(this.enchantmentRegistry, ItemComponentRegistry.V1_21_5.getRegistries(), mappingData);
+        this.itemComponentConverter = new ItemDataComponentConverter(registryAccess);
     }
 
     public void setEnchantmentRegistry(final List<Identifier> enchantmentRegistry) {
@@ -73,29 +53,22 @@ public class ItemHashStorage1_21_5 extends StoredObject {
             return;
         }
 
-        final Pair<ItemComponent<?>, Object> itemComponent = this.itemComponentConverter.viaToMcStructs(structuredData);
-        if (itemComponent == null) {
+        final ItemDataComponentConverter.Result<?> result = this.itemComponentConverter.viaToMcStructs(structuredData);
+        if (result == null) {
             return;
         }
 
-        final int hash = itemComponent.key().getCodec().serialize(HashConverter_v1_21_5.CRC32C, cast(itemComponent.value())).getOrThrow().asInt();
-        final long key = (long) structuredData.id() << 32 | hash;
-        if (!this.hashToStructuredData.containsKey(key)) {
-            this.hashToStructuredData.put(key, structuredData.copy());
-        }
+        final long key = (long) structuredData.id() << 32 | hash(result);
+        this.hashToStructuredData.computeIfAbsent(key, $ -> structuredData.copy());
     }
 
-    public StructuredData<?> getStructuredData(final int componentId, final int hash) {
-        final long key = (long) componentId << 32 | hash;
-        if (this.hashToStructuredData.containsKey(key)) {
-            return this.hashToStructuredData.get(key).copy();
-        } else {
-            return null;
-        }
+    public StructuredData<?> dataFromHash(final int dataComponentId, final int hash) {
+        final long key = (long) dataComponentId << 32 | hash;
+        final StructuredData<?> data = this.hashToStructuredData.get(key);
+        return data != null ? data.copy() : null;
     }
 
-    private static <T> T cast(final Object o) {
-        return (T) o;
+    private static <T> int hash(final ItemDataComponentConverter.Result<T> result) {
+        return result.type().getCodec().serialize(HashConverter_v1_21_5.CRC32C, result.value()).getOrThrow().asInt();
     }
-
 }
