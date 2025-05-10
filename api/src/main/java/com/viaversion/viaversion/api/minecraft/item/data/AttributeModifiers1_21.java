@@ -32,45 +32,36 @@ import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean showInTooltip,
-                                     Display display) implements Copyable {
+public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean showInTooltip) implements Copyable {
 
     public AttributeModifiers1_21(final AttributeModifier[] modifiers) {
         this(modifiers, true);
     }
 
-    public AttributeModifiers1_21(final AttributeModifier[] modifiers, final boolean showInTooltip) {
-        this(modifiers, showInTooltip, Display.DEFAULT);
-    }
-
-    public AttributeModifiers1_21(final AttributeModifier[] modifiers, final Display display) {
-        this(modifiers, true, display);
-    }
-
     public static final Type<AttributeModifiers1_21> TYPE1_21 = new Type<>(AttributeModifiers1_21.class) {
         @Override
         public AttributeModifiers1_21 read(final ByteBuf buffer) {
-            final AttributeModifier[] modifiers = AttributeModifier.ARRAY_TYPE.read(buffer);
+            final AttributeModifier[] modifiers = AttributeModifier.ARRAY_TYPE1_21.read(buffer);
             final boolean showInTooltip = buffer.readBoolean();
             return new AttributeModifiers1_21(modifiers, showInTooltip);
         }
 
         @Override
         public void write(final ByteBuf buffer, final AttributeModifiers1_21 value) {
-            AttributeModifier.ARRAY_TYPE.write(buffer, value.modifiers());
+            AttributeModifier.ARRAY_TYPE1_21.write(buffer, value.modifiers());
             buffer.writeBoolean(value.showInTooltip());
         }
     };
     public static final Type<AttributeModifiers1_21> TYPE1_21_5 = new Type<>(AttributeModifiers1_21.class) {
         @Override
         public AttributeModifiers1_21 read(final ByteBuf buffer) {
-            final AttributeModifier[] modifiers = AttributeModifier.ARRAY_TYPE.read(buffer);
+            final AttributeModifier[] modifiers = AttributeModifier.ARRAY_TYPE1_21.read(buffer);
             return new AttributeModifiers1_21(modifiers);
         }
 
         @Override
         public void write(final ByteBuf buffer, final AttributeModifiers1_21 value) {
-            AttributeModifier.ARRAY_TYPE.write(buffer, value.modifiers());
+            AttributeModifier.ARRAY_TYPE1_21.write(buffer, value.modifiers());
         }
 
         @Override
@@ -81,16 +72,13 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
     public static final Type<AttributeModifiers1_21> TYPE1_22 = new Type<>(AttributeModifiers1_21.class) {
         @Override
         public AttributeModifiers1_21 read(final ByteBuf buffer) {
-            final AttributeModifier[] modifiers = AttributeModifier.ARRAY_TYPE.read(buffer);
-            final int displayType = Types.VAR_INT.readPrimitive(buffer);
-            final Display display = displayType == OverrideText.ID ? new OverrideText(Types.TAG.read(buffer)) : new Display(displayType);
-            return new AttributeModifiers1_21(modifiers, display);
+            final AttributeModifier[] modifiers = AttributeModifier.ARRAY_TYPE1_22.read(buffer);
+            return new AttributeModifiers1_21(modifiers);
         }
 
         @Override
         public void write(final ByteBuf buffer, final AttributeModifiers1_21 value) {
-            AttributeModifier.ARRAY_TYPE.write(buffer, value.modifiers());
-            value.display.write(buffer);
+            AttributeModifier.ARRAY_TYPE1_22.write(buffer, value.modifiers());
         }
     };
 
@@ -98,21 +86,25 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
         final AttributeModifier[] modifiers = new AttributeModifier[this.modifiers.length];
         for (int i = 0; i < this.modifiers.length; i++) {
             final AttributeModifier modifier = this.modifiers[i];
-            modifiers[i] = new AttributeModifier(rewriteFunction.applyAsInt(modifier.attribute()), modifier.modifier(), modifier.slotType());
+            modifiers[i] = new AttributeModifier(rewriteFunction.applyAsInt(modifier.attribute()), modifier.modifier(), modifier.slotType(), modifier.display());
         }
         return new AttributeModifiers1_21(modifiers, showInTooltip);
     }
 
     @Override
     public AttributeModifiers1_21 copy() {
-        return new AttributeModifiers1_21(Copyable.copy(modifiers), showInTooltip, display.copy());
+        return new AttributeModifiers1_21(Copyable.copy(modifiers), showInTooltip);
     }
 
-    public record AttributeModifier(int attribute, ModifierData modifier, int slotType) {
+    public record AttributeModifier(int attribute, ModifierData modifier, int slotType, Display display) {
         private static final String[] EQUIPMENT_SLOT_GROUPS = {"any", "mainhand", "offhand", "hand", "feet", "legs", "chest", "head", "armor", "body", "saddle"};
         private static final String[] OPERATION = {"add_value", "add_multiplied_base", "add_multiplied_total"};
 
-        public static final Type<AttributeModifier> TYPE = new Type<>(AttributeModifier.class) {
+        public AttributeModifier(final int attribute, final ModifierData modifier, final int slotType) {
+            this(attribute, modifier, slotType, Display.DEFAULT);
+        }
+
+        public static final Type<AttributeModifier> TYPE1_21 = new Type<>(AttributeModifier.class) {
             @Override
             public AttributeModifier read(final ByteBuf buffer) {
                 final int attribute = Types.VAR_INT.readPrimitive(buffer);
@@ -139,7 +131,28 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
                     .writeOptional("slot", Types.STRING, EQUIPMENT_SLOT_GROUPS[value.slotType()], "any"));
             }
         };
-        public static final Type<AttributeModifier[]> ARRAY_TYPE = new ArrayType<>(TYPE);
+        public static final Type<AttributeModifier[]> ARRAY_TYPE1_21 = new ArrayType<>(TYPE1_21);
+
+        public static final Type<AttributeModifier> TYPE1_22 = new Type<>(AttributeModifier.class) {
+            @Override
+            public AttributeModifier read(final ByteBuf buffer) {
+                final int attribute = Types.VAR_INT.readPrimitive(buffer);
+                final ModifierData modifier = ModifierData.TYPE.read(buffer);
+                final int slot = Types.VAR_INT.readPrimitive(buffer);
+                final int displayType = Types.VAR_INT.readPrimitive(buffer);
+                final Display display = displayType == OverrideText.ID ? new OverrideText(Types.TAG.read(buffer)) : new Display(displayType);
+                return new AttributeModifier(attribute, modifier, slot, display);
+            }
+
+            @Override
+            public void write(final ByteBuf buffer, final AttributeModifier value) {
+                Types.VAR_INT.writePrimitive(buffer, value.attribute);
+                ModifierData.TYPE.write(buffer, value.modifier);
+                Types.VAR_INT.writePrimitive(buffer, value.slotType);
+                value.display.write(buffer);
+            }
+        };
+        public static final Type<AttributeModifier[]> ARRAY_TYPE1_22 = new ArrayType<>(TYPE1_22);
     }
 
     public record ModifierData(String id, double amount, int operation) {
