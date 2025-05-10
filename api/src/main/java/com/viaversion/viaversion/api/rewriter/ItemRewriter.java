@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
@@ -49,6 +50,17 @@ public interface ItemRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter<T
      */
     @Nullable
     Item handleItemToServer(UserConnection connection, @Nullable Item item);
+
+    /**
+     * Returns the rewritten item, which may or may not be the same given HashedItem instance.
+     * <p>
+     * Used starting with 1.22.
+     *
+     * @param connection user connection
+     * @param item       hashed item
+     * @return rewritten hashed item
+     */
+    HashedItem handleHashedItem(UserConnection connection, HashedItem item);
 
     /**
      * Returns the item type of the current protocol.

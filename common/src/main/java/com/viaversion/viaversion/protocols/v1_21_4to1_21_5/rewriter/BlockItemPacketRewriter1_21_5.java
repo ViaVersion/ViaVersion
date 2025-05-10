@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.EitherHolder;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
@@ -63,7 +64,6 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
-import com.viaversion.viaversion.connection.ProtocolInfoImpl;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPacket1_21_5;
@@ -345,7 +345,8 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         appendItemDataFixComponents(connection, item);
 
         // Store the data components if necessary for the server, the client only sends data hashes now
-        if (((ProtocolInfoImpl) connection.getProtocolInfo()).isProcessingClientboundInventoryPacket()) {
+        final ItemHasher itemHasher = connection.getItemHasher(protocol.getClass());
+        if (itemHasher != null && itemHasher.isProcessingClientboundInventoryPacket()) {
             final ItemHashStorage1_21_5 hasher = connection.get(ItemHashStorage1_21_5.class);
             for (final StructuredData<?> data : dataContainer.data().values()) {
                 hasher.trackStructuredData(data);

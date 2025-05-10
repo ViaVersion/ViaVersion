@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-import net.lenni0451.mcstructs.core.Identifier;
 
 public final class EntityPacketRewriter1_21_5 extends EntityRewriter<ClientboundPacket1_21_2, Protocol1_21_4To1_21_5> {
     private static final int ATTACK_BLOCKED_ENTITY_EVENT = 29;
@@ -84,9 +83,9 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             @Override
             public RegistryEntry[] handle(final UserConnection connection, final String key, final RegistryEntry[] entries) {
                 if (key.equals("enchantment")) {
-                    final List<Identifier> identifiers = new ArrayList<>();
+                    final List<String> identifiers = new ArrayList<>();
                     for (final RegistryEntry entry : entries) {
-                        identifiers.add(Identifier.of(entry.key()));
+                        identifiers.add((entry.key()));
                     }
                     connection.get(ItemHashStorage1_21_5.class).setEnchantmentRegistry(identifiers);
                 }

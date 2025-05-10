@@ -80,6 +80,11 @@ public class HashedStructuredItem implements HashedItem {
     }
 
     @Override
+    public HashedItem copy() {
+        return new HashedStructuredItem(identifier, amount, new Int2IntOpenHashMap(dataHashes), new IntOpenHashSet(removedData));
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

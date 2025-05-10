@@ -28,13 +28,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.lenni0451.mcstructs.converter.impl.v1_21_5.HashConverter_v1_21_5;
-import net.lenni0451.mcstructs.core.Identifier;
 import net.lenni0451.mcstructs.itemcomponents.ItemComponentRegistry;
 
 public class ItemHashStorage1_21_5 extends StoredObject {
 
     private final Map<Long, StructuredData<?>> hashToStructuredData = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(512).<Long, StructuredData<?>>build().asMap();
-    private final List<Identifier> enchantmentRegistry = new ArrayList<>();
+    private final List<String> enchantmentRegistry = new ArrayList<>();
     private final ItemDataComponentConverter itemComponentConverter;
 
     public ItemHashStorage1_21_5(final UserConnection connection, final MappingData mappingData) {
@@ -43,7 +42,7 @@ public class ItemHashStorage1_21_5 extends StoredObject {
         this.itemComponentConverter = new ItemDataComponentConverter(registryAccess);
     }
 
-    public void setEnchantmentRegistry(final List<Identifier> enchantmentRegistry) {
+    public void setEnchantmentRegistry(final List<String> enchantmentRegistry) {
         this.enchantmentRegistry.clear();
         this.enchantmentRegistry.addAll(enchantmentRegistry);
     }

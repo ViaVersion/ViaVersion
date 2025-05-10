@@ -3,13 +3,13 @@ metadata.format.version = "1.1"
 [versions]
 
 gson = "2.12.1"
-guava = "33.4.8-jre" # 17.0 can be assumed by platforms, but we require newer API
 fastutil = "8.5.15"
 vianbt = "5.1.0"
 mcstructs = "5-3.1.0-SNAPSHOT"
 
 # Common provided
 netty = "4.0.20.Final"
+guava = "17.0"
 snakeYaml = "2.2"
 
 junit = "5.11.4"
@@ -25,7 +25,6 @@ viaProxy = "3.4.2-SNAPSHOT"
 [libraries]
 
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
-guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
 vianbt = { group = "com.viaversion", name = "nbt", version.ref = "vianbt" }
 # Custom version that uses ViaNBT instead of its own inbuilt NBT library
@@ -33,6 +32,7 @@ text = { group = "com.viaversion.mcstructs", name = "text", version.ref = "mcstr
 itemDataComponents = { group = "com.viaversion.mcstructs", name = "itemcomponents", version.ref = "mcstructs" }
 
 netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 snakeYaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeYaml" }
 
 jupiterApi = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }

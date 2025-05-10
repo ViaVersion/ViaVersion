@@ -24,6 +24,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
+import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -60,7 +61,7 @@ public class RegistryDataRewriter {
     public RegistryEntry[] handle(final UserConnection connection, String key, RegistryEntry[] entries) {
         key = Key.stripMinecraftNamespace(key);
         if (key.equals("enchantment")) {
-            updateEnchantments(entries);
+            updateEnchantments(connection, entries);
         } else if (key.equals("trim_material")) {
             updateTrimMaterials(entries);
         }
@@ -119,8 +120,10 @@ public class RegistryDataRewriter {
         }
     }
 
-    public void updateEnchantments(final RegistryEntry[] entries) {
+    public void updateEnchantments(final UserConnection connection, final RegistryEntry[] entries) {
+        final List<String> identifiers = new ArrayList<>(entries.length);
         for (final RegistryEntry entry : entries) {
+            identifiers.add(entry.key());
             if (entry.tag() == null) {
                 continue;
             }
@@ -148,6 +151,11 @@ public class RegistryDataRewriter {
             }
 
             updateAttributesFields(effects);
+        }
+
+        final ItemHasher itemHasher = connection.getItemHasher(protocol.getClass());
+        if (itemHasher != null) {
+            itemHasher.setEnchantments(identifiers);
         }
     }
 

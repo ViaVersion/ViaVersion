@@ -84,10 +84,10 @@ public final class ItemDataComponentConverter {
                 booleans.add(b);
             }
             return new Result<>(ItemComponentRegistry.V1_21_5.CUSTOM_MODEL_DATA, new Types_v1_21_4.CustomModelData(
-                    floats,
-                    booleans,
-                    Arrays.asList(customModelData.strings()),
-                    intArrayToIntList(customModelData.colors())
+                floats,
+                booleans,
+                Arrays.asList(customModelData.strings()),
+                intArrayToIntList(customModelData.colors())
             ));
         });
         this.notImplemented(StructuredDataKey.TOOLTIP_DISPLAY);
@@ -392,7 +392,7 @@ public final class ItemDataComponentConverter {
 
         RegistryEntry getEnchantment(final int networkId);
 
-        static RegistryAccess of(final List<Identifier> enchantments, final Registries registries, final MappingData mappingData) {
+        static RegistryAccess of(final List<String> enchantments, final Registries registries, final MappingData mappingData) {
             return new RegistryAccessImpl(enchantments, registries, mappingData);
         }
     }
