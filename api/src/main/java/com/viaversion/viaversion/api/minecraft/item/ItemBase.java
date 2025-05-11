@@ -22,11 +22,13 @@
  */
 package com.viaversion.viaversion.api.minecraft.item;
 
+import com.viaversion.viaversion.util.Copyable;
+
 /**
  * @see Item
  * @see HashedItem
  */
-public interface ItemBase {
+public interface ItemBase extends Copyable {
 
     /**
      * Returns the item identifier.
@@ -64,4 +66,7 @@ public interface ItemBase {
     default boolean isEmpty() {
         return identifier() == 0 || amount() <= 0;
     }
+
+    @Override
+    ItemBase copy();
 }

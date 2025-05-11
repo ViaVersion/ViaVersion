@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.Mappings;
+import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -34,7 +35,7 @@ import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.connection.ProtocolInfoImpl;
+import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Rewritable;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
@@ -90,6 +91,35 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         if (item == null) return null;
         if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
             item.setIdentifier(protocol.getMappingData().getOldItemId(item.identifier()));
+        }
+        return item;
+    }
+
+    @Override
+    public HashedItem handleHashedItem(final UserConnection connection, final HashedItem item) {
+        final MappingData mappingData = protocol.getMappingData();
+        if (mappingData == null) {
+            return item;
+        }
+
+        final FullMappings dataComponentMappings = mappingData.getDataComponentSerializerMappings();
+        if (dataComponentMappings != null) {
+            updateHashedItemDataComponentIds(item, dataComponentMappings.inverse());
+
+            final int customDataId = dataComponentMappings.id("custom_data");
+            if (item.dataHashesById().containsKey(customDataId)) {
+                // Use the original hashed item if we can find it in the cache
+                final int customDataHash = item.dataHashesById().get(customDataId);
+                final ItemHasherBase itemHasher = itemHasher(connection);
+                final HashedItem originalHashedItem = itemHasher.originalHashedItem(customDataHash, item);
+                if (originalHashedItem != null) {
+                    return originalHashedItem;
+                }
+            }
+        }
+
+        if (mappingData.getItemMappings() != null) {
+            item.setIdentifier(mappingData.getOldItemId(item.identifier()));
         }
         return item;
     }
@@ -499,22 +529,31 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     protected @Nullable Item handleItemToClientAndTrackHash(final UserConnection connection, @Nullable Item item) {
-        final ProtocolInfoImpl protocolInfo = (ProtocolInfoImpl) connection.getProtocolInfo();
-        protocolInfo.setProcessingClientboundInventoryPacket(true);
+        final ItemHasher itemHasher = itemHasher(connection);
+        if (itemHasher == null) {
+            return handleItemToClient(connection, item);
+        }
+
+        itemHasher.setProcessingClientboundInventoryPacket(true);
         try {
             return this.handleItemToClient(connection, item);
         } finally {
-            protocolInfo.setProcessingClientboundInventoryPacket(false);
+            itemHasher.setProcessingClientboundInventoryPacket(false);
         }
     }
 
     protected void passthroughClientboundItemAndTrackHash(final PacketWrapper wrapper) {
-        final ProtocolInfoImpl protocolInfo = (ProtocolInfoImpl) wrapper.user().getProtocolInfo();
-        protocolInfo.setProcessingClientboundInventoryPacket(true);
+        final ItemHasher itemHasher = itemHasher(wrapper.user());
+        if (itemHasher == null) {
+            passthroughClientboundItem(wrapper);
+            return;
+        }
+
+        itemHasher.setProcessingClientboundInventoryPacket(true);
         try {
             this.passthroughClientboundItem(wrapper);
         } finally {
-            protocolInfo.setProcessingClientboundInventoryPacket(false);
+            itemHasher.setProcessingClientboundInventoryPacket(false);
         }
     }
 
@@ -524,20 +563,12 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     protected void passthroughHashedItem(final PacketWrapper wrapper) {
-        final HashedItem item = wrapper.passthrough(Types.HASHED_ITEM);
-        final MappingData mappingData = protocol.getMappingData();
-        if (mappingData == null) {
-            return;
-        }
+        final HashedItem item = handleHashedItem(wrapper.user(), wrapper.read(Types.HASHED_ITEM));
+        wrapper.write(Types.HASHED_ITEM, item);
+    }
 
-        if (mappingData.getItemMappings() != null) {
-            item.setIdentifier(mappingData.getOldItemId(item.identifier()));
-        }
-
-        final FullMappings dataComponentMappings = protocol.getMappingData().getDataComponentSerializerMappings();
-        if (dataComponentMappings != null) {
-            updateHashedItemDataComponentIds(item, dataComponentMappings.inverse());
-        }
+    protected <T extends ItemHasher> @Nullable T itemHasher(final UserConnection connection) {
+        return connection.getItemHasher(protocol.getClass());
     }
 
     protected void updateHashedItemDataComponentIds(final HashedItem item, final FullMappings mappings) {
@@ -549,9 +580,10 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                     continue;
                 }
 
-                // Let's hope the hash didn't change...
                 final int hash = addedData.remove(id);
-                addedData.put(mappedId, hash);
+                if (mappedId != -1) {
+                    addedData.put(mappedId, hash);
+                }
             }
         }
 
@@ -564,7 +596,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 }
 
                 removedData.remove(id);
-                removedData.add(mappedId);
+                if (mappedId != -1) {
+                    removedData.add(mappedId);
+                }
             }
         }
     }

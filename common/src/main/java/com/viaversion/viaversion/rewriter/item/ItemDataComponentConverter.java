@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
+import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -50,15 +51,16 @@ import net.lenni0451.mcstructs.itemcomponents.registry.Registry;
 import net.lenni0451.mcstructs.itemcomponents.registry.RegistryEntry;
 import net.lenni0451.mcstructs.itemcomponents.registry.RegistryTag;
 import net.lenni0451.mcstructs.text.TextComponent;
-import net.lenni0451.mcstructs.text.serializer.TextComponentCodec;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ItemDataComponentConverter {
 
     private final Map<StructuredDataKey<?>, Converter<?, ?>> converters = new Reference2ObjectOpenHashMap<>();
+    private final SerializerVersion serializerVersion;
     private final RegistryAccess registryAccess;
 
-    public ItemDataComponentConverter(final RegistryAccess registryAccess) {
+    public ItemDataComponentConverter(final SerializerVersion serializerVersion, final RegistryAccess registryAccess) {
+        this.serializerVersion = serializerVersion;
         this.registryAccess = registryAccess;
         this.direct(StructuredDataKey.CUSTOM_DATA, ItemComponentRegistry.V1_21_5.CUSTOM_DATA);
         this.direct(StructuredDataKey.MAX_STACK_SIZE, ItemComponentRegistry.V1_21_5.MAX_STACK_SIZE);
@@ -84,10 +86,10 @@ public final class ItemDataComponentConverter {
                 booleans.add(b);
             }
             return new Result<>(ItemComponentRegistry.V1_21_5.CUSTOM_MODEL_DATA, new Types_v1_21_4.CustomModelData(
-                    floats,
-                    booleans,
-                    Arrays.asList(customModelData.strings()),
-                    intArrayToIntList(customModelData.colors())
+                floats,
+                booleans,
+                Arrays.asList(customModelData.strings()),
+                intArrayToIntList(customModelData.colors())
             ));
         });
         this.notImplemented(StructuredDataKey.TOOLTIP_DISPLAY);
@@ -287,7 +289,7 @@ public final class ItemDataComponentConverter {
         this.register(key, value -> new Result<>(result, new RegistryTag(registry, Identifier.of(value))));
     }
 
-    private static Converter<Tag[], List<TextComponent>> stringArrayToTextComponentArray(final ItemComponent<List<TextComponent>> itemComponent) {
+    private Converter<Tag[], List<TextComponent>> stringArrayToTextComponentArray(final ItemComponent<List<TextComponent>> itemComponent) {
         return tags -> {
             final List<TextComponent> textComponents = new ArrayList<>(tags.length);
             for (final Tag tag : tags) {
@@ -306,8 +308,8 @@ public final class ItemDataComponentConverter {
         return new Types_v1_20_5.FireworkExplosions(explosionShape, intArrayToIntList(explosion.colors()), intArrayToIntList(explosion.fadeColors()), explosion.hasTrail(), explosion.hasTwinkle());
     }
 
-    private static TextComponent convertTextComponent(final Tag tag) {
-        return tag != null ? TextComponentCodec.V1_21_5.deserialize(tag) : null;
+    private TextComponent convertTextComponent(final Tag tag) {
+        return tag != null ? this.serializerVersion.toComponent(tag) : null;
     }
 
     private static List<Integer> intArrayToIntList(final int[] array) {
@@ -392,7 +394,7 @@ public final class ItemDataComponentConverter {
 
         RegistryEntry getEnchantment(final int networkId);
 
-        static RegistryAccess of(final List<Identifier> enchantments, final Registries registries, final MappingData mappingData) {
+        static RegistryAccess of(final List<String> enchantments, final Registries registries, final MappingData mappingData) {
             return new RegistryAccessImpl(enchantments, registries, mappingData);
         }
     }

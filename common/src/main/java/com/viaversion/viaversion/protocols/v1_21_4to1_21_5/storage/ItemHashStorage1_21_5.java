@@ -18,34 +18,34 @@
 package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.storage;
 
 import com.google.common.cache.CacheBuilder;
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.rewriter.item.ItemDataComponentConverter;
 import com.viaversion.viaversion.rewriter.item.ItemDataComponentConverter.RegistryAccess;
+import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.lenni0451.mcstructs.converter.impl.v1_21_5.HashConverter_v1_21_5;
-import net.lenni0451.mcstructs.core.Identifier;
 import net.lenni0451.mcstructs.itemcomponents.ItemComponentRegistry;
 
-public class ItemHashStorage1_21_5 extends StoredObject {
+public class ItemHashStorage1_21_5 implements ItemHasher {
 
     private final Map<Long, StructuredData<?>> hashToStructuredData = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(512).<Long, StructuredData<?>>build().asMap();
-    private final List<Identifier> enchantmentRegistry = new ArrayList<>();
+    private final List<String> enchantmentRegistry = new ArrayList<>();
     private final ItemDataComponentConverter itemComponentConverter;
+    private boolean processingClientboundInventoryPacket;
 
-    public ItemHashStorage1_21_5(final UserConnection connection, final MappingData mappingData) {
-        super(connection);
+    public ItemHashStorage1_21_5(final MappingData mappingData) {
         final RegistryAccess registryAccess = RegistryAccess.of(this.enchantmentRegistry, ItemComponentRegistry.V1_21_5.getRegistries(), mappingData);
-        this.itemComponentConverter = new ItemDataComponentConverter(registryAccess);
+        this.itemComponentConverter = new ItemDataComponentConverter(SerializerVersion.V1_21_5, registryAccess);
     }
 
-    public void setEnchantmentRegistry(final List<Identifier> enchantmentRegistry) {
+    @Override
+    public void setEnchantments(final List<String> enchantments) {
         this.enchantmentRegistry.clear();
-        this.enchantmentRegistry.addAll(enchantmentRegistry);
+        this.enchantmentRegistry.addAll(enchantments);
     }
 
     public void trackStructuredData(final StructuredData<?> structuredData) {
@@ -70,5 +70,15 @@ public class ItemHashStorage1_21_5 extends StoredObject {
 
     private static <T> int hash(final ItemDataComponentConverter.Result<T> result) {
         return result.type().getCodec().serialize(HashConverter_v1_21_5.CRC32C, result.value()).getOrThrow().asInt();
+    }
+
+    @Override
+    public boolean isProcessingClientboundInventoryPacket() {
+        return this.processingClientboundInventoryPacket;
+    }
+
+    @Override
+    public void setProcessingClientboundInventoryPacket(final boolean processingClientboundInventoryPacket) {
+        this.processingClientboundInventoryPacket = processingClientboundInventoryPacket;
     }
 }

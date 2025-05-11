@@ -17,9 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.template;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.item.HashedItem;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
+import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPacket1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
@@ -76,5 +80,20 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         recipeRewriter.registerPlaceGhostRecipe(ClientboundPackets1_21_2.PLACE_GHOST_RECIPE);
         // OR do this if serialization of recipes changed and override the relevant method
         // Add new serializers to RecipeDisplayRewriter, or extend the last one for changes
+    }
+
+    @Override
+    public Item handleItemToClient(final UserConnection connection, final Item item) {
+        if (item.isEmpty()) {
+            return item;
+        }
+
+        final ItemHasherBase itemHasher = itemHasher(connection); // get the original hashed item and store it later if there are any changes that could affect the data hashes
+        final HashedItem originalHashedItem = hashItem(item, itemHasher);
+
+        super.handleItemToClient(connection, item);
+
+        storeOriginalHashedItem(item, itemHasher, originalHashedItem); // has to be called AFTER all modifications
+        return item;
     }
 }

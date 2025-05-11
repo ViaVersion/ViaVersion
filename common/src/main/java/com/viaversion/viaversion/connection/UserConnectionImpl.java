@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -60,6 +61,7 @@ public class UserConnectionImpl implements UserConnection {
     private final long id = IDS.incrementAndGet();
     private final Map<Class<?>, StorableObject> storedObjects = new ConcurrentHashMap<>();
     private final Map<Class<? extends Protocol>, EntityTracker> entityTrackers = new HashMap<>();
+    private final Map<Class<? extends Protocol>, ItemHasher> itemHashers = new HashMap<>();
     private final Map<Class<? extends Protocol>, ClientWorld> clientWorlds = new HashMap<>();
     private final PacketTracker packetTracker = new PacketTracker(this);
     private final Set<UUID> passthroughTokens = Collections.newSetFromMap(CacheBuilder.newBuilder()
@@ -132,6 +134,16 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
+    public void addItemHasher(final Class<? extends Protocol> protocolClass, final ItemHasher itemHasher) {
+        itemHashers.putIfAbsent(protocolClass, itemHasher);
+    }
+
+    @Override
+    public @Nullable <T extends ItemHasher> T getItemHasher(Class<? extends Protocol> protocolClass) {
+        return (T) itemHashers.get(protocolClass);
+    }
+
+    @Override
     public @Nullable <T extends ClientWorld> T getClientWorld(final Class<? extends Protocol> protocolClass) {
         return (T) clientWorlds.get(protocolClass);
     }
@@ -160,6 +172,7 @@ public class UserConnectionImpl implements UserConnection {
             }
             storedObjects.clear();
             entityTrackers.clear();
+            itemHashers.clear();
             clientWorlds.clear();
         }
     }

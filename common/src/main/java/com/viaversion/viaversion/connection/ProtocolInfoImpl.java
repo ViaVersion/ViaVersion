@@ -32,7 +32,6 @@ public class ProtocolInfoImpl implements ProtocolInfo {
     private String username;
     private UUID uuid;
     private ProtocolPipeline pipeline;
-    private boolean processingClientboundInventoryPacket;
 
     @Override
     public State getClientState() {
@@ -108,21 +107,6 @@ public class ProtocolInfoImpl implements ProtocolInfo {
     @Override
     public void setPipeline(ProtocolPipeline pipeline) {
         this.pipeline = pipeline;
-    }
-
-    /**
-     * Returns whether this connection is currently processing a clientbound player inventory packet.
-     * <p>
-     * Used for checking when it is necessary to track/process item data hashes.
-     *
-     * @return true if processing a clientbound inventory packet, false otherwise
-     */
-    public boolean isProcessingClientboundInventoryPacket() {
-        return processingClientboundInventoryPacket;
-    }
-
-    public void setProcessingClientboundInventoryPacket(final boolean processingClientboundInventoryPacket) {
-        this.processingClientboundInventoryPacket = processingClientboundInventoryPacket;
     }
 
     @Override

@@ -63,7 +63,6 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
-import com.viaversion.viaversion.connection.ProtocolInfoImpl;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPacket1_21_5;
@@ -345,10 +344,10 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         appendItemDataFixComponents(connection, item);
 
         // Store the data components if necessary for the server, the client only sends data hashes now
-        if (((ProtocolInfoImpl) connection.getProtocolInfo()).isProcessingClientboundInventoryPacket()) {
-            final ItemHashStorage1_21_5 hasher = connection.get(ItemHashStorage1_21_5.class);
+        final ItemHashStorage1_21_5 itemHasher = itemHasher(connection);
+        if (itemHasher.isProcessingClientboundInventoryPacket()) {
             for (final StructuredData<?> data : dataContainer.data().values()) {
-                hasher.trackStructuredData(data);
+                itemHasher.trackStructuredData(data);
             }
         }
 
@@ -495,7 +494,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
 
     private StructuredItem convertHashedItemToStructuredItem(final UserConnection connection, final HashedItem hashedItem) {
         final StructuredItem item = new StructuredItem(hashedItem.identifier(), hashedItem.amount());
-        final ItemHashStorage1_21_5 hasher = connection.get(ItemHashStorage1_21_5.class);
+        final ItemHashStorage1_21_5 hasher = itemHasher(connection);
         final Map<StructuredDataKey<?>, StructuredData<?>> structuredDataMap = item.dataContainer().data();
         for (final Int2IntMap.Entry hashEntry : hashedItem.dataHashesById().int2IntEntrySet()) {
             final StructuredData<?> structuredData = hasher.dataFromHash(hashEntry.getIntKey(), hashEntry.getIntValue());

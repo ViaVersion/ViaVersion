@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.util.Copyable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface Item extends ItemBase, Copyable {
+public interface Item extends ItemBase {
 
     /**
      * Returns the item data. Always 0 for 1.13+ items.

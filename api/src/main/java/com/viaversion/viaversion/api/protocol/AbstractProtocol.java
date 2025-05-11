@@ -26,6 +26,7 @@ import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
@@ -245,6 +246,10 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
 
     protected void addEntityTracker(UserConnection connection, EntityTracker tracker) {
         connection.addEntityTracker(this.getClass(), tracker);
+    }
+
+    protected void addItemHasher(UserConnection connection, ItemHasher hasher) {
+        connection.addItemHasher(this.getClass(), hasher);
     }
 
     protected PacketTypesProvider<CU, CM, SM, SU> createPacketTypesProvider() {

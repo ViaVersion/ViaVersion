@@ -20,26 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item;
+package com.viaversion.viaversion.api.data.item;
 
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import java.util.List;
 
 /**
- * Item that does not hold any real data outside of its id and amount.
- * Instead, it holds hashes of added data and a set of keys of removed data.
+ * Used for converting items to hashed items and caching them for later use during serverbound packets.
  * <p>
- * This stores the raw int identifiers instead of data keys to simplify handling across protocols
- * under the assumption that the keys are almost never needed beyond automated id updating.
- *
- * @see Item
+ * Most of this stays in the internal module given non-permanent, imperfect caching as well as missing converters.
  */
-public interface HashedItem extends ItemBase {
+public interface ItemHasher {
 
-    Int2IntMap dataHashesById();
+    /**
+     * Returns whether this connection is currently processing a clientbound player inventory packet.
+     * <p>
+     * Used for checking when it is necessary to track/process item data hashes.
+     *
+     * @return true if processing a clientbound inventory packet, false otherwise
+     */
+    boolean isProcessingClientboundInventoryPacket();
 
-    IntSet removedDataIds();
+    void setProcessingClientboundInventoryPacket(boolean processingClientboundInventoryPacket);
 
-    @Override
-    HashedItem copy();
+    /**
+     * Sets the enchantment registry for this connection.
+     *
+     * @param enchantments list of enchantment identifiers
+     */
+    void setEnchantments(List<String> enchantments);
 }

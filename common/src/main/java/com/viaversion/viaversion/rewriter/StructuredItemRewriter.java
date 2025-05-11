@@ -18,15 +18,18 @@
 package com.viaversion.viaversion.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.EitherHolder;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
@@ -34,8 +37,9 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.connection.ProtocolInfoImpl;
+import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.util.Rewritable;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -76,6 +80,36 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         return item;
     }
 
+    protected @Nullable HashedItem hashItem(final Item item, @Nullable final ItemHasherBase hasher) {
+        // Hash the original item from open inventory data to be able to get it back out of serverbound hashed items
+        return hasher == null || !hasher.isProcessingClientboundInventoryPacket() ? null : hasher.toHashedItem(item);
+    }
+
+    protected void storeOriginalHashedItem(final Item item, final ItemHasherBase hasher, @Nullable final HashedItem originalHashedItem) {
+        if (originalHashedItem == null || item.dataContainer().isEmpty()) {
+            return;
+        }
+
+        // Check if the hashed data is the same, this will also prevent unnecessary backups due to missing converters
+        final HashedItem hashedItem = hasher.toHashedItem(item);
+        if (hashedItem.dataHashesById().equals(originalHashedItem.dataHashesById()) && hashedItem.removedDataIds().equals(originalHashedItem.removedDataIds())) {
+            return;
+        }
+
+        // Always has to be AFTER any modification - Use the custom_data hash as a key to the original hashes.
+        // This is much easier/cheaper than tracking via the full hashed item, as collisions are both acceptable and still unlikely.
+        final CompoundTag originalHashes = new CompoundTag();
+        for (final Int2IntMap.Entry entry : originalHashedItem.dataHashesById().int2IntEntrySet()) {
+            originalHashes.putInt(Integer.toString(entry.getIntKey()), entry.getIntValue());
+        }
+        originalHashes.put("removed", new IntArrayTag(originalHashedItem.removedDataIds().toIntArray()));
+
+        final CompoundTag customTag = createCustomTag(item);
+        saveTag(customTag, originalHashes, "original_hashes");
+
+        hasher.trackOriginalHashedItem(customTag, originalHashedItem);
+    }
+
     @Override
     public Item handleItemToServer(UserConnection connection, Item item) {
         if (item.isEmpty()) {
@@ -89,7 +123,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
 
         updateItemDataComponentTypeIds(item.dataContainer(), false);
         updateItemDataComponents(connection, item, false);
-        restoreTextComponents(item);
+        restoreBackupData(item);
         return item;
     }
 
@@ -136,14 +170,18 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             }
         }
 
-        final ProtocolInfoImpl protocolInfo = ((ProtocolInfoImpl) connection.getProtocolInfo());
-        final boolean processingClientboundInventoryPacket = protocolInfo.isProcessingClientboundInventoryPacket();
-        protocolInfo.setProcessingClientboundInventoryPacket(false); // Don't track items inside items
+        final ItemHasher itemHasher = itemHasher(connection);
         final ItemHandler itemHandler = clientbound ? this::handleItemToClient : this::handleItemToServer;
-        try {
+        if (itemHasher != null && itemHasher.isProcessingClientboundInventoryPacket()) {
+            // Don't track items inside items
+            itemHasher.setProcessingClientboundInventoryPacket(false);
+            try {
+                updateItemDataComponents(connection, clientbound, container, itemHandler);
+            } finally {
+                itemHasher.setProcessingClientboundInventoryPacket(true);
+            }
+        } else {
             updateItemDataComponents(connection, clientbound, container, itemHandler);
-        } finally {
-            protocolInfo.setProcessingClientboundInventoryPacket(processingClientboundInventoryPacket);
         }
     }
 
@@ -203,30 +241,31 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
     }
 
-    protected void restoreTextComponents(final Item item) {
+    protected void restoreBackupData(final Item item) {
         final StructuredDataContainer data = item.dataContainer();
         final CompoundTag customData = data.get(StructuredDataKey.CUSTOM_DATA);
         if (customData == null) {
             return;
         }
 
+        customData.remove(nbtTagName("original_hashes"));
+
         // Remove custom name
         if (customData.remove(nbtTagName("added_custom_name")) != null) {
             data.remove(StructuredDataKey.CUSTOM_NAME);
-            removeCustomTag(data, customData);
         } else {
             final Tag customName = removeBackupTag(customData, "custom_name");
             if (customName != null) {
                 data.set(StructuredDataKey.CUSTOM_NAME, customName);
-                removeCustomTag(data, customData);
             }
 
             final Tag itemName = removeBackupTag(customData, "item_name");
             if (itemName != null) {
                 data.set(StructuredDataKey.ITEM_NAME, itemName);
-                removeCustomTag(data, customData);
             }
         }
+
+        removeCustomTag(data, customData);
     }
 
     protected CompoundTag createCustomTag(final Item item) {

@@ -25,11 +25,11 @@ import net.lenni0451.mcstructs.itemcomponents.registry.Registry;
 import net.lenni0451.mcstructs.itemcomponents.registry.RegistryEntry;
 
 final class RegistryAccessImpl implements ItemDataComponentConverter.RegistryAccess {
-    private final List<Identifier> enchantments;
+    private final List<String> enchantments;
     private final Registries registries;
     private final MappingData mappingData;
 
-    RegistryAccessImpl(final List<Identifier> enchantments, final Registries registries, final MappingData mappingData) {
+    RegistryAccessImpl(final List<String> enchantments, final Registries registries, final MappingData mappingData) {
         this.enchantments = enchantments;
         this.registries = registries;
         this.mappingData = mappingData;
@@ -52,6 +52,6 @@ final class RegistryAccessImpl implements ItemDataComponentConverter.RegistryAcc
         if (networkId < 0 || networkId >= this.enchantments.size()) {
             return new RegistryEntry(registry, Identifier.of("viaversion", "unknown/enchantment/" + networkId));
         }
-        return new RegistryEntry(registry, this.enchantments.get(networkId));
+        return new RegistryEntry(registry, Identifier.of(this.enchantments.get(networkId)));
     }
 }

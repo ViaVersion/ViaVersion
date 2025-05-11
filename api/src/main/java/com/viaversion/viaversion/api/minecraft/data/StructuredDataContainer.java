@@ -284,6 +284,10 @@ public final class StructuredDataContainer implements Copyable {
         return data;
     }
 
+    public boolean isEmpty() {
+        return data.isEmpty();
+    }
+
     @Override
     public String toString() {
         return "StructuredDataContainer{" +

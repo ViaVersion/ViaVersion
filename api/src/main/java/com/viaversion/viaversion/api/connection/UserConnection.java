@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.connection;
 
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
@@ -98,6 +99,23 @@ public interface UserConnection {
      * @param tracker       entity tracker
      */
     void addEntityTracker(Class<? extends Protocol> protocolClass, EntityTracker tracker);
+
+    /**
+     * Adds an item hasher to the user connection.
+     *
+     * @param protocolClass protocol class
+     * @param itemHasher   item hasher
+     */
+    void addItemHasher(Class<? extends Protocol> protocolClass, ItemHasher itemHasher);
+
+    /**
+     * Returns the item hasher by the given protocol class if present.
+     *
+     * @param protocolClass protocol class
+     * @param <T>           item hasher type
+     * @return item hasher if present
+     */
+    @Nullable <T extends ItemHasher> T getItemHasher(Class<? extends Protocol> protocolClass);
 
     /**
      * Returns the client world by the given protocol class if present.
