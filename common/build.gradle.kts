@@ -24,11 +24,12 @@ tasks.named<Jar>("sourcesJar") {
 // Task to quickly test/debug code changes using https://github.com/ViaVersion/ViaProxy
 // For further instructions see the ViaProxy repository README
 val prepareViaProxyFiles by tasks.registering(Copy::class) {
-    dependsOn(tasks.named("jar"))
+    dependsOn(project.tasks.shadowJar)
+
+    from(project.tasks.shadowJar.get().archiveFile.get().asFile)
+    into(layout.projectDirectory.dir("run/jars"))
 
     val projectName = project.name
-    from(layout.buildDirectory.file("libs/${projectName}.jar"))
-    into(layout.projectDirectory.dir("run/jars"))
     rename { "${projectName}.jar" }
 }
 
