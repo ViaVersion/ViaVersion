@@ -449,12 +449,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         updateDisplay(connection, data, tag.getCompoundTag("display"), hideFlagsValue);
 
         final NumberTag damage = tag.getNumberTag("Damage");
-        if (damage != null && damage.asInt() != 0) {
+        if (damage != null && damage.asInt() > 0) {
             data.set(StructuredDataKey.DAMAGE, damage.asInt());
         }
 
         final NumberTag repairCost = tag.getNumberTag("RepairCost");
-        if (repairCost != null && repairCost.asInt() != 0) {
+        if (repairCost != null && repairCost.asInt() > 0) {
             data.set(StructuredDataKey.REPAIR_COST, repairCost.asInt());
         }
 
