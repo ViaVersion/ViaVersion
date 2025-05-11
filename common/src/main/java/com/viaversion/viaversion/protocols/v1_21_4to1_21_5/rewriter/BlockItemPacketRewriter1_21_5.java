@@ -196,9 +196,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             wrapper.passthrough(Types.BYTE); // Button
             wrapper.passthrough(Types.VAR_INT); // Mode
 
-            // On a protocol level, there is no sane way for us to reconstruct the original item here if it has any extra data.
-            // Send them with just their id and amount, which simply forces the server to re-sync it if there is extra data.
-
+            // Try our best to get the actual item out of it - will be wrong for some data component types that don't have their conversion implemented
             final int affectedItems = Limit.max(wrapper.passthrough(Types.VAR_INT), 128);
             for (int i = 0; i < affectedItems; i++) {
                 wrapper.passthrough(Types.SHORT); // Slot
