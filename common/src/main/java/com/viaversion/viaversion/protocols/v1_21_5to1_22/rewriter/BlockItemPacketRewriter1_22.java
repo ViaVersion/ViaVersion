@@ -20,10 +20,12 @@ package com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_22;
+import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPacket1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPacket1_21_5;
@@ -72,8 +74,11 @@ public final class BlockItemPacketRewriter1_22 extends StructuredItemRewriter<Cl
 
     @Override
     public Item handleItemToClient(final UserConnection connection, final Item item) {
+        final ItemHasherBase itemHasher = itemHasher(connection);
+        final HashedItem originalHashedItem = hashItem(item, itemHasher);
         super.handleItemToClient(connection, item);
         updateItemData(item);
+        storeOriginalHashedItem(item, itemHasher, originalHashedItem);
         return item;
     }
 
