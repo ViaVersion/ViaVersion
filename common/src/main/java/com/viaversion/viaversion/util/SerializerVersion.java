@@ -20,6 +20,9 @@ package com.viaversion.viaversion.util;
 import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
+import net.lenni0451.mcstructs.core.Identifier;
+import net.lenni0451.mcstructs.itemcomponents.ItemComponent;
+import net.lenni0451.mcstructs.itemcomponents.ItemComponentRegistry;
 import net.lenni0451.mcstructs.snbt.SNbt;
 import net.lenni0451.mcstructs.snbt.exceptions.SNbtDeserializeException;
 import net.lenni0451.mcstructs.snbt.exceptions.SNbtSerializeException;
@@ -50,19 +53,26 @@ public enum SerializerVersion {
     V1_20_3(TextComponentCodec.V1_20_3, SNbt.V1_14),
     V1_20_5(TextComponentCodec.V1_20_5, SNbt.V1_14),
     V1_21_4(TextComponentCodec.V1_21_4, SNbt.V1_14),
-    V1_21_5(TextComponentCodec.V1_21_5, null/*Currently not needed and also not implemented 100% in MCStructs*/);
+    V1_21_5(ItemComponentRegistry.V1_21_5, TextComponentCodec.V1_21_5, null/*Currently not needed and also not implemented 100% in MCStructs*/);
 
     final TextComponentSerializer jsonSerializer;
     final SNbt<? extends Tag> sNbt;
     final TextComponentCodec codec;
+    final ItemComponentRegistry itemComponentRegistry;
 
     SerializerVersion(final TextComponentSerializer jsonSerializer, final SNbt<? extends Tag> sNbt) {
         this.jsonSerializer = jsonSerializer;
         this.sNbt = sNbt;
         this.codec = null;
+        this.itemComponentRegistry = null;
     }
 
     SerializerVersion(final TextComponentCodec codec, final SNbt<? extends Tag> sNbt) {
+        this(null, codec, sNbt);
+    }
+
+    SerializerVersion(final ItemComponentRegistry itemComponentRegistry, final TextComponentCodec codec, final SNbt<? extends Tag> sNbt) {
+        this.itemComponentRegistry = itemComponentRegistry;
         this.codec = codec;
         this.jsonSerializer = codec.asSerializer();
         this.sNbt = sNbt;
@@ -127,5 +137,9 @@ public enum SerializerVersion {
         } catch (SNbtSerializeException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public ItemComponent<?> getItemComponent(final String identifier) {
+        return itemComponentRegistry.getComponent(Identifier.of(identifier));
     }
 }

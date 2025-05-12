@@ -82,7 +82,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
 
     protected @Nullable HashedItem hashItem(final Item item, @Nullable final ItemHasherBase hasher) {
         // Hash the original item from open inventory data to be able to get it back out of serverbound hashed items
-        return hasher == null || !hasher.isProcessingClientboundInventoryPacket() ? null : hasher.toHashedItem(item);
+        return hasher == null || !hasher.isProcessingClientboundInventoryPacket() ? null : hasher.toHashedItem(item, false);
     }
 
     protected void storeOriginalHashedItem(final Item item, final ItemHasherBase hasher, @Nullable final HashedItem originalHashedItem) {
@@ -91,7 +91,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         // Check if the hashed data is the same, this will also prevent unnecessary backups due to missing converters
-        final HashedItem hashedItem = hasher.toHashedItem(item);
+        final HashedItem hashedItem = hasher.toHashedItem(item, true);
         if (hashedItem.dataHashesById().equals(originalHashedItem.dataHashesById()) && hashedItem.removedDataIds().equals(originalHashedItem.removedDataIds())) {
             return;
         }

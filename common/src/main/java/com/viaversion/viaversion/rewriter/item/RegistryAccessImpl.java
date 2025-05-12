@@ -17,12 +17,14 @@
  */
 package com.viaversion.viaversion.rewriter.item;
 
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
 import java.util.List;
 import net.lenni0451.mcstructs.core.Identifier;
 import net.lenni0451.mcstructs.itemcomponents.impl.Registries;
 import net.lenni0451.mcstructs.itemcomponents.registry.Registry;
 import net.lenni0451.mcstructs.itemcomponents.registry.RegistryEntry;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class RegistryAccessImpl implements ItemDataComponentConverter.RegistryAccess {
     private final List<String> enchantments;
@@ -36,22 +38,33 @@ final class RegistryAccessImpl implements ItemDataComponentConverter.RegistryAcc
     }
 
     @Override
-    public RegistryEntry getItem(final int networkId) {
-        final String identifier = this.mappingData.getFullItemMappings().mappedIdentifier(networkId);
-        final Registry registry = this.registries.item;
-        if (identifier != null) {
-            return new RegistryEntry(registry, Identifier.of(identifier));
-        } else {
-            return new RegistryEntry(registry, Identifier.of("viaversion", "unknown/item/" + networkId));
-        }
+    public RegistryEntry item(final int id, final boolean mapped) {
+        return registryEntry(registries.item, mappingData.getFullItemMappings(), id, mapped);
     }
 
     @Override
-    public RegistryEntry getEnchantment(final int networkId) {
-        final Registry registry = this.registries.enchantment;
-        if (networkId < 0 || networkId >= this.enchantments.size()) {
-            return new RegistryEntry(registry, Identifier.of("viaversion", "unknown/enchantment/" + networkId));
-        }
-        return new RegistryEntry(registry, Identifier.of(this.enchantments.get(networkId)));
+    public RegistryEntry enchantment(final int id) {
+        final String identifier = id >= 0 && id < this.enchantments.size() ? this.enchantments.get(id) : null;
+        return new RegistryEntry(this.registries.enchantment, identifier(identifier, id));
+    }
+
+    @Override
+    public RegistryEntry attributeModifier(final int id, final boolean mapped) {
+        return registryEntry(registries.attributeModifier, mappingData.getAttributeMappings(), id, mapped);
+    }
+
+    @Override
+    public String dataComponentType(final int id, final boolean mapped) {
+        final FullMappings mappings = mappingData.getDataComponentSerializerMappings();
+        return mapped ? mappings.mappedIdentifier(id) : mappings.identifier(id);
+    }
+
+    private RegistryEntry registryEntry(final Registry registry, final FullMappings mappings, final int id, final boolean mapped) {
+        final String identifier = mapped ? mappings.mappedIdentifier(id) : mappings.identifier(id);
+        return new RegistryEntry(registry, identifier(identifier, id));
+    }
+
+    private Identifier identifier(@Nullable final String identifier, final int id) {
+        return identifier != null ? Identifier.of(identifier) : Identifier.of("viaversion", "unknown/" + id);
     }
 }

@@ -47,13 +47,13 @@ public class ItemHasherBase implements ItemHasher {
     protected final UserConnection connection;
     private boolean processingClientboundInventoryPacket;
 
-    public ItemHasherBase(final UserConnection connection, final SerializerVersion serializerVersion, final MappingData mappingData) {
+    public ItemHasherBase(final UserConnection connection, final SerializerVersion serializerVersion, final SerializerVersion mappedSerializerVersion, final MappingData mappingData) {
         final RegistryAccess registryAccess = RegistryAccess.of(
             this.enchantments,
             ItemComponentRegistry.V1_21_5.getRegistries(), // Unused outside of file deserialization
             mappingData
         );
-        this.itemComponentConverter = new ItemDataComponentConverter(serializerVersion, registryAccess);
+        this.itemComponentConverter = new ItemDataComponentConverter(serializerVersion, mappedSerializerVersion, registryAccess);
         this.connection = connection;
     }
 
@@ -67,13 +67,14 @@ public class ItemHasherBase implements ItemHasher {
      * Returns the hashed item for the given item. Not all data may be successfully hashed.
      *
      * @param item the item to hash
+     * @param mapped whether the item is mapped to the client version
      * @return the hashed item
      */
-    public HashedItem toHashedItem(final Item item) {
-        return toHashedItem(this.itemComponentConverter, item);
+    public HashedItem toHashedItem(final Item item, final boolean mapped) {
+        return toHashedItem(this.itemComponentConverter, item, mapped);
     }
 
-    public static HashedItem toHashedItem(final ItemDataComponentConverter converter, final Item item) {
+    public static HashedItem toHashedItem(final ItemDataComponentConverter converter, final Item item, final boolean mapped) {
         final HashedItem hashedItem = new HashedStructuredItem(item.identifier(), item.amount());
         for (final StructuredData<?> data : item.dataContainer().data().values()) {
             if (data.isEmpty()) {
@@ -81,7 +82,7 @@ public class ItemHasherBase implements ItemHasher {
                 continue;
             }
 
-            final ItemDataComponentConverter.Result<?> result = converter.viaToMcStructs(data);
+            final ItemDataComponentConverter.Result<?> result = converter.viaToMcStructs(data, mapped);
             final int hash = result != null ? hash(result) : UNKNOWN_HASH;
             hashedItem.dataHashesById().put(data.id(), hash);
         }

@@ -39,7 +39,7 @@ public class ItemHashStorage1_21_5 implements ItemHasher {
 
     public ItemHashStorage1_21_5(final MappingData mappingData) {
         final RegistryAccess registryAccess = RegistryAccess.of(this.enchantmentRegistry, ItemComponentRegistry.V1_21_5.getRegistries(), mappingData);
-        this.itemComponentConverter = new ItemDataComponentConverter(SerializerVersion.V1_21_5, registryAccess);
+        this.itemComponentConverter = new ItemDataComponentConverter(SerializerVersion.V1_21_5, SerializerVersion.V1_21_5, registryAccess); // always using 1.21.5 items as input
     }
 
     @Override
@@ -53,7 +53,7 @@ public class ItemHashStorage1_21_5 implements ItemHasher {
             return;
         }
 
-        final ItemDataComponentConverter.Result<?> result = this.itemComponentConverter.viaToMcStructs(structuredData);
+        final ItemDataComponentConverter.Result<?> result = this.itemComponentConverter.viaToMcStructs(structuredData, true);
         if (result == null) {
             return;
         }

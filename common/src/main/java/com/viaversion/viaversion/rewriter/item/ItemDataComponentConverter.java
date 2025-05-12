@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_21;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
@@ -44,6 +45,7 @@ import net.lenni0451.mcstructs.itemcomponents.ItemComponentMap;
 import net.lenni0451.mcstructs.itemcomponents.ItemComponentRegistry;
 import net.lenni0451.mcstructs.itemcomponents.impl.Registries;
 import net.lenni0451.mcstructs.itemcomponents.impl.v1_20_5.Types_v1_20_5;
+import net.lenni0451.mcstructs.itemcomponents.impl.v1_21.Types_v1_21;
 import net.lenni0451.mcstructs.itemcomponents.impl.v1_21_2.Types_v1_21_2;
 import net.lenni0451.mcstructs.itemcomponents.impl.v1_21_4.Types_v1_21_4;
 import net.lenni0451.mcstructs.itemcomponents.impl.v1_21_5.Types_v1_21_5;
@@ -57,10 +59,12 @@ public final class ItemDataComponentConverter {
 
     private final Map<StructuredDataKey<?>, Converter<?, ?>> converters = new Reference2ObjectOpenHashMap<>();
     private final SerializerVersion serializerVersion;
+    private final SerializerVersion mappedSerializerVersion;
     private final RegistryAccess registryAccess;
 
-    public ItemDataComponentConverter(final SerializerVersion serializerVersion, final RegistryAccess registryAccess) {
-        this.serializerVersion = serializerVersion;
+    public ItemDataComponentConverter(final SerializerVersion unmappedSerializerVersion, final SerializerVersion mappedSerializerVersion, final RegistryAccess registryAccess) {
+        this.serializerVersion = unmappedSerializerVersion;
+        this.mappedSerializerVersion = mappedSerializerVersion;
         this.registryAccess = registryAccess;
         this.direct(StructuredDataKey.CUSTOM_DATA, ItemComponentRegistry.V1_21_5.CUSTOM_DATA);
         this.direct(StructuredDataKey.MAX_STACK_SIZE, ItemComponentRegistry.V1_21_5.MAX_STACK_SIZE);
@@ -75,7 +79,18 @@ public final class ItemDataComponentConverter {
         this.register(StructuredDataKey.ENCHANTMENTS1_21_5, this.convertEnchantmentsFunction(ItemComponentRegistry.V1_21_5.ENCHANTMENTS));
         this.notImplemented(StructuredDataKey.CAN_PLACE_ON1_21_5);
         this.notImplemented(StructuredDataKey.CAN_BREAK1_21_5);
-        this.notImplemented(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5);
+        this.register(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5, (attributes, mapped) -> {
+            final List<Types_v1_21.AttributeModifier> result = new ArrayList<>(attributes.modifiers().length);
+            for (final AttributeModifiers1_21.AttributeModifier modifier : attributes.modifiers()) {
+                final AttributeModifiers1_21.ModifierData modifierData = modifier.modifier();
+                result.add(new Types_v1_21.AttributeModifier(
+                    registryAccess.attributeModifier(modifier.attribute(), mapped),
+                    new Types_v1_21.AttributeModifier.EntityAttribute(Identifier.of(modifierData.id()), modifierData.amount(), Types_v1_21.AttributeModifier.EntityAttribute.Operation.values()[modifierData.operation()]),
+                    Types_v1_20_5.AttributeModifier.Slot.values()[modifier.slotType()]
+                ));
+            }
+            return new Result<>(ItemComponentRegistry.V1_21_5.ATTRIBUTE_MODIFIERS, result);
+        });
         this.register(StructuredDataKey.CUSTOM_MODEL_DATA1_21_4, customModelData -> {
             final List<Float> floats = new ArrayList<>(customModelData.floats().length);
             for (final float f : customModelData.floats()) {
@@ -92,7 +107,13 @@ public final class ItemDataComponentConverter {
                 intArrayToIntList(customModelData.colors())
             ));
         });
-        this.notImplemented(StructuredDataKey.TOOLTIP_DISPLAY);
+        this.register(StructuredDataKey.TOOLTIP_DISPLAY, (tooltipDisplay, mapped) -> {
+            final List<ItemComponent<?>> result = new ArrayList<>(tooltipDisplay.hiddenComponents().size());
+            for (final int hiddenComponent : tooltipDisplay.hiddenComponents()) {
+                result.add(dataComponentType(hiddenComponent, mapped));
+            }
+            return new Result<>(ItemComponentRegistry.V1_21_5.TOOLTIP_DISPLAY, new Types_v1_21_5.TooltipDisplay(tooltipDisplay.hideTooltip(), result));
+        });
         this.direct(StructuredDataKey.REPAIR_COST, ItemComponentRegistry.V1_21_5.REPAIR_COST);
         this.unit(StructuredDataKey.CREATIVE_SLOT_LOCK, ItemComponentRegistry.V1_21_5.CREATIVE_SLOT_LOCK);
         this.direct(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, ItemComponentRegistry.V1_21_5.ENCHANTMENT_GLINT_OVERRIDE);
@@ -141,11 +162,11 @@ public final class ItemDataComponentConverter {
             }
             return new Result<>(ItemComponentRegistry.V1_21_5.WRITABLE_BOOK_CONTENT, new Types_v1_20_5.WritableBook(resultPages));
         });
-        this.register(StructuredDataKey.WRITTEN_BOOK_CONTENT, writtenBook -> {
+        this.register(StructuredDataKey.WRITTEN_BOOK_CONTENT, (writtenBook, mapped) -> {
             final Types_v1_20_5.RawFilteredPair<String> resultTitle = new Types_v1_20_5.RawFilteredPair<>(writtenBook.title().raw(), writtenBook.title().filtered());
             final List<Types_v1_20_5.RawFilteredPair<TextComponent>> resultPages = new ArrayList<>(writtenBook.pages().length);
             for (final FilterableComponent page : writtenBook.pages()) {
-                resultPages.add(new Types_v1_20_5.RawFilteredPair<>(convertTextComponent(page.raw()), convertTextComponent(page.filtered())));
+                resultPages.add(new Types_v1_20_5.RawFilteredPair<>(convertTextComponent(page.raw(), mapped), convertTextComponent(page.filtered(), mapped)));
             }
             return new Result<>(ItemComponentRegistry.V1_21_5.WRITTEN_BOOK_CONTENT, new Types_v1_20_5.WrittenBook(resultTitle, writtenBook.author(), writtenBook.generation(), resultPages, writtenBook.resolved()));
         });
@@ -192,12 +213,12 @@ public final class ItemDataComponentConverter {
         this.notImplemented(StructuredDataKey.BANNER_PATTERNS);
         this.intToEnum(StructuredDataKey.BASE_COLOR, ItemComponentRegistry.V1_21_5.BASE_COLOR, Types_v1_20_5.DyeColor.class);
         this.notImplemented(StructuredDataKey.POT_DECORATIONS);
-        this.register(StructuredDataKey.CONTAINER1_21_5, items -> {
-            final List<Types_v1_20_5.ContainerSlot> resultSlots = new ArrayList<>();
+        this.register(StructuredDataKey.CONTAINER1_21_5, (items, mapped) -> {
+            final List<Types_v1_20_5.ContainerSlot> resultSlots = new ArrayList<>(items.length);
             for (int i = 0; i < items.length; i++) {
                 final Item item = items[i];
                 if (!item.isEmpty()) {
-                    resultSlots.add(new Types_v1_20_5.ContainerSlot(i, this.convertItemStack(item)));
+                    resultSlots.add(new Types_v1_20_5.ContainerSlot(i, this.convertItemStack(item, mapped)));
                 }
             }
             return new Result<>(ItemComponentRegistry.V1_21_5.CONTAINER, resultSlots);
@@ -206,7 +227,7 @@ public final class ItemDataComponentConverter {
             return new Result<>(ItemComponentRegistry.V1_21_5.BLOCK_STATE, blockState.properties());
         });
         this.register(StructuredDataKey.BEES, bees -> {
-            final List<Types_v1_20_5.BeeData> resultBeeData = new ArrayList<>();
+            final List<Types_v1_20_5.BeeData> resultBeeData = new ArrayList<>(bees.length);
             for (final Bee bee : bees) {
                 resultBeeData.add(new Types_v1_20_5.BeeData(bee.entityData(), bee.ticksInHive(), bee.minTicksInHive()));
             }
@@ -241,13 +262,17 @@ public final class ItemDataComponentConverter {
         this.intToEnum(StructuredDataKey.SHULKER_COLOR, ItemComponentRegistry.V1_21_5.SHULKER_COLOR, Types_v1_20_5.DyeColor.class);
     }
 
-    public <I> Result<?> viaToMcStructs(final StructuredData<I> structuredData) {
+    public <I> Result<?> viaToMcStructs(final StructuredData<I> structuredData, final boolean mapped) {
         final Converter<?, ?> conversionFunction = this.converters.get(structuredData.key());
         if (conversionFunction == null) {
             throw new IllegalArgumentException("Unknown structured data key: " + structuredData.key());
         }
         //noinspection unchecked
-        return ((Converter<I, ?>) conversionFunction).convert(structuredData.value());
+        return ((Converter<I, ?>) conversionFunction).convert(structuredData.value(), mapped);
+    }
+
+    private <I, O> void register(final StructuredDataKey<I> key, final SimpleConverter<I, O> converter) {
+        this.converters.put(key, converter);
     }
 
     private <I, O> void register(final StructuredDataKey<I> key, final Converter<I, O> converter) {
@@ -274,11 +299,11 @@ public final class ItemDataComponentConverter {
     }
 
     private void textComponent(final StructuredDataKey<Tag> key, final ItemComponent<TextComponent> result) {
-        this.register(key, tag -> new Result<>(result, convertTextComponent(tag)));
+        this.register(key, (tag, mapped) -> new Result<>(result, convertTextComponent(tag, mapped)));
     }
 
     private void item(final StructuredDataKey<Item> key, final ItemComponent<Types_v1_20_5.ItemStack> result) {
-        this.register(key, item -> new Result<>(result, this.convertItemStack(item)));
+        this.register(key, (item, mapped) -> new Result<>(result, this.convertItemStack(item, mapped)));
     }
 
     private void identifier(final StructuredDataKey<String> key, final ItemComponent<Identifier> result) {
@@ -290,16 +315,16 @@ public final class ItemDataComponentConverter {
     }
 
     private Converter<Tag[], List<TextComponent>> stringArrayToTextComponentArray(final ItemComponent<List<TextComponent>> itemComponent) {
-        return tags -> {
+        return (tags, mapped) -> {
             final List<TextComponent> textComponents = new ArrayList<>(tags.length);
             for (final Tag tag : tags) {
-                textComponents.add(convertTextComponent(tag));
+                textComponents.add(convertTextComponent(tag, mapped));
             }
             return new Result<>(itemComponent, textComponents);
         };
     }
 
-    private static <I extends Tag, O> Converter<I, O> passthroughNbtCodec(final ItemComponent<O> itemComponent) {
+    private static <I extends Tag, O> SimpleConverter<I, O> passthroughNbtCodec(final ItemComponent<O> itemComponent) {
         return tag -> new Result<>(itemComponent, itemComponent.getCodec().deserialize(NbtConverter_v1_21_5.INSTANCE, tag).getOrThrow());
     }
 
@@ -308,8 +333,11 @@ public final class ItemDataComponentConverter {
         return new Types_v1_20_5.FireworkExplosions(explosionShape, intArrayToIntList(explosion.colors()), intArrayToIntList(explosion.fadeColors()), explosion.hasTrail(), explosion.hasTwinkle());
     }
 
-    private TextComponent convertTextComponent(final Tag tag) {
-        return tag != null ? this.serializerVersion.toComponent(tag) : null;
+    private TextComponent convertTextComponent(final Tag tag, final boolean mapped) {
+        if (tag != null) {
+            return mapped ? this.mappedSerializerVersion.toComponent(tag) : this.serializerVersion.toComponent(tag);
+        }
+        return null;
     }
 
     private static List<Integer> intArrayToIntList(final int[] array) {
@@ -321,32 +349,32 @@ public final class ItemDataComponentConverter {
     }
 
     private Converter<Item[], List<Types_v1_20_5.ItemStack>> convertItemArrayFunction(final ItemComponent<List<Types_v1_20_5.ItemStack>> itemComponent) {
-        return items -> {
+        return (items, mapped) -> {
             final List<Types_v1_20_5.ItemStack> itemStacks = new ArrayList<>(items.length);
             for (Item item : items) {
-                itemStacks.add(this.convertItemStack(item));
+                itemStacks.add(this.convertItemStack(item, mapped));
             }
             return new Result<>(itemComponent, itemStacks);
         };
     }
 
-    private Converter<Enchantments, Map<RegistryEntry, Integer>> convertEnchantmentsFunction(final ItemComponent<Map<RegistryEntry, Integer>> itemComponent) {
+    private SimpleConverter<Enchantments, Map<RegistryEntry, Integer>> convertEnchantmentsFunction(final ItemComponent<Map<RegistryEntry, Integer>> itemComponent) {
         return enchantments -> {
             final Map<RegistryEntry, Integer> enchantmentMap = new HashMap<>();
             for (final Int2IntMap.Entry entry : enchantments.enchantments().int2IntEntrySet()) {
-                enchantmentMap.put(this.registryAccess.getEnchantment(entry.getIntKey()), entry.getIntValue());
+                enchantmentMap.put(this.registryAccess.enchantment(entry.getIntKey()), entry.getIntValue());
             }
             return new Result<>(itemComponent, enchantmentMap);
         };
     }
 
-    private Types_v1_20_5.ItemStack convertItemStack(final Item item) {
-        final Types_v1_20_5.ItemStack itemStack = new Types_v1_20_5.ItemStack(this.registryAccess.getItem(item.identifier()), item.amount(), new ItemComponentMap(ItemComponentRegistry.V1_21_5));
+    private Types_v1_20_5.ItemStack convertItemStack(final Item item, final boolean mapped) {
+        final Types_v1_20_5.ItemStack itemStack = new Types_v1_20_5.ItemStack(this.registryAccess.item(item.identifier(), mapped), item.amount(), new ItemComponentMap(ItemComponentRegistry.V1_21_5));
         final ItemComponentMap itemComponentMap = itemStack.getComponents();
 
         for (final StructuredData<?> structuredData : item.dataContainer().data().values()) {
             if (structuredData.isPresent()) {
-                final Result<?> itemComponent = viaToMcStructs(structuredData);
+                final Result<?> itemComponent = viaToMcStructs(structuredData, mapped);
                 if (itemComponent != null) {
                     setGeneric(itemComponentMap, itemComponent);
                 }
@@ -366,6 +394,11 @@ public final class ItemDataComponentConverter {
         return ItemComponentRegistry.V1_21_5.getRegistries();
     }
 
+    private ItemComponent<?> dataComponentType(final int id, final boolean mapped) {
+        final String identifier = this.registryAccess.dataComponentType(id, mapped);
+        return mapped ? this.mappedSerializerVersion.getItemComponent(identifier) : this.serializerVersion.getItemComponent(identifier);
+    }
+
     /**
      * Converts one of our own data types to MCStructs data types.
      *
@@ -375,7 +408,24 @@ public final class ItemDataComponentConverter {
     @FunctionalInterface
     public interface Converter<I, O> {
 
+        Result<O> convert(I value, boolean mapped);
+    }
+
+    /**
+     * Converts one of our own data types to MCStructs data types, assumed to not use the {@code mapped} value.
+     *
+     * @param <I> input ViaVersion data type
+     * @param <O> output MCStructs data type
+     */
+    @FunctionalInterface
+    public interface SimpleConverter<I, O> extends Converter<I, O> {
+
         Result<O> convert(I value);
+
+        @Override
+        default Result<O> convert(final I value, final boolean mapped) {
+            return this.convert(value);
+        }
     }
 
     /**
@@ -390,9 +440,13 @@ public final class ItemDataComponentConverter {
 
     public interface RegistryAccess {
 
-        RegistryEntry getItem(final int networkId);
+        RegistryEntry item(int id, boolean mapped);
 
-        RegistryEntry getEnchantment(final int networkId);
+        RegistryEntry enchantment(int id);
+
+        RegistryEntry attributeModifier(int id, boolean mapped);
+
+        String dataComponentType(int id, boolean mapped);
 
         static RegistryAccess of(final List<String> enchantments, final Registries registries, final MappingData mappingData) {
             return new RegistryAccessImpl(enchantments, registries, mappingData);

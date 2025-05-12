@@ -49,6 +49,7 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 //   ServerboundPacket1_21_4
 //   EntityTypes1_21_4 (MAPPED type)
 //   Types1_21_4.PARTICLE
+//   SerializerVersion.V1_21_5
 //   1.99, 1.98
 final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, ClientboundPacket1_21_2, ServerboundPacket1_21_4, ServerboundPacket1_21_4> {
 
@@ -139,7 +140,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, 
     public void init(final UserConnection connection) {
         // Register the entity tracker - used for entity id/entity data rewriting AND for tracking world data sent to the client (then used for chunk data rewriting)
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_4.PLAYER));
-        addItemHasher(connection, new ItemHasherBase(connection, SerializerVersion.V1_21_5, MAPPINGS));
+        addItemHasher(connection, new ItemHasherBase(connection, SerializerVersion.V1_21_5, SerializerVersion.V1_21_5, MAPPINGS));
     }
 
     // Overriding these four methods is important as they are relied on various rewriter classes
