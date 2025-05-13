@@ -150,7 +150,9 @@ public enum ClientboundPackets1_22 implements ClientboundPacket1_22 {
     PROJECTILE_POWER, // 0x80
     CUSTOM_REPORT_DETAILS, // 0x81
     SERVER_LINKS, // 0x82
-    TRACKED_WAYPOINT; // 0x83
+    TRACKED_WAYPOINT, // 0x83
+    CLEAR_DIALOG, // 0x84
+    SHOW_DIALOG; // 0x85
 
     @Override
     public int getId() {

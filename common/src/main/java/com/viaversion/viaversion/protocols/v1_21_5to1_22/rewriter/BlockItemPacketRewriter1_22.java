@@ -20,28 +20,26 @@ package com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
-import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_22;
-import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPacket1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
-import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPacket1_21_5;
-import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPackets1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.Protocol1_21_5To1_22;
+import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPacket1_22;
+import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPackets1_22;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 
-public final class BlockItemPacketRewriter1_22 extends StructuredItemRewriter<ClientboundPacket1_21_5, ServerboundPacket1_21_5, Protocol1_21_5To1_22> {
+public final class BlockItemPacketRewriter1_22 extends StructuredItemRewriter<ClientboundPacket1_21_5, ServerboundPacket1_22, Protocol1_21_5To1_22> {
 
     public BlockItemPacketRewriter1_22(final Protocol1_21_5To1_22 protocol) {
         super(protocol,
-            Types1_21_5.ITEM, Types1_21_5.ITEM_ARRAY, Types1_22.ITEM, Types1_22.ITEM_ARRAY,
-            Types1_21_5.ITEM_COST, Types1_21_5.OPTIONAL_ITEM_COST, Types1_22.ITEM_COST, Types1_22.OPTIONAL_ITEM_COST
+                Types1_21_5.ITEM, Types1_21_5.ITEM_ARRAY, Types1_22.ITEM, Types1_22.ITEM_ARRAY,
+                Types1_21_5.ITEM_COST, Types1_21_5.OPTIONAL_ITEM_COST, Types1_22.ITEM_COST, Types1_22.OPTIONAL_ITEM_COST
         );
     }
 
@@ -63,8 +61,8 @@ public final class BlockItemPacketRewriter1_22 extends StructuredItemRewriter<Cl
         registerAdvancements1_20_3(ClientboundPackets1_21_5.UPDATE_ADVANCEMENTS);
         registerSetEquipment(ClientboundPackets1_21_5.SET_EQUIPMENT);
         registerMerchantOffers1_20_5(ClientboundPackets1_21_5.MERCHANT_OFFERS);
-        registerContainerClick1_21_5(ServerboundPackets1_21_5.CONTAINER_CLICK);
-        registerSetCreativeModeSlot1_21_5(ServerboundPackets1_21_5.SET_CREATIVE_MODE_SLOT, Types1_21_5.LENGTH_PREFIXED_ITEM, Types1_22.LENGTH_PREFIXED_ITEM);
+        registerContainerClick1_21_5(ServerboundPackets1_22.CONTAINER_CLICK);
+        registerSetCreativeModeSlot1_21_5(ServerboundPackets1_22.SET_CREATIVE_MODE_SLOT, Types1_21_5.LENGTH_PREFIXED_ITEM, Types1_22.LENGTH_PREFIXED_ITEM);
 
         final RecipeDisplayRewriter<ClientboundPacket1_21_5> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(protocol);
         recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_5.UPDATE_RECIPES);
@@ -73,41 +71,40 @@ public final class BlockItemPacketRewriter1_22 extends StructuredItemRewriter<Cl
     }
 
     @Override
-    public Item handleItemToClient(final UserConnection connection, final Item item) {
-        final ItemHasherBase itemHasher = itemHasher(connection);
-        final HashedItem originalHashedItem = hashItem(item, itemHasher);
-        super.handleItemToClient(connection, item);
+    protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
+        super.handleItemDataComponentsToClient(connection, item, container);
         updateItemData(item);
-        storeOriginalHashedItem(item, itemHasher, originalHashedItem);
-        return item;
     }
 
     @Override
-    public Item handleItemToServer(final UserConnection connection, final Item item) {
-        super.handleItemToServer(connection, item);
+    protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
+        super.handleItemDataComponentsToServer(connection, item, container);
         downgradeItemData(item);
-        return item;
     }
 
     public static void updateItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
+        dataContainer.replaceKey(StructuredDataKey.EQUIPPABLE1_21_5, StructuredDataKey.EQUIPPABLE1_22);
+        dataContainer.replaceKey(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_22);
+
         dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21_5, StructuredDataKey.CHARGED_PROJECTILES1_22);
         dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21_5, StructuredDataKey.BUNDLE_CONTENTS1_22);
         dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_5, StructuredDataKey.CONTAINER1_22);
         dataContainer.replaceKey(StructuredDataKey.USE_REMAINDER1_21_5, StructuredDataKey.USE_REMAINDER1_22);
         dataContainer.replaceKey(StructuredDataKey.CAN_PLACE_ON1_21_5, StructuredDataKey.CAN_PLACE_ON1_22);
         dataContainer.replaceKey(StructuredDataKey.CAN_BREAK1_21_5, StructuredDataKey.CAN_BREAK1_22);
-        dataContainer.replaceKey(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_22);
     }
 
     public static void downgradeItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
+        dataContainer.replaceKey(StructuredDataKey.EQUIPPABLE1_22, StructuredDataKey.EQUIPPABLE1_21_5);
+        dataContainer.replaceKey(StructuredDataKey.ATTRIBUTE_MODIFIERS1_22, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5);
+
         dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_22, StructuredDataKey.CHARGED_PROJECTILES1_21_5);
         dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_22, StructuredDataKey.BUNDLE_CONTENTS1_21_5);
         dataContainer.replaceKey(StructuredDataKey.CONTAINER1_22, StructuredDataKey.CONTAINER1_21_5);
         dataContainer.replaceKey(StructuredDataKey.USE_REMAINDER1_22, StructuredDataKey.USE_REMAINDER1_21_5);
         dataContainer.replaceKey(StructuredDataKey.CAN_PLACE_ON1_22, StructuredDataKey.CAN_PLACE_ON1_21_5);
         dataContainer.replaceKey(StructuredDataKey.CAN_BREAK1_22, StructuredDataKey.CAN_BREAK1_21_5);
-        dataContainer.replaceKey(StructuredDataKey.ATTRIBUTE_MODIFIERS1_22, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5);
     }
 }

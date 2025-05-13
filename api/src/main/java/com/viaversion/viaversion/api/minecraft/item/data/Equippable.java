@@ -35,11 +35,17 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Nullable String model,
                          @Nullable String cameraOverlay, @Nullable HolderSet allowedEntities, boolean dispensable,
-                         boolean swappable, boolean damageOnHurt, boolean equipOnInteract) implements Rewritable {
+                         boolean swappable, boolean damageOnHurt, boolean equipOnInteract,
+                         boolean canBeSheared, Holder<SoundEvent> shearingSound) implements Rewritable {
 
     public Equippable(final int equipmentSlot, final Holder<SoundEvent> soundEvent, @Nullable final String model, @Nullable final String cameraOverlay,
                       @Nullable final HolderSet allowedEntities, final boolean dispensable, final boolean swappable, final boolean damageOnHurt) {
         this(equipmentSlot, soundEvent, model, cameraOverlay, allowedEntities, dispensable, swappable, damageOnHurt, true);
+    }
+
+    public Equippable(final int equipmentSlot, final Holder<SoundEvent> soundEvent, @Nullable final String model, @Nullable final String cameraOverlay,
+                      @Nullable final HolderSet allowedEntities, final boolean dispensable, final boolean swappable, final boolean damageOnHurt, final boolean equipOnInteract) {
+        this(equipmentSlot, soundEvent, model, cameraOverlay, allowedEntities, dispensable, swappable, damageOnHurt, equipOnInteract, false, Holder.of(0));
     }
 
     public static final Type<Equippable> TYPE1_21_2 = new Type<>(Equippable.class) {
@@ -96,10 +102,43 @@ public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Null
             buffer.writeBoolean(value.equipOnInteract());
         }
     };
+    public static final Type<Equippable> TYPE1_22 = new Type<>(Equippable.class) {
+        @Override
+        public Equippable read(final ByteBuf buffer) {
+            final int equipmentSlot = Types.VAR_INT.readPrimitive(buffer);
+            final Holder<SoundEvent> soundEvent = Types.SOUND_EVENT.read(buffer);
+            final String model = Types.OPTIONAL_STRING.read(buffer);
+            final String cameraOverlay = Types.OPTIONAL_STRING.read(buffer);
+            final HolderSet allowedEntities = Types.OPTIONAL_HOLDER_SET.read(buffer);
+            final boolean dispensable = buffer.readBoolean();
+            final boolean swappable = buffer.readBoolean();
+            final boolean damageOnHurt = buffer.readBoolean();
+            final boolean equipOnInteract = buffer.readBoolean();
+            final boolean canBeSheared = buffer.readBoolean();
+            final Holder<SoundEvent> shearingSound = Types.SOUND_EVENT.read(buffer);
+            return new Equippable(equipmentSlot, soundEvent, model, cameraOverlay, allowedEntities, dispensable, swappable, damageOnHurt, equipOnInteract, canBeSheared, shearingSound);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final Equippable value) {
+            Types.VAR_INT.writePrimitive(buffer, value.equipmentSlot());
+            Types.SOUND_EVENT.write(buffer, value.soundEvent());
+            Types.OPTIONAL_STRING.write(buffer, value.model());
+            Types.OPTIONAL_STRING.write(buffer, value.cameraOverlay());
+            Types.OPTIONAL_HOLDER_SET.write(buffer, value.allowedEntities());
+            buffer.writeBoolean(value.dispensable());
+            buffer.writeBoolean(value.swappable());
+            buffer.writeBoolean(value.damageOnHurt());
+            buffer.writeBoolean(value.equipOnInteract());
+            buffer.writeBoolean(value.canBeSheared());
+            Types.SOUND_EVENT.write(buffer, value.shearingSound());
+        }
+    };
 
     @Override
     public Equippable rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(Rewritable.soundRewriteFunction(protocol, clientbound));
-        return soundEvent == this.soundEvent ? this : new Equippable(equipmentSlot, soundEvent, model, cameraOverlay, allowedEntities, dispensable, swappable, damageOnHurt, equipOnInteract);
+        final Holder<SoundEvent> shearingSound = this.shearingSound.updateId(Rewritable.soundRewriteFunction(protocol, clientbound));
+        return soundEvent == this.soundEvent && shearingSound == this.shearingSound ? this : new Equippable(equipmentSlot, soundEvent, model, cameraOverlay, allowedEntities, dispensable, swappable, damageOnHurt, equipOnInteract, canBeSheared, shearingSound);
     }
 }

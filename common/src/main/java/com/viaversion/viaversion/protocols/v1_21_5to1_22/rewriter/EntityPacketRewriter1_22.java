@@ -28,6 +28,7 @@ import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPackets1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.Protocol1_21_5To1_22;
+import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPackets1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.storage.SneakStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
@@ -55,13 +56,13 @@ public final class EntityPacketRewriter1_22 extends EntityRewriter<ClientboundPa
             wrapper.user().get(SneakStorage.class).setSneaking(false);
         });
 
-        protocol.registerServerbound(ServerboundPackets1_21_5.PLAYER_COMMAND, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_22.PLAYER_COMMAND, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Entity ID
             final int action = wrapper.read(Types.VAR_INT);
             wrapper.write(Types.VAR_INT, action + 2); // press_shift_key and release_shift_key gone
         });
 
-        protocol.registerServerbound(ServerboundPackets1_21_5.PLAYER_INPUT, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_22.PLAYER_INPUT, wrapper -> {
             final byte flags = wrapper.passthrough(Types.BYTE);
             final boolean pressingShift = (flags & 1 << 5) != 0;
             if (wrapper.user().get(SneakStorage.class).setSneaking(pressingShift)) {
@@ -87,6 +88,8 @@ public final class EntityPacketRewriter1_22 extends EntityRewriter<ClientboundPa
             Types1_22.ENTITY_DATA_TYPES.componentType,
             Types1_22.ENTITY_DATA_TYPES.optionalComponentType
         );
+
+        filter().type(EntityTypes1_22.HANGING_ENTITY).addIndex(8); // Direction
     }
 
     @Override

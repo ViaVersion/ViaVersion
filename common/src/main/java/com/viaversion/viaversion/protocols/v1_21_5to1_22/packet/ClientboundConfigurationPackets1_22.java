@@ -15,25 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet;
+package com.viaversion.viaversion.protocols.v1_21_5to1_22.packet;
 
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPacket1_21_4;
-import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPacket1_21_5;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPacket1_22;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacket1_21_2;
 
-public enum ServerboundConfigurationPackets1_20_5 implements ServerboundPacket1_20_5, ServerboundPacket1_21_2,
-    ServerboundPacket1_21_4, ServerboundPacket1_21_5, ServerboundPacket1_22 {
+public enum ClientboundConfigurationPackets1_22 implements ClientboundPacket1_22 {
 
-    CLIENT_INFORMATION, // 0x00
-    COOKIE_RESPONSE, // 0x01
-    CUSTOM_PAYLOAD, // 0x02
+    COOKIE_REQUEST, // 0x00
+    CUSTOM_PAYLOAD, // 0x01
+    DISCONNECT, // 0x02
     FINISH_CONFIGURATION, // 0x03
     KEEP_ALIVE, // 0x04
-    PONG, // 0x05
-    RESOURCE_PACK, // 0x06
-    SELECT_KNOWN_PACKS; // 0x07
+    PING, // 0x05
+    RESET_CHAT, // 0x06
+    REGISTRY_DATA, // 0x07
+    RESOURCE_PACK_POP, // 0x08
+    RESOURCE_PACK_PUSH, // 0x09
+    STORE_COOKIE, // 0x0A
+    TRANSFER, // 0x0B
+    UPDATE_ENABLED_FEATURES, // 0x0C
+    UPDATE_TAGS, // 0x0D
+    SELECT_KNOWN_PACKS, // 0x0E
+    CUSTOM_REPORT_DETAILS, // 0x0F
+    SERVER_LINKS, // 0x10
+    CLEAR_DIALOG, // 0x11
+    SHOW_DIALOG; // 0x12
 
     @Override
     public int getId() {

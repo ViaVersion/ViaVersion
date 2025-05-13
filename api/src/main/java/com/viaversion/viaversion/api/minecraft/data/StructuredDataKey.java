@@ -131,6 +131,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Enchantable> ENCHANTABLE = new StructuredDataKey<>("enchantable", Enchantable.TYPE);
     public static final StructuredDataKey<Equippable> EQUIPPABLE1_21_2 = new StructuredDataKey<>("equippable", Equippable.TYPE1_21_2);
     public static final StructuredDataKey<Equippable> EQUIPPABLE1_21_5 = new StructuredDataKey<>("equippable", Equippable.TYPE1_21_5);
+    public static final StructuredDataKey<Equippable> EQUIPPABLE1_22 = new StructuredDataKey<>("equippable", Equippable.TYPE1_22);
     public static final StructuredDataKey<HolderSet> REPAIRABLE = new StructuredDataKey<>("repairable", Types.HOLDER_SET);
     public static final StructuredDataKey<Unit> GLIDER = new StructuredDataKey<>("glider", Types.EMPTY);
     public static final StructuredDataKey<Key> TOOLTIP_STYLE = new StructuredDataKey<>("tooltip_style", Types.RESOURCE_LOCATION);

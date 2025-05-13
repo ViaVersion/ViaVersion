@@ -20,11 +20,13 @@ package com.viaversion.viaversion.protocols.v1_21_5to1_22;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_22;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_22;
@@ -37,8 +39,11 @@ import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPacket1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPackets1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ClientboundConfigurationPackets1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ClientboundPacket1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ClientboundPackets1_22;
+import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPacket1_22;
+import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPackets1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter.BlockItemPacketRewriter1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter.ComponentRewriter1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter.EntityPacketRewriter1_22;
@@ -50,10 +55,11 @@ import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 import com.viaversion.viaversion.util.SerializerVersion;
+import java.util.Locale;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
-public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPacket1_21_5, ClientboundPacket1_22, ServerboundPacket1_21_5, ServerboundPacket1_21_5> {
+public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPacket1_21_5, ClientboundPacket1_22, ServerboundPacket1_21_5, ServerboundPacket1_22> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.21.5", "1.21.6"); // It's both 1.21.6 and 1.22 until we know what it is
     private final EntityPacketRewriter1_22 entityRewriter = new EntityPacketRewriter1_22(this);
@@ -63,7 +69,7 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
     private final NBTComponentRewriter<ClientboundPacket1_21_5> componentRewriter = new ComponentRewriter1_22(this);
 
     public Protocol1_21_5To1_22() {
-        super(ClientboundPacket1_21_5.class, ClientboundPacket1_22.class, ServerboundPacket1_21_5.class, ServerboundPacket1_21_5.class);
+        super(ClientboundPacket1_21_5.class, ClientboundPacket1_22.class, ServerboundPacket1_21_5.class, ServerboundPacket1_22.class);
     }
 
     @Override
@@ -97,6 +103,23 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
         new StatisticsRewriter<>(this).register(ClientboundPackets1_21_5.AWARD_STATS);
         new AttributeRewriter<>(this).register1_21(ClientboundPackets1_21_5.UPDATE_ATTRIBUTES);
         new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_21_5.COMMANDS);
+
+        registerClientbound(ClientboundPackets1_21_5.CHANGE_DIFFICULTY, wrapper -> {
+            final short difficulty = wrapper.read(Types.UNSIGNED_BYTE);
+            wrapper.write(Types.VAR_INT, (int) difficulty);
+        });
+        registerServerbound(ServerboundPackets1_22.CHANGE_DIFFICULTY, wrapper -> {
+            final int difficulty = wrapper.read(Types.VAR_INT);
+            wrapper.write(Types.UNSIGNED_BYTE, (short) difficulty);
+        });
+
+        registerServerbound(ServerboundPackets1_22.CHANGE_GAME_MODE, ServerboundPackets1_21_5.CHAT_COMMAND, wrapper -> {
+            final int gameMode = wrapper.read(Types.VAR_INT);
+            final GameMode mode = GameMode.getById(gameMode);
+            wrapper.write(Types.STRING, "gamemode " + mode.name().toLowerCase(Locale.ROOT));
+        });
+
+        cancelServerbound(ServerboundPackets1_22.CUSTOM_CLICK_ACTION);
     }
 
     @Override
@@ -132,7 +155,7 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
             StructuredDataKey.CONTAINER_LOOT, StructuredDataKey.TOOL1_21_5, StructuredDataKey.ITEM_NAME, StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER,
             StructuredDataKey.FOOD1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_22,
             StructuredDataKey.REPAIRABLE, StructuredDataKey.ENCHANTABLE, StructuredDataKey.CONSUMABLE1_21_2,
-            StructuredDataKey.USE_COOLDOWN, StructuredDataKey.DAMAGE, StructuredDataKey.EQUIPPABLE1_21_5, StructuredDataKey.ITEM_MODEL,
+            StructuredDataKey.USE_COOLDOWN, StructuredDataKey.DAMAGE, StructuredDataKey.EQUIPPABLE1_22, StructuredDataKey.ITEM_MODEL,
             StructuredDataKey.GLIDER, StructuredDataKey.TOOLTIP_STYLE, StructuredDataKey.DEATH_PROTECTION, StructuredDataKey.WEAPON,
             StructuredDataKey.POTION_DURATION_SCALE, StructuredDataKey.VILLAGER_VARIANT, StructuredDataKey.WOLF_VARIANT, StructuredDataKey.WOLF_COLLAR,
             StructuredDataKey.FOX_VARIANT, StructuredDataKey.SALMON_SIZE, StructuredDataKey.PARROT_VARIANT, StructuredDataKey.TROPICAL_FISH_PATTERN,
@@ -150,7 +173,7 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_22.PLAYER));
-        addItemHasher(connection, new ItemHasherBase(connection, SerializerVersion.V1_21_5, MAPPINGS));
+        addItemHasher(connection, new ItemHasherBase(connection, SerializerVersion.V1_21_5, SerializerVersion.V1_21_5, MAPPINGS));
         connection.put(new SneakStorage());
     }
 
@@ -185,12 +208,12 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    protected PacketTypesProvider<ClientboundPacket1_21_5, ClientboundPacket1_22, ServerboundPacket1_21_5, ServerboundPacket1_21_5> createPacketTypesProvider() {
+    protected PacketTypesProvider<ClientboundPacket1_21_5, ClientboundPacket1_22, ServerboundPacket1_21_5, ServerboundPacket1_22> createPacketTypesProvider() {
         return new SimplePacketTypesProvider<>(
             packetTypeMap(unmappedClientboundPacketType, ClientboundPackets1_21_5.class, ClientboundConfigurationPackets1_21.class),
-            packetTypeMap(mappedClientboundPacketType, ClientboundPackets1_22.class, ClientboundConfigurationPackets1_21.class),
+            packetTypeMap(mappedClientboundPacketType, ClientboundPackets1_22.class, ClientboundConfigurationPackets1_22.class),
             packetTypeMap(mappedServerboundPacketType, ServerboundPackets1_21_5.class, ServerboundConfigurationPackets1_20_5.class),
-            packetTypeMap(unmappedServerboundPacketType, ServerboundPackets1_21_5.class, ServerboundConfigurationPackets1_20_5.class)
+            packetTypeMap(unmappedServerboundPacketType, ServerboundPackets1_22.class, ServerboundConfigurationPackets1_20_5.class)
         );
     }
 }
