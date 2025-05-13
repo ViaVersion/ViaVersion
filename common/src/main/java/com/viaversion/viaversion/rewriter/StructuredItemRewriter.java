@@ -64,11 +64,23 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         super(protocol, itemType, itemArrayType, itemType, itemArrayType);
     }
 
+    /**
+     * Rewrites an item to the client, including item hash tracking if necessary.
+     *
+     * @param connection user connection
+     * @param item item
+     * @return the rewritten item, can be the same or a new object
+     * @see #handleItemDataComponentsToClient(UserConnection, Item, StructuredDataContainer)
+     * @see #handleItemToServer(UserConnection, Item)
+     */
     @Override
     public Item handleItemToClient(UserConnection connection, Item item) {
         if (item.isEmpty()) {
             return item;
         }
+
+        final ItemHasherBase itemHasher = itemHasher(connection); // get the original hashed item and store it later if there are any changes that could affect the data hashes
+        final HashedItem originalHashedItem = hashItem(item, itemHasher);
 
         final MappingData mappingData = protocol.getMappingData();
         if (mappingData != null && mappingData.getItemMappings() != null) {
@@ -76,7 +88,9 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         updateItemDataComponentTypeIds(item.dataContainer(), true);
-        updateItemDataComponents(connection, item, true);
+        handleItemDataComponentsToClient(connection, item, item.dataContainer());
+
+        storeOriginalHashedItem(item, itemHasher, originalHashedItem); // has to be called AFTER all modifications - override updateItemDataComponentsToClient instead of this method if needed
         return item;
     }
 
@@ -122,7 +136,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         updateItemDataComponentTypeIds(item.dataContainer(), false);
-        updateItemDataComponents(connection, item, false);
+        handleItemDataComponentsToServer(connection, item, item.dataContainer());
         restoreBackupData(item);
         return item;
     }
@@ -146,11 +160,18 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         container.updateIds(protocol, dataComponentMappings::getNewId);
     }
 
-    protected void updateItemDataComponents(final UserConnection connection, final Item item, final boolean clientbound) {
-        final StructuredDataContainer container = item.dataContainer();
-        if (clientbound && protocol.getComponentRewriter() != null) {
-            updateComponent(connection, item, StructuredDataKey.ITEM_NAME, "item_name");
-            updateComponent(connection, item, StructuredDataKey.CUSTOM_NAME, "custom_name");
+    /**
+     * This method is called last after changing the item identifier and data component type ids in clientbound item packets.
+     * Always remember to call the super method.
+     *
+     * @param connection user connection
+     * @param item item to update
+     * @param container item data container
+     */
+    protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
+        if (protocol.getComponentRewriter() != null) {
+            updateTextComponent(connection, item, StructuredDataKey.ITEM_NAME, "item_name");
+            updateTextComponent(connection, item, StructuredDataKey.CUSTOM_NAME, "custom_name");
 
             final Tag[] lore = container.get(StructuredDataKey.LORE);
             if (lore != null) {
@@ -171,18 +192,21 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         final ItemHasher itemHasher = itemHasher(connection);
-        final ItemHandler itemHandler = clientbound ? this::handleItemToClient : this::handleItemToServer;
         if (itemHasher != null && itemHasher.isProcessingClientboundInventoryPacket()) {
             // Don't track items inside items
             itemHasher.setProcessingClientboundInventoryPacket(false);
             try {
-                updateItemDataComponents(connection, clientbound, container, itemHandler);
+                updateItemDataComponents(connection, true, container, this::handleItemToClient);
             } finally {
                 itemHasher.setProcessingClientboundInventoryPacket(true);
             }
         } else {
-            updateItemDataComponents(connection, clientbound, container, itemHandler);
+            updateItemDataComponents(connection, true, container, this::handleItemToClient);
         }
+    }
+
+    protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
+        updateItemDataComponents(connection, false, container, this::handleItemToServer);
     }
 
     // Casting around Rewritable and especially Holder gets ugly, but the only good alternative is to do everything manually
@@ -228,7 +252,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         return holder.updateValue(val -> val instanceof Rewritable rewritable ? (V) rewritable.rewrite(connection, protocol, clientbound) : val);
     }
 
-    protected void updateComponent(final UserConnection connection, final Item item, final StructuredDataKey<Tag> key, final String backupKey) {
+    protected void updateTextComponent(final UserConnection connection, final Item item, final StructuredDataKey<Tag> key, final String backupKey) {
         final Tag name = item.dataContainer().get(key);
         if (name == null) {
             return;
@@ -242,30 +266,31 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     }
 
     protected void restoreBackupData(final Item item) {
-        final StructuredDataContainer data = item.dataContainer();
-        final CompoundTag customData = data.get(StructuredDataKey.CUSTOM_DATA);
-        if (customData == null) {
-            return;
+        final StructuredDataContainer container = item.dataContainer();
+        final CompoundTag customData = container.get(StructuredDataKey.CUSTOM_DATA);
+        if (customData != null) {
+            restoreBackupData(item, container, customData);
+            removeCustomTag(container, customData);
         }
+    }
 
+    protected void restoreBackupData(final Item item, final StructuredDataContainer container, final CompoundTag customData) {
         customData.remove(nbtTagName("original_hashes"));
 
         // Remove custom name
         if (customData.remove(nbtTagName("added_custom_name")) != null) {
-            data.remove(StructuredDataKey.CUSTOM_NAME);
+            container.remove(StructuredDataKey.CUSTOM_NAME);
         } else {
             final Tag customName = removeBackupTag(customData, "custom_name");
             if (customName != null) {
-                data.set(StructuredDataKey.CUSTOM_NAME, customName);
+                container.set(StructuredDataKey.CUSTOM_NAME, customName);
             }
 
             final Tag itemName = removeBackupTag(customData, "item_name");
             if (itemName != null) {
-                data.set(StructuredDataKey.ITEM_NAME, itemName);
+                container.set(StructuredDataKey.ITEM_NAME, itemName);
             }
         }
-
-        removeCustomTag(data, customData);
     }
 
     protected CompoundTag createCustomTag(final Item item) {
