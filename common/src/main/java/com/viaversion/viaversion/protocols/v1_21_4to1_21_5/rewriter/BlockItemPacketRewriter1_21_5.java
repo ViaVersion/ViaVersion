@@ -24,6 +24,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.EitherHolder;
@@ -327,7 +328,18 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
 
     @Override
     public Item handleItemToClient(final UserConnection connection, final Item item) {
-        super.handleItemToClient(connection, item);
+        // Don't call super, not actually using ItemHasherBase
+        if (item.isEmpty()) {
+            return item;
+        }
+
+        final MappingData mappingData = protocol.getMappingData();
+        if (mappingData != null && mappingData.getItemMappings() != null) {
+            item.setIdentifier(mappingData.getNewItemId(item.identifier()));
+        }
+
+        updateItemDataComponentTypeIds(item.dataContainer(), true);
+        handleItemDataComponentsToClient(connection, item, item.dataContainer());
 
         final StructuredDataContainer dataContainer = item.dataContainer();
         if (dataContainer.hasValue(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP)) {
