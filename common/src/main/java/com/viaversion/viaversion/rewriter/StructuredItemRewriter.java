@@ -136,8 +136,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         updateItemDataComponentTypeIds(item.dataContainer(), false);
+        restoreBackupData(item); // Restore first, then update the remaining
         handleItemDataComponentsToServer(connection, item, item.dataContainer());
-        restoreBackupData(item);
         return item;
     }
 
