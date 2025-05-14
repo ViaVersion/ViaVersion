@@ -87,10 +87,20 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             item.setIdentifier(mappingData.getNewItemId(item.identifier()));
         }
 
-        updateItemDataComponentTypeIds(item.dataContainer(), true);
-        handleItemDataComponentsToClient(connection, item, item.dataContainer());
+        final StructuredDataContainer dataContainer = item.dataContainer();
+        updateItemDataComponentTypeIds(dataContainer, true);
 
-        storeOriginalHashedItem(item, itemHasher, originalHashedItem); // has to be called AFTER all modifications - override updateItemDataComponentsToClient instead of this method if needed
+        // Save the inconvertible data before we start modifying the item
+        final CompoundTag backupTag = new CompoundTag();
+        backupInconvertibleData(connection, item, dataContainer, backupTag);
+        if (!backupTag.isEmpty()) {
+            saveTag(createCustomTag(item), backupTag, "backup");
+        }
+
+        handleRewritablesToClient(connection, dataContainer, originalHashedItem != null ? itemHasher : null);
+        handleItemDataComponentsToClient(connection, item, dataContainer);
+
+        storeOriginalHashedItem(item, itemHasher, originalHashedItem); // has to be called AFTER all modifications - override handleItemDataComponentsToClient instead of this method if needed
         return item;
     }
 
@@ -135,8 +145,10 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             item.setIdentifier(mappingData.getOldItemId(item.identifier()));
         }
 
+        // Handle rewritables first, then restore backup data, then the rest
         updateItemDataComponentTypeIds(item.dataContainer(), false);
-        restoreBackupData(item); // Restore first, then update the remaining
+        handleRewritables(connection, false, item.dataContainer(), this::handleItemToServer);
+        restoreBackupData(item);
         handleItemDataComponentsToServer(connection, item, item.dataContainer());
         return item;
     }
@@ -190,28 +202,29 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
                 }
             }
         }
-
-        final ItemHasher itemHasher = itemHasher(connection);
-        if (itemHasher != null && itemHasher.isProcessingClientboundInventoryPacket()) {
-            // Don't track items inside items
-            itemHasher.setProcessingClientboundInventoryPacket(false);
-            try {
-                updateItemDataComponents(connection, true, container, this::handleItemToClient);
-            } finally {
-                itemHasher.setProcessingClientboundInventoryPacket(true);
-            }
-        } else {
-            updateItemDataComponents(connection, true, container, this::handleItemToClient);
-        }
     }
 
     protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
-        updateItemDataComponents(connection, false, container, this::handleItemToServer);
+    }
+
+    protected void handleRewritablesToClient(final UserConnection connection, final StructuredDataContainer container, @Nullable final ItemHasher itemHasher) {
+        if (itemHasher == null) {
+            handleRewritables(connection, true, container, this::handleItemToClient);
+            return;
+        }
+
+        // Don't track items inside items
+        itemHasher.setProcessingClientboundInventoryPacket(false);
+        try {
+            handleRewritables(connection, true, container, this::handleItemToClient);
+        } finally {
+            itemHasher.setProcessingClientboundInventoryPacket(true);
+        }
     }
 
     // Casting around Rewritable and especially Holder gets ugly, but the only good alternative is to do everything manually
     @SuppressWarnings("unchecked")
-    private void updateItemDataComponents(UserConnection connection, boolean clientbound, StructuredDataContainer container, ItemHandler itemHandler) {
+    private void handleRewritables(UserConnection connection, boolean clientbound, StructuredDataContainer container, ItemHandler itemHandler) {
         for (final Map.Entry<StructuredDataKey<?>, StructuredData<?>> entry : container.data().entrySet()) {
             final StructuredData<?> data = entry.getValue();
             if (data.isEmpty()) {
@@ -274,6 +287,23 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
     }
 
+    /**
+     * Stores inconvertible data in a backup tag. Called before data component modification to the item.
+     *
+     * @param connection user connection
+     * @param item item to save data for
+     * @param dataContainer item data container
+     */
+    protected void backupInconvertibleData(final UserConnection connection, final Item item, final StructuredDataContainer dataContainer, final CompoundTag backupTag) {
+    }
+
+    /**
+     * Restored inconvertible backup data from the item. Called after rewritables and before the remaining data component modification.
+     *
+     * @param item item
+     * @param container item data container
+     * @param customData custom data tag
+     */
     protected void restoreBackupData(final Item item, final StructuredDataContainer container, final CompoundTag customData) {
         customData.remove(nbtTagName("original_hashes"));
 

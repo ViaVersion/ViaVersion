@@ -17,7 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.template;
 
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
@@ -83,17 +85,32 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
     }
 
     @Override
-    public Item handleItemToClient(final UserConnection connection, final Item item) {
-        if (item.isEmpty()) {
-            return item;
-        }
+    protected void backupInconvertibleData(final UserConnection connection, final Item item, final StructuredDataContainer dataContainer, final CompoundTag backupTag) {
+        super.backupInconvertibleData(connection, item, dataContainer, backupTag);
+        // back up any data if needed here, called before the method below
+    }
 
-        final ItemHasherBase itemHasher = itemHasher(connection); // get the original hashed item and store it later if there are any changes that could affect the data hashes
-        final HashedItem originalHashedItem = hashItem(item, itemHasher);
+    @Override
+    protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
+        super.handleItemDataComponentsToClient(connection, item, container);
+        updateData(item, container);
+    }
 
-        super.handleItemToClient(connection, item);
+    public static void updateData(final Item item, final StructuredDataContainer container) { // public for VB
+    }
 
-        storeOriginalHashedItem(item, itemHasher, originalHashedItem); // has to be called AFTER all modifications
-        return item;
+    @Override
+    protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
+        super.handleItemDataComponentsToServer(connection, item, container);
+        downgradeData(item, container);
+    }
+
+    public static void downgradeData(final Item item, final StructuredDataContainer container) {
+    }
+
+    @Override
+    protected void restoreBackupData(final Item item, final StructuredDataContainer container, final CompoundTag customData) {
+        super.restoreBackupData(item, container, customData);
+        // restore any data if needed here
     }
 }

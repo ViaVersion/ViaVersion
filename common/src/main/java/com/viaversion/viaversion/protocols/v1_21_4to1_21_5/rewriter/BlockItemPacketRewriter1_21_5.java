@@ -338,10 +338,11 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             item.setIdentifier(mappingData.getNewItemId(item.identifier()));
         }
 
-        updateItemDataComponentTypeIds(item.dataContainer(), true);
-        handleItemDataComponentsToClient(connection, item, item.dataContainer());
-
         final StructuredDataContainer dataContainer = item.dataContainer();
+        updateItemDataComponentTypeIds(dataContainer, true);
+        handleRewritablesToClient(connection, dataContainer, null);
+        handleItemDataComponentsToClient(connection, item, dataContainer);
+
         if (dataContainer.hasValue(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP)) {
             final CompoundTag backupTag = new CompoundTag();
             backupTag.putBoolean("hide_additional_tooltip", true);
@@ -367,18 +368,18 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
     @Override
     public Item handleItemToServer(final UserConnection connection, final Item item) {
         super.handleItemToServer(connection, item);
-
-        final StructuredDataContainer dataContainer = item.dataContainer();
-        final CompoundTag customData = dataContainer.get(StructuredDataKey.CUSTOM_DATA);
-        if (customData != null && customData.remove(nbtTagName("backup")) instanceof final CompoundTag backupTag) {
-            if (backupTag.getBoolean("hide_additional_tooltip")) {
-                dataContainer.set(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP);
-            }
-            removeCustomTag(dataContainer, customData);
-        }
-
         downgradeItemData(item);
         return item;
+    }
+
+    @Override
+    protected void restoreBackupData(final Item item, final StructuredDataContainer container, final CompoundTag customData) {
+        super.restoreBackupData(item, container, customData);
+        if (customData.remove(nbtTagName("backup")) instanceof final CompoundTag backupTag) {
+            if (backupTag.getBoolean("hide_additional_tooltip")) {
+                container.set(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP);
+            }
+        }
     }
 
     public static void updateItemData(final Item item) {
