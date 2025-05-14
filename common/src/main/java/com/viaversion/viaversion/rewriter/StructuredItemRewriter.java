@@ -82,11 +82,6 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         final ItemHasherBase itemHasher = itemHasher(connection); // get the original hashed item and store it later if there are any changes that could affect the data hashes
         final HashedItem originalHashedItem = hashItem(item, itemHasher);
 
-        final MappingData mappingData = protocol.getMappingData();
-        if (mappingData != null && mappingData.getItemMappings() != null) {
-            item.setIdentifier(mappingData.getNewItemId(item.identifier()));
-        }
-
         final StructuredDataContainer dataContainer = item.dataContainer();
         updateItemDataComponentTypeIds(dataContainer, true);
 
@@ -95,6 +90,11 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         backupInconvertibleData(connection, item, dataContainer, backupTag);
         if (!backupTag.isEmpty()) {
             saveTag(createCustomTag(item), backupTag, "backup");
+        }
+
+        final MappingData mappingData = protocol.getMappingData();
+        if (mappingData != null && mappingData.getItemMappings() != null) {
+            item.setIdentifier(mappingData.getNewItemId(item.identifier()));
         }
 
         handleRewritablesToClient(connection, dataContainer, originalHashedItem != null ? itemHasher : null);
@@ -312,8 +312,9 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         customData.remove(nbtTagName("original_hashes"));
 
         // Remove custom name
-        if (customData.remove(nbtTagName("added_custom_name")) != null) {
+        if (removeBackupTag(customData, "added_custom_name") != null) {
             container.remove(StructuredDataKey.CUSTOM_NAME);
+            // Remove the others as well
         } else {
             final Tag customName = removeBackupTag(customData, "custom_name");
             if (customName != null) {
