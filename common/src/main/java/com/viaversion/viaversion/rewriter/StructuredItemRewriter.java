@@ -147,7 +147,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
 
         // Handle rewritables first, then restore backup data, then the rest
         updateItemDataComponentTypeIds(item.dataContainer(), false);
-        handleRewritables(connection, false, item.dataContainer(), this::handleItemToServer);
+        handleRewritablesToServer(connection, item.dataContainer());
         restoreBackupData(item);
         handleItemDataComponentsToServer(connection, item, item.dataContainer());
         return item;
@@ -220,6 +220,10 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         } finally {
             itemHasher.setProcessingClientboundInventoryPacket(true);
         }
+    }
+
+    protected void handleRewritablesToServer(final UserConnection connection, final StructuredDataContainer container) {
+        handleRewritables(connection, false, container, this::handleItemToServer);
     }
 
     // Casting around Rewritable and especially Holder gets ugly, but the only good alternative is to do everything manually
