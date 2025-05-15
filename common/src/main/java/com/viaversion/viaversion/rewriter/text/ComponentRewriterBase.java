@@ -301,6 +301,19 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
         if (mappedId != null) {
             idTag.setValue(mappedId);
         }
+
+        if (componentsTag == null) {
+            return;
+        }
+
+        handleWrittenBookContents(connection, componentsTag);
+        handleContainerContents(connection, componentsTag);
+        handleItemArrayContents(connection, componentsTag, "bundle_contents");
+        handleItemArrayContents(connection, componentsTag, "charged_projectiles");
+        final CompoundTag useRemainder = TagUtil.getNamespacedCompoundTag(componentsTag, "use_remainder");
+        if (useRemainder != null) {
+            handleShowItem(connection, useRemainder);
+        }
     }
 
     protected void handleContainerContents(final UserConnection connection, final CompoundTag tag) {
@@ -338,7 +351,7 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
         }
 
         for (final CompoundTag itemTag : container) {
-            handleShowItem(connection, itemTag, itemTag.getCompoundTag("components"));
+            handleShowItem(connection, itemTag);
         }
     }
 

@@ -112,16 +112,6 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
         handleEnchantments(componentsTag, "enchantments");
         handleEnchantments(componentsTag, "stored_enchantments");
 
-        // Usual item handling
-        final CompoundTag useRemainder = TagUtil.getNamespacedCompoundTag(componentsTag, "use_remainder");
-        if (useRemainder != null) {
-            handleShowItem(connection, useRemainder);
-        }
-        handleContainerContents(connection, componentsTag);
-        handleItemArrayContents(connection, componentsTag, "bundle_contents");
-        handleItemArrayContents(connection, componentsTag, "charged_projectiles");
-        handleWrittenBookContents(connection, componentsTag);
-
         // NO MORE SNBT IN TEXT COMPONENTS
         updateUglyJson(componentsTag, connection);
 

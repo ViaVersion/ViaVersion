@@ -65,18 +65,6 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
         } else if (action.equals("show_item")) {
             final CompoundTag componentsTag = hoverEventTag.getCompoundTag("components");
             handleShowItem(connection, hoverEventTag, componentsTag);
-            if (componentsTag == null) {
-                return;
-            }
-
-            handleWrittenBookContents(connection, componentsTag);
-            handleContainerContents(connection, componentsTag);
-            handleItemArrayContents(connection, componentsTag, "bundle_contents");
-            handleItemArrayContents(connection, componentsTag, "charged_projectiles");
-            final CompoundTag useRemainder = TagUtil.getNamespacedCompoundTag(componentsTag, "use_remainder");
-            if (useRemainder != null) {
-                handleShowItem(connection, useRemainder);
-            }
         }
     }
 

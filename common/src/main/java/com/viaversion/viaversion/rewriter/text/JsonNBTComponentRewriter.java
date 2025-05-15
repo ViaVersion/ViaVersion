@@ -203,24 +203,9 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
             convertLegacyItemContents(hoverEventTag);
 
             final CompoundTag contentsTag = hoverEventTag.getCompoundTag("contents");
-            if (contentsTag == null) {
-                return;
-            }
-
-            final CompoundTag componentsTag = contentsTag.getCompoundTag("components");
-            handleShowItem(connection, contentsTag, componentsTag);
-            if (componentsTag != null) {
-                final CompoundTag useRemainder = TagUtil.getNamespacedCompoundTag(componentsTag, "use_remainder");
-                if (useRemainder != null) {
-                    handleShowItem(connection, useRemainder);
-                }
-                handleContainerContents(connection, componentsTag);
-                if (inputSerializerVersion() != null) {
-                    handleWrittenBookContents(connection, componentsTag);
-                }
-
-                handleItemArrayContents(connection, componentsTag, "bundle_contents");
-                handleItemArrayContents(connection, componentsTag, "charged_projectiles");
+            if (contentsTag != null) {
+                final CompoundTag componentsTag = contentsTag.getCompoundTag("components");
+                handleShowItem(connection, contentsTag, componentsTag);
             }
         }
     }
@@ -240,6 +225,13 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
         processTag(connection, asTag);
 
         tag.setValue(output.toString(output.toComponent(asTag)));
+    }
+
+    @Override
+    protected void handleWrittenBookContents(final UserConnection connection, final CompoundTag tag) {
+        if (inputSerializerVersion() != null) {
+            super.handleWrittenBookContents(connection, tag);
+        }
     }
 
     @Override
