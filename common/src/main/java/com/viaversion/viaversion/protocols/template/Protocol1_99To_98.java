@@ -20,11 +20,14 @@ package com.viaversion.viaversion.protocols.template;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_5;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_4;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_5;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
+import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
@@ -34,11 +37,11 @@ import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
-import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 import com.viaversion.viaversion.util.SerializerVersion;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
@@ -48,7 +51,7 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 //   ClientboundPacket1_21_2
 //   ServerboundPacket1_21_4
 //   EntityTypes1_21_4 (MAPPED type)
-//   Types1_21_4.PARTICLE
+//   VersionedTypes.V1_21_5
 //   SerializerVersion.V1_21_5
 //   1.99, 1.98
 final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, ClientboundPacket1_21_2, ServerboundPacket1_21_4, ServerboundPacket1_21_4> {
@@ -56,7 +59,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, 
     public static final MappingData MAPPINGS = new MappingDataBase("1.98", "1.99");
     private final EntityPacketRewriter1_99 entityRewriter = new EntityPacketRewriter1_99(this);
     private final BlockItemPacketRewriter1_99 itemRewriter = new BlockItemPacketRewriter1_99(this);
-    private final ParticleRewriter<ClientboundPacket1_21_2> particleRewriter = new ParticleRewriter<>(this, /*Types1_OLD.PARTICLE,*/ Types1_21_4.PARTICLE);
+    private final ParticleRewriter<ClientboundPacket1_21_2> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket1_21_2> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket1_21_2> componentRewriter = new ComponentRewriter1_99(this);
 
@@ -118,7 +121,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, 
         // EntityTypes1_21_4.initialize(this);
 
         // Uncomment if a new particle was added = ids shifted; requires a new Types_ class copied from the last
-        /*Types1_21_4.PARTICLE.filler(this)
+        /*mappedTypes().particle.filler(this)
             .reader("block", ParticleType.Readers.BLOCK)
             .reader("block_marker", ParticleType.Readers.BLOCK)
             .reader("dust_pillar", ParticleType.Readers.BLOCK)
@@ -143,7 +146,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, 
         addItemHasher(connection, new ItemHasherBase(connection, SerializerVersion.V1_21_5, SerializerVersion.V1_21_5, MAPPINGS));
     }
 
-    // Overriding these four methods is important as they are relied on various rewriter classes
+    // Overriding these methods is important as they are relied on various rewriter classes
     // and have mapping load methods called in AbstractProtocol via the getters
     @Override
     public MappingData getMappingData() {
@@ -173,6 +176,16 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, 
     @Override
     public NBTComponentRewriter<ClientboundPacket1_21_2> getComponentRewriter() {
         return componentRewriter;
+    }
+
+    @Override
+    public Types1_20_5<StructuredDataKeys1_21_5, EntityDataTypes1_21_5> types() {
+        return VersionedTypes.V1_21_5;
+    }
+
+    @Override
+    public Types1_20_5<StructuredDataKeys1_21_5, EntityDataTypes1_21_5> mappedTypes() {
+        return VersionedTypes.V1_21_5;
     }
 
     @Override

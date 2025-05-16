@@ -30,7 +30,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +65,7 @@ public class ChunkType1_13 extends Type<Chunk> {
         for (int i = 0; i < 16; i++) {
             if ((primaryBitmask & (1 << i)) == 0) continue; // Section not set
 
-            ChunkSection section = Types1_13.CHUNK_SECTION.read(data);
+            ChunkSection section = Types.CHUNK_SECTION1_13.read(data);
             sections[i] = section;
             section.getLight().readBlockLight(data);
             if (hasSkyLight) {
@@ -102,7 +101,7 @@ public class ChunkType1_13 extends Type<Chunk> {
             for (int i = 0; i < 16; i++) {
                 ChunkSection section = chunk.getSections()[i];
                 if (section == null) continue; // Section not set
-                Types1_13.CHUNK_SECTION.write(buf, section);
+                Types.CHUNK_SECTION1_13.write(buf, section);
                 section.getLight().writeBlockLight(buf);
 
                 if (!section.getLight().hasSkyLight()) continue; // No sky light, we're done here.

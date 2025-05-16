@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
-import com.viaversion.viaversion.api.type.types.version.Types1_21;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -61,7 +61,7 @@ public record FoodProperties1_20_5(int nutrition, float saturationModifier, bool
             final float saturationModifier = buffer.readFloat();
             final boolean canAlwaysEat = buffer.readBoolean();
             final float eatSeconds = buffer.readFloat();
-            final Item usingConvertsTo = Types1_21.OPTIONAL_ITEM.read(buffer);
+            final Item usingConvertsTo = VersionedTypes.V1_21.optionalItem.read(buffer);
             final FoodEffect[] possibleEffects = FoodEffect.ARRAY_TYPE.read(buffer);
             return new FoodProperties1_20_5(nutrition, saturationModifier, canAlwaysEat, eatSeconds, usingConvertsTo, possibleEffects);
         }
@@ -72,7 +72,7 @@ public record FoodProperties1_20_5(int nutrition, float saturationModifier, bool
             buffer.writeFloat(value.saturationModifier);
             buffer.writeBoolean(value.canAlwaysEat);
             buffer.writeFloat(value.eatSeconds);
-            Types1_21.OPTIONAL_ITEM.write(buffer, value.usingConvertsTo);
+            VersionedTypes.V1_21.optionalItem.write(buffer, value.usingConvertsTo);
             FoodEffect.ARRAY_TYPE.write(buffer, value.possibleEffects);
         }
     };

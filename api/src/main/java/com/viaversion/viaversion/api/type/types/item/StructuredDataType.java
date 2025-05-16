@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
+import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StructuredDataType extends Type<StructuredData<?>> implements StructuredDataTypeBase {
@@ -67,7 +68,11 @@ public class StructuredDataType extends Type<StructuredData<?>> implements Struc
     }
 
     public DataFiller filler(final Protocol<?, ?, ?, ?> protocol) {
-        return new DataFiller(protocol);
+        final DataFiller filler = new DataFiller(protocol);
+        if (protocol.mappedTypes() != null) {
+            filler.add(protocol.mappedTypes().structuredDataKeys().keys());
+        }
+        return filler;
     }
 
     public final class DataFiller {
@@ -90,6 +95,13 @@ public class StructuredDataType extends Type<StructuredData<?>> implements Struc
         }
 
         public DataFiller add(final StructuredDataKey<?>... keys) {
+            for (final StructuredDataKey<?> key : keys) {
+                add(key);
+            }
+            return this;
+        }
+
+        public DataFiller add(final Collection<StructuredDataKey<?>> keys) {
             for (final StructuredDataKey<?> key : keys) {
                 add(key);
             }

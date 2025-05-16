@@ -30,8 +30,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
-import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
-import com.viaversion.viaversion.api.type.types.version.Types1_21;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
@@ -60,10 +58,7 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
     private static final int SWIFT_SNEAK_ID = 12;
 
     public BlockItemPacketRewriter1_21(final Protocol1_20_5To1_21 protocol) {
-        super(protocol,
-            Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY, Types1_21.ITEM, Types1_21.ITEM_ARRAY,
-            Types1_20_5.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_21.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST
-        );
+        super(protocol);
     }
 
     @Override
@@ -186,9 +181,6 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
     public static void updateItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
         dataContainer.replaceKey(StructuredDataKey.FOOD1_20_5, StructuredDataKey.FOOD1_21);
-        dataContainer.replaceKey(StructuredDataKey.CONTAINER1_20_5, StructuredDataKey.CONTAINER1_21);
-        dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_20_5, StructuredDataKey.CHARGED_PROJECTILES1_21);
-        dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_20_5, StructuredDataKey.BUNDLE_CONTENTS1_21);
         dataContainer.replace(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, attributeModifiers -> {
             final AttributeModifiers1_21.AttributeModifier[] modifiers = Arrays.stream(attributeModifiers.modifiers()).map(modifier -> {
                 final int mappedAttributeId = Protocol1_20_5To1_21.MAPPINGS.getNewAttributeId(modifier.attribute());
@@ -224,9 +216,6 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
     public static void downgradeItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
         dataContainer.replaceKey(StructuredDataKey.FOOD1_21, StructuredDataKey.FOOD1_20_5);
-        dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21, StructuredDataKey.CONTAINER1_20_5);
-        dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21, StructuredDataKey.CHARGED_PROJECTILES1_20_5);
-        dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21, StructuredDataKey.BUNDLE_CONTENTS1_20_5);
         dataContainer.remove(StructuredDataKey.JUKEBOX_PLAYABLE1_21);
         dataContainer.replace(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, attributeModifiers -> {
             final AttributeModifiers1_20_5.AttributeModifier[] modifiers = Arrays.stream(attributeModifiers.modifiers()).map(modifier -> {

@@ -30,7 +30,6 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
-import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_3to1_10.rewriter.ItemPacketRewriter1_10;
@@ -45,7 +44,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
             return inputValue / 63.0F;
         }
     };
-    public static final ValueTransformer<List<EntityData>, List<EntityData>> TRANSFORM_ENTITY_DATA = new ValueTransformer<>(Types1_9.ENTITY_DATA_LIST) {
+    public static final ValueTransformer<List<EntityData>, List<EntityData>> TRANSFORM_ENTITY_DATA = new ValueTransformer<>(Types.ENTITY_DATA_LIST1_9) {
         @Override
         public List<EntityData> transform(PacketWrapper wrapper, List<EntityData> inputValue) {
             for (EntityData data : inputValue) {
@@ -104,7 +103,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
             @Override
             public void register() {
                 map(Types.VAR_INT); // 0 - Entity ID
-                map(Types1_9.ENTITY_DATA_LIST, TRANSFORM_ENTITY_DATA); // 1 - Entity data list
+                map(Types.ENTITY_DATA_LIST1_9, TRANSFORM_ENTITY_DATA); // 1 - Entity data list
             }
         });
 
@@ -124,7 +123,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_9.ENTITY_DATA_LIST, TRANSFORM_ENTITY_DATA); // 12 - Entity data
+                map(Types.ENTITY_DATA_LIST1_9, TRANSFORM_ENTITY_DATA); // 12 - Entity data
             }
         });
 
@@ -139,7 +138,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
                 map(Types.DOUBLE); // 4 - Z
                 map(Types.BYTE); // 5 - Yaw
                 map(Types.BYTE); // 6 - Pitch
-                map(Types1_9.ENTITY_DATA_LIST, TRANSFORM_ENTITY_DATA); // 7 - Entity data list
+                map(Types.ENTITY_DATA_LIST1_9, TRANSFORM_ENTITY_DATA); // 7 - Entity data list
             }
         });
 

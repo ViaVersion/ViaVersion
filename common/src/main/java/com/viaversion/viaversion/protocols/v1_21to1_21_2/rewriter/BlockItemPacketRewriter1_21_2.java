@@ -49,8 +49,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
-import com.viaversion.viaversion.api.type.types.version.Types1_21;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
@@ -79,7 +78,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
     public static final List<StructuredDataKey<?>> NEW_DATA_TO_REMOVE = List.of(
         StructuredDataKey.REPAIRABLE, StructuredDataKey.ENCHANTABLE, StructuredDataKey.CONSUMABLE1_21_2,
-        StructuredDataKey.USE_REMAINDER1_21_2, StructuredDataKey.USE_COOLDOWN, StructuredDataKey.ITEM_MODEL,
+        StructuredDataKey.V1_21_2.useRemainder, StructuredDataKey.USE_COOLDOWN, StructuredDataKey.ITEM_MODEL,
         StructuredDataKey.EQUIPPABLE1_21_2, StructuredDataKey.GLIDER, StructuredDataKey.TOOLTIP_STYLE,
         StructuredDataKey.DEATH_PROTECTION
     );
@@ -90,10 +89,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
     private static final int RECIPE_REMOVE = 2;
 
     public BlockItemPacketRewriter1_21_2(final Protocol1_21To1_21_2 protocol) {
-        super(protocol,
-            Types1_21.ITEM, Types1_21.ITEM_ARRAY, Types1_21_2.ITEM, Types1_21_2.ITEM_ARRAY,
-            Types1_21.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST, Types1_21_2.ITEM_COST, Types1_21_2.OPTIONAL_ITEM_COST
-        );
+        super(protocol);
     }
 
     @Override
@@ -233,14 +229,14 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 }
             }
 
-            final Particle smallExplosionParticle = wrapper.read(Types1_21.PARTICLE);
-            final Particle largeExplosionParticle = wrapper.read(Types1_21.PARTICLE);
+            final Particle smallExplosionParticle = wrapper.read(VersionedTypes.V1_21.particle);
+            final Particle largeExplosionParticle = wrapper.read(VersionedTypes.V1_21.particle);
             if (power >= 2.0F && blockInteractionMode != 0) {
                 protocol.getParticleRewriter().rewriteParticle(wrapper.user(), largeExplosionParticle);
-                wrapper.write(Types1_21_2.PARTICLE, largeExplosionParticle);
+                wrapper.write(VersionedTypes.V1_21_2.particle, largeExplosionParticle);
             } else {
                 protocol.getParticleRewriter().rewriteParticle(wrapper.user(), smallExplosionParticle);
-                wrapper.write(Types1_21_2.PARTICLE, smallExplosionParticle);
+                wrapper.write(VersionedTypes.V1_21_2.particle, smallExplosionParticle);
             }
 
             protocol.getSoundRewriter().soundHolderHandler().handle(wrapper);
@@ -560,13 +556,10 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
             dataContainer.set(StructuredDataKey.CONSUMABLE1_21_2, new Consumable1_21_2(food.eatSeconds(), 1 /* eat */, sound, true, consumeEffects));
             if (food.usingConvertsTo() != null) {
-                dataContainer.set(StructuredDataKey.USE_REMAINDER1_21_2, food.usingConvertsTo());
+                dataContainer.set(StructuredDataKey.V1_21_2.useRemainder, food.usingConvertsTo());
             }
             return new FoodProperties1_21_2(food.nutrition(), food.saturationModifier(), food.canAlwaysEat());
         });
-        dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21, StructuredDataKey.CONTAINER1_21_2);
-        dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21, StructuredDataKey.CHARGED_PROJECTILES1_21_2);
-        dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21, StructuredDataKey.BUNDLE_CONTENTS1_21_2);
         dataContainer.replaceKey(StructuredDataKey.POTION_CONTENTS1_20_5, StructuredDataKey.POTION_CONTENTS1_21_2);
         dataContainer.replace(StructuredDataKey.FIRE_RESISTANT, StructuredDataKey.DAMAGE_RESISTANT, fireResistant -> new DamageResistant("minecraft:is_fire"));
         dataContainer.replace(StructuredDataKey.LOCK, tag -> {
@@ -608,7 +601,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         });
         dataContainer.replace(StructuredDataKey.FOOD1_21_2, StructuredDataKey.FOOD1_21, food -> {
             final Consumable1_21_2 consumableData = dataContainer.get(StructuredDataKey.CONSUMABLE1_21_2);
-            final Item useRemainderData = dataContainer.get(StructuredDataKey.USE_REMAINDER1_21_2);
+            final Item useRemainderData = dataContainer.get(StructuredDataKey.V1_21_2.useRemainder);
             final float eatSeconds = consumableData != null ? consumableData.consumeSeconds() : 1.6F;
             final List<FoodProperties1_20_5.FoodEffect> foodEffects = new ArrayList<>();
             if (consumableData != null) {
@@ -629,9 +622,6 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             }
             return trim;
         });
-        dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_2, StructuredDataKey.CONTAINER1_21);
-        dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21_2, StructuredDataKey.CHARGED_PROJECTILES1_21);
-        dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21_2, StructuredDataKey.BUNDLE_CONTENTS1_21);
         dataContainer.replaceKey(StructuredDataKey.POTION_CONTENTS1_21_2, StructuredDataKey.POTION_CONTENTS1_20_5);
         dataContainer.replace(StructuredDataKey.DAMAGE_RESISTANT, StructuredDataKey.FIRE_RESISTANT, damageResistant -> {
             if (Key.stripMinecraftNamespace(damageResistant.typesTagKey()).equals("is_fire")) {

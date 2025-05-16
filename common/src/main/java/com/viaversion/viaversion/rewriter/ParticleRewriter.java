@@ -36,19 +36,9 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
     private final Type<Particle> mappedParticleType;
 
     public ParticleRewriter(final Protocol<C, ?, ?, ?> protocol) {
-        this(protocol, null);
-    }
-
-    public ParticleRewriter(final Protocol<C, ?, ?, ?> protocol, final Type<Particle> particleType) {
         this.protocol = protocol;
-        this.particleType = particleType;
-        this.mappedParticleType = particleType;
-    }
-
-    public ParticleRewriter(final Protocol<C, ?, ?, ?> protocol, final Type<Particle> particleType, final Type<Particle> mappedParticleType) {
-        this.protocol = protocol;
-        this.particleType = particleType;
-        this.mappedParticleType = mappedParticleType;
+        this.particleType = protocol.types() != null ? protocol.types().particle() : null;
+        this.mappedParticleType = protocol.mappedTypes() != null ? protocol.mappedTypes().particle() : null;
     }
 
     public void registerLevelParticles1_13(C packetType, Type<?> coordType) {

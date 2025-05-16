@@ -28,8 +28,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_21;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
@@ -70,7 +69,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
     @Override
     public void registerPackets() {
         registerTrackerWithData1_19(ClientboundPackets1_21.ADD_ENTITY, EntityTypes1_21_2.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_21.SET_ENTITY_DATA, Types1_21.ENTITY_DATA_LIST, Types1_21_2.ENTITY_DATA_LIST);
+        registerSetEntityData(ClientboundPackets1_21.SET_ENTITY_DATA);
         registerRemoveEntities(ClientboundPackets1_21.REMOVE_ENTITIES);
 
         protocol.appendClientbound(ClientboundPackets1_21.ADD_ENTITY, wrapper -> {
@@ -437,16 +436,16 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
-        filter().mapDataType(Types1_21_2.ENTITY_DATA_TYPES::byId);
+        filter().mapDataType(VersionedTypes.V1_21_2.entityDataTypes::byId);
 
         registerEntityDataTypeHandler(
-            Types1_21_2.ENTITY_DATA_TYPES.itemType,
-            Types1_21_2.ENTITY_DATA_TYPES.blockStateType,
-            Types1_21_2.ENTITY_DATA_TYPES.optionalBlockStateType,
-            Types1_21_2.ENTITY_DATA_TYPES.particleType,
-            Types1_21_2.ENTITY_DATA_TYPES.particlesType,
-            Types1_21_2.ENTITY_DATA_TYPES.componentType,
-            Types1_21_2.ENTITY_DATA_TYPES.optionalComponentType
+            VersionedTypes.V1_21_2.entityDataTypes.itemType,
+            VersionedTypes.V1_21_2.entityDataTypes.blockStateType,
+            VersionedTypes.V1_21_2.entityDataTypes.optionalBlockStateType,
+            VersionedTypes.V1_21_2.entityDataTypes.particleType,
+            VersionedTypes.V1_21_2.entityDataTypes.particlesType,
+            VersionedTypes.V1_21_2.entityDataTypes.componentType,
+            VersionedTypes.V1_21_2.entityDataTypes.optionalComponentType
         );
         registerBlockStateHandler(EntityTypes1_21_2.ABSTRACT_MINECART, 11);
 
@@ -512,7 +511,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             // Re-apply entity data previously set
             final PacketWrapper setEntityDataPacket = PacketWrapper.create(ClientboundPackets1_21_2.SET_ENTITY_DATA, event.user());
             setEntityDataPacket.write(Types.VAR_INT, event.entityId());
-            setEntityDataPacket.write(Types1_21_2.ENTITY_DATA_LIST, entity.entityData());
+            setEntityDataPacket.write(VersionedTypes.V1_21_2.entityDataList, entity.entityData());
             setEntityDataPacket.send(Protocol1_21To1_21_2.class);
 
             // Re-attach all passengers

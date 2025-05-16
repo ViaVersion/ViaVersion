@@ -29,8 +29,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_8;
-import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
@@ -115,7 +113,7 @@ public class SpawnPacketRewriter1_9 {
                             // TEMP FIX FOR POTIONS UNTIL WE FIGURE OUT HOW TO TRANSFORM SENT PACKETS
                             EntityData potion = new EntityData(5, EntityDataTypes1_9.ITEM, item);
                             entityData.add(potion);
-                            wrapper1.write(Types1_9.ENTITY_DATA_LIST, entityData);
+                            wrapper1.write(Types.ENTITY_DATA_LIST1_9, entityData);
                         });
                         // Fix packet order
                         wrapper.send(Protocol1_8To1_9.class);
@@ -201,9 +199,9 @@ public class SpawnPacketRewriter1_9 {
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
 
-                map(Types1_8.ENTITY_DATA_LIST, Types1_9.ENTITY_DATA_LIST);
+                map(Types.ENTITY_DATA_LIST1_8, Types.ENTITY_DATA_LIST1_9);
                 handler(wrapper -> {
-                    List<EntityData> entityDataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
+                    List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_9, 0);
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     if (tracker.hasEntity(entityId)) {
@@ -215,7 +213,7 @@ public class SpawnPacketRewriter1_9 {
                 });
                 // Handler for entity data
                 handler(wrapper -> {
-                    List<EntityData> entityDataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
+                    List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_9, 0);
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     tracker.handleEntityData(entityID, entityDataList);
@@ -278,10 +276,10 @@ public class SpawnPacketRewriter1_9 {
                     }
                 });
 
-                map(Types1_8.ENTITY_DATA_LIST, Types1_9.ENTITY_DATA_LIST);
+                map(Types.ENTITY_DATA_LIST1_8, Types.ENTITY_DATA_LIST1_9);
 
                 handler(wrapper -> {
-                    List<EntityData> entityDataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
+                    List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_9, 0);
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     if (tracker.hasEntity(entityId)) {
@@ -294,7 +292,7 @@ public class SpawnPacketRewriter1_9 {
 
                 // Handler for entity data
                 handler(wrapper -> {
-                    List<EntityData> entityDataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
+                    List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_9, 0);
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     tracker.handleEntityData(entityID, entityDataList);

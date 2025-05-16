@@ -21,15 +21,13 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_21;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 
 public final class ParticleRewriter1_21_2 extends ParticleRewriter<ClientboundPacket1_21> {
 
     public ParticleRewriter1_21_2(final Protocol<ClientboundPacket1_21, ?, ?, ?> protocol) {
-        super(protocol, Types1_21.PARTICLE, Types1_21_2.PARTICLE);
+        super(protocol);
     }
 
     private void floatsToARGB(final Particle particle, final int fromIndex) {
@@ -43,7 +41,7 @@ public final class ParticleRewriter1_21_2 extends ParticleRewriter<ClientboundPa
     @Override
     public void rewriteParticle(final UserConnection connection, final Particle particle) {
         super.rewriteParticle(connection, particle);
-        
+
         final String identifier = protocol.getMappingData().getParticleMappings().mappedIdentifier(particle.id());
         if ("minecraft:dust_color_transition".equals(identifier)) {
             floatsToARGB(particle, 0);

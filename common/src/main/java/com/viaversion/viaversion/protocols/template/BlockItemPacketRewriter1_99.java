@@ -20,12 +20,8 @@ package com.viaversion.viaversion.protocols.template;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
-import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
-import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPacket1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
@@ -38,15 +34,10 @@ import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 // To replace if needed:
 //   ChunkType1_21_5
 //   RecipeDisplayRewriter
-//   Types1_21_4, Types1_OLD
 final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_4, Protocol1_99To_98> {
 
     public BlockItemPacketRewriter1_99(final Protocol1_99To_98 protocol) {
-        super(protocol, Types1_21_4.ITEM, Types1_21_4.ITEM_ARRAY);
-        /*super(protocol,
-            Types1_OLD.ITEM, Types1_OLD.ITEM_ARRAY, Types1_21_4.ITEM, Types1_21_4.ITEM_ARRAY,
-            Types1_OLD.ITEM_COST, Types1_OLD.OPTIONAL_ITEM_COST, Types1_21_4.ITEM_COST, Types1_21_4.OPTIONAL_ITEM_COST
-        );*/
+        super(protocol);
     }
 
     @Override
@@ -74,7 +65,7 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         registerSetEquipment(ClientboundPackets1_21_2.SET_EQUIPMENT);
         registerMerchantOffers1_20_5(ClientboundPackets1_21_2.MERCHANT_OFFERS);
         registerContainerClick1_21_5(ServerboundPackets1_21_4.CONTAINER_CLICK);
-        registerSetCreativeModeSlot1_21_5(ServerboundPackets1_21_4.SET_CREATIVE_MODE_SLOT, Types1_21_5.LENGTH_PREFIXED_ITEM, Types1_21_5.LENGTH_PREFIXED_ITEM); // Change this
+        registerSetCreativeModeSlot1_21_5(ServerboundPackets1_21_4.SET_CREATIVE_MODE_SLOT);
 
         final RecipeDisplayRewriter<ClientboundPacket1_21_2> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(protocol);
         recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_2.UPDATE_RECIPES);
@@ -93,10 +84,10 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
     @Override
     protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
         super.handleItemDataComponentsToClient(connection, item, container);
-        updateData(item, container);
+        upgradeData(item, container);
     }
 
-    public static void updateData(final Item item, final StructuredDataContainer container) { // public for VB
+    public static void upgradeData(final Item item, final StructuredDataContainer container) { // public for VB
     }
 
     @Override

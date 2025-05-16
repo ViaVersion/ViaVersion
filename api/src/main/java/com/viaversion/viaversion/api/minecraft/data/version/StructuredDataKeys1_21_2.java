@@ -20,25 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.version;
+package com.viaversion.viaversion.api.minecraft.data.version;
 
-import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkSectionType1_9;
-import com.viaversion.viaversion.api.type.types.entitydata.EntityDataListType;
-import com.viaversion.viaversion.api.type.types.entitydata.EntityDataType1_9;
-import java.util.List;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 
-public final class Types1_9 {
-    /**
-     * Entity data type for 1.9
-     */
-    public static final Type<EntityData> ENTITY_DATA = new EntityDataType1_9();
-    /**
-     * Entity data list type for 1.9
-     */
-    public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
+public class StructuredDataKeys1_21_2 extends VersionedStructuredDataKeys {
 
-    public static final Type<ChunkSection> CHUNK_SECTION = new ChunkSectionType1_9();
+    public final StructuredDataKey<Item[]> container;
+    public final StructuredDataKey<Item[]> chargedProjectiles;
+    public final StructuredDataKey<Item[]> bundleContents;
+    public final StructuredDataKey<Item> useRemainder;
+
+    public StructuredDataKeys1_21_2(final VersionedTypesHolder types) {
+        this.container = add("container", new ArrayType<>(types.item(), 256));
+        this.chargedProjectiles = add("charged_projectiles", types.itemArray());
+        this.bundleContents = add("bundle_contents", types.itemArray());
+        this.useRemainder = add("use_remainder", types.item());
+    }
 }

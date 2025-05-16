@@ -35,8 +35,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.Protocol1_21_2To1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPacket1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
@@ -51,10 +49,7 @@ import com.viaversion.viaversion.util.TagUtil;
 public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_4, Protocol1_21_2To1_21_4> {
 
     public BlockItemPacketRewriter1_21_4(final Protocol1_21_2To1_21_4 protocol) {
-        super(protocol,
-            Types1_21_2.ITEM, Types1_21_2.ITEM_ARRAY, Types1_21_4.ITEM, Types1_21_4.ITEM_ARRAY,
-            Types1_21_2.ITEM_COST, Types1_21_2.OPTIONAL_ITEM_COST, Types1_21_4.ITEM_COST, Types1_21_4.OPTIONAL_ITEM_COST
-        );
+        super(protocol);
     }
 
     @Override
@@ -190,20 +185,12 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
 
     public static void updateItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
-        dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21_2, StructuredDataKey.CHARGED_PROJECTILES1_21_4);
-        dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21_2, StructuredDataKey.BUNDLE_CONTENTS1_21_4);
-        dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_2, StructuredDataKey.CONTAINER1_21_4);
-        dataContainer.replaceKey(StructuredDataKey.USE_REMAINDER1_21_2, StructuredDataKey.USE_REMAINDER1_21_4);
         dataContainer.replaceKey(StructuredDataKey.TRIM1_21_2, StructuredDataKey.TRIM1_21_4);
         dataContainer.remove(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5);
     }
 
     public static void downgradeItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
-        dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21_4, StructuredDataKey.CHARGED_PROJECTILES1_21_2);
-        dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21_4, StructuredDataKey.BUNDLE_CONTENTS1_21_2);
-        dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_4, StructuredDataKey.CONTAINER1_21_2);
-        dataContainer.replaceKey(StructuredDataKey.USE_REMAINDER1_21_4, StructuredDataKey.USE_REMAINDER1_21_2);
         dataContainer.replaceKey(StructuredDataKey.TRIM1_21_4, StructuredDataKey.TRIM1_21_2);
         dataContainer.remove(StructuredDataKey.CUSTOM_MODEL_DATA1_21_4);
     }

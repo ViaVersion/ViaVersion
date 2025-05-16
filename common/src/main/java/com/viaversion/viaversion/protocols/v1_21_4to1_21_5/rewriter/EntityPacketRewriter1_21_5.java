@@ -27,8 +27,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_5;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
@@ -54,7 +53,7 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
     @Override
     public void registerPackets() {
         registerTrackerWithData1_19(ClientboundPackets1_21_2.ADD_ENTITY, EntityTypes1_21_5.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA, Types1_21_4.ENTITY_DATA_LIST, Types1_21_5.ENTITY_DATA_LIST);
+        registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA);
         registerRemoveEntities(ClientboundPackets1_21_2.REMOVE_ENTITIES);
         registerPlayerAbilities(ClientboundPackets1_21_2.PLAYER_ABILITIES);
         registerGameEvent(ClientboundPackets1_21_2.GAME_EVENT);
@@ -223,36 +222,36 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
     protected void registerRewrites() {
         filter().handler((event, data) -> {
             final int id = data.dataType().typeId();
-            if (id == Types1_21_4.ENTITY_DATA_TYPES.wolfVariantType.typeId()) {
+            if (id == VersionedTypes.V1_21_4.entityDataTypes.wolfVariantType.typeId()) {
                 final Holder<WolfVariant> wolfVariant = data.value();
-                data.setTypeAndValue(Types1_21_5.ENTITY_DATA_TYPES.wolfVariantType, wolfVariant.hasId() ? wolfVariant.id() : 0);
+                data.setTypeAndValue(VersionedTypes.V1_21_5.entityDataTypes.wolfVariantType, wolfVariant.hasId() ? wolfVariant.id() : 0);
                 return;
             }
 
             int mappedId = id;
-            if (mappedId >= Types1_21_5.ENTITY_DATA_TYPES.cowVariantType.typeId()) {
+            if (mappedId >= VersionedTypes.V1_21_5.entityDataTypes.cowVariantType.typeId()) {
                 mappedId++;
             }
-            if (mappedId >= Types1_21_5.ENTITY_DATA_TYPES.wolfSoundVariantType.typeId()) {
+            if (mappedId >= VersionedTypes.V1_21_5.entityDataTypes.wolfSoundVariantType.typeId()) {
                 mappedId++;
             }
-            if (mappedId >= Types1_21_5.ENTITY_DATA_TYPES.pigVariantType.typeId()) {
+            if (mappedId >= VersionedTypes.V1_21_5.entityDataTypes.pigVariantType.typeId()) {
                 mappedId++;
             }
-            if (mappedId >= Types1_21_5.ENTITY_DATA_TYPES.chickenVariantType.typeId()) {
+            if (mappedId >= VersionedTypes.V1_21_5.entityDataTypes.chickenVariantType.typeId()) {
                 mappedId++;
             }
-            data.setDataType(Types1_21_5.ENTITY_DATA_TYPES.byId(mappedId));
+            data.setDataType(VersionedTypes.V1_21_5.entityDataTypes.byId(mappedId));
         });
 
         registerEntityDataTypeHandler(
-            Types1_21_5.ENTITY_DATA_TYPES.itemType,
-            Types1_21_5.ENTITY_DATA_TYPES.blockStateType,
-            Types1_21_5.ENTITY_DATA_TYPES.optionalBlockStateType,
-            Types1_21_5.ENTITY_DATA_TYPES.particleType,
-            Types1_21_5.ENTITY_DATA_TYPES.particlesType,
-            Types1_21_5.ENTITY_DATA_TYPES.componentType,
-            Types1_21_5.ENTITY_DATA_TYPES.optionalComponentType
+            VersionedTypes.V1_21_5.entityDataTypes.itemType,
+            VersionedTypes.V1_21_5.entityDataTypes.blockStateType,
+            VersionedTypes.V1_21_5.entityDataTypes.optionalBlockStateType,
+            VersionedTypes.V1_21_5.entityDataTypes.particleType,
+            VersionedTypes.V1_21_5.entityDataTypes.particlesType,
+            VersionedTypes.V1_21_5.entityDataTypes.componentType,
+            VersionedTypes.V1_21_5.entityDataTypes.optionalComponentType
         );
 
         // Minecarts finally have the block state data type
@@ -264,14 +263,14 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
                 return;
             }
 
-            data.setTypeAndValue(Types1_21_5.ENTITY_DATA_TYPES.optionalBlockStateType, mappedBlockState);
+            data.setTypeAndValue(VersionedTypes.V1_21_5.entityDataTypes.optionalBlockStateType, mappedBlockState);
         });
         filter().type(EntityTypes1_21_5.ABSTRACT_MINECART).removeIndex(13); // Custom display
 
         filter().type(EntityTypes1_21_5.MOOSHROOM).index(17).handler(((event, data) -> {
             final String typeName = data.value();
             final int typeId = typeName.equals("red") ? 0 : 1;
-            data.setTypeAndValue(Types1_21_5.ENTITY_DATA_TYPES.varIntType, typeId);
+            data.setTypeAndValue(VersionedTypes.V1_21_5.entityDataTypes.varIntType, typeId);
         }));
 
         // Removed saddles
@@ -302,7 +301,7 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         final PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_21_5.SET_EQUIPMENT, event.user());
         equipmentPacket.write(Types.VAR_INT, event.entityId());
         equipmentPacket.write(Types.BYTE, SADDLE_EQUIPMENT_SLOT);
-        equipmentPacket.write(Types1_21_5.ITEM, saddled ? new StructuredItem(SADDLE_ITEM_ID, 1) : StructuredItem.empty());
+        equipmentPacket.write(VersionedTypes.V1_21_5.item, saddled ? new StructuredItem(SADDLE_ITEM_ID, 1) : StructuredItem.empty());
         equipmentPacket.send(Protocol1_21_4To1_21_5.class);
     }
 

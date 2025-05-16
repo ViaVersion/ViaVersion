@@ -24,32 +24,104 @@ package com.viaversion.viaversion.api.type.types.version;
 
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
-import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.data.version.VersionedStructuredDataKeys;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
-import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_20_5;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.AbstractEntityDataTypes;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.ArrayType;
-import com.viaversion.viaversion.api.type.types.item.ItemCostType1_20_5;
-import com.viaversion.viaversion.api.type.types.item.ItemType1_20_5;
-import com.viaversion.viaversion.api.type.types.item.StructuredDataType;
 import com.viaversion.viaversion.api.type.types.entitydata.EntityDataListType;
 import com.viaversion.viaversion.api.type.types.entitydata.EntityDataType;
+import com.viaversion.viaversion.api.type.types.item.ItemCostType1_20_5;
+import com.viaversion.viaversion.api.type.types.item.ItemType1_20_5;
+import com.viaversion.viaversion.api.type.types.item.LengthPrefixedStructuredDataType;
+import com.viaversion.viaversion.api.type.types.item.StructuredDataType;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import java.util.List;
+import java.util.function.Function;
 
-// Most of these are only safe to use after protocol loading
-public final class Types1_20_5 {
+public class Types1_20_5<K extends VersionedStructuredDataKeys, E extends AbstractEntityDataTypes> implements VersionedTypesHolder {
 
-    public static final StructuredDataType STRUCTURED_DATA = new StructuredDataType();
-    public static final Type<StructuredData<?>[]> STRUCTURED_DATA_ARRAY = new ArrayType<>(STRUCTURED_DATA);
-    public static final Type<Item> ITEM = new ItemType1_20_5(STRUCTURED_DATA);
-    public static final Type<Item[]> ITEM_ARRAY = new ArrayType<>(ITEM);
-    public static final Type<Item> ITEM_COST = new ItemCostType1_20_5(STRUCTURED_DATA_ARRAY);
-    public static final Type<Item> OPTIONAL_ITEM_COST = new ItemCostType1_20_5.OptionalItemCostType(ITEM_COST);
+    public final StructuredDataType structuredData = new StructuredDataType();
+    public final LengthPrefixedStructuredDataType lengthPrefixedStructuredData = new LengthPrefixedStructuredDataType(structuredData);
+    public final Type<StructuredData<?>[]> structuredDataArray = new ArrayType<>(structuredData);
+    public final Type<Item> item = new ItemType1_20_5(structuredData);
+    public final Type<Item> lengthPrefixedItem = new ItemType1_20_5(lengthPrefixedStructuredData);
+    public final Type<Item[]> itemArray = new ArrayType<>(item);
+    public final Type<Item> itemCost = new ItemCostType1_20_5(structuredDataArray);
+    public final Type<Item> optionalItemCost = new ItemCostType1_20_5.OptionalItemCostType(itemCost);
+    public final K structuredDataKeys;
 
-    public static final ParticleType PARTICLE = new ParticleType();
-    public static final ArrayType<Particle> PARTICLES = new ArrayType<>(PARTICLE);
-    public static final EntityDataTypes1_20_5 ENTITY_DATA_TYPES = new EntityDataTypes1_20_5(PARTICLE, PARTICLES);
-    public static final Type<EntityData> ENTITY_DATA = new EntityDataType(ENTITY_DATA_TYPES);
-    public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
+    public final ParticleType particle = new ParticleType();
+    public final ArrayType<Particle> particles = new ArrayType<>(particle);
+    public final E entityDataTypes;
+    public final Type<EntityData> entityData;
+    public final Type<List<EntityData>> entityDataList;
+
+    public Types1_20_5(final Function<Types1_20_5<?, ?>, K> keysSupplier, final Function<Types1_20_5<?, ?>, E> entityDataTypesSupplier) {
+        this.structuredDataKeys = keysSupplier.apply(this);
+        this.entityDataTypes = entityDataTypesSupplier.apply(this);
+        this.entityData = new EntityDataType(entityDataTypes);
+        this.entityDataList = new EntityDataListType(entityData);
+    }
+
+    @Override
+    public Type<Item> item() {
+        return item;
+    }
+
+    @Override
+    public Type<Item[]> itemArray() {
+        return itemArray;
+    }
+
+    @Override
+    public Type<Item> itemCost() {
+        return itemCost;
+    }
+
+    @Override
+    public Type<Item> optionalItemCost() {
+        return optionalItemCost;
+    }
+
+    @Override
+    public Type<Item> lengthPrefixedItem() {
+        return lengthPrefixedItem;
+    }
+
+    @Override
+    public StructuredDataType structuredData() {
+        return structuredData;
+    }
+
+    @Override
+    public Type<StructuredData<?>[]> structuredDataArray() {
+        return structuredDataArray;
+    }
+
+    @Override
+    public K structuredDataKeys() {
+        return structuredDataKeys;
+    }
+
+    @Override
+    public ParticleType particle() {
+        return particle;
+    }
+
+    @Override
+    public ArrayType<Particle> particles() {
+        return particles;
+    }
+
+    @Override
+    public E entityDataTypes() {
+        return entityDataTypes;
+    }
+
+    @Override
+    public Type<List<EntityData>> entityDataList() {
+        return entityDataList;
+    }
 }

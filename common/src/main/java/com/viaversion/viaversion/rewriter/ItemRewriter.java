@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Rewritable;
@@ -53,24 +54,30 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     private final Type<Item> optionalItemCostType;
     private final Type<Item> mappedOptionalItemCostType;
 
-    public ItemRewriter(
-        T protocol,
-        Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType,
-        Type<Item> itemCostType, Type<Item> optionalItemCostType, Type<Item> mappedItemCostType, Type<Item> mappedOptionalItemCostType
-    ) {
+    public ItemRewriter(T protocol) {
+        super(protocol);
+        final VersionedTypesHolder types = protocol.types();
+        final VersionedTypesHolder mappedTypes = protocol.mappedTypes();
+        this.itemType = types.item();
+        this.itemArrayType = types.itemArray();
+        this.mappedItemType = mappedTypes.item();
+        this.mappedItemArrayType = mappedTypes.itemArray();
+        this.itemCostType = types.itemCost();
+        this.mappedItemCostType = mappedTypes.itemCost();
+        this.optionalItemCostType = types.optionalItemCost();
+        this.mappedOptionalItemCostType = mappedTypes.optionalItemCost();
+    }
+
+    public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType) {
         super(protocol);
         this.itemType = itemType;
         this.itemArrayType = itemArrayType;
         this.mappedItemType = mappedItemType;
         this.mappedItemArrayType = mappedItemArrayType;
-        this.itemCostType = itemCostType;
-        this.mappedItemCostType = mappedItemCostType;
-        this.optionalItemCostType = optionalItemCostType;
-        this.mappedOptionalItemCostType = mappedOptionalItemCostType;
-    }
-
-    public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType) {
-        this(protocol, itemType, itemArrayType, mappedItemType, mappedItemArrayType, null, null, null, null);
+        this.itemCostType = null;
+        this.mappedItemCostType = null;
+        this.optionalItemCostType = null;
+        this.mappedOptionalItemCostType = null;
     }
 
     public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType) {
@@ -225,19 +232,6 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         protocol.registerServerbound(packetType, wrapper -> {
             wrapper.passthrough(Types.SHORT); // Slot
             wrapper.write(itemType, handleItemToServer(wrapper.user(), wrapper.read(mappedItemType)));
-        });
-    }
-
-    public void registerSetCreativeModeSlot1_21_5(S packetType, Type<Item> lengthPrefixedItemType, Type<Item> mappedLengthPrefixedItemType) {
-        protocol.registerServerbound(packetType, wrapper -> {
-            if (!protocol.getEntityRewriter().tracker(wrapper.user()).canInstaBuild()) {
-                // Mimic server/client behavior
-                wrapper.cancel();
-                return;
-            }
-
-            wrapper.passthrough(Types.SHORT); // Slot
-            passthroughLengthPrefixedItem(wrapper, lengthPrefixedItemType, mappedLengthPrefixedItemType);
         });
     }
 
@@ -601,11 +595,6 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 }
             }
         }
-    }
-
-    protected void passthroughLengthPrefixedItem(final PacketWrapper wrapper, final Type<Item> lengthPrefixedItemType, final Type<Item> mappedLengthPrefixedItemType) {
-        final Item item = handleItemToServer(wrapper.user(), wrapper.read(mappedLengthPrefixedItemType));
-        wrapper.write(lengthPrefixedItemType, item);
     }
 
     @Override

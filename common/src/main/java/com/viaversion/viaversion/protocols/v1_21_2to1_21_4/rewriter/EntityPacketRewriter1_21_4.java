@@ -24,8 +24,7 @@ import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_4;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.Protocol1_21_2To1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
@@ -44,7 +43,7 @@ public final class EntityPacketRewriter1_21_4 extends EntityRewriter<Clientbound
     @Override
     public void registerPackets() {
         registerTrackerWithData1_19(ClientboundPackets1_21_2.ADD_ENTITY, EntityTypes1_21_4.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA, Types1_21_2.ENTITY_DATA_LIST, Types1_21_4.ENTITY_DATA_LIST);
+        registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA);
         registerRemoveEntities(ClientboundPackets1_21_2.REMOVE_ENTITIES);
 
         final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol) {
@@ -93,16 +92,16 @@ public final class EntityPacketRewriter1_21_4 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
-        filter().mapDataType(Types1_21_4.ENTITY_DATA_TYPES::byId);
+        filter().mapDataType(VersionedTypes.V1_21_4.entityDataTypes::byId);
 
         registerEntityDataTypeHandler(
-            Types1_21_4.ENTITY_DATA_TYPES.itemType,
-            Types1_21_4.ENTITY_DATA_TYPES.blockStateType,
-            Types1_21_4.ENTITY_DATA_TYPES.optionalBlockStateType,
-            Types1_21_4.ENTITY_DATA_TYPES.particleType,
-            Types1_21_4.ENTITY_DATA_TYPES.particlesType,
-            Types1_21_4.ENTITY_DATA_TYPES.componentType,
-            Types1_21_4.ENTITY_DATA_TYPES.optionalComponentType
+            VersionedTypes.V1_21_4.entityDataTypes.itemType,
+            VersionedTypes.V1_21_4.entityDataTypes.blockStateType,
+            VersionedTypes.V1_21_4.entityDataTypes.optionalBlockStateType,
+            VersionedTypes.V1_21_4.entityDataTypes.particleType,
+            VersionedTypes.V1_21_4.entityDataTypes.particlesType,
+            VersionedTypes.V1_21_4.entityDataTypes.componentType,
+            VersionedTypes.V1_21_4.entityDataTypes.optionalComponentType
         );
         registerBlockStateHandler(EntityTypes1_21_4.ABSTRACT_MINECART, 11);
 
@@ -114,7 +113,7 @@ public final class EntityPacketRewriter1_21_4 extends EntityRewriter<Clientbound
                 case "large" -> 2;
                 default -> 1; // medium
             };
-            data.setTypeAndValue(Types1_21_4.ENTITY_DATA_TYPES.varIntType, typeId);
+            data.setTypeAndValue(VersionedTypes.V1_21_4.entityDataTypes.varIntType, typeId);
         });
     }
 

@@ -365,6 +365,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         registerSetEntityData(packetType, null, dataType);
     }
 
+    public void registerSetEntityData(C packetType) {
+        registerSetEntityData(packetType, protocol.types().entityDataList(), protocol.mappedTypes().entityDataList());
+    }
+
     public void registerLogin1_20_5(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             final int entityId = wrapper.passthrough(Types.INT);

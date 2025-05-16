@@ -23,13 +23,10 @@
 package com.viaversion.viaversion.api.minecraft.entitydata.types;
 
 import com.viaversion.viaversion.api.minecraft.PaintingVariant;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.WolfVariant;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
-import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.misc.ParticleType;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 
 public final class EntityDataTypes1_21_2 extends AbstractEntityDataTypes {
 
@@ -65,10 +62,10 @@ public final class EntityDataTypes1_21_2 extends AbstractEntityDataTypes {
     public final EntityDataType vector3FType = add(29, Types.VECTOR3F);
     public final EntityDataType quaternionType = add(30, Types.QUATERNION);
 
-    public EntityDataTypes1_21_2(final Type<Item> itemType, final ParticleType particleType, final Type<Particle[]> particlesType) {
+    public EntityDataTypes1_21_2(final VersionedTypesHolder types) {
         super(31);
-        this.itemType = add(7, itemType);
-        this.particleType = add(17, particleType);
-        this.particlesType = add(18, particlesType);
+        this.itemType = add(7, types.item());
+        this.particleType = add(17, types.particle());
+        this.particlesType = add(18, types.particles());
     }
 }

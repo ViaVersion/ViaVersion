@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.util.Key;
@@ -341,7 +341,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
 
     private static void writeItemDisplay(final PacketWrapper wrapper, final Item item) {
         wrapper.write(Types.VAR_INT, Recipe.SLOT_DISPLAY_ITEM);
-        wrapper.write(Types1_21_2.ITEM, item.copy());
+        wrapper.write(VersionedTypes.V1_21_2.item, item.copy());
     }
 
     private static void writeCraftingStationDisplay(final PacketWrapper wrapper) {

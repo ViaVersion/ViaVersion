@@ -24,8 +24,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_12;
-import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.Protocol1_11_1To1_12;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
@@ -107,15 +105,15 @@ public class EntityPacketRewriter1_12 extends EntityRewriter<ClientboundPackets1
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_9.ENTITY_DATA_LIST, Types1_12.ENTITY_DATA_LIST); // 12 - Entity data
+                map(Types.ENTITY_DATA_LIST1_9, Types.ENTITY_DATA_LIST1_12); // 12 - Entity data
 
                 // Track mob and rewrite entity data
-                handler(trackerAndRewriterHandler(Types1_12.ENTITY_DATA_LIST));
+                handler(trackerAndRewriterHandler(Types.ENTITY_DATA_LIST1_12));
             }
         });
 
         registerRemoveEntities(ClientboundPackets1_9_3.REMOVE_ENTITIES);
-        registerSetEntityData(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types1_9.ENTITY_DATA_LIST, Types1_12.ENTITY_DATA_LIST);
+        registerSetEntityData(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types.ENTITY_DATA_LIST1_9, Types.ENTITY_DATA_LIST1_12);
     }
 
     @Override

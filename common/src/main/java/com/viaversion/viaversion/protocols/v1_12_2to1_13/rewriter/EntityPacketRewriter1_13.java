@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_12;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.ConnectionData;
@@ -103,7 +102,7 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_12.ENTITY_DATA_LIST, Types1_13.ENTITY_DATA_LIST); // 12 - Entity data
+                map(Types.ENTITY_DATA_LIST1_12, Types1_13.ENTITY_DATA_LIST); // 12 - Entity data
 
                 handler(trackerAndRewriterHandler(Types1_13.ENTITY_DATA_LIST));
             }
@@ -119,7 +118,7 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                 map(Types.DOUBLE); // 4 - Z
                 map(Types.BYTE); // 5 - Yaw
                 map(Types.BYTE); // 6 - Pitch
-                map(Types1_12.ENTITY_DATA_LIST, Types1_13.ENTITY_DATA_LIST); // 7 - Entity data
+                map(Types.ENTITY_DATA_LIST1_12, Types1_13.ENTITY_DATA_LIST); // 7 - Entity data
 
                 handler(trackerAndRewriterHandler(Types1_13.ENTITY_DATA_LIST, EntityTypes1_13.EntityType.PLAYER));
             }
@@ -180,7 +179,7 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
         });
 
         registerRemoveEntities(ClientboundPackets1_12_1.REMOVE_ENTITIES);
-        registerSetEntityData(ClientboundPackets1_12_1.SET_ENTITY_DATA, Types1_12.ENTITY_DATA_LIST, Types1_13.ENTITY_DATA_LIST);
+        registerSetEntityData(ClientboundPackets1_12_1.SET_ENTITY_DATA, Types.ENTITY_DATA_LIST1_12, Types1_13.ENTITY_DATA_LIST);
     }
 
     @Override

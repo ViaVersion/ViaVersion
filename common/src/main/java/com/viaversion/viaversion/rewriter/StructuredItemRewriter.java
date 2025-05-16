@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.Tag;
@@ -35,11 +36,14 @@ import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.util.Rewritable;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -48,20 +52,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
 
     public static final String MARKER_KEY = "VV|custom_data";
 
-    public StructuredItemRewriter(
-        T protocol,
-        Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType,
-        Type<Item> itemCostType, Type<Item> optionalItemCostType, Type<Item> mappedItemCostType, Type<Item> mappedOptionalItemCostType
-    ) {
-        super(protocol, itemType, itemArrayType, mappedItemType, mappedItemArrayType, itemCostType, optionalItemCostType, mappedItemCostType, mappedOptionalItemCostType);
-    }
-
-    public StructuredItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType) {
-        super(protocol, itemType, itemArrayType, mappedItemType, mappedItemArrayType);
-    }
-
-    public StructuredItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType) {
-        super(protocol, itemType, itemArrayType, itemType, itemArrayType);
+    public StructuredItemRewriter(T protocol) {
+        super(protocol);
     }
 
     /**
@@ -202,9 +194,11 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
                 }
             }
         }
+        replaceAnnoyingKeys(container, protocol.types(), protocol.mappedTypes());
     }
 
     protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
+        replaceAnnoyingKeys(container, protocol.mappedTypes(), protocol.types());
     }
 
     protected void handleRewritablesToClient(final UserConnection connection, final StructuredDataContainer container, @Nullable final ItemHasher itemHasher) {
@@ -357,9 +351,47 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
     }
 
+    protected void passthroughLengthPrefixedItem(final PacketWrapper wrapper) {
+        final Item item = handleItemToServer(wrapper.user(), wrapper.read(protocol.mappedTypes().lengthPrefixedItem()));
+        wrapper.write(protocol.types().lengthPrefixedItem(), item);
+    }
+
+    private void replaceAnnoyingKeys(final StructuredDataContainer container, final VersionedTypesHolder types, final VersionedTypesHolder mappedTypes) {
+        final List<StructuredDataKey<?>> keys = types.structuredDataKeys().keys();
+        final List<StructuredDataKey<?>> mappedKeys = mappedTypes.structuredDataKeys().keys();
+        final int minSize = Math.min(keys.size(), mappedKeys.size());
+        for (int i = 0; i < minSize; i++) {
+            // Just assume they are index matched
+            final StructuredDataKey<?> key = keys.get(i);
+            final StructuredDataKey<?> mappedKey = mappedKeys.get(i);
+            replaceKeyUnchecked(container, key, mappedKey);
+        }
+    }
+
+    private static <T> void replaceKeyUnchecked(final StructuredDataContainer container, final StructuredDataKey<T> key, final StructuredDataKey<?> mappedKey) {
+        Preconditions.checkArgument(key.type().getOutputClass() == mappedKey.type().getOutputClass(), "Type mismatch: %s vs %s", key, mappedKey);
+        //noinspection unchecked
+        container.replaceKey(key, (StructuredDataKey<T>) mappedKey);
+    }
+
     @FunctionalInterface
     private interface ItemHandler {
 
         Item rewrite(UserConnection connection, Item item);
+    }
+
+    // -----------------------
+
+    public void registerSetCreativeModeSlot1_21_5(S packetType) {
+        protocol.registerServerbound(packetType, wrapper -> {
+            if (!protocol.getEntityRewriter().tracker(wrapper.user()).canInstaBuild()) {
+                // Mimic server/client behavior
+                wrapper.cancel();
+                return;
+            }
+
+            wrapper.passthrough(Types.SHORT); // Slot
+            passthroughLengthPrefixedItem(wrapper);
+        });
     }
 }

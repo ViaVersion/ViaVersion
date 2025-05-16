@@ -78,7 +78,7 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
-import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
@@ -128,7 +128,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private static final StatePropertyMatcher[] EMPTY_PROPERTY_MATCHERS = new StatePropertyMatcher[0];
 
     public BlockItemPacketRewriter1_20_5(final Protocol1_20_3To1_20_5 protocol) {
-        super(protocol, Types.ITEM1_20_2, Types.ITEM1_20_2_ARRAY, Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY);
+        super(protocol, Types.ITEM1_20_2, Types.ITEM1_20_2_ARRAY, VersionedTypes.V1_20_5.item, VersionedTypes.V1_20_5.itemArray);
     }
 
     @Override
@@ -261,7 +261,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 particle.add(Types.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockStateId));
             } else if (mappings.isItemParticle(particleId)) {
                 final Item item = handleNonEmptyItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
-                particle.add(Types1_20_5.ITEM, item);
+                particle.add(VersionedTypes.V1_20_5.item, item);
             } else if (particleId == mappings.id("dust")) {
                 // R, g, b, scale
                 for (int i = 0; i < 4; i++) {
@@ -285,7 +285,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 particle.add(Types.VAR_INT, wrapper.read(Types.VAR_INT)); // Delay
             }
 
-            wrapper.write(Types1_20_5.PARTICLE, particle);
+            wrapper.write(VersionedTypes.V1_20_5.particle, particle);
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.EXPLODE, wrapper -> {
@@ -304,8 +304,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Types.FLOAT); // Knockback Z
             wrapper.passthrough(Types.VAR_INT); // Block interaction type
 
-            final Particle smallExplosionParticle = wrapper.passthroughAndMap(Types1_20_3.PARTICLE, Types1_20_5.PARTICLE);
-            final Particle largeExplosionParticle = wrapper.passthroughAndMap(Types1_20_3.PARTICLE, Types1_20_5.PARTICLE);
+            final Particle smallExplosionParticle = wrapper.passthroughAndMap(Types1_20_3.PARTICLE, VersionedTypes.V1_20_5.particle);
+            final Particle largeExplosionParticle = wrapper.passthroughAndMap(Types1_20_3.PARTICLE, VersionedTypes.V1_20_5.particle);
             protocol.getParticleRewriter().rewriteParticle(wrapper.user(), smallExplosionParticle);
             protocol.getParticleRewriter().rewriteParticle(wrapper.user(), largeExplosionParticle);
 
@@ -319,10 +319,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
                 Item input = handleNonEmptyItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
-                wrapper.write(Types1_20_5.ITEM_COST, input);
+                wrapper.write(VersionedTypes.V1_20_5.itemCost, input);
 
                 final Item output = handleNonEmptyItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
-                wrapper.write(Types1_20_5.ITEM, output);
+                wrapper.write(VersionedTypes.V1_20_5.item, output);
 
                 Item secondInput = wrapper.read(Types.ITEM1_20_2);
                 if (secondInput != null) {
@@ -331,7 +331,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                         secondInput = null;
                     }
                 }
-                wrapper.write(Types1_20_5.OPTIONAL_ITEM_COST, secondInput);
+                wrapper.write(VersionedTypes.V1_20_5.optionalItemCost, secondInput);
 
                 wrapper.passthrough(Types.BOOLEAN); // Out of stock
                 wrapper.passthrough(Types.INT); // Number of trade uses
@@ -573,9 +573,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         updateMobTags(data, tag);
 
-        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES1_20_5);
+        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.V1_20_5.chargedProjectiles);
         if (old.identifier() == 927) {
-            updateItemList(connection, data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS1_20_5);
+            updateItemList(connection, data, tag, "Items", StructuredDataKey.V1_20_5.bundleContents);
         }
 
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS1_20_5, (hideFlagsValue & StructuredDataConverter.HIDE_ENCHANTMENTS) == 0);
@@ -1531,7 +1531,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     }
                 }
 
-                data.set(StructuredDataKey.CONTAINER1_20_5, filteredItems);
+                data.set(StructuredDataKey.V1_20_5.container, filteredItems);
                 addBlockEntityId(tag, "shulker_box");
             }
         }

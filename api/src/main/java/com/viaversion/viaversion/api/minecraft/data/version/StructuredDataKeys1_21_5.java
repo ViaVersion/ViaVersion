@@ -20,26 +20,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.version;
+package com.viaversion.viaversion.api.minecraft.data.version;
 
-import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkSectionType1_8;
-import com.viaversion.viaversion.api.type.types.entitydata.EntityDataListType;
-import com.viaversion.viaversion.api.type.types.entitydata.EntityDataType1_8;
-import java.util.List;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
+import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate.AdventureModePredicateType1_21_5;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 
-public final class Types1_8 {
+public class StructuredDataKeys1_21_5 extends StructuredDataKeys1_21_2 {
 
-    /**
-     * Entity data type for 1.8
-     */
-    public static final Type<EntityData> ENTITY_DATA = new EntityDataType1_8();
-    /**
-     * Entity data list type for 1.8
-     */
-    public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
+    public final StructuredDataKey<AdventureModePredicate> canPlaceOn;
+    public final StructuredDataKey<AdventureModePredicate> canBreak;
 
-    public static final Type<ChunkSection> CHUNK_SECTION = new ChunkSectionType1_8();
+    public StructuredDataKeys1_21_5(final VersionedTypesHolder types) {
+        super(types);
+        final AdventureModePredicateType1_21_5 adventureModePredicateType = new AdventureModePredicateType1_21_5(types.structuredDataArray());
+        this.canPlaceOn = add("can_place_on", adventureModePredicateType);
+        this.canBreak = add("can_break", adventureModePredicateType);
+    }
 }

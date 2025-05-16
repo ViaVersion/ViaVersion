@@ -30,9 +30,10 @@ import com.viaversion.viaversion.api.type.types.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import java.util.List;
 
+// Only safe to use after protocol loading
 public final class Types1_19 {
 
-    public static final ParticleType PARTICLE = new ParticleType(); // Only safe to use after protocol loading
+    public static final ParticleType PARTICLE = new ParticleType();
     public static final EntityDataTypes1_19 ENTITY_DATA_TYPES = new EntityDataTypes1_19(PARTICLE);
     public static final Type<EntityData> ENTITY_DATA = new EntityDataType(ENTITY_DATA_TYPES);
     public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);

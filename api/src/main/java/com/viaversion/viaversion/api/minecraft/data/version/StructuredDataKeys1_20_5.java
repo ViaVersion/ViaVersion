@@ -20,21 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.version;
+package com.viaversion.viaversion.api.minecraft.data.version;
 
-import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
-import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_20_2;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.entitydata.EntityDataListType;
-import com.viaversion.viaversion.api.type.types.entitydata.EntityDataType;
-import com.viaversion.viaversion.api.type.types.misc.ParticleType;
-import java.util.List;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 
-// Only safe to use after protocol loading
-public final class Types1_20_2 {
+public class StructuredDataKeys1_20_5 extends VersionedStructuredDataKeys {
 
-    public static final ParticleType PARTICLE = Types1_20.PARTICLE;
-    public static final EntityDataTypes1_20_2 ENTITY_DATA_TYPES = new EntityDataTypes1_20_2(PARTICLE);
-    public static final Type<EntityData> ENTITY_DATA = new EntityDataType(ENTITY_DATA_TYPES);
-    public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
+    public final StructuredDataKey<Item[]> container;
+    public final StructuredDataKey<Item[]> chargedProjectiles;
+    public final StructuredDataKey<Item[]> bundleContents;
+
+    public StructuredDataKeys1_20_5(final VersionedTypesHolder types) {
+        this.container = add("container", types.itemArray());
+        this.chargedProjectiles = add("charged_projectiles", types.itemArray());
+        this.bundleContents = add("bundle_contents", types.itemArray());
+    }
 }

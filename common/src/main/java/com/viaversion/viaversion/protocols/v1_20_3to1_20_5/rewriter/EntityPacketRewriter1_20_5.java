@@ -37,7 +37,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
-import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPackets1_20_3;
@@ -73,7 +73,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     @Override
     public void registerPackets() {
         registerTrackerWithData1_19(ClientboundPackets1_20_3.ADD_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_20_3.SET_ENTITY_DATA, Types1_20_3.ENTITY_DATA_LIST, Types1_20_5.ENTITY_DATA_LIST);
+        registerSetEntityData(ClientboundPackets1_20_3.SET_ENTITY_DATA, Types1_20_3.ENTITY_DATA_LIST, VersionedTypes.V1_20_5.entityDataList);
         registerRemoveEntities(ClientboundPackets1_20_3.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_20_3.SET_EQUIPMENT, wrapper -> {
@@ -91,7 +91,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 }
                 wrapper.write(Types.BYTE, slot);
                 Item item = protocol.getItemRewriter().handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
-                wrapper.write(Types1_20_5.ITEM, item);
+                wrapper.write(VersionedTypes.V1_20_5.item, item);
             } while ((slot & 0xFFFFFF80) != 0);
         });
 
@@ -434,26 +434,26 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     protected void registerRewrites() {
         filter().mapDataType(typeId -> {
             int id = typeId;
-            if (id >= Types1_20_5.ENTITY_DATA_TYPES.particlesType.typeId()) {
+            if (id >= VersionedTypes.V1_20_5.entityDataTypes.particlesType.typeId()) {
                 id++;
             }
-            if (id >= Types1_20_5.ENTITY_DATA_TYPES.wolfVariantType.typeId()) {
+            if (id >= VersionedTypes.V1_20_5.entityDataTypes.wolfVariantType.typeId()) {
                 id++;
             }
-            if (id >= Types1_20_5.ENTITY_DATA_TYPES.armadilloState.typeId()) {
+            if (id >= VersionedTypes.V1_20_5.entityDataTypes.armadilloState.typeId()) {
                 id++;
             }
-            return Types1_20_5.ENTITY_DATA_TYPES.byId(id);
+            return VersionedTypes.V1_20_5.entityDataTypes.byId(id);
         });
 
         registerEntityDataTypeHandler(
-            Types1_20_5.ENTITY_DATA_TYPES.itemType,
-            Types1_20_5.ENTITY_DATA_TYPES.blockStateType,
-            Types1_20_5.ENTITY_DATA_TYPES.optionalBlockStateType,
-            Types1_20_5.ENTITY_DATA_TYPES.particleType,
+            VersionedTypes.V1_20_5.entityDataTypes.itemType,
+            VersionedTypes.V1_20_5.entityDataTypes.blockStateType,
+            VersionedTypes.V1_20_5.entityDataTypes.optionalBlockStateType,
+            VersionedTypes.V1_20_5.entityDataTypes.particleType,
             null,
-            Types1_20_5.ENTITY_DATA_TYPES.componentType,
-            Types1_20_5.ENTITY_DATA_TYPES.optionalComponentType
+            VersionedTypes.V1_20_5.entityDataTypes.componentType,
+            VersionedTypes.V1_20_5.entityDataTypes.optionalComponentType
         );
         registerBlockStateHandler(EntityTypes1_20_5.ABSTRACT_MINECART, 11);
 
@@ -461,13 +461,13 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             final int effectColor = data.value();
             if (effectColor == 0) {
                 // No effect
-                data.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[0]);
+                data.setTypeAndValue(VersionedTypes.V1_20_5.entityDataTypes.particlesType, new Particle[0]);
                 return;
             }
 
             final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
             particle.add(Types.INT, withAlpha(effectColor));
-            data.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[]{particle});
+            data.setTypeAndValue(VersionedTypes.V1_20_5.entityDataTypes.particlesType, new Particle[]{particle});
         });
 
         filter().type(EntityTypes1_20_5.LLAMA).handler((event, data) -> {
@@ -481,7 +481,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 final PacketWrapper setEquipment = PacketWrapper.create(ClientboundPackets1_20_5.SET_EQUIPMENT, event.user());
                 setEquipment.write(Types.VAR_INT, event.entityId());
                 setEquipment.write(Types.BYTE, (byte) 6);
-                setEquipment.write(Types1_20_5.ITEM, new StructuredItem(color + 446, 1, new StructuredDataContainer()));
+                setEquipment.write(VersionedTypes.V1_20_5.item, new StructuredItem(color + 446, 1, new StructuredDataContainer()));
                 setEquipment.scheduleSend(Protocol1_20_3To1_20_5.class);
             } else if (dataIndex > 20) {
                 event.setIndex(dataIndex - 1);
@@ -499,7 +499,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                         // Add default particle with data
                         final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
                         particle.add(Types.INT, withAlpha(color));
-                        event.createExtraData(new EntityData(10, Types1_20_5.ENTITY_DATA_TYPES.particleType, particle));
+                        event.createExtraData(new EntityData(10, VersionedTypes.V1_20_5.entityDataTypes.particleType, particle));
                     }
                 } else {
                     addColor(particleData, color);
@@ -512,7 +512,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             if (dataIndex == 11) {
                 // If the particle is found first
                 final EntityData colorData = event.dataAtIndex(9);
-                if (colorData != null && colorData.dataType() == Types1_20_5.ENTITY_DATA_TYPES.varIntType) {
+                if (colorData != null && colorData.dataType() == VersionedTypes.V1_20_5.entityDataTypes.varIntType) {
                     addColor(data, colorData.value());
                 }
             }

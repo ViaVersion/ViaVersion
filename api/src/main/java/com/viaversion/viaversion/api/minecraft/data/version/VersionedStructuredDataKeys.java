@@ -20,22 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.version;
+package com.viaversion.viaversion.api.minecraft.data.version;
 
-import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.entitydata.EntityDataListType;
-import com.viaversion.viaversion.api.type.types.entitydata.EntityDataType1_12;
+import java.util.ArrayList;
 import java.util.List;
 
-public final class Types1_12 {
+public abstract class VersionedStructuredDataKeys {
 
-    /**
-     * Entity data type for 1.12
-     */
-    public static final Type<EntityData> ENTITY_DATA = new EntityDataType1_12();
-    /**
-     * Entity data list type for 1.12
-     */
-    public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
+    private final List<StructuredDataKey<?>> keys = new ArrayList<>();
+
+    protected <T> StructuredDataKey<T> add(final String identifier, final Type<T> type) {
+        final StructuredDataKey<T> key = new StructuredDataKey<>(identifier, type);
+        this.keys.add(key);
+        return key;
+    }
+
+    public List<StructuredDataKey<?>> keys() {
+        return this.keys;
+    }
 }

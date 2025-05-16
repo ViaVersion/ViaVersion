@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.util.ChunkUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -95,7 +94,7 @@ public class ChunkType1_8 extends Type<Chunk> {
         // Read blocks
         for (int i = 0; i < sections.length; i++) {
             if ((bitmask & 1 << i) == 0) continue;
-            sections[i] = Types1_8.CHUNK_SECTION.read(input);
+            sections[i] = Types.CHUNK_SECTION1_8.read(input);
         }
 
         // Read block light
@@ -131,7 +130,7 @@ public class ChunkType1_8 extends Type<Chunk> {
         // Write blocks
         for (int i = 0; i < chunk.getSections().length; i++) {
             if ((chunk.getBitmask() & 1 << i) == 0) continue;
-            Types1_8.CHUNK_SECTION.write(output, chunk.getSections()[i]);
+            Types.CHUNK_SECTION1_8.write(output, chunk.getSections()[i]);
         }
 
         // Write block light

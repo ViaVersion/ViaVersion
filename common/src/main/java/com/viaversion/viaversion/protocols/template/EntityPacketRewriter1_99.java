@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.template;
 
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_4;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
@@ -28,7 +28,7 @@ import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 
 // Replace if needed
 //  Types1_OLD
-//  Types1_21_4
+//  VersionedTypes
 final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPacket1_21_2, Protocol1_99To_98> {
 
     public EntityPacketRewriter1_99(final Protocol1_99To_98 protocol) {
@@ -39,7 +39,7 @@ final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPacket1_2
     public void registerPackets() {
         // Tracks entities, applies entity data rewrites registered below, untracks entities
         registerTrackerWithData1_19(ClientboundPackets1_21_2.ADD_ENTITY, EntityTypes1_21_4.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA, /*Types1_OLD_ENTITY_DATA_LIST, */Types1_21_4.ENTITY_DATA_LIST); // Specify old and new entity data list if changed
+        registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA);
         registerRemoveEntities(ClientboundPackets1_21_2.REMOVE_ENTITIES);
         registerPlayerAbilities(ClientboundPackets1_21_2.PLAYER_ABILITIES);
         registerGameEvent(ClientboundPackets1_21_2.GAME_EVENT);
@@ -52,24 +52,25 @@ final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPacket1_2
 
     @Override
     protected void registerRewrites() {
+        final EntityDataTypes1_21_5 entityDataTypes = protocol.types().entityDataTypes();
         /* Uncomment if entity data classes changed
         filter().mapDataType(typeId -> {
             int id = typeId;
             if (id >= SomeAddedIndex) {
                 id++;
             }
-            return Types1_21_4.ENTITY_DATA_TYPES.byId(id);
+            return entityDataTypes.byId(id);
         });*/
 
         // Registers registry type id changes
         registerEntityDataTypeHandler(
-            Types1_21_4.ENTITY_DATA_TYPES.itemType,
-            Types1_21_4.ENTITY_DATA_TYPES.blockStateType,
-            Types1_21_4.ENTITY_DATA_TYPES.optionalBlockStateType,
-            Types1_21_4.ENTITY_DATA_TYPES.particleType,
-            Types1_21_4.ENTITY_DATA_TYPES.particlesType,
-            Types1_21_4.ENTITY_DATA_TYPES.componentType,
-            Types1_21_4.ENTITY_DATA_TYPES.optionalComponentType
+            entityDataTypes.itemType,
+            entityDataTypes.blockStateType,
+            entityDataTypes.optionalBlockStateType,
+            entityDataTypes.particleType,
+            entityDataTypes.particlesType,
+            entityDataTypes.componentType,
+            entityDataTypes.optionalComponentType
         );
     }
 

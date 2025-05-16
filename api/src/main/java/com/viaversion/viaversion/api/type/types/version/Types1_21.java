@@ -22,35 +22,20 @@
  */
 package com.viaversion.viaversion.api.type.types.version;
 
-import com.viaversion.viaversion.api.minecraft.Particle;
-import com.viaversion.viaversion.api.minecraft.data.StructuredData;
-import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_20_5;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.ArrayType;
-import com.viaversion.viaversion.api.type.types.entitydata.EntityDataListType;
-import com.viaversion.viaversion.api.type.types.entitydata.EntityDataType;
-import com.viaversion.viaversion.api.type.types.item.ItemCostType1_20_5;
 import com.viaversion.viaversion.api.type.types.item.ItemType1_20_5;
-import com.viaversion.viaversion.api.type.types.item.StructuredDataType;
-import com.viaversion.viaversion.api.type.types.misc.ParticleType;
-import java.util.List;
+import java.util.function.Function;
 
-// Most of these are only safe to use after protocol loading
-public final class Types1_21 {
+// 1.21 only (!)
+public final class Types1_21 extends Types1_20_5<StructuredDataKeys1_20_5, EntityDataTypes1_21> {
 
-    public static final StructuredDataType STRUCTURED_DATA = new StructuredDataType();
-    public static final Type<StructuredData<?>[]> STRUCTURED_DATA_ARRAY = new ArrayType<>(STRUCTURED_DATA);
-    public static final ItemType1_20_5 ITEM = new ItemType1_20_5(STRUCTURED_DATA);
-    public static final Type<Item> OPTIONAL_ITEM = ITEM.new OptionalItemType(); // Optional as in boolean prefixed, not via the amount
-    public static final Type<Item[]> ITEM_ARRAY = new ArrayType<>(ITEM);
-    public static final Type<Item> ITEM_COST = new ItemCostType1_20_5(STRUCTURED_DATA_ARRAY);
-    public static final Type<Item> OPTIONAL_ITEM_COST = new ItemCostType1_20_5.OptionalItemCostType(ITEM_COST);
+    public final Type<Item> optionalItem; // Optional as in boolean prefixed, not via the amount
 
-    public static final ParticleType PARTICLE = new ParticleType();
-    public static final ArrayType<Particle> PARTICLES = new ArrayType<>(PARTICLE);
-    public static final EntityDataTypes1_21 ENTITY_DATA_TYPES = new EntityDataTypes1_21(ITEM, PARTICLE, PARTICLES);
-    public static final Type<EntityData> ENTITY_DATA = new EntityDataType(ENTITY_DATA_TYPES);
-    public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
+    public Types1_21(final Function<Types1_20_5<?, ?>, StructuredDataKeys1_20_5> keysSupplier, final Function<Types1_20_5<?, ?>, EntityDataTypes1_21> entityDataTypesSupplier) {
+        super(keysSupplier, entityDataTypesSupplier);
+        this.optionalItem = ((ItemType1_20_5) item).new OptionalItemType();
+    }
 }

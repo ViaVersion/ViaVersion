@@ -147,8 +147,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         register(StructuredDataKey.MAP_ID, this::mapIdToTag, this::mapIdFromTag);
         register(StructuredDataKey.MAP_DECORATIONS, this::mapDecorationsToTag, this::mapDecorationsFromTag);
         registerEmpty(StructuredDataKey.MAP_POST_PROCESSING);
-        register(StructuredDataKey.CHARGED_PROJECTILES1_20_5, this::chargedProjectilesToTag, this::chargedProjectilesFromTag);
-        register(StructuredDataKey.BUNDLE_CONTENTS1_20_5, this::bundleContentsToTag, this::bundleContentsFromTag);
+        register(StructuredDataKey.V1_20_5.chargedProjectiles, this::chargedProjectilesToTag, this::chargedProjectilesFromTag);
+        register(StructuredDataKey.V1_20_5.bundleContents, this::bundleContentsToTag, this::bundleContentsFromTag);
         register(StructuredDataKey.POTION_CONTENTS1_20_5, this::potionContentsToTag, this::potionContentsFromTag);
         register(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, this::suspiciousStewEffectsToTag, this::suspiciousStewEffectsFromTag);
         register(StructuredDataKey.WRITABLE_BOOK_CONTENT, this::writableBookContentToTag, this::writableBookContentFromTag);
@@ -169,7 +169,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         register(StructuredDataKey.BANNER_PATTERNS, this::bannerPatternsToTag, this::bannerPatternsFromTag);
         register(StructuredDataKey.BASE_COLOR, this::baseColorToTag, this::baseColorFromTag);
         register(StructuredDataKey.POT_DECORATIONS, this::potDecorationsToTag, this::potDecorationsFromTag);
-        register(StructuredDataKey.CONTAINER1_20_5, this::containerToTag, this::containerFromTag);
+        register(StructuredDataKey.V1_20_5.container, this::containerToTag, this::containerFromTag);
         register(StructuredDataKey.BLOCK_STATE, this::blockStateToTag, this::blockStateFromTag);
         register(StructuredDataKey.BEES, this::beesToTag, this::beesFromTag);
         register(StructuredDataKey.LOCK, this::lockToTag, this::lockFromTag);

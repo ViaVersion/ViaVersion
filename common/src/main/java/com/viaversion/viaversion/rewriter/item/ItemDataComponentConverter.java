@@ -77,8 +77,8 @@ public final class ItemDataComponentConverter {
         this.register(StructuredDataKey.LORE, stringArrayToTextComponentArray(ItemComponentRegistry.V1_21_5.LORE));
         this.intToEnum(StructuredDataKey.RARITY, ItemComponentRegistry.V1_21_5.RARITY, Types_v1_20_5.Rarity.class);
         this.register(StructuredDataKey.ENCHANTMENTS1_21_5, this.convertEnchantmentsFunction(ItemComponentRegistry.V1_21_5.ENCHANTMENTS));
-        this.notImplemented(StructuredDataKey.CAN_PLACE_ON1_21_5);
-        this.notImplemented(StructuredDataKey.CAN_BREAK1_21_5);
+        this.notImplemented(StructuredDataKey.V1_21_5.canPlaceOn);
+        this.notImplemented(StructuredDataKey.V1_21_5.canBreak);
         this.register(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5, (attributes, mapped) -> {
             final List<Types_v1_21.AttributeModifier> result = new ArrayList<>(attributes.modifiers().length);
             for (final AttributeModifiers1_21.AttributeModifier modifier : attributes.modifiers()) {
@@ -122,7 +122,7 @@ public final class ItemDataComponentConverter {
             return new Result<>(ItemComponentRegistry.V1_21_5.FOOD, new Types_v1_21_2.Food(foodProperties.nutrition(), foodProperties.saturationModifier(), foodProperties.canAlwaysEat()));
         });
         this.notImplemented(StructuredDataKey.CONSUMABLE1_21_2);
-        this.item(StructuredDataKey.USE_REMAINDER1_21_5, ItemComponentRegistry.V1_21_5.USE_REMAINDER);
+        this.item(StructuredDataKey.V1_21_5.useRemainder, ItemComponentRegistry.V1_21_5.USE_REMAINDER);
         this.register(StructuredDataKey.USE_COOLDOWN, useCooldown -> {
             return new Result<>(ItemComponentRegistry.V1_21_5.USE_COOLDOWN, new Types_v1_21_2.UseCooldown(useCooldown.seconds(), Identifier.of(useCooldown.cooldownGroup())));
         });
@@ -150,8 +150,8 @@ public final class ItemDataComponentConverter {
         this.direct(StructuredDataKey.MAP_ID, ItemComponentRegistry.V1_21_5.MAP_ID);
         this.register(StructuredDataKey.MAP_DECORATIONS, passthroughNbtCodec(ItemComponentRegistry.V1_21_5.MAP_DECORATIONS));
         this.intToEnum(StructuredDataKey.MAP_POST_PROCESSING, ItemComponentRegistry.V1_21_5.MAP_POST_PROCESSING, Types_v1_20_5.MapPostProcessing.class);
-        this.register(StructuredDataKey.CHARGED_PROJECTILES1_21_5, convertItemArrayFunction(ItemComponentRegistry.V1_21_5.CHARGED_PROJECTILES));
-        this.register(StructuredDataKey.BUNDLE_CONTENTS1_21_5, convertItemArrayFunction(ItemComponentRegistry.V1_21_5.BUNDLE_CONTENTS));
+        this.register(StructuredDataKey.V1_21_5.chargedProjectiles, convertItemArrayFunction(ItemComponentRegistry.V1_21_5.CHARGED_PROJECTILES));
+        this.register(StructuredDataKey.V1_21_5.bundleContents, convertItemArrayFunction(ItemComponentRegistry.V1_21_5.BUNDLE_CONTENTS));
         this.notImplemented(StructuredDataKey.POTION_CONTENTS1_21_2);
         this.direct(StructuredDataKey.POTION_DURATION_SCALE, ItemComponentRegistry.V1_21_5.POTION_DURATION_SCALE);
         this.notImplemented(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS);
@@ -213,7 +213,7 @@ public final class ItemDataComponentConverter {
         this.notImplemented(StructuredDataKey.BANNER_PATTERNS);
         this.intToEnum(StructuredDataKey.BASE_COLOR, ItemComponentRegistry.V1_21_5.BASE_COLOR, Types_v1_20_5.DyeColor.class);
         this.notImplemented(StructuredDataKey.POT_DECORATIONS);
-        this.register(StructuredDataKey.CONTAINER1_21_5, (items, mapped) -> {
+        this.register(StructuredDataKey.V1_21_5.container, (items, mapped) -> {
             final List<Types_v1_20_5.ContainerSlot> resultSlots = new ArrayList<>(items.length);
             for (int i = 0; i < items.length; i++) {
                 final Item item = items[i];

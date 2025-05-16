@@ -216,13 +216,13 @@ public final class StructuredDataConverter {
             }
         });
         register(StructuredDataKey.BASE_COLOR, (data, tag) -> getBlockEntityTag(tag).putInt("Base", data));
-        register(StructuredDataKey.CHARGED_PROJECTILES1_20_5, (connection, data, tag) -> {
+        register(StructuredDataKey.V1_20_5.chargedProjectiles, (connection, data, tag) -> {
             convertItemList(connection, data, tag, "ChargedProjectiles");
             if (data.length != 0) {
                 tag.putBoolean("Charged", true);
             }
         });
-        register(StructuredDataKey.BUNDLE_CONTENTS1_20_5, (connection, data, tag) -> convertItemList(connection, data, tag, "Items"));
+        register(StructuredDataKey.V1_20_5.bundleContents, (connection, data, tag) -> convertItemList(connection, data, tag, "Items"));
         register(StructuredDataKey.LODESTONE_TRACKER, (data, tag) -> {
             tag.putBoolean("LodestoneTracked", data.tracked());
             if (data.position() != null) {
@@ -500,7 +500,7 @@ public final class StructuredDataConverter {
             }
             getBlockEntityTag(tag, "banner").put("Patterns", patternsTag);
         });
-        register(StructuredDataKey.CONTAINER1_20_5, (connection, data, tag) -> convertItemList(connection, data, getBlockEntityTag(tag), "Items"));
+        register(StructuredDataKey.V1_20_5.container, (connection, data, tag) -> convertItemList(connection, data, getBlockEntityTag(tag), "Items"));
         register(StructuredDataKey.CAN_PLACE_ON1_20_5, (data, tag) -> convertBlockPredicates(tag, data, "CanPlaceOn", HIDE_CAN_PLACE_ON));
         register(StructuredDataKey.CAN_BREAK1_20_5, (data, tag) -> convertBlockPredicates(tag, data, "CanDestroy", HIDE_CAN_DESTROY));
         register(StructuredDataKey.MAP_POST_PROCESSING, (data, tag) -> {

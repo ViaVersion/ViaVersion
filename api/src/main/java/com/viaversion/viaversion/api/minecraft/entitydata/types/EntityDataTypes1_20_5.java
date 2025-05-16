@@ -22,12 +22,9 @@
  */
 package com.viaversion.viaversion.api.minecraft.entitydata.types;
 
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.ArrayType;
-import com.viaversion.viaversion.api.type.types.misc.ParticleType;
-import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 
 public final class EntityDataTypes1_20_5 extends AbstractEntityDataTypes {
 
@@ -38,7 +35,7 @@ public final class EntityDataTypes1_20_5 extends AbstractEntityDataTypes {
     public final EntityDataType stringType = add(4, Types.STRING);
     public final EntityDataType componentType = add(5, Types.TAG);
     public final EntityDataType optionalComponentType = add(6, Types.OPTIONAL_TAG);
-    public final EntityDataType itemType = add(7, Types1_20_5.ITEM);
+    public final EntityDataType itemType;
     public final EntityDataType booleanType = add(8, Types.BOOLEAN);
     public final EntityDataType rotationsType = add(9, Types.ROTATIONS);
     public final EntityDataType blockPositionType = add(10, Types.BLOCK_POSITION1_14);
@@ -63,9 +60,10 @@ public final class EntityDataTypes1_20_5 extends AbstractEntityDataTypes {
     public final EntityDataType vector3FType = add(29, Types.VECTOR3F);
     public final EntityDataType quaternionType = add(30, Types.QUATERNION);
 
-    public EntityDataTypes1_20_5(final ParticleType particleType, final ArrayType<Particle> particlesType) {
+    public EntityDataTypes1_20_5(final VersionedTypesHolder types) {
         super(31);
-        this.particleType = add(17, particleType);
-        this.particlesType = add(18, particlesType);
+        this.itemType = add(7, types.item());
+        this.particleType = add(17, types.particle());
+        this.particlesType = add(18, types.particles());
     }
 }

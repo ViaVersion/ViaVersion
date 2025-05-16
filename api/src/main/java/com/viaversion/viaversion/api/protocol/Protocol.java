@@ -39,6 +39,7 @@ import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.api.rewriter.TagRewriter;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.util.ProtocolLogger;
@@ -393,7 +394,32 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
         return null;
     }
 
+    /**
+     * Returns the protocol's component rewriter if present.
+     *
+     * @return component rewriter
+     */
     default @Nullable ComponentRewriter getComponentRewriter() {
+        return null;
+    }
+
+    /**
+     * Returns types which are initialized during protocol loading in {@link #loadMappingData()}.
+     * <p>
+     * Used in various rewriters starting with 1.21.
+     *
+     * @return versioned types
+     */
+    default @Nullable VersionedTypesHolder types() {
+        return null;
+    }
+
+    /**
+     * Similar to {@link #types()}, but for the mapped types.
+     *
+     * @return versioned types
+     */
+    default @Nullable VersionedTypesHolder mappedTypes() {
         return null;
     }
 

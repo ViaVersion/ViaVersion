@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.type.types.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import java.util.List;
 
+// Only safe to use after protocol loading
 public final class Types1_14 {
 
     public static final ParticleType PARTICLE = new ParticleType();

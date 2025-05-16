@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,7 +63,7 @@ public class ChunkType1_16_2 extends Type<Chunk> {
             if ((primaryBitmask & (1 << i)) == 0) continue; // Section not set
 
             short nonAirBlocksCount = data.readShort();
-            ChunkSection section = Types1_16.CHUNK_SECTION.read(data);
+            ChunkSection section = Types.CHUNK_SECTION1_16.read(data);
             section.setNonAirBlocksCount(nonAirBlocksCount);
             sections[i] = section;
         }
@@ -94,7 +93,7 @@ public class ChunkType1_16_2 extends Type<Chunk> {
                 if (section == null) continue; // Section not set
 
                 buf.writeShort(section.getNonAirBlocksCount());
-                Types1_16.CHUNK_SECTION.write(buf, section);
+                Types.CHUNK_SECTION1_16.write(buf, section);
             }
             buf.readerIndex(0);
             Types.VAR_INT.writePrimitive(output, buf.readableBytes());

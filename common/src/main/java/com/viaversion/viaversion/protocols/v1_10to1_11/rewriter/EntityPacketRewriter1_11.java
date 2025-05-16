@@ -30,7 +30,6 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_10to1_11.Protocol1_10To1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.data.BlockEntityMappings1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.data.EntityMappings1_11;
@@ -109,7 +108,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
 
                         final PacketWrapper setItem = PacketWrapper.create(ClientboundPackets1_9_3.SET_ENTITY_DATA, wrapper.user());
                         setItem.write(Types.VAR_INT, entityId);
-                        setItem.write(Types1_9.ENTITY_DATA_LIST, entityDataList);
+                        setItem.write(Types.ENTITY_DATA_LIST1_9, entityDataList);
                         setItem.send(Protocol1_10To1_11.class);
                     }
                 });
@@ -131,20 +130,20 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_9.ENTITY_DATA_LIST); // 12 - Entity data
+                map(Types.ENTITY_DATA_LIST1_9); // 12 - Entity data
 
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     // Change Type :)
                     int type = wrapper.get(Types.VAR_INT, 1);
 
-                    EntityTypes1_11.EntityType entType = rewriteEntityType(type, wrapper.get(Types1_9.ENTITY_DATA_LIST, 0));
+                    EntityTypes1_11.EntityType entType = rewriteEntityType(type, wrapper.get(Types.ENTITY_DATA_LIST1_9, 0));
                     if (entType != null) {
                         wrapper.set(Types.VAR_INT, 1, entType.getId());
 
                         // Register Type ID
                         wrapper.user().getEntityTracker(Protocol1_10To1_11.class).addEntity(entityId, entType);
-                        handleEntityData(entityId, wrapper.get(Types1_9.ENTITY_DATA_LIST, 0), wrapper.user());
+                        handleEntityData(entityId, wrapper.get(Types.ENTITY_DATA_LIST1_9, 0), wrapper.user());
                     }
                 });
             }
@@ -162,7 +161,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
             }
         });
 
-        registerSetEntityData(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types1_9.ENTITY_DATA_LIST);
+        registerSetEntityData(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types.ENTITY_DATA_LIST1_9);
 
         protocol.registerClientbound(ClientboundPackets1_9_3.TELEPORT_ENTITY, new PacketHandlers() {
             @Override

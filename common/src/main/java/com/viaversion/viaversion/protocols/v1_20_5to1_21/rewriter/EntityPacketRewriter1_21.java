@@ -27,8 +27,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
-import com.viaversion.viaversion.api.type.types.version.Types1_21;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Enchantments1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
@@ -50,7 +49,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
     @Override
     public void registerPackets() {
         registerTrackerWithData1_19(ClientboundPackets1_20_5.ADD_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_20_5.SET_ENTITY_DATA, Types1_20_5.ENTITY_DATA_LIST, Types1_21.ENTITY_DATA_LIST);
+        registerSetEntityData(ClientboundPackets1_20_5.SET_ENTITY_DATA);
         registerRemoveEntities(ClientboundPackets1_20_5.REMOVE_ENTITIES);
 
         final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
@@ -155,24 +154,24 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
     protected void registerRewrites() {
         filter().handler((event, data) -> {
             final EntityDataType type = data.dataType();
-            if (type == Types1_20_5.ENTITY_DATA_TYPES.wolfVariantType) {
+            if (type == VersionedTypes.V1_20_5.entityDataTypes.wolfVariantType) {
                 final int variant = data.value();
-                data.setTypeAndValue(Types1_21.ENTITY_DATA_TYPES.wolfVariantType, Holder.of(variant));
-            } else if (type == Types1_20_5.ENTITY_DATA_TYPES.paintingVariantType) {
+                data.setTypeAndValue(VersionedTypes.V1_21.entityDataTypes.wolfVariantType, Holder.of(variant));
+            } else if (type == VersionedTypes.V1_20_5.entityDataTypes.paintingVariantType) {
                 final int variant = data.value();
-                data.setTypeAndValue(Types1_21.ENTITY_DATA_TYPES.paintingVariantType, Holder.of(variant));
+                data.setTypeAndValue(VersionedTypes.V1_21.entityDataTypes.paintingVariantType, Holder.of(variant));
             } else {
-                data.setDataType(Types1_21.ENTITY_DATA_TYPES.byId(type.typeId()));
+                data.setDataType(VersionedTypes.V1_21.entityDataTypes.byId(type.typeId()));
             }
         });
         registerEntityDataTypeHandler(
-            Types1_21.ENTITY_DATA_TYPES.itemType,
-            Types1_21.ENTITY_DATA_TYPES.blockStateType,
-            Types1_21.ENTITY_DATA_TYPES.optionalBlockStateType,
-            Types1_21.ENTITY_DATA_TYPES.particleType,
-            Types1_21.ENTITY_DATA_TYPES.particlesType,
-            Types1_21.ENTITY_DATA_TYPES.componentType,
-            Types1_21.ENTITY_DATA_TYPES.optionalComponentType
+            VersionedTypes.V1_21.entityDataTypes.itemType,
+            VersionedTypes.V1_21.entityDataTypes.blockStateType,
+            VersionedTypes.V1_21.entityDataTypes.optionalBlockStateType,
+            VersionedTypes.V1_21.entityDataTypes.particleType,
+            VersionedTypes.V1_21.entityDataTypes.particlesType,
+            VersionedTypes.V1_21.entityDataTypes.componentType,
+            VersionedTypes.V1_21.entityDataTypes.optionalComponentType
         );
         registerBlockStateHandler(EntityTypes1_20_5.ABSTRACT_MINECART, 11);
     }
