@@ -187,11 +187,12 @@ public class BukkitPickItemProvider extends PickItemProvider {
                     }
                     return item;
                 };
-            } else if (PaperViaInjector.hasMethod(Material.class, "isItem")) {
-                return (block, includeData) -> new ItemStack(block.getType(), 1);
-            } else {
+            } else if (LegacyBlockToItem.isSupported()) {
                 LegacyBlockToItem legacy = LegacyBlockToItem.getInstance();
                 return legacy != null ? (block, includeData) -> legacy.blockToItem(block) : (b, i) -> null;
+            } else {
+                // Fallback
+                return (block, includeData) -> new ItemStack(block.getType(), 1, (short)0 , block.getData());
             }
         }
 

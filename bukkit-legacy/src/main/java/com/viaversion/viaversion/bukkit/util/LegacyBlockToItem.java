@@ -31,14 +31,11 @@ public class LegacyBlockToItem {
     private static final Random RANDOM = new Random();
 
     static {
-        LegacyBlockToItem instance = null;
+        LegacyBlockToItem instance;
         try {
             instance = new LegacyBlockToItem();
         } catch (ReflectiveOperationException ex) {
-            Via.getPlatform().getLogger().log(
-                Level.WARNING,
-                "Couldn't find reflection methods/fields for pick-block functionality.\n" +
-                    "Pick-block won't work on clients 1.21.4 and newer.", ex);
+            instance = null; // silently fail
         }
         INSTANCE = instance;
     }
@@ -81,6 +78,10 @@ public class LegacyBlockToItem {
 
     public static LegacyBlockToItem getInstance() {
         return INSTANCE;
+    }
+    
+    public static boolean isSupported(){
+        return INSTANCE != null;
     }
 
     public @Nullable ItemStack blockToItem(final Block block) {
