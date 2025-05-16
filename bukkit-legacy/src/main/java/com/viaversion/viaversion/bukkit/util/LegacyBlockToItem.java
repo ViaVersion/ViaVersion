@@ -27,17 +27,15 @@ import java.util.Random;
 import java.util.logging.Level;
 
 public class LegacyBlockToItem {
-    private static final LegacyBlockToItem INSTANCE;
+
     private static final Random RANDOM = new Random();
+    private static LegacyBlockToItem INSTANCE;
 
     static {
-        LegacyBlockToItem instance;
         try {
-            instance = new LegacyBlockToItem();
-        } catch (ReflectiveOperationException ex) {
-            instance = null; // silently fail
+            INSTANCE = new LegacyBlockToItem();
+        } catch (ReflectiveOperationException ignored) {
         }
-        INSTANCE = instance;
     }
 
     private final Method GET_WORLD_HANDLE;
@@ -78,10 +76,6 @@ public class LegacyBlockToItem {
 
     public static LegacyBlockToItem getInstance() {
         return INSTANCE;
-    }
-    
-    public static boolean isSupported(){
-        return INSTANCE != null;
     }
 
     public @Nullable ItemStack blockToItem(final Block block) {
