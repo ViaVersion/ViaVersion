@@ -175,8 +175,6 @@ public class BukkitPickItemProvider extends PickItemProvider {
 
     @FunctionalInterface
     private interface BlockToItem {
-        ItemStack apply(final Block block, final boolean includeData);
-
         static BlockToItem build() {
             if (PaperViaInjector.hasMethod("org.bukkit.block.data.BlockData", "getPlacementMaterial")) {
                 return (block, includeData) -> {
@@ -187,20 +185,19 @@ public class BukkitPickItemProvider extends PickItemProvider {
                     }
                     return item;
                 };
-            } else if (PaperViaInjector.hasMethod(Material.class, "isItem")) {
-                return (block, includeData) -> new ItemStack(block.getType(), 1);
+            } else if (LegacyBlockToItem.getInstance() != null) {
+                return (block, includeData) -> LegacyBlockToItem.getInstance().blockToItem(block);
             } else {
-                LegacyBlockToItem legacy = LegacyBlockToItem.getInstance();
-                return legacy != null ? (block, includeData) -> legacy.blockToItem(block) : (b, i) -> null;
+                return (block, includeData) -> new ItemStack(block.getType(), 1, (short) 0, block.getData());
             }
         }
+
+        ItemStack apply(final Block block, final boolean includeData);
 
     }
 
     @FunctionalInterface
     private interface GetStorageContents {
-        ItemStack[] apply(final PlayerInventory inv);
-
         static GetStorageContents build() {
             if (PaperViaInjector.hasMethod(Inventory.class, "getStorageContents")) {
                 return Inventory::getStorageContents;
@@ -209,12 +206,12 @@ public class BukkitPickItemProvider extends PickItemProvider {
             }
         }
 
+        ItemStack[] apply(final PlayerInventory inv);
+
     }
 
     @FunctionalInterface
     private interface SetInHand {
-        void apply(final PlayerInventory inv, final ItemStack stack);
-
         @SuppressWarnings("deprecation")
         static SetInHand build() {
             if (PaperViaInjector.hasMethod(PlayerInventory.class, "setItemInMainHand")) {
@@ -223,5 +220,7 @@ public class BukkitPickItemProvider extends PickItemProvider {
                 return PlayerInventory::setItemInHand;
             }
         }
+
+        void apply(final PlayerInventory inv, final ItemStack stack);
     }
 }

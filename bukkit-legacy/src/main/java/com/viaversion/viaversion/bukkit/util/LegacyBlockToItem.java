@@ -27,20 +27,15 @@ import java.util.Random;
 import java.util.logging.Level;
 
 public class LegacyBlockToItem {
-    private static final LegacyBlockToItem INSTANCE;
+
     private static final Random RANDOM = new Random();
+    private static LegacyBlockToItem INSTANCE;
 
     static {
-        LegacyBlockToItem instance = null;
         try {
-            instance = new LegacyBlockToItem();
-        } catch (ReflectiveOperationException ex) {
-            Via.getPlatform().getLogger().log(
-                Level.WARNING,
-                "Couldn't find reflection methods/fields for pick-block functionality.\n" +
-                    "Pick-block won't work on clients 1.21.4 and newer.", ex);
+            INSTANCE = new LegacyBlockToItem();
+        } catch (ReflectiveOperationException ignored) {
         }
-        INSTANCE = instance;
     }
 
     private final Method GET_WORLD_HANDLE;
