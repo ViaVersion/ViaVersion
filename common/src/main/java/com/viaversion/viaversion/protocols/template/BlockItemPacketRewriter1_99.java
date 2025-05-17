@@ -84,8 +84,8 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
 
     @Override
     protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
-        super.handleItemDataComponentsToClient(connection, item, container);
         upgradeData(item, container);
+        super.handleItemDataComponentsToClient(connection, item, container);
     }
 
     public static void upgradeData(final Item item, final StructuredDataContainer container) { // public for VB
@@ -93,8 +93,8 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
 
     @Override
     protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
-        super.handleItemDataComponentsToServer(connection, item, container);
         downgradeData(item, container);
+        super.handleItemDataComponentsToServer(connection, item, container);
     }
 
     public static void downgradeData(final Item item, final StructuredDataContainer container) {

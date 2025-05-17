@@ -43,4 +43,5 @@ public final class VersionedTypes {
     public static final Types1_20_5<StructuredDataKeys1_21_2, EntityDataTypes1_21_2> V1_21_2 = new Types1_20_5<>(StructuredDataKeys1_21_2::new, EntityDataTypes1_21_2::new);
     public static final Types1_20_5<StructuredDataKeys1_21_2, EntityDataTypes1_21_2> V1_21_4 = new Types1_20_5<>(StructuredDataKeys1_21_2::new, EntityDataTypes1_21_2::new);
     public static final Types1_20_5<StructuredDataKeys1_21_5, EntityDataTypes1_21_5> V1_21_5 = new Types1_20_5<>(StructuredDataKeys1_21_5::new, EntityDataTypes1_21_5::new);
+    public static final Types1_20_5<StructuredDataKeys1_21_5, EntityDataTypes1_21_5> V1_22 = new Types1_20_5<>(StructuredDataKeys1_21_5::new, EntityDataTypes1_21_5::new);
 }
