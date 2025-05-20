@@ -42,6 +42,7 @@ import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ClientboundConfigurationPackets1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ClientboundPacket1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ClientboundPackets1_22;
+import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundConfigurationPackets1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPacket1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPackets1_22;
 import com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter.BlockItemPacketRewriter1_22;
@@ -120,6 +121,7 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
         });
 
         cancelServerbound(ServerboundPackets1_22.CUSTOM_CLICK_ACTION);
+        cancelServerbound(ServerboundConfigurationPackets1_22.CUSTOM_CLICK_ACTION);
     }
 
     @Override
@@ -170,7 +172,7 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_22.PLAYER));
-        addItemHasher(connection, new ItemHasherBase(connection, SerializerVersion.V1_21_5, SerializerVersion.V1_21_5, MAPPINGS));
+        addItemHasher(connection, new ItemHasherBase(this, connection, SerializerVersion.V1_21_5, SerializerVersion.V1_21_5));
         connection.put(new SneakStorage());
     }
 
@@ -220,7 +222,7 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
             packetTypeMap(unmappedClientboundPacketType, ClientboundPackets1_21_5.class, ClientboundConfigurationPackets1_21.class),
             packetTypeMap(mappedClientboundPacketType, ClientboundPackets1_22.class, ClientboundConfigurationPackets1_22.class),
             packetTypeMap(mappedServerboundPacketType, ServerboundPackets1_21_5.class, ServerboundConfigurationPackets1_20_5.class),
-            packetTypeMap(unmappedServerboundPacketType, ServerboundPackets1_22.class, ServerboundConfigurationPackets1_20_5.class)
+            packetTypeMap(unmappedServerboundPacketType, ServerboundPackets1_22.class, ServerboundConfigurationPackets1_22.class)
         );
     }
 }

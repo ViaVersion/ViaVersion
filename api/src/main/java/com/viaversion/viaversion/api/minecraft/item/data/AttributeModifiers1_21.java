@@ -66,7 +66,7 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
 
         @Override
         public void write(final Ops ops, final AttributeModifiers1_21 value) {
-            ops.write(AttributeModifier.ARRAY_TYPE, value.modifiers);
+            ops.write(AttributeModifier.ARRAY_TYPE1_21, value.modifiers);
         }
     };
     public static final Type<AttributeModifiers1_21> TYPE1_22 = new Type<>(AttributeModifiers1_21.class) {
@@ -79,6 +79,11 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
         @Override
         public void write(final ByteBuf buffer, final AttributeModifiers1_21 value) {
             AttributeModifier.ARRAY_TYPE1_22.write(buffer, value.modifiers());
+        }
+
+        @Override
+        public void write(final Ops ops, final AttributeModifiers1_21 value) {
+            ops.write(AttributeModifier.ARRAY_TYPE1_22, value.modifiers);
         }
     };
 
@@ -151,6 +156,28 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
                 Types.VAR_INT.writePrimitive(buffer, value.slotType);
                 value.display.write(buffer);
             }
+
+            @Override
+            public void write(final Ops ops, final AttributeModifier value) {
+                final Key attribute = ops.context().registryAccess().attributeModifier(value.attribute);
+                ops.writeMap(map -> {
+                    map.write("type", Types.RESOURCE_LOCATION, attribute)
+                        .write("id", Types.RESOURCE_LOCATION, Key.of(value.modifier.id()))
+                        .write("amount", Types.DOUBLE, value.modifier.amount)
+                        .write("operation", Types.STRING, OPERATION[value.modifier.operation()])
+                        .writeOptional("slot", Types.STRING, EQUIPMENT_SLOT_GROUPS[value.slotType()], "any");
+                    if (value.display.equals(Display.DEFAULT)) {
+                        return;
+                    }
+
+                    map.writeMap("display", display -> {
+                        display.write("type", Types.STRING, Display.DISPLAY_TYPES[value.display.id()]);
+                        if (value.display instanceof final OverrideText overrideText) {
+                            display.write("value", Types.TAG, overrideText.component);
+                        }
+                    });
+                });
+            }
         };
         public static final Type<AttributeModifier[]> ARRAY_TYPE1_22 = new ArrayType<>(TYPE1_22);
     }
@@ -176,6 +203,7 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
     }
 
     public static class Display implements Copyable {
+        public static final String[] DISPLAY_TYPES = {"default", "hidden", "override_text"};
         public static final Display DEFAULT = new Display(0);
         private final int id;
 
