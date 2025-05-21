@@ -207,7 +207,12 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
             // Accept teleportation and player position were swapped.
             // Send a ping first to then capture and send the player position the accept teleportation
-            final boolean isBundling = wrapper.user().get(BundleStateTracker.class).isBundling();
+            final BundleStateTracker bundleStateTracker = wrapper.user().get(BundleStateTracker.class);
+            if (bundleStateTracker == null) {
+                return;
+            }
+
+            final boolean isBundling = bundleStateTracker.isBundling();
             if (!isBundling) {
                 final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
                 bundleStart.send(Protocol1_21To1_21_2.class);
@@ -364,6 +369,10 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_STATUS_ONLY, wrapper -> {
             final GroundFlagTracker tracker = wrapper.user().get(GroundFlagTracker.class);
+            if (tracker == null) {
+                return;
+            }
+
             final boolean prevOnGround = tracker.onGround();
             final boolean prevHorizontalCollision = tracker.horizontalCollision();
 
@@ -407,10 +416,11 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
     private void handleOnGround(final PacketWrapper wrapper) {
         final GroundFlagTracker tracker = wrapper.user().get(GroundFlagTracker.class);
-
         final short data = wrapper.read(Types.UNSIGNED_BYTE);
-        wrapper.write(Types.BOOLEAN, tracker.setOnGround((data & 1) != 0)); // Ignoring horizontal collision data
-        tracker.setHorizontalCollision((data & 2) != 0);
+        if (tracker != null) {
+            wrapper.write(Types.BOOLEAN, tracker.setOnGround((data & 1) != 0)); // Ignoring horizontal collision data
+            tracker.setHorizontalCollision((data & 2) != 0);
+        }
     }
 
     private void storeEntityPositionRotation(final PacketWrapper wrapper, final boolean position, final boolean rotation) {
@@ -468,7 +478,12 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
                 return;
             }
 
-            final boolean isBundling = event.user().get(BundleStateTracker.class).isBundling();
+            final BundleStateTracker bundleStateTracker = event.user().get(BundleStateTracker.class);
+            if (bundleStateTracker == null) {
+                return;
+            }
+
+            final boolean isBundling = bundleStateTracker.isBundling();
             if (!isBundling) {
                 final PacketWrapper bundleStart = PacketWrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER, event.user());
                 bundleStart.send(Protocol1_21To1_21_2.class);
@@ -482,7 +497,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             // Detect correct boat entity type from entity data
             final int boatType = (int) data.getValue();
             EntityType entityType;
-            if (tracker.entityType(event.entityId()).isOrHasParent(EntityTypes1_21_2.ABSTRACT_CHEST_BOAT)) {
+            final EntityType childType = tracker.entityType(event.entityId());
+            if (childType != null && childType.isOrHasParent(EntityTypes1_21_2.ABSTRACT_CHEST_BOAT)) {
                 entityType = entityTypeFromChestBoatType(boatType);
             } else {
                 entityType = entityTypeFromBoatType(boatType);
