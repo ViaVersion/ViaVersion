@@ -502,16 +502,6 @@ public final class StructuredDataConverter {
         register(StructuredDataKey.V1_20_5.container, (connection, data, tag) -> convertItemList(connection, data, getBlockEntityTag(tag), "Items"));
         register(StructuredDataKey.CAN_PLACE_ON1_20_5, (data, tag) -> convertBlockPredicates(tag, data, "CanPlaceOn", HIDE_CAN_PLACE_ON));
         register(StructuredDataKey.CAN_BREAK1_20_5, (data, tag) -> convertBlockPredicates(tag, data, "CanDestroy", HIDE_CAN_DESTROY));
-        register(StructuredDataKey.MAP_POST_PROCESSING, (data, tag) -> {
-            if (data == null) {
-                return;
-            }
-            if (data == 0) { // Lock
-                tag.putBoolean("map_to_lock", true);
-            } else if (data == 1) { // Scale
-                tag.putInt("map_scale_direction", 1);
-            }
-        });
         register(StructuredDataKey.TRIM1_20_5, (connection, data, tag) -> {
             final CompoundTag trimTag = new CompoundTag();
             final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
