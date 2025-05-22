@@ -593,11 +593,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         updateProfile(data, tag.get("SkullOwner"));
 
-        final CompoundTag customCreativeLock = tag.getCompoundTag("CustomCreativeLock");
-        if (customCreativeLock != null) {
-            data.set(StructuredDataKey.CREATIVE_SLOT_LOCK);
-        }
-
         final ListTag<StringTag> canPlaceOnTag = tag.getListTag("CanPlaceOn", StringTag.class);
         if (canPlaceOnTag != null) {
             data.set(StructuredDataKey.CAN_PLACE_ON1_20_5, updateBlockPredicates(canPlaceOnTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_PLACE_ON) == 0));
@@ -606,16 +601,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final ListTag<StringTag> canDestroyTag = tag.getListTag("CanDestroy", StringTag.class);
         if (canDestroyTag != null) {
             data.set(StructuredDataKey.CAN_BREAK1_20_5, updateBlockPredicates(canDestroyTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_DESTROY) == 0));
-        }
-
-        final IntTag mapScaleDirectionTag = tag.getIntTag("map_scale_direction");
-        if (mapScaleDirectionTag != null) {
-            data.set(StructuredDataKey.MAP_POST_PROCESSING, 1); // Scale
-        } else {
-            final NumberTag mapToLockTag = tag.getNumberTag("map_to_lock");
-            if (mapToLockTag != null) {
-                data.set(StructuredDataKey.MAP_POST_PROCESSING, 0); // Lock
-            }
         }
 
         // Only for VB, but kept here for simplicity; In VV we back up the original tag and later restore it, in VB

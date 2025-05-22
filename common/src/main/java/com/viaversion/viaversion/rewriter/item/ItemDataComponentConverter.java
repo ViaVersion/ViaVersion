@@ -115,7 +115,7 @@ public final class ItemDataComponentConverter {
             return new Result<>(ItemComponentRegistry.V1_21_5.TOOLTIP_DISPLAY, new Types_v1_21_5.TooltipDisplay(tooltipDisplay.hideTooltip(), result));
         });
         this.direct(StructuredDataKey.REPAIR_COST, ItemComponentRegistry.V1_21_5.REPAIR_COST);
-        this.unit(StructuredDataKey.CREATIVE_SLOT_LOCK, ItemComponentRegistry.V1_21_5.CREATIVE_SLOT_LOCK);
+        this.notSerializable(StructuredDataKey.CREATIVE_SLOT_LOCK);
         this.direct(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, ItemComponentRegistry.V1_21_5.ENCHANTMENT_GLINT_OVERRIDE);
         this.register(StructuredDataKey.INTANGIBLE_PROJECTILE, value -> new Result<>(ItemComponentRegistry.V1_21_5.INTANGIBLE_PROJECTILE, null));
         this.register(StructuredDataKey.FOOD1_21_2, foodProperties -> {
@@ -149,7 +149,7 @@ public final class ItemDataComponentConverter {
         this.direct(StructuredDataKey.MAP_COLOR, ItemComponentRegistry.V1_21_5.MAP_COLOR);
         this.direct(StructuredDataKey.MAP_ID, ItemComponentRegistry.V1_21_5.MAP_ID);
         this.register(StructuredDataKey.MAP_DECORATIONS, passthroughNbtCodec(ItemComponentRegistry.V1_21_5.MAP_DECORATIONS));
-        this.intToEnum(StructuredDataKey.MAP_POST_PROCESSING, ItemComponentRegistry.V1_21_5.MAP_POST_PROCESSING, Types_v1_20_5.MapPostProcessing.class);
+        this.notSerializable(StructuredDataKey.MAP_POST_PROCESSING);
         this.register(StructuredDataKey.V1_21_5.chargedProjectiles, convertItemArrayFunction(ItemComponentRegistry.V1_21_5.CHARGED_PROJECTILES));
         this.register(StructuredDataKey.V1_21_5.bundleContents, convertItemArrayFunction(ItemComponentRegistry.V1_21_5.BUNDLE_CONTENTS));
         this.notImplemented(StructuredDataKey.POTION_CONTENTS1_21_2);
@@ -285,6 +285,12 @@ public final class ItemDataComponentConverter {
 
     private <I> void notImplemented(final StructuredDataKey<I> key) {
         this.register(key, value -> null);
+    }
+
+    private <I> void notSerializable(final StructuredDataKey<I> key) {
+        this.register(key, value -> {
+            throw new IllegalArgumentException(key.identifier() + " is not serializable");
+        });
     }
 
     private void unit(final StructuredDataKey<Unit> key, final ItemComponent<?> result) {
