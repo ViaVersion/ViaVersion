@@ -341,7 +341,6 @@ public final class StructuredDataConverter {
             }
             getBlockEntityTag(tag, "decorated_pot").put("sherds", sherds);
         });
-        register(StructuredDataKey.CREATIVE_SLOT_LOCK, (data, tag) -> tag.put("CustomCreativeLock", new CompoundTag()));
         register(StructuredDataKey.DEBUG_STICK_STATE, (data, tag) -> tag.put("DebugProperty", data));
         register(StructuredDataKey.RECIPES, (data, tag) -> tag.put("Recipes", data));
         register(StructuredDataKey.ENTITY_DATA, (data, tag) -> tag.put("EntityTag", data));
