@@ -289,7 +289,7 @@ public final class ItemDataComponentConverter {
 
     private <I> void notSerializable(final StructuredDataKey<I> key) {
         this.register(key, value -> {
-            throw new IllegalStateException(key.identifier() + " is not serializable");
+            throw new IllegalArgumentException(key.identifier() + " is not serializable");
         });
     }
 
