@@ -193,7 +193,7 @@ public class BukkitPickItemProvider extends PickItemProvider {
                 LegacyBlockToItem legacy = LegacyBlockToItem.getInstance();
                 return legacy != null ? (block, includeData) -> legacy.blockToItem(block) : (b, i) -> null;
             } else if (PaperViaInjector.hasMethod(Material.class, "isItem")) {
-                return (block, includeData) -> block.getType().isItem() ? new ItemStack(block.getType(), 1, (short) 0, block.getData()) : null;
+                return (block, includeData) -> block.getType().isItem() ? new ItemStack(block.getType()) : null;
             } else {
                 return (b, i) -> null;
             }
