@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -72,6 +73,13 @@ public abstract class Filterable<T> {
         public void write(final ByteBuf buffer, final F value) {
             elementType.write(buffer, value.raw());
             optionalElementType.write(buffer, value.filtered());
+        }
+
+        @Override
+        public void write(final Ops ops, final F value) {
+            ops.writeMap(map -> map
+                .write("raw", elementType, value.raw())
+                .writeOptional("filtered", elementType, value.filtered()));
         }
 
         protected abstract F create(T raw, T filtered);

@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.TypeConverter;
@@ -68,6 +69,11 @@ public class FloatType extends Type<Float> implements TypeConverter<Float> {
             return boo ? 1F : 0;
         }
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void write(final Ops ops, final Float value) {
+        ops.writeFloat(value);
     }
 
     public static final class OptionalFloatType extends OptionalType<Float> {

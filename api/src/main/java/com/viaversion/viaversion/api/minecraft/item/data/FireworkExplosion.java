@@ -22,13 +22,18 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.util.ArrayUtil;
 import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 
-public record FireworkExplosion(int shape, int[] colors, int[] fadeColors, boolean hasTrail, boolean hasTwinkle) implements Copyable {
+public record FireworkExplosion(int shape, int[] colors, int[] fadeColors, boolean hasTrail,
+                                boolean hasTwinkle) implements Copyable {
+    public static final String[] SHAPES = {"small_ball", "large_ball", "star", "creeper", "burst"};
+
     public static final Type<FireworkExplosion> TYPE = new Type<>(FireworkExplosion.class) {
         @Override
         public FireworkExplosion read(final ByteBuf buffer) {
@@ -47,6 +52,16 @@ public record FireworkExplosion(int shape, int[] colors, int[] fadeColors, boole
             Types.INT_ARRAY_PRIMITIVE.write(buffer, value.fadeColors);
             buffer.writeBoolean(value.hasTrail);
             buffer.writeBoolean(value.hasTwinkle);
+        }
+
+        @Override
+        public void write(final Ops ops, final FireworkExplosion value) {
+            ops.writeMap(map -> map
+                .write("shape", Types.STRING, SHAPES[value.shape])
+                .writeOptional("colors", new ArrayType<>(Types.INT), ArrayUtil.boxedArray(value.colors), new Integer[0])
+                .writeOptional("fade_colors", new ArrayType<>(Types.INT), ArrayUtil.boxedArray(value.fadeColors), new Integer[0])
+                .writeOptional("has_trail", Types.BOOLEAN, value.hasTrail, false)
+                .writeOptional("has_twinkle", Types.BOOLEAN, value.hasTwinkle, false));
         }
     };
     public static final Type<FireworkExplosion[]> ARRAY_TYPE = new ArrayType<>(TYPE);

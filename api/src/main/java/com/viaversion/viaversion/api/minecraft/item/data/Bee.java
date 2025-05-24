@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
@@ -45,6 +46,14 @@ public record Bee(CompoundTag entityData, int ticksInHive, int minTicksInHive) i
             Types.COMPOUND_TAG.write(buffer, value.entityData);
             Types.VAR_INT.writePrimitive(buffer, value.ticksInHive);
             Types.VAR_INT.writePrimitive(buffer, value.minTicksInHive);
+        }
+
+        @Override
+        public void write(final Ops ops, final Bee value) {
+            ops.writeMap(map -> map
+                .writeOptional("entity_data", Types.COMPOUND_TAG, value.entityData, new CompoundTag())
+                .write("ticks_in_hive", Types.INT, value.ticksInHive)
+                .write("min_ticks_in_hive", Types.INT, value.minTicksInHive));
         }
     };
     public static final Type<Bee[]> ARRAY_TYPE = new ArrayType<>(TYPE);

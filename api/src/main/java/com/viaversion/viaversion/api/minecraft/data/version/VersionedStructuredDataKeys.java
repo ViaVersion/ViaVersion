@@ -24,12 +24,15 @@ package com.viaversion.viaversion.api.minecraft.data.version;
 
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.type.Type;
+import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public abstract class VersionedStructuredDataKeys {
 
     private final List<StructuredDataKey<?>> keys = new ArrayList<>();
+    protected final Set<StructuredDataKey<?>> unsupportedForOps = new ReferenceArraySet<>();
 
     protected <T> StructuredDataKey<T> add(final String identifier, final Type<T> type) {
         final StructuredDataKey<T> key = new StructuredDataKey<>(identifier, type);
@@ -39,5 +42,9 @@ public abstract class VersionedStructuredDataKeys {
 
     public List<StructuredDataKey<?>> keys() {
         return this.keys;
+    }
+
+    public boolean supportsOps(final StructuredDataKey<?> key) {
+        return !unsupportedForOps.contains(key);
     }
 }

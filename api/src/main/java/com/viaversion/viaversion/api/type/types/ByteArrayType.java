@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -59,6 +60,11 @@ public class ByteArrayType extends Type<byte[]> {
         final byte[] array = new byte[length];
         buffer.readBytes(array);
         return array;
+    }
+
+    @Override
+    public void write(final Ops ops, final byte[] value) {
+        ops.writeBytes(value);
     }
 
     public static final class OptionalByteArrayType extends OptionalType<byte[]> {

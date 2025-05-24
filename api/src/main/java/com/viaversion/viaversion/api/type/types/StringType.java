@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -69,6 +70,11 @@ public class StringType extends Type<String> {
         byte[] b = object.getBytes(StandardCharsets.UTF_8);
         Types.VAR_INT.writePrimitive(buffer, b.length);
         buffer.writeBytes(b);
+    }
+
+    @Override
+    public void write(final Ops ops, final String value) {
+        ops.writeString(value);
     }
 
     public static final class OptionalStringType extends OptionalType<String> {

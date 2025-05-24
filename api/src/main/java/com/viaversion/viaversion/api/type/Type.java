@@ -22,13 +22,15 @@
  */
 package com.viaversion.viaversion.api.type;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
+
 /**
  * Type for buffer reading and writing.
  *
  * @param <T> read/written type
  * @see Types
  */
-public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
+public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T>, CodecWriter<T> {
 
     /* Actual Class */
     private final Class<? super T> outputClass;
@@ -58,7 +60,12 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
      * @return type name
      */
     public String getTypeName() {
-        return typeName != null && !typeName.isEmpty() ? typeName : this.getClass().getSimpleName();
+        return typeName != null && !typeName.isEmpty() ? typeName : this.getClass().getName();
+    }
+
+    @Override
+    public void write(Ops ops, T value) {
+        throw new UnsupportedOperationException("Write operation not supported for type: " + getTypeName());
     }
 
     /**

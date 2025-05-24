@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
@@ -41,6 +42,13 @@ public record Fireworks(int flightDuration, FireworkExplosion[] explosions) impl
         public void write(final ByteBuf buffer, final Fireworks value) {
             Types.VAR_INT.writePrimitive(buffer, value.flightDuration);
             FireworkExplosion.ARRAY_TYPE.write(buffer, value.explosions);
+        }
+
+        @Override
+        public void write(final Ops ops, final Fireworks value) {
+            ops.writeMap(map -> map
+                .writeOptional("flight_duration", Types.UNSIGNED_BYTE, (short) value.flightDuration, (short) 0)
+                .writeOptional("explosions", FireworkExplosion.ARRAY_TYPE, value.explosions, new FireworkExplosion[0]));
         }
     };
 

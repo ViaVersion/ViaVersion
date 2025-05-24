@@ -107,13 +107,17 @@ import com.viaversion.viaversion.api.type.types.misc.CompoundTagType;
 import com.viaversion.viaversion.api.type.types.misc.GameProfileType;
 import com.viaversion.viaversion.api.type.types.misc.HolderSetType;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
+import com.viaversion.viaversion.api.type.types.misc.KeyType;
 import com.viaversion.viaversion.api.type.types.misc.NamedCompoundTagType;
 import com.viaversion.viaversion.api.type.types.misc.PlayerMessageSignatureType;
 import com.viaversion.viaversion.api.type.types.misc.ProfileKeyType;
+import com.viaversion.viaversion.api.type.types.misc.ProfilePropertyType;
 import com.viaversion.viaversion.api.type.types.misc.SoundEventType;
+import com.viaversion.viaversion.api.type.types.misc.TagKeyType;
 import com.viaversion.viaversion.api.type.types.misc.TagType;
 import com.viaversion.viaversion.api.type.types.misc.VillagerDataType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Unit;
 import java.util.List;
 import java.util.UUID;
@@ -173,6 +177,11 @@ public final class Types {
     /* MC Types */
     public static final Type<byte[]> SERVERBOUND_CUSTOM_PAYLOAD_DATA = new RemainingBytesType(Short.MAX_VALUE);
 
+    public static final Type<Key> RESOURCE_LOCATION = new KeyType();
+    public static final Type<Key> OPTIONAL_RESOURCE_LOCATION = new KeyType.OptionalKeyType();
+    public static final Type<Key[]> RESOURCE_LOCATION_ARRAY = new ArrayType<>(RESOURCE_LOCATION);
+    public static final Type<Key> TAG_KEY = new TagKeyType();
+
     public static final Type<BlockPosition> BLOCK_POSITION1_8 = new BlockPositionType1_8();
     public static final Type<BlockPosition> OPTIONAL_POSITION1_8 = new BlockPositionType1_8.OptionalBlockPositionType();
     public static final Type<BlockPosition> BLOCK_POSITION1_14 = new BlockPositionType1_14();
@@ -211,6 +220,8 @@ public final class Types {
     public static final Type<VillagerData> VILLAGER_DATA = new VillagerDataType();
 
     public static final Type<GameProfile> GAME_PROFILE = new GameProfileType();
+    public static final Type<GameProfile.Property> PROFILE_PROPERTY = new ProfilePropertyType();
+    public static final Type<GameProfile.Property[]> PROFILE_PROPERTY_ARRAY = new ArrayType<>(PROFILE_PROPERTY);
     public static final Type<ProfileKey> PROFILE_KEY = new ProfileKeyType();
     public static final Type<ProfileKey> OPTIONAL_PROFILE_KEY = new ProfileKeyType.OptionalProfileKeyType();
 

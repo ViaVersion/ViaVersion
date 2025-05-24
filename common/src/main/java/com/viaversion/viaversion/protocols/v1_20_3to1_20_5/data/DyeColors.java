@@ -17,28 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data;
 
+import com.viaversion.viaversion.api.minecraft.item.data.EnumTypes;
 import com.viaversion.viaversion.util.KeyMappings;
 
 public final class DyeColors {
 
-    public static final KeyMappings COLORS = new KeyMappings(
-        "white",
-        "orange",
-        "magenta",
-        "light_blue",
-        "yellow",
-        "lime",
-        "pink",
-        "gray",
-        "light_gray",
-        "cyan",
-        "purple",
-        "blue",
-        "brown",
-        "green",
-        "red",
-        "black"
-    );
+    public static final KeyMappings COLORS = new KeyMappings(EnumTypes.DYE_COLOR.names());
 
     public static String idToKey(final int id) {
         final String color = COLORS.idToKey(id);

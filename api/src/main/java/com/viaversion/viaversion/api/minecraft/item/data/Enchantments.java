@@ -22,9 +22,11 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -80,6 +82,16 @@ public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) imple
                 Types.VAR_INT.writePrimitive(buffer, entry.getIntKey());
                 Types.VAR_INT.writePrimitive(buffer, entry.getIntValue());
             }
+        }
+
+        @Override
+        public void write(final Ops ops, final Enchantments value) {
+            ops.writeMap(map -> {
+                for (final Int2IntMap.Entry entry : value.enchantments.int2IntEntrySet()) {
+                    final Key key = ops.context().registryAccess().enchantment(entry.getIntKey());
+                    map.write(Types.RESOURCE_LOCATION, key, Types.VAR_INT, entry.getIntValue());
+                }
+            });
         }
     };
 

@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_18_2to1_19;
 
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -239,7 +240,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
             public void register() {
                 map(Types.UUID); // UUID
                 map(Types.STRING); // Name
-                create(Types.VAR_INT, 0); // No properties
+                create(Types.PROFILE_PROPERTY_ARRAY, new GameProfile.Property[0]); // No properties
             }
         });
 

@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.TypeConverter;
 import io.netty.buffer.ByteBuf;
@@ -49,6 +50,11 @@ public class ByteType extends Type<Byte> implements TypeConverter<Byte> {
     @Deprecated
     public void write(ByteBuf buffer, Byte object) {
         buffer.writeByte(object);
+    }
+
+    @Override
+    public void write(final Ops ops, final Byte value) {
+        ops.writeByte(value);
     }
 
     @Override

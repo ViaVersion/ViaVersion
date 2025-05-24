@@ -184,8 +184,8 @@ public final class StructuredDataConverter {
         register(StructuredDataKey.WRITABLE_BOOK_CONTENT, (data, tag) -> {
             final ListTag<StringTag> pages = new ListTag<>(StringTag.class);
             final CompoundTag filteredPages = new CompoundTag();
-            for (int i = 0; i < data.length; i++) {
-                final FilterableString page = data[i];
+            for (int i = 0; i < data.pages().length; i++) {
+                final FilterableString page = data.pages()[i];
                 pages.add(new StringTag(page.raw()));
                 if (page.filtered() != null) {
                     filteredPages.putString(Integer.toString(i), page.filtered());
@@ -319,7 +319,7 @@ public final class StructuredDataConverter {
             getBlockEntityTag(tag, "beehive").put("Bees", bees);
         });
         register(StructuredDataKey.LOCK, (data, tag) -> getBlockEntityTag(tag).put("Lock", data));
-        register(StructuredDataKey.NOTE_BLOCK_SOUND, (data, tag) -> getBlockEntityTag(tag, "player_head").putString("note_block_sound", data));
+        register(StructuredDataKey.NOTE_BLOCK_SOUND, (data, tag) -> getBlockEntityTag(tag, "player_head").putString("note_block_sound", data.original()));
         register(StructuredDataKey.POT_DECORATIONS, (data, tag) -> {
             IntArrayTag originalSherds = null;
 

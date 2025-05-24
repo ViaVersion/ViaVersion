@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types.math;
 
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -49,6 +50,11 @@ public class BlockPositionType1_14 extends Type<BlockPosition> {
         buffer.writeLong((((long) object.x() & 0x3ffffff) << 38)
             | (object.y() & 0xfff)
             | ((((long) object.z()) & 0x3ffffff) << 12));
+    }
+
+    @Override
+    public void write(final Ops ops, final BlockPosition value) {
+        ops.write(Types.INT_ARRAY_PRIMITIVE, new int[]{value.x(), value.y(), value.z()});
     }
 
     public static final class OptionalBlockPositionType extends OptionalType<BlockPosition> {

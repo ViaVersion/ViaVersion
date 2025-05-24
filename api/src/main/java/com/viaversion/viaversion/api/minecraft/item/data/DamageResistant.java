@@ -22,22 +22,29 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 
-public record DamageResistant(String typesTagKey) {
+public record DamageResistant(Key typesTagKey) {
 
     public static final Type<DamageResistant> TYPE = new Type<>(DamageResistant.class) {
         @Override
         public DamageResistant read(final ByteBuf buffer) {
-            final String typesTagKey = Types.STRING.read(buffer);
+            final Key typesTagKey = Types.RESOURCE_LOCATION.read(buffer);
             return new DamageResistant(typesTagKey);
         }
 
         @Override
         public void write(final ByteBuf buffer, final DamageResistant value) {
-            Types.STRING.write(buffer, value.typesTagKey());
+            Types.RESOURCE_LOCATION.write(buffer, value.typesTagKey());
+        }
+
+        @Override
+        public void write(final Ops ops, final DamageResistant value) {
+            ops.writeMap(map -> map.write("types", Types.TAG_KEY, value.typesTagKey));
         }
     };
 }

@@ -245,16 +245,7 @@ public class PlayerPacketRewriter1_9 {
                         wrapper.passthrough(Types.UUID); // Player UUID
                         if (action == 0) { // add player
                             wrapper.passthrough(Types.STRING); // Player Name
-
-                            int properties = wrapper.passthrough(Types.VAR_INT);
-
-                            // loop through properties
-                            for (int j = 0; j < properties; j++) {
-                                wrapper.passthrough(Types.STRING); // name
-                                wrapper.passthrough(Types.STRING); // value
-                                wrapper.passthrough(Types.OPTIONAL_STRING); // signature
-                            }
-
+                            wrapper.passthrough(Types.PROFILE_PROPERTY_ARRAY);
                             wrapper.passthrough(Types.VAR_INT); // gamemode
                             wrapper.passthrough(Types.VAR_INT); // ping
                             String displayName = wrapper.read(Types.OPTIONAL_STRING);

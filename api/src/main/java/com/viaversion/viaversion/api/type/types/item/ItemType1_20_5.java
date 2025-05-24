@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types.item;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
@@ -31,6 +32,7 @@ import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.Map;
@@ -114,6 +116,31 @@ public class ItemType1_20_5 extends Type<Item> {
                 Types.VAR_INT.writePrimitive(buffer, value.id());
             }
         }
+    }
+
+    @Override
+    public void write(final Ops ops, final Item item) {
+        ops.writeMap(map -> {
+            map.write("id", Types.RESOURCE_LOCATION, ops.context().registryAccess().item(item.identifier()))
+                .write("count", Types.VAR_INT, item.amount());
+
+            if (item.dataContainer().isEmpty()) {
+                return;
+            }
+
+            map.writeMap("components", components -> {
+                for (final Map.Entry<StructuredDataKey<?>, StructuredData<?>> entry : item.dataContainer().data().entrySet()) {
+                    final StructuredData<?> data = entry.getValue();
+                    String key = Key.namespaced(data.key().identifier());
+                    if (data.isEmpty()) {
+                        key = "!" + key;
+                    }
+
+                    //noinspection unchecked
+                    components.write(key, (Type<StructuredData<?>>) dataType, data);
+                }
+            });
+        });
     }
 
     public final class OptionalItemType extends OptionalType<Item> {

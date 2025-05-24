@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
@@ -49,6 +50,15 @@ public record BlockStateProperties(Map<String, String> properties) implements Co
                 Types.STRING.write(buffer, entry.getKey());
                 Types.STRING.write(buffer, entry.getValue());
             }
+        }
+
+        @Override
+        public void write(final Ops ops, final BlockStateProperties value) {
+            ops.writeMap(map -> {
+                for (final Map.Entry<String, String> entry : value.properties.entrySet()) {
+                    map.write(Types.STRING, entry.getKey(), Types.STRING, entry.getValue());
+                }
+            });
         }
     };
 

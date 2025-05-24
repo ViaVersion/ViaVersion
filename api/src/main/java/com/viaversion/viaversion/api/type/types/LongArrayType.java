@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
@@ -69,5 +70,10 @@ public class LongArrayType extends Type<long[]> {
         for (final long l : object) {
             buffer.writeLong(l);
         }
+    }
+
+    @Override
+    public void write(final Ops ops, final long[] value) {
+        ops.writeLongs(value);
     }
 }

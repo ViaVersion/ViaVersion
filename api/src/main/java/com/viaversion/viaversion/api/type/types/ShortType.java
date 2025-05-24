@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.TypeConverter;
 import io.netty.buffer.ByteBuf;
@@ -56,6 +57,11 @@ public class ShortType extends Type<Short> implements TypeConverter<Short> {
     @Deprecated
     public void write(ByteBuf buffer, Short object) {
         buffer.writeShort(object);
+    }
+
+    @Override
+    public void write(final Ops ops, final Short value) {
+        ops.writeShort(value);
     }
 
     @Override

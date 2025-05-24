@@ -20,40 +20,40 @@ package com.viaversion.viaversion.data.item;
 import com.google.common.cache.CacheBuilder;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.item.ItemHasher;
+import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
+import com.viaversion.viaversion.api.minecraft.codec.CodecContext.RegistryAccess;
+import com.viaversion.viaversion.api.minecraft.codec.hash.Hasher;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.HashedStructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.rewriter.item.ItemDataComponentConverter;
-import com.viaversion.viaversion.rewriter.item.ItemDataComponentConverter.RegistryAccess;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.codec.CodecRegistryContext;
+import com.viaversion.viaversion.codec.hash.HashFunction;
+import com.viaversion.viaversion.codec.hash.HashOps;
 import com.viaversion.viaversion.util.SerializerVersion;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.lenni0451.mcstructs.converter.impl.v1_21_5.HashConverter_v1_21_5;
-import net.lenni0451.mcstructs.itemcomponents.ItemComponentRegistry;
-import net.lenni0451.mcstructs.itemcomponents.impl.v1_21_5.ItemComponents_v1_21_5;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemHasherBase implements ItemHasher {
 
-    public static final int UNKNOWN_HASH = Integer.MIN_VALUE;
+    public static int UNKNOWN_HASH = 399825415; // some random-ish number, from hashing Integer.MIN_VALUE+1 with crc32c
     private final Map<Integer, HashedItem> hashes = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(1024).<Integer, HashedItem>build().asMap();
-    private final List<String> enchantments = new ArrayList<>();
-    private final ItemDataComponentConverter itemComponentConverter;
     protected final UserConnection connection;
+    private final List<String> enchantments = new ArrayList<>();
     private boolean processingClientboundInventoryPacket;
+    private final CodecContext context;
+    private final CodecContext mappedContext;
 
-    public ItemHasherBase(final UserConnection connection, final SerializerVersion serializerVersion, final SerializerVersion mappedSerializerVersion, final MappingData mappingData) {
-        final RegistryAccess registryAccess = RegistryAccess.of(
-            this.enchantments,
-            ItemComponentRegistry.V1_21_5.getRegistries(), // Unused outside of file deserialization
-            mappingData
-        );
-        this.itemComponentConverter = new ItemDataComponentConverter(serializerVersion, mappedSerializerVersion, registryAccess);
+    public ItemHasherBase(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection, final SerializerVersion serializerVersion, final SerializerVersion mappedSerializerVersion) {
+        final RegistryAccess registryAccess = RegistryAccess.of(this.enchantments, protocol.getMappingData());
+        this.context = new CodecRegistryContext(protocol, serializerVersion, mappedSerializerVersion, registryAccess, false);
+        this.mappedContext = new CodecRegistryContext(protocol, serializerVersion, mappedSerializerVersion, registryAccess, true);
         this.connection = connection;
     }
 
@@ -71,10 +71,10 @@ public class ItemHasherBase implements ItemHasher {
      * @return the hashed item
      */
     public HashedItem toHashedItem(final Item item, final boolean mapped) {
-        return toHashedItem(this.itemComponentConverter, item, mapped);
+        return toHashedItem(new HashOps(mapped ? mappedContext : context, HashFunction.CRC32C), item);
     }
 
-    public static HashedItem toHashedItem(final ItemDataComponentConverter converter, final Item item, final boolean mapped) {
+    public static HashedItem toHashedItem(final Hasher hasher, final Item item) {
         final HashedItem hashedItem = new HashedStructuredItem(item.identifier(), item.amount());
         for (final StructuredData<?> data : item.dataContainer().data().values()) {
             if (data.isEmpty()) {
@@ -82,8 +82,7 @@ public class ItemHasherBase implements ItemHasher {
                 continue;
             }
 
-            final ItemDataComponentConverter.Result<?> result = converter.viaToMcStructs(data, mapped);
-            final int hash = result != null ? hash(result) : UNKNOWN_HASH;
+            final int hash = hasher.context().isSupported(data.key()) ? hash(hasher, data) : ItemHasherBase.UNKNOWN_HASH;
             hashedItem.dataHashesById().put(data.id(), hash);
         }
         return hashedItem;
@@ -122,7 +121,7 @@ public class ItemHasherBase implements ItemHasher {
             final int typeId = entry.getIntKey();
             if (entry.getIntValue() == UNKNOWN_HASH && clientItem.dataHashesById().containsKey(typeId)) {
                 final int clientProvidedHash = clientItem.dataHashesById().get(typeId);
-                originalItem.dataHashesById().put(typeId, clientProvidedHash);
+                entry.setValue(clientProvidedHash);
             }
         }
         return originalItem;
@@ -138,11 +137,15 @@ public class ItemHasherBase implements ItemHasher {
         this.processingClientboundInventoryPacket = processingClientboundInventoryPacket;
     }
 
-    private static <T> int hash(final ItemDataComponentConverter.Result<T> result) {
-        return result.type().getCodec().serialize(HashConverter_v1_21_5.CRC32C, result.value()).getOrThrow().asInt();
+    private static <T> int hash(final Hasher hasher, final StructuredData<T> data) {
+        hasher.reset();
+        hasher.write(data.key().type(), data.value());
+        return hasher.hash();
     }
 
     private int hashTag(final CompoundTag tag) {
-        return ItemComponents_v1_21_5.V1_21_5.CUSTOM_DATA.getCodec().serialize(HashConverter_v1_21_5.CRC32C, tag).getOrThrow().asInt();
+        final HashOps hasher = new HashOps(context, HashFunction.CRC32C);
+        Types.TAG.write(hasher, tag);
+        return hasher.hash();
     }
 }

@@ -18,28 +18,31 @@
 package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.storage;
 
 import com.google.common.cache.CacheBuilder;
-import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
+import com.viaversion.viaversion.api.minecraft.codec.CodecContext.RegistryAccess;
+import com.viaversion.viaversion.api.minecraft.codec.hash.Hasher;
 import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
-import com.viaversion.viaversion.rewriter.item.ItemDataComponentConverter;
-import com.viaversion.viaversion.rewriter.item.ItemDataComponentConverter.RegistryAccess;
+import com.viaversion.viaversion.codec.CodecRegistryContext;
+import com.viaversion.viaversion.codec.hash.HashFunction;
+import com.viaversion.viaversion.codec.hash.HashOps;
+import com.viaversion.viaversion.data.item.ItemHasherBase;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.lenni0451.mcstructs.converter.impl.v1_21_5.HashConverter_v1_21_5;
-import net.lenni0451.mcstructs.itemcomponents.ItemComponentRegistry;
 
 public class ItemHashStorage1_21_5 implements ItemHasher {
 
     private final Map<Long, StructuredData<?>> hashToStructuredData = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(512).<Long, StructuredData<?>>build().asMap();
     private final List<String> enchantmentRegistry = new ArrayList<>();
-    private final ItemDataComponentConverter itemComponentConverter;
     private boolean processingClientboundInventoryPacket;
+    private final CodecContext context;
 
-    public ItemHashStorage1_21_5(final MappingData mappingData) {
-        final RegistryAccess registryAccess = RegistryAccess.of(this.enchantmentRegistry, ItemComponentRegistry.V1_21_5.getRegistries(), mappingData);
-        this.itemComponentConverter = new ItemDataComponentConverter(SerializerVersion.V1_21_5, SerializerVersion.V1_21_5, registryAccess); // always using 1.21.5 items as input
+    public ItemHashStorage1_21_5(final Protocol1_21_4To1_21_5 protocol) {
+        final RegistryAccess registryAccess = RegistryAccess.of(this.enchantmentRegistry, protocol.getMappingData());
+        this.context = new CodecRegistryContext(protocol, SerializerVersion.V1_21_5, SerializerVersion.V1_21_5, registryAccess, true); // always using 1.21.5 items as input
     }
 
     @Override
@@ -53,12 +56,13 @@ public class ItemHashStorage1_21_5 implements ItemHasher {
             return;
         }
 
-        final ItemDataComponentConverter.Result<?> result = this.itemComponentConverter.viaToMcStructs(structuredData, true);
-        if (result == null) {
+        final HashOps hasher = new HashOps(context, HashFunction.CRC32C);
+        final int hash = hasher.context().isSupported(structuredData.key()) ? hash(hasher, structuredData) : ItemHasherBase.UNKNOWN_HASH;
+        if (hash == ItemHasherBase.UNKNOWN_HASH) {
             return;
         }
 
-        final long key = (long) structuredData.id() << 32 | hash(result);
+        final long key = (long) structuredData.id() << 32 | hash;
         this.hashToStructuredData.computeIfAbsent(key, $ -> structuredData.copy());
     }
 
@@ -68,8 +72,9 @@ public class ItemHashStorage1_21_5 implements ItemHasher {
         return data != null ? data.copy() : null;
     }
 
-    private static <T> int hash(final ItemDataComponentConverter.Result<T> result) {
-        return result.type().getCodec().serialize(HashConverter_v1_21_5.CRC32C, result.value()).getOrThrow().asInt();
+    private static <T> int hash(final Hasher hasher, final StructuredData<T> data) {
+        hasher.write(data.key().type(), data.value());
+        return hasher.hash();
     }
 
     @Override

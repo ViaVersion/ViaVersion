@@ -23,9 +23,11 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -44,6 +46,14 @@ public record UseCooldown(float seconds, @Nullable String cooldownGroup) impleme
         public void write(final ByteBuf buffer, final UseCooldown value) {
             buffer.writeFloat(value.seconds());
             Types.OPTIONAL_STRING.write(buffer, value.cooldownGroup());
+        }
+
+        @Override
+        public void write(final Ops ops, final UseCooldown value) {
+            final Key cooldownGroup = value.cooldownGroup != null ? Key.of(value.cooldownGroup) : null;
+            ops.writeMap(map -> map
+                .write("seconds", Types.FLOAT, value.seconds())
+                .writeOptional("cooldown_group", Types.RESOURCE_LOCATION, cooldownGroup));
         }
     };
 

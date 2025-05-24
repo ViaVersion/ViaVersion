@@ -1,6 +1,6 @@
 dependencies {
     api(projects.viaversionApi)
-    api(rootProject.libs.bundles.mcstructs) {
+    api(rootProject.libs.text) {
         exclude("com.google.code.gson", "gson")
         exclude("com.viaversion", "nbt")
     }

@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
@@ -40,6 +41,13 @@ public record Weapon(int itemDamagePerAttack, float disableBlockingForSeconds) {
         public void write(final ByteBuf buffer, final Weapon value) {
             Types.VAR_INT.writePrimitive(buffer, value.itemDamagePerAttack());
             buffer.writeFloat(value.disableBlockingForSeconds());
+        }
+
+        @Override
+        public void write(final Ops ops, final Weapon weapon) {
+            ops.writeMap(map -> map
+                .writeOptional("item_damage_per_attack", Types.INT, weapon.itemDamagePerAttack, 1)
+                .writeOptional("disable_blocking_for_seconds", Types.FLOAT, weapon.disableBlockingForSeconds, 0F));
         }
     };
 }

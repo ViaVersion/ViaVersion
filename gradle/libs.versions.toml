@@ -29,7 +29,6 @@ fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil"
 vianbt = { group = "com.viaversion", name = "nbt", version.ref = "vianbt" }
 # Custom version that uses ViaNBT instead of its own inbuilt NBT library
 text = { group = "com.viaversion.mcstructs", name = "text", version.ref = "mcstructs" }
-itemDataComponents = { group = "com.viaversion.mcstructs", name = "itemcomponents", version.ref = "mcstructs" }
 
 netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
@@ -49,4 +48,3 @@ viaProxy = { group = "net.raphimc", name = "ViaProxy", version.ref = "viaProxy" 
 [bundles]
 
 junit = ["jupiterApi", "jupiterEngine"]
-mcstructs = ["text", "itemDataComponents"]

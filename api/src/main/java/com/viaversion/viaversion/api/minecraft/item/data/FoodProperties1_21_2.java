@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
@@ -42,6 +43,14 @@ public record FoodProperties1_21_2(int nutrition, float saturationModifier, bool
             Types.VAR_INT.writePrimitive(buffer, value.nutrition);
             buffer.writeFloat(value.saturationModifier);
             buffer.writeBoolean(value.canAlwaysEat);
+        }
+
+        @Override
+        public void write(final Ops ops, final FoodProperties1_21_2 value) {
+            ops.writeMap(map -> map
+                .write("nutrition", Types.VAR_INT, value.nutrition)
+                .write("saturation", Types.FLOAT, value.saturationModifier)
+                .writeOptional("can_always_eat", Types.BOOLEAN, value.canAlwaysEat, false));
         }
     };
 }

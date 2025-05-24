@@ -23,11 +23,14 @@
 package com.viaversion.viaversion.api.type.types.misc;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import java.util.Map;
 
 
 /**
@@ -58,6 +61,15 @@ public class CompoundTagType extends Type<CompoundTag> {
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void write(final Ops ops, final CompoundTag value) {
+        ops.writeMap(map -> {
+            for (final Map.Entry<String, Tag> entry : value.entrySet()) {
+                map.write(entry.getKey(), Types.TAG, entry.getValue());
+            }
+        });
     }
 
     public static final class OptionalCompoundTagType extends OptionalType<CompoundTag> {

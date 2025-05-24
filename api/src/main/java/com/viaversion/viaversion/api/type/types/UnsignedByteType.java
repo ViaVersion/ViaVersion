@@ -22,8 +22,10 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.TypeConverter;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class UnsignedByteType extends Type<Short> implements TypeConverter<Short> {
@@ -41,6 +43,11 @@ public class UnsignedByteType extends Type<Short> implements TypeConverter<Short
     @Override
     public void write(ByteBuf buffer, Short object) {
         buffer.writeByte(object);
+    }
+
+    @Override
+    public void write(Ops ops, Short value) {
+        Types.BYTE.write(ops, (byte) (value & 0xFF));
     }
 
     @Override

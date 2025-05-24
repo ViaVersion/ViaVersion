@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
@@ -90,5 +91,14 @@ public class ArrayType<T> extends Type<T[]> {
         for (T o : object) {
             elementType.write(buffer, o);
         }
+    }
+
+    @Override
+    public void write(final Ops ops, final T[] value) {
+        ops.writeList(list -> {
+            for (T element : value) {
+                list.write(elementType, element);
+            }
+        });
     }
 }

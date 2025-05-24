@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentMatchers;
 import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentMatchers.DataComponentMatchersType;
+import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentPredicate;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -42,7 +43,7 @@ public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher
                              DataComponentMatchers dataMatchers) implements Copyable, Rewritable {
 
     public BlockPredicate(@Nullable final HolderSet holderSet, final StatePropertyMatcher @Nullable [] propertyMatchers, @Nullable final CompoundTag tag) {
-        this(holderSet, propertyMatchers, tag, null);
+        this(holderSet, propertyMatchers, tag, new DataComponentMatchers(new StructuredData[0], new DataComponentPredicate[0]));
     }
 
     public static final Type<BlockPredicate> TYPE1_20_5 = new Type<>(BlockPredicate.class) {

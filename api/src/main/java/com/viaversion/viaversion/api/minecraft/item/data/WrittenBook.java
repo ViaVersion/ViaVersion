@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
@@ -48,6 +49,16 @@ public record WrittenBook(FilterableString title, String author, int generation,
             Types.VAR_INT.writePrimitive(buffer, value.generation);
             FilterableComponent.ARRAY_TYPE.write(buffer, value.pages);
             buffer.writeBoolean(value.resolved);
+        }
+
+        @Override
+        public void write(final Ops ops, final WrittenBook value) {
+            ops.writeMap(map -> map
+                .write("title", FilterableString.TYPE, value.title)
+                .write("author", Types.STRING, value.author)
+                .writeOptional("generation", Types.INT, value.generation, 0)
+                .writeOptional("pages", FilterableComponent.ARRAY_TYPE, value.pages, new FilterableComponent[0])
+                .writeOptional("resolved", Types.BOOLEAN, value.resolved, false));
         }
     };
 

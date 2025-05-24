@@ -22,7 +22,9 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public record DyedColor(int rgb, boolean showInTooltip) {
@@ -55,6 +57,11 @@ public record DyedColor(int rgb, boolean showInTooltip) {
         @Override
         public void write(final ByteBuf buffer, final DyedColor value) {
             buffer.writeInt(value.rgb);
+        }
+
+        @Override
+        public void write(final Ops ops, final DyedColor dyedColor) {
+            ops.write(Types.INT, dyedColor.rgb);
         }
     };
 }

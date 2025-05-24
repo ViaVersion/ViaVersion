@@ -22,12 +22,16 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.util.ArrayUtil;
 import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 
-public record CustomModelData1_21_4(float[] floats, boolean[] booleans, String[] strings, int[] colors) implements Copyable {
+public record CustomModelData1_21_4(float[] floats, boolean[] booleans, String[] strings,
+                                    int[] colors) implements Copyable {
 
     public static final Type<CustomModelData1_21_4> TYPE = new Type<>(CustomModelData1_21_4.class) {
         @Override
@@ -45,6 +49,15 @@ public record CustomModelData1_21_4(float[] floats, boolean[] booleans, String[]
             Types.BOOLEAN_ARRAY_PRIMITIVE.write(buffer, value.booleans());
             Types.STRING_ARRAY.write(buffer, value.strings());
             Types.INT_ARRAY_PRIMITIVE.write(buffer, value.colors());
+        }
+
+        @Override
+        public void write(final Ops ops, final CustomModelData1_21_4 value) {
+            ops.writeMap(map -> map
+                .writeOptional("floats", new ArrayType<>(Types.FLOAT), ArrayUtil.boxedArray(value.floats), new Float[0])
+                .writeOptional("flags", new ArrayType<>(Types.BOOLEAN), ArrayUtil.boxedArray(value.booleans), new Boolean[0])
+                .writeOptional("strings", Types.STRING_ARRAY, value.strings(), new String[0])
+                .writeOptional("colors", new ArrayType<>(Types.INT), ArrayUtil.boxedArray(value.colors), new Integer[0]));
         }
     };
 

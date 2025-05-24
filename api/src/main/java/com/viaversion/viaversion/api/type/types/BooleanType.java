@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.TypeConverter;
@@ -29,6 +30,7 @@ import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class BooleanType extends Type<Boolean> implements TypeConverter<Boolean> {
+
     public BooleanType() {
         super(Boolean.class);
     }
@@ -50,6 +52,11 @@ public class BooleanType extends Type<Boolean> implements TypeConverter<Boolean>
             return number.intValue() == 1;
         }
         return (Boolean) o;
+    }
+
+    @Override
+    public void write(final Ops ops, final Boolean value) {
+        ops.writeBoolean(value);
     }
 
     // Lol

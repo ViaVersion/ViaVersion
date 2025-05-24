@@ -37,5 +37,7 @@ public class StructuredDataKeys1_21_5 extends StructuredDataKeys1_21_2 {
         final AdventureModePredicateType1_21_5 adventureModePredicateType = new AdventureModePredicateType1_21_5(types.structuredDataArray());
         this.canPlaceOn = add("can_place_on", adventureModePredicateType);
         this.canBreak = add("can_break", adventureModePredicateType);
+        this.unsupportedForOps.add(this.canPlaceOn);
+        this.unsupportedForOps.add(this.canBreak);
     }
 }

@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -46,5 +47,10 @@ public abstract class OptionalType<T> extends Type<T> {
             buffer.writeBoolean(true);
             type.write(buffer, value);
         }
+    }
+
+    @Override
+    public void write(final Ops ops, final T value) {
+        type.write(ops, value);
     }
 }

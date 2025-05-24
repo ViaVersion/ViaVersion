@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
@@ -43,6 +44,12 @@ public record LodestoneTracker(@Nullable GlobalBlockPosition position, boolean t
             Types.OPTIONAL_GLOBAL_POSITION.write(buffer, value.position);
             buffer.writeBoolean(value.tracked);
         }
-    };
 
+        @Override
+        public void write(final Ops ops, final LodestoneTracker value) {
+            ops.writeMap(map -> map
+                .writeOptional("target", Types.GLOBAL_POSITION, value.position)
+                .writeOptional("tracked", Types.BOOLEAN, value.tracked, true));
+        }
+    };
 }

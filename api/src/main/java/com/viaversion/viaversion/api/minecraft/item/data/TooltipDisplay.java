@@ -23,9 +23,11 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
@@ -54,6 +56,14 @@ public record TooltipDisplay(boolean hideTooltip,
             for (int hiddenComponent : value.hiddenComponents()) {
                 Types.VAR_INT.writePrimitive(buffer, hiddenComponent);
             }
+        }
+
+        @Override
+        public void write(final Ops ops, final TooltipDisplay value) {
+            final Key[] hiddenComponents = value.hiddenComponents.intStream().mapToObj(id -> ops.context().registryAccess().dataComponentType(id)).toArray(Key[]::new);
+            ops.writeMap(map -> map
+                .writeOptional("hide_tooltip", Types.BOOLEAN, value.hideTooltip, false)
+                .writeOptional("hidden_components", Types.RESOURCE_LOCATION_ARRAY, hiddenComponents, new Key[0]));
         }
     };
 

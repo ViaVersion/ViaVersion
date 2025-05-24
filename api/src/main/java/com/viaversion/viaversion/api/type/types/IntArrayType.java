@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
@@ -62,5 +63,10 @@ public class IntArrayType extends Type<int[]> {
             array[i] = buffer.readInt();
         }
         return array;
+    }
+
+    @Override
+    public void write(final Ops ops, final int[] value) {
+        ops.writeInts(value);
     }
 }

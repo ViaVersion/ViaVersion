@@ -128,13 +128,7 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                 wrapper.passthrough(Types.UUID); // UUID
                 if (action == 0) { // Add player
                     wrapper.passthrough(Types.STRING); // Player Name
-
-                    final int properties = wrapper.passthrough(Types.VAR_INT);
-                    for (int j = 0; j < properties; j++) {
-                        wrapper.passthrough(Types.STRING); // Name
-                        wrapper.passthrough(Types.STRING); // Value
-                        wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
-                    }
+                    wrapper.passthrough(Types.PROFILE_PROPERTY_ARRAY);
 
                     final int gamemode = wrapper.read(Types.VAR_INT);
                     final int ping = wrapper.read(Types.VAR_INT);

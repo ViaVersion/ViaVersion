@@ -24,7 +24,7 @@ package com.viaversion.viaversion.api.minecraft.data.version;
 
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.api.minecraft.item.data.ContainterContents.ContainerContentsType;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 
 public class StructuredDataKeys1_21_2 extends VersionedStructuredDataKeys {
@@ -35,7 +35,7 @@ public class StructuredDataKeys1_21_2 extends VersionedStructuredDataKeys {
     public final StructuredDataKey<Item> useRemainder;
 
     public StructuredDataKeys1_21_2(final VersionedTypesHolder types) {
-        this.container = add("container", new ArrayType<>(types.item(), 256));
+        this.container = add("container", new ContainerContentsType(types.item()));
         this.chargedProjectiles = add("charged_projectiles", types.itemArray());
         this.bundleContents = add("bundle_contents", types.itemArray());
         this.useRemainder = add("use_remainder", types.item());

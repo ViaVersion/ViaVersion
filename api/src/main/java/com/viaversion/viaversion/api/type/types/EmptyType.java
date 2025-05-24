@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Unit;
 import io.netty.buffer.ByteBuf;
@@ -39,5 +40,12 @@ public final class EmptyType extends Type<Unit> {
 
     @Override
     public void write(final ByteBuf buffer, final Unit value) {
+    }
+
+    @Override
+    public void write(final Ops ops, final Unit value) {
+        // Written as an empty map because lol
+        ops.writeMap(map -> {
+        });
     }
 }

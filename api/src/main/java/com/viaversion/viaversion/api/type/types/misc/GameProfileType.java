@@ -23,9 +23,11 @@
 package com.viaversion.viaversion.api.type.types.misc;
 
 import com.viaversion.viaversion.api.minecraft.GameProfile;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
+import java.util.UUID;
 
 public final class GameProfileType extends Type<GameProfile> {
 
@@ -36,15 +38,8 @@ public final class GameProfileType extends Type<GameProfile> {
     @Override
     public GameProfile read(final ByteBuf buffer) {
         final String name = Types.OPTIONAL_STRING.read(buffer);
-        final java.util.UUID id = Types.OPTIONAL_UUID.read(buffer);
-        final int propertyCount = Types.VAR_INT.readPrimitive(buffer);
-        final GameProfile.Property[] properties = new GameProfile.Property[propertyCount];
-        for (int i = 0; i < propertyCount; i++) {
-            final String propertyName = Types.STRING.read(buffer);
-            final String propertyValue = Types.STRING.read(buffer);
-            final String propertySignature = Types.OPTIONAL_STRING.read(buffer);
-            properties[i] = new GameProfile.Property(propertyName, propertyValue, propertySignature);
-        }
+        final UUID id = Types.OPTIONAL_UUID.read(buffer);
+        final GameProfile.Property[] properties = Types.PROFILE_PROPERTY_ARRAY.read(buffer);
         return new GameProfile(name, id, properties);
     }
 
@@ -52,11 +47,14 @@ public final class GameProfileType extends Type<GameProfile> {
     public void write(final ByteBuf buffer, final GameProfile value) {
         Types.OPTIONAL_STRING.write(buffer, value.name());
         Types.OPTIONAL_UUID.write(buffer, value.id());
-        Types.VAR_INT.writePrimitive(buffer, value.properties().length);
-        for (final GameProfile.Property property : value.properties()) {
-            Types.STRING.write(buffer, property.name());
-            Types.STRING.write(buffer, property.value());
-            Types.OPTIONAL_STRING.write(buffer, property.signature());
-        }
+        Types.PROFILE_PROPERTY_ARRAY.write(buffer, value.properties());
+    }
+
+    @Override
+    public void write(final Ops ops, final GameProfile value) {
+        ops.writeMap(map -> map
+            .writeOptional("name", Types.STRING, value.name())
+            .writeOptional("id", Types.STRING, value.id().toString())
+            .write("properties", Types.PROFILE_PROPERTY_ARRAY, value.properties()));
     }
 }

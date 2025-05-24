@@ -22,10 +22,12 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
@@ -60,6 +62,11 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
         public void write(final ByteBuf buffer, final AttributeModifiers1_21 value) {
             AttributeModifier.ARRAY_TYPE.write(buffer, value.modifiers());
         }
+
+        @Override
+        public void write(final Ops ops, final AttributeModifiers1_21 value) {
+            ops.write(AttributeModifier.ARRAY_TYPE, value.modifiers);
+        }
     };
 
     public AttributeModifiers1_21 rewrite(final Int2IntFunction rewriteFunction) {
@@ -77,6 +84,8 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
     }
 
     public record AttributeModifier(int attribute, ModifierData modifier, int slotType) {
+        private static final String[] EQUIPMENT_SLOT_GROUPS = {"any", "mainhand", "offhand", "hand", "feet", "legs", "chest", "head", "armor", "body", "saddle"};
+        private static final String[] OPERATION = {"add_value", "add_multiplied_base", "add_multiplied_total"};
 
         public static final Type<AttributeModifier> TYPE = new Type<>(AttributeModifier.class) {
             @Override
@@ -92,6 +101,17 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
                 Types.VAR_INT.writePrimitive(buffer, value.attribute);
                 ModifierData.TYPE.write(buffer, value.modifier);
                 Types.VAR_INT.writePrimitive(buffer, value.slotType);
+            }
+
+            @Override
+            public void write(final Ops ops, final AttributeModifier value) {
+                final Key attribute = ops.context().registryAccess().attributeModifier(value.attribute);
+                ops.writeMap(map -> map
+                    .write("type", Types.RESOURCE_LOCATION, attribute)
+                    .write("id", Types.RESOURCE_LOCATION, Key.of(value.modifier.id()))
+                    .write("amount", Types.DOUBLE, value.modifier.amount)
+                    .write("operation", Types.STRING, OPERATION[value.modifier.operation()])
+                    .writeOptional("slot", Types.STRING, EQUIPMENT_SLOT_GROUPS[value.slotType()], "any"));
             }
         };
         public static final Type<AttributeModifier[]> ARRAY_TYPE = new ArrayType<>(TYPE);
@@ -116,4 +136,5 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
             }
         };
     }
+
 }

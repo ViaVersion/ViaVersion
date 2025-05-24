@@ -277,13 +277,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
                 wrapper.passthrough(Types.UUID);
                 if (actions.get(0)) {
                     wrapper.passthrough(Types.STRING); // Player Name
-
-                    final int properties = wrapper.passthrough(Types.VAR_INT);
-                    for (int j = 0; j < properties; j++) {
-                        wrapper.passthrough(Types.STRING); // Name
-                        wrapper.passthrough(Types.STRING); // Value
-                        wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
-                    }
+                    wrapper.passthrough(Types.PROFILE_PROPERTY_ARRAY);
                 }
                 if (actions.get(1) && wrapper.passthrough(Types.BOOLEAN)) {
                     wrapper.passthrough(Types.UUID); // Session UUID

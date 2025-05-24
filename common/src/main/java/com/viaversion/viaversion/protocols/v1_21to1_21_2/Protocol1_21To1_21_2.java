@@ -113,14 +113,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
             wrapper.passthrough(Types.UUID); // UUID
             wrapper.passthrough(Types.STRING); // Name
-
-            final int properties = wrapper.passthrough(Types.VAR_INT);
-            for (int i = 0; i < properties; i++) {
-                wrapper.passthrough(Types.STRING); // Name
-                wrapper.passthrough(Types.STRING); // Value
-                wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
-            }
-
+            wrapper.passthrough(Types.PROFILE_PROPERTY_ARRAY);
             wrapper.read(Types.BOOLEAN); // Strict error handling
         });
 
@@ -147,13 +140,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
                 wrapper.passthrough(Types.UUID);
                 if (actions.get(0)) {
                     wrapper.passthrough(Types.STRING); // Player Name
-
-                    final int properties = wrapper.passthrough(Types.VAR_INT);
-                    for (int j = 0; j < properties; j++) {
-                        wrapper.passthrough(Types.STRING); // Name
-                        wrapper.passthrough(Types.STRING); // Value
-                        wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
-                    }
+                    wrapper.passthrough(Types.PROFILE_PROPERTY_ARRAY);
                 }
                 if (actions.get(1) && wrapper.passthrough(Types.BOOLEAN)) {
                     wrapper.passthrough(Types.UUID); // Session UUID

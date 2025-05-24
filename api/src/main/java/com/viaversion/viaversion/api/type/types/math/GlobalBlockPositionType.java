@@ -23,9 +23,11 @@
 package com.viaversion.viaversion.api.type.types.math;
 
 import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 
 public class GlobalBlockPositionType extends Type<GlobalBlockPosition> {
@@ -44,6 +46,13 @@ public class GlobalBlockPositionType extends Type<GlobalBlockPosition> {
     public void write(ByteBuf buffer, GlobalBlockPosition object) {
         Types.STRING.write(buffer, object.dimension());
         Types.BLOCK_POSITION1_14.write(buffer, object);
+    }
+
+    @Override
+    public void write(final Ops ops, final GlobalBlockPosition value) {
+        ops.writeMap(map -> map
+            .write("dimension", Types.RESOURCE_LOCATION, Key.of(value.dimension()))
+            .write("pos", Types.BLOCK_POSITION1_14, value));
     }
 
     public static final class OptionalGlobalPositionType extends OptionalType<GlobalBlockPosition> {

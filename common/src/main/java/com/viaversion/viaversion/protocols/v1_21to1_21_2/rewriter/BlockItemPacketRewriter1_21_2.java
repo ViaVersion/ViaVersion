@@ -561,7 +561,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             return new FoodProperties1_21_2(food.nutrition(), food.saturationModifier(), food.canAlwaysEat());
         });
         dataContainer.replaceKey(StructuredDataKey.POTION_CONTENTS1_20_5, StructuredDataKey.POTION_CONTENTS1_21_2);
-        dataContainer.replace(StructuredDataKey.FIRE_RESISTANT, StructuredDataKey.DAMAGE_RESISTANT, fireResistant -> new DamageResistant("minecraft:is_fire"));
+        dataContainer.replace(StructuredDataKey.FIRE_RESISTANT, StructuredDataKey.DAMAGE_RESISTANT, fireResistant -> new DamageResistant(Key.of("minecraft:is_fire")));
         dataContainer.replace(StructuredDataKey.LOCK, tag -> {
             final String lock = ((StringTag) tag).getValue();
             final CompoundTag predicateTag = new CompoundTag();
@@ -624,7 +624,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         });
         dataContainer.replaceKey(StructuredDataKey.POTION_CONTENTS1_21_2, StructuredDataKey.POTION_CONTENTS1_20_5);
         dataContainer.replace(StructuredDataKey.DAMAGE_RESISTANT, StructuredDataKey.FIRE_RESISTANT, damageResistant -> {
-            if (Key.stripMinecraftNamespace(damageResistant.typesTagKey()).equals("is_fire")) {
+            if (damageResistant.typesTagKey().equals("is_fire")) {
                 return Unit.INSTANCE;
             }
             return null;
