@@ -22,11 +22,31 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record GameProfile(@Nullable String name, @Nullable UUID id, Property[] properties) {
 
+    public GameProfile(@Nullable final String name, @Nullable final UUID id) {
+        this(name, id, new Property[0]);
+    }
+
+    public Map<String, List<Property>> propertiesMap() {
+        final Map<String, List<Property>> map = new HashMap<>();
+        for (Property property : properties) {
+            map.computeIfAbsent(property.name(), k -> new ArrayList<>()).add(property);
+        }
+        return map;
+    }
+
     public record Property(String name, String value, @Nullable String signature) {
+
+        public Property(final String name, final String value) {
+            this(name, value, null);
+        }
     }
 }
