@@ -430,7 +430,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     try {
                         page.setValue(ComponentUtil.convertJsonOrEmpty(page.getValue(), SerializerVersion.V1_8, SerializerVersion.V1_9).toString());
                     } catch (final Exception e) {
-                        // Don't fail on invalid JSON as per Vanilla behavior
+                        // Don't fail on invalid JSON as per Vanilla behaviour
                     }
                 }
             }
