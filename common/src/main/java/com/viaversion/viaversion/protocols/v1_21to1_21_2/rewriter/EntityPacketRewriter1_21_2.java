@@ -44,6 +44,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.GroundFlagTrack
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -154,8 +155,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.passthrough(Types.BOOLEAN); // Flat
             wrapper.passthrough(Types.OPTIONAL_GLOBAL_POSITION); // Last death location
             wrapper.passthrough(Types.VAR_INT); // Portal cooldown
-
             wrapper.write(Types.VAR_INT, 64); // Sea level
+            final byte keepDataMask = wrapper.passthrough(Types.BYTE); // Keep data mask
 
             final EntityTracker entityTracker = tracker(wrapper.user());
             if (entityTracker.currentWorld() != null && !entityTracker.currentWorld().equals(world)) {
@@ -169,6 +170,33 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
             wrapper.user().put(new GroundFlagTracker());
             wrapper.user().remove(ClientVehicleStorage.class);
+
+            if ((keepDataMask & 2) != 0) { // <= 1.21.1 resets some player data even when keep entity data is set
+                final boolean isBundling = wrapper.user().get(BundleStateTracker.class).isBundling();
+                if (!isBundling) {
+                    final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
+                    bundleStart.send(Protocol1_21To1_21_2.class);
+                }
+
+                wrapper.send(Protocol1_21To1_21_2.class);
+                wrapper.cancel();
+
+                final PacketWrapper entityDataPacket = wrapper.create(ClientboundPackets1_21_2.SET_ENTITY_DATA);
+                entityDataPacket.write(Types.VAR_INT, entityTracker.clientEntityId()); // Entity id
+                final List<EntityData> entityData = new ArrayList<>();
+                entityData.add(new EntityData(6 /*pose*/, VersionedTypes.V1_21_2.entityDataTypes.poseType, 0 /*standing*/));
+                entityData.add(new EntityData(9 /*health*/, VersionedTypes.V1_21_2.entityDataTypes.floatType, 20F)); // TODO: Track max health
+                entityDataPacket.write(VersionedTypes.V1_21_2.entityDataList, entityData);
+                entityDataPacket.send(Protocol1_21To1_21_2.class);
+
+                // TODO: Set the player velocity to zero
+                // TODO: Set pitch to 0 and yaw to -180
+
+                if (!isBundling) {
+                    final PacketWrapper bundleEnd = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
+                    bundleEnd.send(Protocol1_21To1_21_2.class);
+                }
+            }
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.PLAYER_POSITION, wrapper -> {
