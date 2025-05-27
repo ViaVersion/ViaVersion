@@ -54,7 +54,7 @@ public final class GameProfileType extends Type<GameProfile> {
     public void write(final Ops ops, final GameProfile value) {
         ops.writeMap(map -> map
             .writeOptional("name", Types.STRING, value.name())
-            .writeOptional("id", Types.STRING, value.id().toString())
+            .writeOptional("id", Types.STRING, value.id() != null ? value.id().toString() : null)
             .write("properties", Types.PROFILE_PROPERTY_ARRAY, value.properties()));
     }
 }
