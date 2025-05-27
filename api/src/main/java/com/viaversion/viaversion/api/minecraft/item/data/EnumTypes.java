@@ -35,7 +35,6 @@ public final class EnumTypes {
     public static final EnumType FOX_VARIANT = new EnumType("red", "snow");
     public static final EnumType SALMON_VARIANT = new EnumType("small", "medium", "large");
     public static final EnumType PARROT_VARIANT = new EnumType("red_blue", "blue", "green", "yellow_blue", "gray");
-    public static final EnumType TROPICAL_FISH_PATTERN = new EnumType("kob", "sunstreak", "snooper", "dasher", "brinely", "spotty", "flopper", "stripey", "glitter", "blockfish", "betty", "clayfish");
     public static final EnumType MUSHROOM_COW_VARIANT = new EnumType("red", "brown");
     public static final EnumType RABBIT_VARIANT = new EnumType("brown", "white", "black", "white_splotched", "gold", "salt", "evil");
     public static final EnumType HORSE_VARIANT = new EnumType("white", "creamy", "chestnut", "brown", "black", "gray", "dark_brown");

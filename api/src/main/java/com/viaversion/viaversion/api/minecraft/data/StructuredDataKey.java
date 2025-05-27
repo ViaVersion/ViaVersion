@@ -64,6 +64,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.ProvidesTrimMaterial;
 import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.ToolProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.TooltipDisplay;
+import com.viaversion.viaversion.api.minecraft.item.data.TropicalFishPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.UseCooldown;
 import com.viaversion.viaversion.api.minecraft.item.data.Weapon;
@@ -186,7 +187,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> FOX_VARIANT = new StructuredDataKey<>("fox/variant", EnumTypes.FOX_VARIANT);
     public static final StructuredDataKey<Integer> SALMON_SIZE = new StructuredDataKey<>("salmon/size", EnumTypes.SALMON_VARIANT);
     public static final StructuredDataKey<Integer> PARROT_VARIANT = new StructuredDataKey<>("parrot/variant", EnumTypes.PARROT_VARIANT);
-    public static final StructuredDataKey<Integer> TROPICAL_FISH_PATTERN = new StructuredDataKey<>("tropical_fish/pattern", EnumTypes.TROPICAL_FISH_PATTERN);
+    public static final StructuredDataKey<TropicalFishPattern> TROPICAL_FISH_PATTERN = new StructuredDataKey<>("tropical_fish/pattern", TropicalFishPattern.TYPE);
     public static final StructuredDataKey<Integer> TROPICAL_FISH_BASE_COLOR = new StructuredDataKey<>("tropical_fish/base_color", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<Integer> TROPICAL_FISH_PATTERN_COLOR = new StructuredDataKey<>("tropical_fish/pattern_color", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<Integer> MOOSHROOM_VARIANT = new StructuredDataKey<>("mooshroom/variant", EnumTypes.MUSHROOM_COW_VARIANT);
