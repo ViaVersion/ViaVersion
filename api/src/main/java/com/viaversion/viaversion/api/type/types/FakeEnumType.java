@@ -24,42 +24,49 @@ package com.viaversion.viaversion.api.type.types;
 
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.util.MathUtil;
+import java.util.List;
 
-public final class EnumType extends VarIntType {
+/**
+ * For enum types with hardcoded custom ids.
+ *
+ * @see EnumType
+ */
+public final class FakeEnumType extends VarIntType {
 
-    private final String[] names;
-    private final Fallback fallback;
+    private final Entry[] entries;
 
-    public EnumType(final String... names) {
-        this(Fallback.ZERO, names);
+    public FakeEnumType(final List<String> initialNames, final Entry... remainingEntries) {
+        this.entries = new Entry[initialNames.size() + remainingEntries.length];
+        for (int i = 0; i < initialNames.size(); i++) {
+            this.entries[i] = Entry.of(i, initialNames.get(i));
+        }
+        System.arraycopy(remainingEntries, 0, this.entries, initialNames.size(), remainingEntries.length);
     }
 
-    public EnumType(final Fallback fallback, final String... names) {
-        this.names = names;
-        this.fallback = fallback;
+    public FakeEnumType(final Entry... entries) {
+        this.entries = entries;
     }
 
     @Override
     public void write(final Ops ops, final Integer value) {
-        final String name;
-        if (value < 0 || value >= names.length) {
-            name = switch (fallback) {
-                case ZERO -> names[0];
-                case WRAP -> names[Math.floorMod(value, names.length)];
-                case CLAMP -> names[MathUtil.clamp(value, 0, names.length - 1)];
-            };
-        } else {
-            name = names[value];
+        Entry entry = null;
+        for (final Entry e : entries) {
+            if (e.id == value) {
+                entry = e;
+                break;
+            }
         }
-        Types.STRING.write(ops, name);
+        Types.STRING.write(ops, entry != null ? entry.name : entries[0].name);
     }
 
-    public String[] names() {
-        return names;
+    public Entry[] entries() {
+        return entries;
     }
 
-    public enum Fallback {
-        ZERO, WRAP, CLAMP
+    public record Entry(int id, String name) {
+
+        public static Entry of(final int id, final String name) {
+            return new Entry(id, name);
+        }
     }
 }

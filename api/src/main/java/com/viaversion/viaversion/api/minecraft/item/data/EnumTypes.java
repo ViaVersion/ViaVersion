@@ -23,7 +23,12 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.types.EnumType;
+import com.viaversion.viaversion.api.type.types.EnumType.Fallback;
+import com.viaversion.viaversion.api.type.types.FakeEnumType;
 import com.viaversion.viaversion.api.type.types.RegistryValueType;
+import java.util.List;
+
+import static com.viaversion.viaversion.api.type.types.FakeEnumType.Entry.of;
 
 /**
  * Enum types that aren't associated with any specific item data in this package.
@@ -33,13 +38,14 @@ public final class EnumTypes {
     public static final EnumType DYE_COLOR = new EnumType("white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black");
     public static final EnumType RARITY = new EnumType("common", "uncommon", "rare", "epic");
     public static final EnumType FOX_VARIANT = new EnumType("red", "snow");
-    public static final EnumType SALMON_VARIANT = new EnumType("small", "medium", "large");
-    public static final EnumType PARROT_VARIANT = new EnumType("red_blue", "blue", "green", "yellow_blue", "gray");
-    public static final EnumType MUSHROOM_COW_VARIANT = new EnumType("red", "brown");
-    public static final EnumType RABBIT_VARIANT = new EnumType("brown", "white", "black", "white_splotched", "gold", "salt", "evil");
-    public static final EnumType HORSE_VARIANT = new EnumType("white", "creamy", "chestnut", "brown", "black", "gray", "dark_brown");
-    public static final EnumType LLAMA_VARIANT = new EnumType("creamy", "white", "brown", "gray");
+    public static final EnumType SALMON_VARIANT = new EnumType(Fallback.CLAMP, "small", "medium", "large");
+    public static final EnumType PARROT_VARIANT = new EnumType(Fallback.CLAMP, "red_blue", "blue", "green", "yellow_blue", "gray");
+    public static final EnumType MUSHROOM_COW_VARIANT = new EnumType(Fallback.CLAMP, "red", "brown");
+    public static final EnumType HORSE_VARIANT = new EnumType(Fallback.WRAP, "white", "creamy", "chestnut", "brown", "black", "gray", "dark_brown");
+    public static final EnumType LLAMA_VARIANT = new EnumType(Fallback.CLAMP, "creamy", "white", "brown", "gray");
     public static final EnumType AXOLOTL_VARIANT = new EnumType("lucy", "wild", "gold", "cyan", "blue");
+    // Enums with non-ordinal ids
+    public static final FakeEnumType RABBIT_VARIANT = new FakeEnumType(List.of("brown", "white", "black", "white_splotched", "gold", "salt"), of(99, "evil"));
     // Pretty much enums, but with a resource location
     public static final RegistryValueType VILLAGER_TYPE = new RegistryValueType("desert", "jungle", "plains", "savanna", "snow", "swamp", "taiga");
 }

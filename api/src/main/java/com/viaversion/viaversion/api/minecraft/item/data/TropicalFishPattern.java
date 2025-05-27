@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import java.util.Arrays;
 
-// Completely cooked packed id instead of just using an ordinal
+// Completely cooked packed id instead of just using an ordinal. Not even consistent enough for FakeEnumType
 public record TropicalFishPattern(int packedId) {
 
     public static final Type<TropicalFishPattern> TYPE = new Type<>(TropicalFishPattern.class) {
@@ -45,7 +45,7 @@ public record TropicalFishPattern(int packedId) {
 
         @Override
         public void write(final Ops ops, final TropicalFishPattern value) {
-            final Pattern pattern = Arrays.stream(Pattern.values()).filter(e -> e.packedId == value.packedId).findAny().get();
+            final Pattern pattern = Arrays.stream(Pattern.values()).filter(e -> e.packedId == value.packedId).findAny().orElse(Pattern.KOB);
             ops.write(Types.STRING, pattern.key);
         }
     };
