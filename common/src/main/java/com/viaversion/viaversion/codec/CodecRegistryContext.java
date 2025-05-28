@@ -39,7 +39,7 @@ public record CodecRegistryContext(Protocol<?, ?, ?, ?> protocol, SerializerVers
         StructuredDataKey.BANNER_PATTERNS, StructuredDataKey.POT_DECORATIONS, StructuredDataKey.BREAK_SOUND,
         StructuredDataKey.WOLF_VARIANT, StructuredDataKey.WOLF_SOUND_VARIANT, StructuredDataKey.PIG_VARIANT,
         StructuredDataKey.COW_VARIANT, StructuredDataKey.CHICKEN_VARIANT, StructuredDataKey.FROG_VARIANT,
-        StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.CAT_VARIANT, StructuredDataKey.EQUIPPABLE1_22
+        StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.CAT_VARIANT, StructuredDataKey.EQUIPPABLE1_21_6
     ));
 
     public CodecRegistryContext(final Protocol<?, ?, ?, ?> protocol, final SerializerVersion serializerVersion, final SerializerVersion mappedSerializerVersion, final RegistryAccess registryAccess, final boolean mapped) {

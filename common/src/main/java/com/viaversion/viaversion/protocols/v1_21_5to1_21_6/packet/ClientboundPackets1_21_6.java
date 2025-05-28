@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_21_5to1_22.packet;
+package com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet;
 
-public enum ClientboundPackets1_22 implements ClientboundPacket1_22 {
+public enum ClientboundPackets1_21_6 implements ClientboundPacket1_21_6 {
 
     BUNDLE_DELIMITER, // 0x00
     ADD_ENTITY, // 0x01

@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_21_5to1_22;
+package com.viaversion.viaversion.protocols.v1_21_5to1_21_6;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_22;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_6;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
@@ -39,16 +39,16 @@ import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPacket1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPackets1_21_5;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ClientboundConfigurationPackets1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ClientboundPacket1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ClientboundPackets1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundConfigurationPackets1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPacket1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPackets1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter.BlockItemPacketRewriter1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter.ComponentRewriter1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter.EntityPacketRewriter1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.storage.SneakStorage;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundConfigurationPackets1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPacket1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPackets1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundConfigurationPackets1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPacket1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.rewriter.BlockItemPacketRewriter1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.rewriter.ComponentRewriter1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.rewriter.EntityPacketRewriter1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.storage.SneakStorage;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -60,17 +60,17 @@ import java.util.Locale;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
-public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPacket1_21_5, ClientboundPacket1_22, ServerboundPacket1_21_5, ServerboundPacket1_22> {
+public final class Protocol1_21_5To1_21_6 extends AbstractProtocol<ClientboundPacket1_21_5, ClientboundPacket1_21_6, ServerboundPacket1_21_5, ServerboundPacket1_21_6> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.21.5", "1.21.6"); // It's both 1.21.6 and 1.22 until we know what it is
-    private final EntityPacketRewriter1_22 entityRewriter = new EntityPacketRewriter1_22(this);
-    private final BlockItemPacketRewriter1_22 itemRewriter = new BlockItemPacketRewriter1_22(this);
+    public static final MappingData MAPPINGS = new MappingDataBase("1.21.5", "1.21.6");
+    private final EntityPacketRewriter1_21_6 entityRewriter = new EntityPacketRewriter1_21_6(this);
+    private final BlockItemPacketRewriter1_21_6 itemRewriter = new BlockItemPacketRewriter1_21_6(this);
     private final ParticleRewriter<ClientboundPacket1_21_5> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket1_21_5> tagRewriter = new TagRewriter<>(this);
-    private final NBTComponentRewriter<ClientboundPacket1_21_5> componentRewriter = new ComponentRewriter1_22(this);
+    private final NBTComponentRewriter<ClientboundPacket1_21_5> componentRewriter = new ComponentRewriter1_21_6(this);
 
-    public Protocol1_21_5To1_22() {
-        super(ClientboundPacket1_21_5.class, ClientboundPacket1_22.class, ServerboundPacket1_21_5.class, ServerboundPacket1_22.class);
+    public Protocol1_21_5To1_21_6() {
+        super(ClientboundPacket1_21_5.class, ClientboundPacket1_21_6.class, ServerboundPacket1_21_5.class, ServerboundPacket1_21_6.class);
     }
 
     @Override
@@ -109,25 +109,25 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
             final short difficulty = wrapper.read(Types.UNSIGNED_BYTE);
             wrapper.write(Types.VAR_INT, (int) difficulty);
         });
-        registerServerbound(ServerboundPackets1_22.CHANGE_DIFFICULTY, wrapper -> {
+        registerServerbound(ServerboundPackets1_21_6.CHANGE_DIFFICULTY, wrapper -> {
             final int difficulty = wrapper.read(Types.VAR_INT);
             wrapper.write(Types.UNSIGNED_BYTE, (short) difficulty);
         });
 
-        registerServerbound(ServerboundPackets1_22.CHANGE_GAME_MODE, ServerboundPackets1_21_5.CHAT_COMMAND, wrapper -> {
+        registerServerbound(ServerboundPackets1_21_6.CHANGE_GAME_MODE, ServerboundPackets1_21_5.CHAT_COMMAND, wrapper -> {
             final int gameMode = wrapper.read(Types.VAR_INT);
             final GameMode mode = GameMode.getById(gameMode);
             wrapper.write(Types.STRING, "gamemode " + mode.name().toLowerCase(Locale.ROOT));
         });
 
-        cancelServerbound(ServerboundPackets1_22.CUSTOM_CLICK_ACTION);
-        cancelServerbound(ServerboundConfigurationPackets1_22.CUSTOM_CLICK_ACTION);
+        cancelServerbound(ServerboundPackets1_21_6.CUSTOM_CLICK_ACTION);
+        cancelServerbound(ServerboundConfigurationPackets1_21_6.CUSTOM_CLICK_ACTION);
     }
 
     @Override
     protected void onMappingDataLoaded() {
-        EntityTypes1_22.initialize(this);
-        VersionedTypes.V1_22.particle.filler(this)
+        EntityTypes1_21_6.initialize(this);
+        VersionedTypes.V1_21_6.particle.filler(this)
             .reader("block", ParticleType.Readers.BLOCK)
             .reader("block_marker", ParticleType.Readers.BLOCK)
             .reader("dust_pillar", ParticleType.Readers.BLOCK)
@@ -141,7 +141,7 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
             .reader("entity_effect", ParticleType.Readers.COLOR)
             .reader("trail", ParticleType.Readers.TRAIL1_21_4)
             .reader("item", ParticleType.Readers.item(itemRewriter.mappedItemType()));
-        VersionedTypes.V1_22.structuredData.filler(this).add(StructuredDataKey.CUSTOM_DATA, StructuredDataKey.MAX_STACK_SIZE, StructuredDataKey.MAX_DAMAGE,
+        VersionedTypes.V1_21_6.structuredData.filler(this).add(StructuredDataKey.CUSTOM_DATA, StructuredDataKey.MAX_STACK_SIZE, StructuredDataKey.MAX_DAMAGE,
             StructuredDataKey.UNBREAKABLE1_21_5, StructuredDataKey.RARITY, StructuredDataKey.TOOLTIP_DISPLAY, StructuredDataKey.DAMAGE_RESISTANT,
             StructuredDataKey.CUSTOM_NAME, StructuredDataKey.LORE, StructuredDataKey.ENCHANTMENTS1_21_5,
             StructuredDataKey.CUSTOM_MODEL_DATA1_21_4, StructuredDataKey.BLOCKS_ATTACKS, StructuredDataKey.PROVIDES_BANNER_PATTERNS,
@@ -155,9 +155,9 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
             StructuredDataKey.PROFILE, StructuredDataKey.NOTE_BLOCK_SOUND, StructuredDataKey.BANNER_PATTERNS, StructuredDataKey.BASE_COLOR,
             StructuredDataKey.POT_DECORATIONS, StructuredDataKey.BLOCK_STATE, StructuredDataKey.BEES, StructuredDataKey.LOCK,
             StructuredDataKey.CONTAINER_LOOT, StructuredDataKey.TOOL1_21_5, StructuredDataKey.ITEM_NAME, StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER,
-            StructuredDataKey.FOOD1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_22,
+            StructuredDataKey.FOOD1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_6,
             StructuredDataKey.REPAIRABLE, StructuredDataKey.ENCHANTABLE, StructuredDataKey.CONSUMABLE1_21_2,
-            StructuredDataKey.USE_COOLDOWN, StructuredDataKey.DAMAGE, StructuredDataKey.EQUIPPABLE1_22, StructuredDataKey.ITEM_MODEL,
+            StructuredDataKey.USE_COOLDOWN, StructuredDataKey.DAMAGE, StructuredDataKey.EQUIPPABLE1_21_6, StructuredDataKey.ITEM_MODEL,
             StructuredDataKey.GLIDER, StructuredDataKey.TOOLTIP_STYLE, StructuredDataKey.DEATH_PROTECTION, StructuredDataKey.WEAPON,
             StructuredDataKey.POTION_DURATION_SCALE, StructuredDataKey.VILLAGER_VARIANT, StructuredDataKey.WOLF_VARIANT, StructuredDataKey.WOLF_COLLAR,
             StructuredDataKey.FOX_VARIANT, StructuredDataKey.SALMON_SIZE, StructuredDataKey.PARROT_VARIANT, StructuredDataKey.TROPICAL_FISH_PATTERN,
@@ -171,7 +171,7 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
 
     @Override
     public void init(final UserConnection connection) {
-        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_22.PLAYER));
+        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_6.PLAYER));
         addItemHasher(connection, new ItemHasherBase(this, connection, SerializerVersion.V1_21_5, SerializerVersion.V1_21_5));
         connection.put(new SneakStorage());
     }
@@ -182,12 +182,12 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    public EntityPacketRewriter1_22 getEntityRewriter() {
+    public EntityPacketRewriter1_21_6 getEntityRewriter() {
         return entityRewriter;
     }
 
     @Override
-    public BlockItemPacketRewriter1_22 getItemRewriter() {
+    public BlockItemPacketRewriter1_21_6 getItemRewriter() {
         return itemRewriter;
     }
 
@@ -213,16 +213,16 @@ public final class Protocol1_21_5To1_22 extends AbstractProtocol<ClientboundPack
 
     @Override
     public VersionedTypesHolder mappedTypes() {
-        return VersionedTypes.V1_22;
+        return VersionedTypes.V1_21_6;
     }
 
     @Override
-    protected PacketTypesProvider<ClientboundPacket1_21_5, ClientboundPacket1_22, ServerboundPacket1_21_5, ServerboundPacket1_22> createPacketTypesProvider() {
+    protected PacketTypesProvider<ClientboundPacket1_21_5, ClientboundPacket1_21_6, ServerboundPacket1_21_5, ServerboundPacket1_21_6> createPacketTypesProvider() {
         return new SimplePacketTypesProvider<>(
             packetTypeMap(unmappedClientboundPacketType, ClientboundPackets1_21_5.class, ClientboundConfigurationPackets1_21.class),
-            packetTypeMap(mappedClientboundPacketType, ClientboundPackets1_22.class, ClientboundConfigurationPackets1_22.class),
+            packetTypeMap(mappedClientboundPacketType, ClientboundPackets1_21_6.class, ClientboundConfigurationPackets1_21_6.class),
             packetTypeMap(mappedServerboundPacketType, ServerboundPackets1_21_5.class, ServerboundConfigurationPackets1_20_5.class),
-            packetTypeMap(unmappedServerboundPacketType, ServerboundPackets1_22.class, ServerboundConfigurationPackets1_22.class)
+            packetTypeMap(unmappedServerboundPacketType, ServerboundPackets1_21_6.class, ServerboundConfigurationPackets1_21_6.class)
         );
     }
 }

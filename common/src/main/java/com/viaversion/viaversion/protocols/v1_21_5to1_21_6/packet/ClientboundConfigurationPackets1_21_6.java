@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_21_5to1_22.packet;
+package com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet;
 
 import com.viaversion.viaversion.api.protocol.packet.State;
 
-public enum ClientboundConfigurationPackets1_22 implements ClientboundPacket1_22 {
+public enum ClientboundConfigurationPackets1_21_6 implements ClientboundPacket1_21_6 {
 
     COOKIE_REQUEST, // 0x00
     CUSTOM_PAYLOAD, // 0x01

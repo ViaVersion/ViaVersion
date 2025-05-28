@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter;
+package com.viaversion.viaversion.protocols.v1_21_5to1_21_6.rewriter;
 
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_22;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_6;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_5;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
@@ -27,21 +27,21 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfi
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPacket1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPackets1_21_5;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.Protocol1_21_5To1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPackets1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.storage.SneakStorage;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.Protocol1_21_5To1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.storage.SneakStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 
-public final class EntityPacketRewriter1_22 extends EntityRewriter<ClientboundPacket1_21_5, Protocol1_21_5To1_22> {
+public final class EntityPacketRewriter1_21_6 extends EntityRewriter<ClientboundPacket1_21_5, Protocol1_21_5To1_21_6> {
 
-    public EntityPacketRewriter1_22(final Protocol1_21_5To1_22 protocol) {
+    public EntityPacketRewriter1_21_6(final Protocol1_21_5To1_21_6 protocol) {
         super(protocol);
     }
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_21_5.ADD_ENTITY, EntityTypes1_22.FALLING_BLOCK);
+        registerTrackerWithData1_19(ClientboundPackets1_21_5.ADD_ENTITY, EntityTypes1_21_6.FALLING_BLOCK);
         registerSetEntityData(ClientboundPackets1_21_5.SET_ENTITY_DATA);
         registerRemoveEntities(ClientboundPackets1_21_5.REMOVE_ENTITIES);
         registerPlayerAbilities(ClientboundPackets1_21_5.PLAYER_ABILITIES);
@@ -56,13 +56,13 @@ public final class EntityPacketRewriter1_22 extends EntityRewriter<ClientboundPa
             wrapper.user().get(SneakStorage.class).setSneaking(false);
         });
 
-        protocol.registerServerbound(ServerboundPackets1_22.PLAYER_COMMAND, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_21_6.PLAYER_COMMAND, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Entity ID
             final int action = wrapper.read(Types.VAR_INT);
             wrapper.write(Types.VAR_INT, action + 2); // press_shift_key and release_shift_key gone
         });
 
-        protocol.registerServerbound(ServerboundPackets1_22.PLAYER_INPUT, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_21_6.PLAYER_INPUT, wrapper -> {
             final byte flags = wrapper.passthrough(Types.BYTE);
             final boolean pressingShift = (flags & 1 << 5) != 0;
             if (wrapper.user().get(SneakStorage.class).setSneaking(pressingShift)) {
@@ -71,14 +71,14 @@ public final class EntityPacketRewriter1_22 extends EntityRewriter<ClientboundPa
                 playerCommandPacket.write(Types.VAR_INT, tracker(wrapper.user()).clientEntityId());
                 playerCommandPacket.write(Types.VAR_INT, pressingShift ? 0 : 1);
                 playerCommandPacket.write(Types.VAR_INT, 0); // No data
-                playerCommandPacket.sendToServer(Protocol1_21_5To1_22.class);
+                playerCommandPacket.sendToServer(Protocol1_21_5To1_21_6.class);
             }
         });
     }
 
     @Override
     protected void registerRewrites() {
-        final EntityDataTypes1_21_5 entityDataTypes = VersionedTypes.V1_22.entityDataTypes;
+        final EntityDataTypes1_21_5 entityDataTypes = VersionedTypes.V1_21_6.entityDataTypes;
         filter().mapDataType(entityDataTypes::byId);
         registerEntityDataTypeHandler(
             entityDataTypes.itemType,
@@ -90,7 +90,7 @@ public final class EntityPacketRewriter1_22 extends EntityRewriter<ClientboundPa
             entityDataTypes.optionalComponentType
         );
 
-        filter().type(EntityTypes1_22.HANGING_ENTITY).addIndex(8); // Direction
+        filter().type(EntityTypes1_21_6.HANGING_ENTITY).addIndex(8); // Direction
     }
 
     @Override
@@ -100,6 +100,6 @@ public final class EntityPacketRewriter1_22 extends EntityRewriter<ClientboundPa
 
     @Override
     public EntityType typeFromId(final int type) {
-        return EntityTypes1_22.getTypeFromId(type);
+        return EntityTypes1_21_6.getTypeFromId(type);
     }
 }

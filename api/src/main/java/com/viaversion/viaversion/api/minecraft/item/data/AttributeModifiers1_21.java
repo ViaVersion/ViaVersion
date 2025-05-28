@@ -69,21 +69,21 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
             ops.write(AttributeModifier.ARRAY_TYPE1_21, value.modifiers);
         }
     };
-    public static final Type<AttributeModifiers1_21> TYPE1_22 = new Type<>(AttributeModifiers1_21.class) {
+    public static final Type<AttributeModifiers1_21> TYPE1_21_6 = new Type<>(AttributeModifiers1_21.class) {
         @Override
         public AttributeModifiers1_21 read(final ByteBuf buffer) {
-            final AttributeModifier[] modifiers = AttributeModifier.ARRAY_TYPE1_22.read(buffer);
+            final AttributeModifier[] modifiers = AttributeModifier.ARRAY_TYPE1_21_6.read(buffer);
             return new AttributeModifiers1_21(modifiers);
         }
 
         @Override
         public void write(final ByteBuf buffer, final AttributeModifiers1_21 value) {
-            AttributeModifier.ARRAY_TYPE1_22.write(buffer, value.modifiers());
+            AttributeModifier.ARRAY_TYPE1_21_6.write(buffer, value.modifiers());
         }
 
         @Override
         public void write(final Ops ops, final AttributeModifiers1_21 value) {
-            ops.write(AttributeModifier.ARRAY_TYPE1_22, value.modifiers);
+            ops.write(AttributeModifier.ARRAY_TYPE1_21_6, value.modifiers);
         }
     };
 
@@ -138,7 +138,7 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
         };
         public static final Type<AttributeModifier[]> ARRAY_TYPE1_21 = new ArrayType<>(TYPE1_21);
 
-        public static final Type<AttributeModifier> TYPE1_22 = new Type<>(AttributeModifier.class) {
+        public static final Type<AttributeModifier> TYPE1_21_6 = new Type<>(AttributeModifier.class) {
             @Override
             public AttributeModifier read(final ByteBuf buffer) {
                 final int attribute = Types.VAR_INT.readPrimitive(buffer);
@@ -179,7 +179,7 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
                 });
             }
         };
-        public static final Type<AttributeModifier[]> ARRAY_TYPE1_22 = new ArrayType<>(TYPE1_22);
+        public static final Type<AttributeModifier[]> ARRAY_TYPE1_21_6 = new ArrayType<>(TYPE1_21_6);
     }
 
     public record ModifierData(String id, double amount, int operation) {

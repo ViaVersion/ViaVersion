@@ -15,9 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_21_5to1_22.packet;
+package com.viaversion.viaversion.protocols.v1_21_5to1_21_6.storage;
 
-import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
+import com.viaversion.viaversion.api.connection.StorableObject;
 
-public interface ServerboundPacket1_22 extends ServerboundPacketType {
+public final class SneakStorage implements StorableObject {
+    private boolean sneaking;
+
+    public boolean sneaking() {
+        return sneaking;
+    }
+
+    public boolean setSneaking(final boolean sneaking) {
+        final boolean previous = this.sneaking;
+        this.sneaking = sneaking;
+        return previous != sneaking;
+    }
 }

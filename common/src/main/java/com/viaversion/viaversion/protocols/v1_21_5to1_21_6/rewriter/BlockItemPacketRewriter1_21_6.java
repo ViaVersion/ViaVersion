@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_21_5to1_22.rewriter;
+package com.viaversion.viaversion.protocols.v1_21_5to1_21_6.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
@@ -25,16 +25,16 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPacket1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.Protocol1_21_5To1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPacket1_22;
-import com.viaversion.viaversion.protocols.v1_21_5to1_22.packet.ServerboundPackets1_22;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.Protocol1_21_5To1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPacket1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 
-public final class BlockItemPacketRewriter1_22 extends StructuredItemRewriter<ClientboundPacket1_21_5, ServerboundPacket1_22, Protocol1_21_5To1_22> {
+public final class BlockItemPacketRewriter1_21_6 extends StructuredItemRewriter<ClientboundPacket1_21_5, ServerboundPacket1_21_6, Protocol1_21_5To1_21_6> {
 
-    public BlockItemPacketRewriter1_22(final Protocol1_21_5To1_22 protocol) {
+    public BlockItemPacketRewriter1_21_6(final Protocol1_21_5To1_21_6 protocol) {
         super(protocol);
     }
 
@@ -56,8 +56,8 @@ public final class BlockItemPacketRewriter1_22 extends StructuredItemRewriter<Cl
         registerAdvancements1_20_3(ClientboundPackets1_21_5.UPDATE_ADVANCEMENTS);
         registerSetEquipment(ClientboundPackets1_21_5.SET_EQUIPMENT);
         registerMerchantOffers1_20_5(ClientboundPackets1_21_5.MERCHANT_OFFERS);
-        registerContainerClick1_21_5(ServerboundPackets1_22.CONTAINER_CLICK);
-        registerSetCreativeModeSlot1_21_5(ServerboundPackets1_22.SET_CREATIVE_MODE_SLOT);
+        registerContainerClick1_21_5(ServerboundPackets1_21_6.CONTAINER_CLICK);
+        registerSetCreativeModeSlot1_21_5(ServerboundPackets1_21_6.SET_CREATIVE_MODE_SLOT);
 
         final RecipeDisplayRewriter<ClientboundPacket1_21_5> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(protocol);
         recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_5.UPDATE_RECIPES);
@@ -79,13 +79,13 @@ public final class BlockItemPacketRewriter1_22 extends StructuredItemRewriter<Cl
 
     public static void upgradeItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
-        dataContainer.replaceKey(StructuredDataKey.EQUIPPABLE1_21_5, StructuredDataKey.EQUIPPABLE1_22);
-        dataContainer.replaceKey(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_22);
+        dataContainer.replaceKey(StructuredDataKey.EQUIPPABLE1_21_5, StructuredDataKey.EQUIPPABLE1_21_6);
+        dataContainer.replaceKey(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_6);
     }
 
     public static void downgradeItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
-        dataContainer.replaceKey(StructuredDataKey.EQUIPPABLE1_22, StructuredDataKey.EQUIPPABLE1_21_5);
-        dataContainer.replaceKey(StructuredDataKey.ATTRIBUTE_MODIFIERS1_22, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5);
+        dataContainer.replaceKey(StructuredDataKey.EQUIPPABLE1_21_6, StructuredDataKey.EQUIPPABLE1_21_5);
+        dataContainer.replaceKey(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_6, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5);
     }
 }

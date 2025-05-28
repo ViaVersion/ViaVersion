@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_21_5to1_22.packet;
+package com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet;
 
-public enum ServerboundPackets1_22 implements ServerboundPacket1_22 {
+public enum ServerboundPackets1_21_6 implements ServerboundPacket1_21_6 {
 
     ACCEPT_TELEPORTATION, // 0x00
     BLOCK_ENTITY_TAG_QUERY, // 0x01

@@ -102,7 +102,7 @@ public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Null
             buffer.writeBoolean(value.equipOnInteract());
         }
     };
-    public static final Type<Equippable> TYPE1_22 = new Type<>(Equippable.class) {
+    public static final Type<Equippable> TYPE1_21_6 = new Type<>(Equippable.class) {
         @Override
         public Equippable read(final ByteBuf buffer) {
             final int equipmentSlot = Types.VAR_INT.readPrimitive(buffer);

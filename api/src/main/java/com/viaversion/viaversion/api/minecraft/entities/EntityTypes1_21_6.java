@@ -29,7 +29,7 @@ import com.viaversion.viaversion.util.Key;
 import java.util.Locale;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public enum EntityTypes1_22 implements EntityType {
+public enum EntityTypes1_21_6 implements EntityType {
 
     ENTITY(null, null),
 
@@ -274,12 +274,12 @@ public enum EntityTypes1_22 implements EntityType {
     private final String identifier;
     private int id = -1;
 
-    EntityTypes1_22(final EntityType parent) {
+    EntityTypes1_21_6(final EntityType parent) {
         this.parent = parent;
         this.identifier = Key.namespaced(name().toLowerCase(Locale.ROOT));
     }
 
-    EntityTypes1_22(final EntityType parent, @Nullable final String identifier) {
+    EntityTypes1_21_6(final EntityType parent, @Nullable final String identifier) {
         this.parent = parent;
         this.identifier = identifier;
     }
