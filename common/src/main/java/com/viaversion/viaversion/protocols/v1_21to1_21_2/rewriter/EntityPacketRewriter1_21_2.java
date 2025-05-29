@@ -42,6 +42,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ClientVehicleSt
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.EntityTracker1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.GroundFlagTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.TeleportAckCancelStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import java.util.ArrayList;
@@ -189,8 +190,21 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
                 entityDataPacket.write(VersionedTypes.V1_21_2.entityDataList, entityData);
                 entityDataPacket.send(Protocol1_21To1_21_2.class);
 
-                // TODO: Set the player velocity to zero
-                // TODO: Set pitch to 0 and yaw to -180
+                final int teleportId = ThreadLocalRandom.current().nextInt();
+                wrapper.user().get(TeleportAckCancelStorage.class).cancelTeleportId(teleportId);
+
+                final PacketWrapper positionPacket = wrapper.create(ClientboundPackets1_21_2.PLAYER_POSITION);
+                positionPacket.write(Types.VAR_INT, teleportId); // Teleport id
+                positionPacket.write(Types.DOUBLE, 0D); // X
+                positionPacket.write(Types.DOUBLE, 0D); // Y
+                positionPacket.write(Types.DOUBLE, 0D); // Z
+                positionPacket.write(Types.DOUBLE, 0D); // Delta movement X
+                positionPacket.write(Types.DOUBLE, 0D); // Delta movement Y
+                positionPacket.write(Types.DOUBLE, 0D); // Delta movement Z
+                positionPacket.write(Types.FLOAT, -180F); // Y rot
+                positionPacket.write(Types.FLOAT, 0F); // X rot
+                positionPacket.write(Types.INT, 0b00000111); // Relative arguments
+                positionPacket.send(Protocol1_21To1_21_2.class);
 
                 if (!isBundling) {
                     final PacketWrapper bundleEnd = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
@@ -408,6 +422,11 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
                 wrapper.sendToServer(Protocol1_21To1_21_2.class);
                 wrapper.cancel();
                 playerPositionStorage.sendMovePlayerPosRot(wrapper.user());
+                return;
+            }
+            final int teleportId = wrapper.passthrough(Types.VAR_INT); // Teleport id
+            if (wrapper.user().get(TeleportAckCancelStorage.class).checkShouldCancelTeleportAck(teleportId)) {
+                wrapper.cancel();
             }
         });
     }

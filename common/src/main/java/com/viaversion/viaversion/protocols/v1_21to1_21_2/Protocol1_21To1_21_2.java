@@ -54,6 +54,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.EntityTracker1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.GroundFlagTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.TeleportAckCancelStorage;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -224,6 +225,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         addEntityTracker(connection, new EntityTracker1_21_2(connection));
         connection.put(new BundleStateTracker());
         connection.put(new GroundFlagTracker());
+        connection.put(new TeleportAckCancelStorage());
 
         final ProtocolVersion protocolVersion = connection.getProtocolInfo().protocolVersion();
         if (protocolVersion.olderThan(ProtocolVersion.v1_21_4)) { // Only needed for 1.21.2/1.21.3
