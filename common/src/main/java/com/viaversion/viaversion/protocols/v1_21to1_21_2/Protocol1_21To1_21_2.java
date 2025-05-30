@@ -59,7 +59,12 @@ import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
@@ -157,6 +162,52 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
                     wrapper.passthrough(Types.VAR_INT); // Latency
                 }
                 componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
+            }
+        });
+
+        appendClientbound(ClientboundPackets1_21.UPDATE_ATTRIBUTES, wrapper -> {
+            wrapper.resetReader();
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            final EntityTracker1_21_2 entityTracker = wrapper.user().getEntityTracker(Protocol1_21To1_21_2.class);
+            if (entityId != entityTracker.clientEntityId()) {
+                return;
+            }
+
+            final int size = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                final int attributeId = wrapper.passthrough(Types.VAR_INT);
+                if (attributeId == 18) { // generic.max_health
+                    final double base = wrapper.passthrough(Types.DOUBLE); // Base
+                    final int modifierSize = wrapper.passthrough(Types.VAR_INT);
+                    final Int2ObjectMap<Map<String, Double>> attributeModifiers = new Int2ObjectOpenHashMap<>();
+                    for (int j = 0; j < modifierSize; j++) {
+                        final String modifierId = wrapper.passthrough(Types.STRING); // ID
+                        final double amount = wrapper.passthrough(Types.DOUBLE); // Amount
+                        final byte operation = wrapper.passthrough(Types.BYTE); // Operation
+                        attributeModifiers.computeIfAbsent(operation, k -> new HashMap<>()).put(modifierId, amount);
+                    }
+
+                    double v1 = base;
+                    for (Double value : attributeModifiers.getOrDefault(0, Collections.emptyMap()).values()) { // ADD_VALUE
+                        v1 += value;
+                    }
+                    double v2 = v1;
+                    for (Double value : attributeModifiers.getOrDefault(1, Collections.emptyMap()).values()) { // ADD_MULTIPLIED_BASE
+                        v2 += v1 * value;
+                    }
+                    for (Double value : attributeModifiers.getOrDefault(2, Collections.emptyMap()).values()) { // ADD_MULTIPLIED_TOTAL
+                        v2 *= 1D + value;
+                    }
+                    entityTracker.setPlayerMaxHealthAttributeValue(Math.max(1D, Math.min(1024D, v2)));
+                } else {
+                    wrapper.passthrough(Types.DOUBLE); // Base
+                    final int modifierSize = wrapper.passthrough(Types.VAR_INT);
+                    for (int j = 0; j < modifierSize; j++) {
+                        wrapper.passthrough(Types.STRING); // ID
+                        wrapper.passthrough(Types.DOUBLE); // Amount
+                        wrapper.passthrough(Types.BYTE); // Operation
+                    }
+                }
             }
         });
 

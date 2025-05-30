@@ -31,6 +31,7 @@ import java.util.UUID;
 public final class EntityTracker1_21_2 extends EntityTrackerBase {
 
     private final Int2ObjectMap<BoatEntity> boats = new Int2ObjectOpenHashMap<>();
+    private double playerMaxHealthAttributeValue = 20F;
 
     public EntityTracker1_21_2(final UserConnection connection) {
         super(connection, EntityTypes1_21_2.PLAYER);
@@ -57,6 +58,14 @@ public final class EntityTracker1_21_2 extends EntityTrackerBase {
         removeEntity(entityId);
         boats.put(entityId, entity);
         addEntity(entityId, type);
+    }
+
+    public double playerMaxHealthAttributeValue() {
+        return this.playerMaxHealthAttributeValue;
+    }
+
+    public void setPlayerMaxHealthAttributeValue(final double playerMaxHealthAttributeValue) {
+        this.playerMaxHealthAttributeValue = playerMaxHealthAttributeValue;
     }
 
     public static class BoatEntity {

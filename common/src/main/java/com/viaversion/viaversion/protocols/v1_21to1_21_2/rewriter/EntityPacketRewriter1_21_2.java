@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_2;
@@ -159,7 +158,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.write(Types.VAR_INT, 64); // Sea level
             final byte keepDataMask = wrapper.passthrough(Types.BYTE); // Keep data mask
 
-            final EntityTracker entityTracker = tracker(wrapper.user());
+            final EntityTracker1_21_2 entityTracker = tracker(wrapper.user());
             if (entityTracker.currentWorld() != null && !entityTracker.currentWorld().equals(world)) {
                 final ChunkLoadTracker chunkLoadTracker = wrapper.user().get(ChunkLoadTracker.class);
                 if (chunkLoadTracker != null) {
@@ -172,6 +171,9 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.user().put(new GroundFlagTracker());
             wrapper.user().remove(ClientVehicleStorage.class);
 
+            if ((keepDataMask & 1) == 0) { // If don't keep entity attributes
+                entityTracker.setPlayerMaxHealthAttributeValue(20F);
+            }
             if ((keepDataMask & 2) != 0) { // <= 1.21.1 resets some player data even when keep entity data is set
                 final boolean isBundling = wrapper.user().get(BundleStateTracker.class).isBundling();
                 if (!isBundling) {
@@ -186,7 +188,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
                 entityDataPacket.write(Types.VAR_INT, entityTracker.clientEntityId()); // Entity id
                 final List<EntityData> entityData = new ArrayList<>();
                 entityData.add(new EntityData(6 /*pose*/, VersionedTypes.V1_21_2.entityDataTypes.poseType, 0 /*standing*/));
-                entityData.add(new EntityData(9 /*health*/, VersionedTypes.V1_21_2.entityDataTypes.floatType, 20F)); // Max health should be tracked, but whatever
+                entityData.add(new EntityData(9 /*health*/, VersionedTypes.V1_21_2.entityDataTypes.floatType, (float) entityTracker.playerMaxHealthAttributeValue()));
                 entityDataPacket.write(VersionedTypes.V1_21_2.entityDataList, entityData);
                 entityDataPacket.send(Protocol1_21To1_21_2.class);
 
