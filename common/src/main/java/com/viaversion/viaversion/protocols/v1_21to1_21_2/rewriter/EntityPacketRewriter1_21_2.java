@@ -186,7 +186,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
                 entityDataPacket.write(Types.VAR_INT, entityTracker.clientEntityId()); // Entity id
                 final List<EntityData> entityData = new ArrayList<>();
                 entityData.add(new EntityData(6 /*pose*/, VersionedTypes.V1_21_2.entityDataTypes.poseType, 0 /*standing*/));
-                entityData.add(new EntityData(9 /*health*/, VersionedTypes.V1_21_2.entityDataTypes.floatType, 20F)); // TODO: Track max health
+                entityData.add(new EntityData(9 /*health*/, VersionedTypes.V1_21_2.entityDataTypes.floatType, 20F)); // Max health should be tracked, but whatever
                 entityDataPacket.write(VersionedTypes.V1_21_2.entityDataList, entityData);
                 entityDataPacket.send(Protocol1_21To1_21_2.class);
 
