@@ -21,12 +21,12 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Key;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public final class TagKeys implements StorableObject {
 
-    private final List<String> identifiers = new ArrayList<>();
+    private final Set<String> identifiers = new HashSet<>();
 
     public TagKeys(final PacketWrapper wrapper) {
         final int length = wrapper.passthrough(Types.VAR_INT);
