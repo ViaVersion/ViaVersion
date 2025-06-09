@@ -52,6 +52,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.EntityPacket
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.ParticleRewriter1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.TagKeys;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -84,8 +85,8 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
     protected void registerPackets() {
         super.registerPackets();
 
-        tagRewriter.registerGeneric(ClientboundPackets1_20_3.UPDATE_TAGS);
-        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_3.UPDATE_TAGS);
+        registerClientbound(ClientboundPackets1_20_3.UPDATE_TAGS, this::updateTags);
+        registerClientbound(ClientboundConfigurationPackets1_20_3.UPDATE_TAGS, this::updateTags);
 
         final SoundRewriter<ClientboundPacket1_20_3> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_20_3.SOUND);
@@ -226,6 +227,12 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         cancelServerbound(ServerboundConfigurationPackets1_20_5.SELECT_KNOWN_PACKS);
         cancelServerbound(ServerboundPackets1_20_5.COOKIE_RESPONSE);
         cancelServerbound(ServerboundPackets1_20_5.DEBUG_SAMPLE_SUBSCRIPTION);
+    }
+
+    private void updateTags(final PacketWrapper wrapper) {
+        tagRewriter.handleGeneric(wrapper);
+        wrapper.resetReader();
+        wrapper.user().put(new TagKeys(wrapper));
     }
 
     private void fixChatAck(final PacketWrapper wrapper, final AcknowledgedMessagesStorage storage) {
