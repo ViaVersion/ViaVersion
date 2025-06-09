@@ -97,6 +97,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.BannerPatternStorage;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.TagKeys;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -596,12 +597,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final ListTag<StringTag> canPlaceOnTag = tag.getListTag("CanPlaceOn", StringTag.class);
         if (canPlaceOnTag != null) {
-            data.set(StructuredDataKey.CAN_PLACE_ON1_20_5, updateBlockPredicates(canPlaceOnTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_PLACE_ON) == 0));
+            data.set(StructuredDataKey.CAN_PLACE_ON1_20_5, updateBlockPredicates(connection, canPlaceOnTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_PLACE_ON) == 0));
         }
 
         final ListTag<StringTag> canDestroyTag = tag.getListTag("CanDestroy", StringTag.class);
         if (canDestroyTag != null) {
-            data.set(StructuredDataKey.CAN_BREAK1_20_5, updateBlockPredicates(canDestroyTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_DESTROY) == 0));
+            data.set(StructuredDataKey.CAN_BREAK1_20_5, updateBlockPredicates(connection, canDestroyTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_DESTROY) == 0));
         }
 
         // Only for VB, but kept here for simplicity; In VV we back up the original tag and later restore it, in VB
@@ -802,16 +803,16 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(StructuredDataKey.BANNER_PATTERNS, patternLayer.toArray(new BannerPatternLayer[0]));
     }
 
-    private AdventureModePredicate updateBlockPredicates(final ListTag<StringTag> tag, final boolean showInTooltip) {
+    private AdventureModePredicate updateBlockPredicates(final UserConnection connection, final ListTag<StringTag> tag, final boolean showInTooltip) {
         final BlockPredicate[] predicates = tag.stream()
             .map(StringTag::getValue)
-            .map(this::deserializeBlockPredicate)
+            .map(rawPredicate -> deserializeBlockPredicate(connection, rawPredicate))
             .filter(Objects::nonNull)
             .toArray(BlockPredicate[]::new);
         return new AdventureModePredicate(predicates, showInTooltip);
     }
 
-    private @Nullable BlockPredicate deserializeBlockPredicate(final String rawPredicate) {
+    private @Nullable BlockPredicate deserializeBlockPredicate(final UserConnection connection, final String rawPredicate) {
         final int propertiesStartIndex = rawPredicate.indexOf('[');
         final int tagStartIndex = rawPredicate.indexOf('{');
         int idLength = rawPredicate.length();
@@ -832,7 +833,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             holders = HolderSet.of(new int[]{id});
         } else {
-            holders = HolderSet.of(identifier.substring(1));
+            final String tagKey = identifier.substring(1);
+            if (!connection.get(TagKeys.class).isValidIdentifier(tagKey)) {
+                return null;
+            }
+
+            holders = HolderSet.of(tagKey);
         }
 
         final int propertiesEndIndex = rawPredicate.indexOf(']');
