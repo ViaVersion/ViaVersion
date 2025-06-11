@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
@@ -61,6 +62,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         "dream_goat_horn"
     };
     private static final float IMPULSE = 0.98F;
+
+    private final boolean isVF = Via.getPlatform().getPlatformName().equals("ViaFabric");
 
     public EntityPacketRewriter1_21_2(final Protocol1_21To1_21_2 protocol) {
         super(protocol);
@@ -289,7 +292,14 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
                 updatedFlags |= 2;
             }
 
-            vehicleStorage.storeMovement(sidewaysMovement, forwardMovement, updatedFlags);
+            // Dirty workaround for https://github.com/ViaVersion/ViaVersion/issues/4508. TODO Check whether this is caused by Fabric API or something else
+            if (wrapper.user().isServerSide() && isVF) {
+                wrapper.write(Types.FLOAT, sidewaysMovement);
+                wrapper.write(Types.FLOAT, forwardMovement);
+                wrapper.write(Types.BYTE, flags);
+            } else {
+                vehicleStorage.storeMovement(sidewaysMovement, forwardMovement, updatedFlags);
+            }
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.TELEPORT_ENTITY, ClientboundPackets1_21_2.ENTITY_POSITION_SYNC, wrapper -> {
@@ -350,7 +360,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             handleOnGround(wrapper);
 
             final ClientVehicleStorage vehicleStorage = wrapper.user().get(ClientVehicleStorage.class);
-            if (vehicleStorage == null) {
+            if (vehicleStorage == null || (wrapper.user().isServerSide() && isVF)) {
                 return;
             }
 
