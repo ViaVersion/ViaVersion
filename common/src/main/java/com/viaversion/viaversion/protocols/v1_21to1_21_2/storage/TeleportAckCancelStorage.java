@@ -26,12 +26,7 @@ public class TeleportAckCancelStorage implements StorableObject {
     private final IntSet cancelTeleportIds = new IntOpenHashSet();
 
     public boolean checkShouldCancelTeleportAck(final int teleportId) {
-        if (this.cancelTeleportIds.contains(teleportId)) {
-            this.cancelTeleportIds.remove(teleportId);
-            return true;
-        } else {
-            return false;
-        }
+        return this.cancelTeleportIds.remove(teleportId);
     }
 
     public void cancelTeleportId(final int teleportId) {
