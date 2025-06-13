@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16;
@@ -73,12 +72,7 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
 
         wrapper.write(Types.STRING, dimensionName); // dimension
         wrapper.write(Types.STRING, outputName); // world
-
-        final EntityTracker tracker = tracker(wrapper.user());
-        if (tracker.currentWorld() != null && !tracker.currentWorld().equals(outputName)) {
-            tracker.clearEntities();
-        }
-        tracker.setCurrentWorld(outputName);
+        trackWorld(wrapper.user(), outputName);
     };
 
     public EntityPacketRewriter1_16(Protocol1_15_2To1_16 protocol) {

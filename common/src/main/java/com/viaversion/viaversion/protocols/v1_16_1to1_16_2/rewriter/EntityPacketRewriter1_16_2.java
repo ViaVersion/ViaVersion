@@ -77,13 +77,8 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
             String dimensionType = wrapper.read(Types.STRING);
             wrapper.write(Types.NAMED_COMPOUND_TAG, getDimensionData(dimensionType));
 
-            final String world = wrapper.read(Types.STRING);
-            final com.viaversion.viaversion.api.data.entity.EntityTracker tracker = tracker(wrapper.user());
-            if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
-                tracker.clearEntities();
-            }
-            tracker.setCurrentWorld(world);
-            wrapper.write(Types.STRING, world);
+            final String world = wrapper.passthrough(Types.STRING);
+            trackWorld(wrapper.user(), world);
         });
     }
 

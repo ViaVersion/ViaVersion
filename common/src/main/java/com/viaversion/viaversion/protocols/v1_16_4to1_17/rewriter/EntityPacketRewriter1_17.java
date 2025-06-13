@@ -111,7 +111,6 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
                 });
                 handler(wrapper -> {
                     final String world = wrapper.passthrough(Types.STRING);
-
                     tracker(wrapper.user()).setCurrentWorld(world);
                 });
                 handler(playerTrackerHandler());
@@ -123,11 +122,7 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
             addNewDimensionData(dimensionData);
 
             final String world = wrapper.passthrough(Types.STRING);
-            final EntityTracker tracker = tracker(wrapper.user());
-            if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
-                tracker.clearEntities();
-            }
-            tracker.setCurrentWorld(world);
+            trackWorld(wrapper.user(), world);
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.UPDATE_ATTRIBUTES, new PacketHandlers() {
