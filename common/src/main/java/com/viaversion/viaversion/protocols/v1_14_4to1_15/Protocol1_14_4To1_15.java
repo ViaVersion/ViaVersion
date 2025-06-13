@@ -80,6 +80,7 @@ public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public void init(UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_15.PLAYER));
+        connection.addClientWorld(this.getClass(), new com.viaversion.viaversion.api.minecraft.ClientWorld());
     }
 
     @Override
