@@ -109,6 +109,10 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
                     CompoundTag currentDimensionTag = wrapper.get(Types.NAMED_COMPOUND_TAG, 1);
                     addNewDimensionData(currentDimensionTag);
                 });
+                handler(wrapper -> {
+                    final String world = wrapper.passthrough(Types.STRING);
+                    tracker(wrapper.user()).setCurrentWorld(world);
+                });
                 handler(playerTrackerHandler());
             }
         });
@@ -117,7 +121,8 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
             CompoundTag dimensionData = wrapper.passthrough(Types.NAMED_COMPOUND_TAG);
             addNewDimensionData(dimensionData);
 
-            tracker(wrapper.user()).clearEntities();
+            final String world = wrapper.passthrough(Types.STRING);
+            trackWorld(wrapper.user(), world);
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.UPDATE_ATTRIBUTES, new PacketHandlers() {

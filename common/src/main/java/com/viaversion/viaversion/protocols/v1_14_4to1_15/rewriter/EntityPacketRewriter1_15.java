@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_15;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -87,7 +88,11 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
             public void register() {
                 map(Types.INT);
                 handler(wrapper -> {
-                    tracker(wrapper.user()).clearEntities();
+                    final ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_14_4To1_15.class);
+                    int dimensionId = wrapper.get(Types.INT, 0);
+                    if (clientWorld.setEnvironment(dimensionId)) {
+                        tracker(wrapper.user()).clearEntities();
+                    }
                     wrapper.write(Types.LONG, 0L); // Level Seed
                 });
             }
@@ -108,6 +113,12 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
                 map(Types.BOOLEAN); // 6 - Reduce Debug Info
 
                 handler(wrapper -> wrapper.write(Types.BOOLEAN, !Via.getConfig().is1_15InstantRespawn())); // Show Death Screen
+                handler(wrapper -> {
+                    final int dimension = wrapper.get(Types.INT, 1);
+                    final ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_14_4To1_15.class);
+
+                    clientWorld.setEnvironment(dimension);
+                });
             }
         });
 

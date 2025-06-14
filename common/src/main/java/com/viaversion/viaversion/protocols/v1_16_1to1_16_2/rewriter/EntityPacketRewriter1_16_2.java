@@ -62,6 +62,10 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
                     wrapper.write(Types.NAMED_COMPOUND_TAG, getDimensionData(dimensionType));
                 });
                 map(Types.STRING); // Dimension
+                handler(wrapper -> {
+                    final String world = wrapper.get(Types.STRING, 0);
+                    tracker(wrapper.user()).setCurrentWorld(world);
+                });
                 map(Types.LONG); // Seed
                 map(Types.UNSIGNED_BYTE, Types.VAR_INT); // Max players
                 // ...
@@ -73,7 +77,8 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
             String dimensionType = wrapper.read(Types.STRING);
             wrapper.write(Types.NAMED_COMPOUND_TAG, getDimensionData(dimensionType));
 
-            tracker(wrapper.user()).clearEntities();
+            final String world = wrapper.passthrough(Types.STRING);
+            trackWorld(wrapper.user(), world);
         });
     }
 

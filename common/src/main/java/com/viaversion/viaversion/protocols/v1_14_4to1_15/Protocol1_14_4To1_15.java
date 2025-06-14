@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_14_4to1_15;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_15;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -80,6 +81,7 @@ public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public void init(UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_15.PLAYER));
+        connection.addClientWorld(this.getClass(), new ClientWorld());
     }
 
     @Override

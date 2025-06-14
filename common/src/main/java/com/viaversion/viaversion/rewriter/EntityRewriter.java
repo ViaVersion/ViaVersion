@@ -423,11 +423,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         });
     }
 
-    public void clearEntities(final UserConnection connection) {
-        final EntityTracker tracker = tracker(connection);
-        tracker.clearEntities();
-    }
-
     public PacketHandler trackerHandler() {
         return trackerAndRewriterHandler(null);
     }
@@ -440,6 +435,15 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         final EntityTracker tracker = tracker(connection);
         tracker.setClientEntityId(entityId);
         tracker.addEntity(entityId, tracker.playerType());
+    }
+
+    public void trackWorld(final UserConnection connection, final String world) {
+        // Clear entities if the world changes
+        final EntityTracker tracker = tracker(connection);
+        if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
+            tracker.clearEntities();
+        }
+        tracker.setCurrentWorld(world);
     }
 
     /**
@@ -470,10 +474,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             }
 
             String world = wrapper.get(Types.STRING, 0);
-            if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
-                tracker.clearEntities();
-            }
-            tracker.setCurrentWorld(world);
+            trackWorld(wrapper.user(), world);
         };
     }
 
@@ -492,10 +493,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             tracker.setCurrentMinY(dimensionData.minY());
 
             String world = wrapper.get(Types.STRING, 1);
-            if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
-                tracker.clearEntities();
-            }
-            tracker.setCurrentWorld(world);
+            trackWorld(wrapper.user(), world);
         };
     }
 
@@ -518,12 +516,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         }
         tracker.setCurrentWorldSectionHeight(dimensionData.height() >> 4);
         tracker.setCurrentMinY(dimensionData.minY());
-
-        // Clear entities if the world changes
-        if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
-            tracker.clearEntities();
-        }
-        tracker.setCurrentWorld(world);
+        trackWorld(connection, world);
     }
 
     public PacketHandler biomeSizeTracker() {
