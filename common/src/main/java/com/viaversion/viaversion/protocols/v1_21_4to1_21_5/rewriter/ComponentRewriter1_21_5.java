@@ -188,7 +188,17 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
 
             clickEventTag.putInt("page", page);
         } else if (action.equals("run_command") || action.equals("suggest_command")) {
-            clickEventTag.put("command", clickEventTag.getStringTag("value"));
+            final String value = clickEventTag.getString("value");
+            final StringBuilder command = new StringBuilder();
+            for (final char c : value.toCharArray()) {
+                if (c != 167 && c >= ' ' && c != 127) {
+                    command.append(c);
+                } else if (action.equals("suggest_command") && c == '\n') {
+                    command.append(c);
+                }
+            }
+
+            clickEventTag.putString("command", command.toString());
         }
     }
 
