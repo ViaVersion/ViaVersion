@@ -190,8 +190,9 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
         } else if (action.equals("run_command") || action.equals("suggest_command")) {
             final String value = clickEventTag.getString("value");
             final StringBuilder command = new StringBuilder();
-            for (final char c : value.toCharArray()) {
-                if (c != 167 && c >= ' ' && c != 127) {
+            for (int i = 0; i < value.length(); i++) {
+                final char c = value.charAt(i);
+                if (c != '§' && c >= ' ' && c != 127) {
                     command.append(c);
                 } else if (action.equals("suggest_command") && c == '\n') {
                     command.append(c);
