@@ -25,6 +25,17 @@ package com.viaversion.viaversion.util;
 public final class MathUtil {
 
     /**
+     * Returns the ceiled integer value of the given float.
+     *
+     * @param value float value to ceil
+     * @return ceiled integer value
+     */
+    public static int ceil(final float value) {
+        final int intValue = (int) value;
+        return value > intValue ? intValue + 1 : intValue;
+    }
+
+    /**
      * Returns the ceiled log to the base of 2 for the given number.
      *
      * @param i positive number to ceillog
