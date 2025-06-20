@@ -17,6 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_5to1_21_6.rewriter;
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_6;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_5;
@@ -52,6 +54,14 @@ public final class EntityPacketRewriter1_21_6 extends EntityRewriter<Clientbound
         final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
         protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
 
+        protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
+            // send server links dialog as vanilla doesn't show server links by default otherwise
+            final PacketWrapper dialogsPacket = PacketWrapper.create(ClientboundConfigurationPackets1_21.REGISTRY_DATA, wrapper.user());
+            dialogsPacket.write(Types.STRING, "minecraft:dialog");
+            dialogsPacket.write(Types.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{serverLinksDialog()});
+            dialogsPacket.send(Protocol1_21_5To1_21_6.class);
+        });
+
         protocol.appendClientbound(ClientboundPackets1_21_5.RESPAWN, wrapper -> {
             wrapper.user().get(SneakStorage.class).setSneaking(false);
         });
@@ -74,6 +84,30 @@ public final class EntityPacketRewriter1_21_6 extends EntityRewriter<Clientbound
                 playerCommandPacket.sendToServer(Protocol1_21_5To1_21_6.class);
             }
         });
+    }
+
+    private RegistryEntry serverLinksDialog() {
+        final CompoundTag serverLinksDialog = new CompoundTag();
+        serverLinksDialog.putString("type", "minecraft:server_links");
+
+        final CompoundTag title = new CompoundTag();
+        title.putString("translate", "menu.server_links.title");
+        serverLinksDialog.put("title", title);
+
+        final CompoundTag externalTitle = new CompoundTag();
+        externalTitle.putString("translate", "menu.server_links");
+        serverLinksDialog.put("external_title", externalTitle);
+
+        final CompoundTag exitAction = new CompoundTag();
+        exitAction.putInt("width", 200);
+        final CompoundTag exitActionLabel = new CompoundTag();
+        exitActionLabel.putString("translate", "gui.back");
+        exitAction.put("label", exitActionLabel);
+        serverLinksDialog.put("exit_action", exitAction);
+
+        serverLinksDialog.putInt("columns", 1);
+        serverLinksDialog.putInt("button_width", 310);
+        return new RegistryEntry("server_links", serverLinksDialog);
     }
 
     @Override
