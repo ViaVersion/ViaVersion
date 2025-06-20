@@ -39,6 +39,7 @@ import com.viaversion.viaversion.protocols.v1_18_2to1_19.data.MappingData1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.packet.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.packet.ServerboundPackets1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.provider.AckSequenceProvider;
+import com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter.ComponentRewriter1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter.EntityPacketRewriter1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter.ItemPacketRewriter1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter.WorldPacketRewriter1_19;
@@ -60,22 +61,11 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
     private final EntityPacketRewriter1_19 entityRewriter = new EntityPacketRewriter1_19(this);
     private final ItemPacketRewriter1_19 itemRewriter = new ItemPacketRewriter1_19(this);
     private final ParticleRewriter<ClientboundPackets1_18> particleRewriter = new ParticleRewriter<>(this);
+    private final ComponentRewriter1_19 componentRewriter = new ComponentRewriter1_19(this);
     private final TagRewriter<ClientboundPackets1_18> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_18_2To1_19() {
         super(ClientboundPackets1_18.class, ClientboundPackets1_19.class, ServerboundPackets1_17.class, ServerboundPackets1_19.class);
-    }
-
-    public static boolean isTextComponentNull(final JsonElement element) {
-        return element == null || element.isJsonNull() || (element.isJsonArray() && element.getAsJsonArray().isEmpty());
-    }
-
-    public static JsonElement mapTextComponentIfNull(JsonElement component) {
-        if (!isTextComponentNull(component)) {
-            return component;
-        } else {
-            return ComponentUtil.emptyJsonComponent();
-        }
     }
 
     @Override
@@ -131,7 +121,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_18.AWARD_STATS);
 
-        final PacketHandler singleNullTextComponentMapper = wrapper -> wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.read(Types.COMPONENT)));
+        final PacketHandler singleNullTextComponentMapper = wrapper -> wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.user(), wrapper.read(Types.COMPONENT)));
         registerClientbound(ClientboundPackets1_18.SET_TITLE_TEXT, singleNullTextComponentMapper);
         registerClientbound(ClientboundPackets1_18.SET_SUBTITLE_TEXT, singleNullTextComponentMapper);
         registerClientbound(ClientboundPackets1_18.SET_ACTION_BAR_TEXT, singleNullTextComponentMapper);
@@ -139,20 +129,59 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
             wrapper.passthrough(Types.STRING); // Objective Name
             byte action = wrapper.passthrough(Types.BYTE); // Mode
             if (action == 0 || action == 2) {
-                wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.read(Types.COMPONENT))); // Display Name
+                wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.user(), wrapper.read(Types.COMPONENT))); // Display Name
             }
         });
         registerClientbound(ClientboundPackets1_18.SET_PLAYER_TEAM, wrapper -> {
             wrapper.passthrough(Types.STRING); // Team Name
             byte action = wrapper.passthrough(Types.BYTE); // Mode
             if (action == 0 || action == 2) {
-                wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.read(Types.COMPONENT))); // Display Name
+                wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.user(), wrapper.read(Types.COMPONENT))); // Display Name
                 wrapper.passthrough(Types.BYTE); // Flags
                 wrapper.passthrough(Types.STRING); // Name Tag Visibility
                 wrapper.passthrough(Types.STRING); // Collision rule
                 wrapper.passthrough(Types.VAR_INT); // Color
-                wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.read(Types.COMPONENT))); // Prefix
-                wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.read(Types.COMPONENT))); // Suffix
+                wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.user(), wrapper.read(Types.COMPONENT))); // Prefix
+                wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.user(), wrapper.read(Types.COMPONENT))); // Suffix
+            }
+        });
+
+        componentRewriter.registerBossEvent(ClientboundPackets1_18.BOSS_EVENT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_18.DISCONNECT);
+        componentRewriter.registerTabList(ClientboundPackets1_18.TAB_LIST);
+        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_18.OPEN_SCREEN);
+        componentRewriter.registerPlayerCombatKill(ClientboundPackets1_18.PLAYER_COMBAT_KILL);
+        componentRewriter.registerPing();
+
+        registerClientbound(ClientboundPackets1_18.PLAYER_INFO, wrapper -> {
+            final int action = wrapper.passthrough(Types.VAR_INT);
+            final int entries = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < entries; i++) {
+                wrapper.passthrough(Types.UUID); // UUID
+                if (action == 0) { // Add player
+                    wrapper.passthrough(Types.STRING); // Player Name
+                    wrapper.passthrough(Types.PROFILE_PROPERTY_ARRAY);
+                    wrapper.passthrough(Types.VAR_INT); // Gamemode
+                    wrapper.passthrough(Types.VAR_INT); // Ping
+                    final JsonElement displayName = wrapper.read(Types.OPTIONAL_COMPONENT); // Display name
+                    if (isJsonNotNull(displayName)) {
+                        wrapper.write(Types.OPTIONAL_COMPONENT, displayName);
+                    } else {
+                        wrapper.write(Types.OPTIONAL_COMPONENT, null);
+                    }
+
+                    // No public profile signature
+                    wrapper.write(Types.OPTIONAL_PROFILE_KEY, null);
+                } else if (action == 1 || action == 2) { // Update gamemode/update latency
+                    wrapper.passthrough(Types.VAR_INT);
+                } else if (action == 3) { // Update display name
+                    final JsonElement displayName = wrapper.read(Types.OPTIONAL_COMPONENT); // Display name
+                    if (isJsonNotNull(displayName)) {
+                        wrapper.write(Types.OPTIONAL_COMPONENT, displayName);
+                    } else {
+                        wrapper.write(Types.OPTIONAL_COMPONENT, null);
+                    }
+                }
             }
         });
 
@@ -288,8 +317,21 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
         });
     }
 
-    private static long randomLong() {
+    private long randomLong() {
         return ThreadLocalRandom.current().nextLong();
+    }
+
+    public boolean isJsonNotNull(final JsonElement element) {
+        return element != null && !element.isJsonNull() && (!element.isJsonArray() || !element.getAsJsonArray().isEmpty());
+    }
+
+    public JsonElement mapTextComponentIfNull(final UserConnection connection, final JsonElement component) {
+        if (isJsonNotNull(component)) {
+            componentRewriter.processText(connection, component);
+            return component;
+        } else {
+            return ComponentUtil.emptyJsonComponent();
+        }
     }
 
     @Override

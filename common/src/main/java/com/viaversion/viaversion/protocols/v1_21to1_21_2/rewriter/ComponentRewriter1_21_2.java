@@ -94,6 +94,15 @@ public final class ComponentRewriter1_21_2 extends JsonNBTComponentRewriter<Clie
         }
     }
 
+    @Override
+    protected void handleTranslate(final UserConnection connection, final CompoundTag parentTag, final StringTag translateTag) {
+        if (translateTag.getValue().equals("commands.drop.no_loot_table")) {
+            translateTag.setValue("Entity %s has no loot table");
+        } else if (translateTag.getValue().equals("commands.advancement.advancementNotFound")) {
+            translateTag.setValue("No advancement was found by the name '%1$s'");
+        }
+    }
+
     public static void convertAttributes(final CompoundTag componentsTag, final FullMappings mappings) {
         final CompoundTag attributeModifiers = TagUtil.getNamespacedCompoundTag(componentsTag, "attribute_modifiers");
         if (attributeModifiers == null) {
