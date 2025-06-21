@@ -44,7 +44,6 @@ publishing {
 fun ShadowJar.configureRelocations() {
     relocate("com.google.gson", "com.viaversion.viaversion.libs.gson")
     relocate("it.unimi.dsi.fastutil", "com.viaversion.viaversion.libs.fastutil")
-    relocate("net.lenni0451.mcstructs", "com.viaversion.viaversion.libs.mcstructs")
     relocate("org.yaml.snakeyaml", "com.viaversion.viaversion.libs.snakeyaml")
 }
 
