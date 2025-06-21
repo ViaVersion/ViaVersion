@@ -49,10 +49,19 @@ public class ChunkSectionType1_18 extends Type<ChunkSection> {
 
     @Override
     public ChunkSection read(final ByteBuf buffer) {
+        if (buffer.readableBytes() < 2) {
+            return new ChunkSectionImpl();
+        }
         final ChunkSection chunkSection = new ChunkSectionImpl();
-        chunkSection.setNonAirBlocksCount(buffer.readShort());
-        chunkSection.addPalette(PaletteType.BLOCKS, blockPaletteType.read(buffer));
-        chunkSection.addPalette(PaletteType.BIOMES, biomePaletteType.read(buffer));
+        int before = buffer.readerIndex();
+        try {
+            chunkSection.setNonAirBlocksCount(buffer.readShort());
+            chunkSection.addPalette(PaletteType.BLOCKS, blockPaletteType.read(buffer));
+            chunkSection.addPalette(PaletteType.BIOMES, biomePaletteType.read(buffer));
+        } catch (IndexOutOfBoundsException e) {
+            buffer.readerIndex(before);
+            return new ChunkSectionImpl();
+        }
         return chunkSection;
     }
 
@@ -66,6 +75,7 @@ public class ChunkSectionType1_18 extends Type<ChunkSection> {
     public int serializedSize(final Chunk chunk) {
         int length = 0;
         for (final ChunkSection section : chunk.getSections()) {
+            if (section == null) continue; // Skip null sections
             length += Short.BYTES
                 + blockPaletteType.serializedSize(section.palette(PaletteType.BLOCKS))
                 + biomePaletteType.serializedSize(section.palette(PaletteType.BIOMES));
