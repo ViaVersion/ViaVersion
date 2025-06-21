@@ -189,13 +189,23 @@ public class BukkitPickItemProvider extends PickItemProvider {
                     }
                     return item;
                 };
-            } else if (Via.getAPI().getServerVersion().lowestSupportedProtocolVersion().equalTo(ProtocolVersion.v1_8)) {
-                LegacyBlockToItem legacy = LegacyBlockToItem.getInstance();
+            }
+
+            final ProtocolVersion version = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
+            if (version.equalTo(ProtocolVersion.v1_8)) {
+                final LegacyBlockToItem legacy = LegacyBlockToItem.getInstance();
                 return legacy != null ? (block, includeData) -> legacy.blockToItem(block) : (b, i) -> null;
             } else if (PaperViaInjector.hasMethod(Material.class, "isItem")) {
-                return (block, includeData) -> block.getType().isItem() ? new ItemStack(block.getType()) : null;
+                return (block, includeData) -> {
+                    if (!block.getType().isItem()) {
+                        return null;
+                    }
+                    return version.newerThanOrEqualTo(ProtocolVersion.v1_13)
+                        ? new ItemStack(block.getType())
+                        : new ItemStack(block.getType(), 1, (short) 0, block.getData());
+                };
             } else {
-                return (b, i) -> null;
+                return (block, includeData) -> null;
             }
         }
     }
