@@ -15,26 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.template;
+package com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet;
 
-import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
-import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
+import com.viaversion.viaversion.api.protocol.packet.State;
 
-final class ComponentRewriter1_99 extends NBTComponentRewriter<ClientboundPacket1_21_2> {
+public enum ServerboundConfigurationPackets1_21_6 implements ServerboundPacket1_21_6 {
 
-    public ComponentRewriter1_99(final Protocol1_98To1_99 protocol) {
-        super(protocol);
+    CLIENT_INFORMATION, // 0x00
+    COOKIE_RESPONSE, // 0x01
+    CUSTOM_PAYLOAD, // 0x02
+    FINISH_CONFIGURATION, // 0x03
+    KEEP_ALIVE, // 0x04
+    PONG, // 0x05
+    RESOURCE_PACK, // 0x06
+    SELECT_KNOWN_PACKS, // 0x07
+    CUSTOM_CLICK_ACTION; // 0x08
+
+    @Override
+    public int getId() {
+        return ordinal();
     }
 
     @Override
-    protected void handleShowItem(final UserConnection connection, final CompoundTag itemTag, final CompoundTag componentsTag) {
-        super.handleShowItem(connection, itemTag, componentsTag);
-        if (componentsTag == null) {
-            return;
-        }
+    public String getName() {
+        return name();
+    }
 
-        // Remove or update data from componentsTag
+    @Override
+    public State state() {
+        return State.CONFIGURATION;
     }
 }

@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.storage;
 
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext.RegistryAccess;
@@ -31,11 +32,11 @@ import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_
 import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class ItemHashStorage1_21_5 implements ItemHasher {
 
-    private final Map<Long, StructuredData<?>> hashToStructuredData = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(512).<Long, StructuredData<?>>build().asMap();
+    private final Cache<Long, StructuredData<?>> hashToStructuredData = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(512).build();
     private final List<String> enchantmentRegistry = new ArrayList<>();
     private boolean processingClientboundInventoryPacket;
     private final CodecContext context;
@@ -63,12 +64,16 @@ public class ItemHashStorage1_21_5 implements ItemHasher {
         }
 
         final long key = (long) structuredData.id() << 32 | hash;
-        this.hashToStructuredData.computeIfAbsent(key, $ -> structuredData.copy());
+        try {
+            this.hashToStructuredData.get(key, structuredData::copy);
+        } catch (final ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public StructuredData<?> dataFromHash(final int dataComponentId, final int hash) {
         final long key = (long) dataComponentId << 32 | hash;
-        final StructuredData<?> data = this.hashToStructuredData.get(key);
+        final StructuredData<?> data = this.hashToStructuredData.getIfPresent(key);
         return data != null ? data.copy() : null;
     }
 

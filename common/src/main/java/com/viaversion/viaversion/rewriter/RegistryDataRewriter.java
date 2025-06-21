@@ -45,17 +45,22 @@ import java.util.function.Consumer;
 public class RegistryDataRewriter {
     private final Map<String, Consumer<CompoundTag>> enchantmentEffectRewriters = new Object2ObjectArrayMap<>();
     private final Map<String, List<RegistryEntry>> toAdd = new Object2ObjectArrayMap<>();
-    private final Protocol<?, ?, ?, ?> protocol;
+    private final Set<String> toRemove = new HashSet<>();
+    protected final Protocol<?, ?, ?, ?> protocol;
 
     public RegistryDataRewriter(Protocol<?, ?, ?, ?> protocol) {
         this.protocol = protocol;
     }
 
     public void handle(final PacketWrapper wrapper) {
-        final String registryKey = wrapper.passthrough(Types.STRING);
+        final String registryKey = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
         RegistryEntry[] entries = wrapper.read(Types.REGISTRY_ENTRY_ARRAY);
-        entries = handle(wrapper.user(), Key.stripMinecraftNamespace(registryKey), entries);
+        entries = handle(wrapper.user(), registryKey, entries);
         wrapper.write(Types.REGISTRY_ENTRY_ARRAY, entries);
+
+        if (this.toRemove.contains(registryKey)) {
+            wrapper.cancel();
+        }
     }
 
     public RegistryEntry[] handle(final UserConnection connection, String key, RegistryEntry[] entries) {
@@ -64,6 +69,8 @@ public class RegistryDataRewriter {
             updateEnchantments(connection, entries);
         } else if (key.equals("trim_material")) {
             updateTrimMaterials(entries);
+        } else if (key.equals("jukebox_song")) {
+            updateJukeboxSongs(entries);
         }
 
         final List<RegistryEntry> toAdd = this.toAdd.get(key);
@@ -101,6 +108,10 @@ public class RegistryDataRewriter {
 
     public void addEnchantmentEffectRewriter(final String key, final Consumer<CompoundTag> rewriter) {
         enchantmentEffectRewriters.put(Key.stripMinecraftNamespace(key), rewriter);
+    }
+
+    public void remove(final String registryKey) {
+        toRemove.add(Key.stripMinecraftNamespace(registryKey));
     }
 
     public void trackDimensionAndBiomes(final UserConnection connection, final String registryKey, final RegistryEntry[] entries) {
@@ -176,6 +187,10 @@ public class RegistryDataRewriter {
 
             updateItem(ingredientTag);
         }
+    }
+
+    public void updateJukeboxSongs(final RegistryEntry[] entries) {
+        // can be overridden
     }
 
     private void updateNestedEffect(final CompoundTag effectsTag) {

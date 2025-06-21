@@ -54,7 +54,7 @@ public interface ItemRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter<T
     /**
      * Returns the rewritten item, which may or may not be the same given HashedItem instance.
      * <p>
-     * Used starting with 1.22.
+     * Used starting with 1.21.6.
      *
      * @param connection user connection
      * @param item       hashed item

@@ -34,9 +34,10 @@ import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 // To replace if needed:
 //   ChunkType1_21_5
 //   RecipeDisplayRewriter
-final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_4, Protocol1_99To_98> {
+//   Types1_21_4, Types1_OLD
+final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_4, Protocol1_98To1_99> {
 
-    public BlockItemPacketRewriter1_99(final Protocol1_99To_98 protocol) {
+    public BlockItemPacketRewriter1_99(final Protocol1_98To1_99 protocol) {
         super(protocol);
     }
 
@@ -83,8 +84,8 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
 
     @Override
     protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
-        super.handleItemDataComponentsToClient(connection, item, container);
         upgradeData(item, container);
+        super.handleItemDataComponentsToClient(connection, item, container);
     }
 
     public static void upgradeData(final Item item, final StructuredDataContainer container) { // public for VB
@@ -92,8 +93,8 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
 
     @Override
     protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
-        super.handleItemDataComponentsToServer(connection, item, container);
         downgradeData(item, container);
+        super.handleItemDataComponentsToServer(connection, item, container);
     }
 
     public static void downgradeData(final Item item, final StructuredDataContainer container) {
