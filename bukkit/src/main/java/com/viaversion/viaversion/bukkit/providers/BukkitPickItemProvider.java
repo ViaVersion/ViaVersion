@@ -18,8 +18,10 @@
 package com.viaversion.viaversion.bukkit.providers;
 
 import com.viaversion.viaversion.ViaVersionPlugin;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
 import com.viaversion.viaversion.bukkit.util.LegacyBlockToItem;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.provider.PickItemProvider;
@@ -187,14 +189,25 @@ public class BukkitPickItemProvider extends PickItemProvider {
                     }
                     return item;
                 };
-            } else if (PaperViaInjector.hasMethod(Material.class, "isItem")) {
-                return (block, includeData) -> new ItemStack(block.getType(), 1);
-            } else {
-                LegacyBlockToItem legacy = LegacyBlockToItem.getInstance();
+            }
+
+            final ProtocolVersion version = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
+            if (version.equalTo(ProtocolVersion.v1_8)) {
+                final LegacyBlockToItem legacy = LegacyBlockToItem.getInstance();
                 return legacy != null ? (block, includeData) -> legacy.blockToItem(block) : (b, i) -> null;
+            } else if (PaperViaInjector.hasMethod(Material.class, "isItem")) {
+                return (block, includeData) -> {
+                    if (!block.getType().isItem()) {
+                        return null;
+                    }
+                    return version.newerThanOrEqualTo(ProtocolVersion.v1_13)
+                        ? new ItemStack(block.getType())
+                        : new ItemStack(block.getType(), 1, (short) 0, block.getData());
+                };
+            } else {
+                return (block, includeData) -> null;
             }
         }
-
     }
 
     @FunctionalInterface
