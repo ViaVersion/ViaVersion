@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_21_5to1_21_6.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_6;
@@ -34,6 +35,7 @@ import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.storage.SneakStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
+import com.viaversion.viaversion.util.Key;
 
 public final class EntityPacketRewriter1_21_6 extends EntityRewriter<ClientboundPacket1_21_5, Protocol1_21_5To1_21_6> {
 
@@ -51,7 +53,32 @@ public final class EntityPacketRewriter1_21_6 extends EntityRewriter<Clientbound
         registerLogin1_20_5(ClientboundPackets1_21_5.LOGIN);
         registerRespawn1_20_5(ClientboundPackets1_21_5.RESPAWN);
 
-        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
+        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol) {
+            @Override
+            public RegistryEntry[] handle(final UserConnection connection, final String key, final RegistryEntry[] entries) {
+                if (!"dimension_type".equals(key)) {
+                    return super.handle(connection, key, entries);
+                }
+                for (final RegistryEntry entry : entries) {
+                    if (entry.tag() == null) {
+                        continue; // client will use its own defaults
+                    }
+                    // the client will render clouds if effects aren't set to either the_nether or the_end
+                    final CompoundTag tag = (CompoundTag) entry.tag();
+                    String effects = tag.getString("effects");
+                    if (effects != null) {
+                        effects = Key.stripMinecraftNamespace(effects);
+                        if ("the_nether".equals(effects) || "the_end".equals(effects)) {
+                            continue; // don't show clouds
+                        }
+                    }
+                    if (!tag.contains("cloud_height")) {
+                        tag.putInt("cloud_height", 192);
+                    }
+                }
+                return super.handle(connection, key, entries);
+            }
+        };
         protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
 
         protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
