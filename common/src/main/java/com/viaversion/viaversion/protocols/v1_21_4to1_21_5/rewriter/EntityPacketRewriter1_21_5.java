@@ -75,29 +75,15 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             wrapper.write(Types.SHORT, (short) 0);
         });
 
-        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol) {
-            @Override
-            public RegistryEntry[] handle(final UserConnection connection, final String key, final RegistryEntry[] entries) {
-                if (!key.equals("wolf_variant")) {
-                    return super.handle(connection, key, entries);
-                }
-
-                for (final RegistryEntry entry : entries) {
-                    if (entry.tag() == null) {
-                        continue;
-                    }
-
-                    final CompoundTag variant = (CompoundTag) entry.tag();
-                    final CompoundTag assets = new CompoundTag();
-                    variant.put("assets", assets);
-                    assets.put("wild", variant.remove("wild_texture"));
-                    assets.put("tame", variant.remove("tame_texture"));
-                    assets.put("angry", variant.remove("angry_texture"));
-                    variant.remove("biomes");
-                }
-                return entries;
-            }
-        };
+        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
+        registryDataRewriter.addHandler("wolf_variant", (key, variant) -> {
+            final CompoundTag assets = new CompoundTag();
+            variant.put("assets", assets);
+            assets.put("wild", variant.remove("wild_texture"));
+            assets.put("tame", variant.remove("tame_texture"));
+            assets.put("angry", variant.remove("angry_texture"));
+            variant.remove("biomes");
+        });
         protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
 
         protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
