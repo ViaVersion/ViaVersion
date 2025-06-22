@@ -19,13 +19,13 @@ package com.viaversion.viaversion.util;
 
 import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.libs.mcstructs.snbt.SNbt;
+import com.viaversion.viaversion.libs.mcstructs.snbt.exceptions.SNbtDeserializeException;
+import com.viaversion.viaversion.libs.mcstructs.snbt.exceptions.SNbtSerializeException;
+import com.viaversion.viaversion.libs.mcstructs.text.TextComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentCodec;
+import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
-import net.lenni0451.mcstructs.snbt.SNbt;
-import net.lenni0451.mcstructs.snbt.exceptions.SNbtDeserializeException;
-import net.lenni0451.mcstructs.snbt.exceptions.SNbtSerializeException;
-import net.lenni0451.mcstructs.text.TextComponent;
-import net.lenni0451.mcstructs.text.serializer.TextComponentCodec;
-import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
 
 /**
  * Wrapper enum to unify text component and string nbt serialization functions across different versions.
@@ -50,7 +50,8 @@ public enum SerializerVersion {
     V1_20_3(TextComponentCodec.V1_20_3, SNbt.V1_14),
     V1_20_5(TextComponentCodec.V1_20_5, SNbt.V1_14),
     V1_21_4(TextComponentCodec.V1_21_4, SNbt.V1_14),
-    V1_21_5(TextComponentCodec.V1_21_5, null/*Currently not needed and also not implemented 100% in MCStructs*/);
+    V1_21_5(TextComponentCodec.V1_21_5, null/*Currently not needed and also not implemented 100% in MCStructs*/),
+    V1_21_6(TextComponentCodec.V1_21_6, null);
 
     final TextComponentSerializer jsonSerializer;
     final SNbt<? extends Tag> sNbt;

@@ -144,7 +144,7 @@ final class Protocol1_98To1_99 extends AbstractProtocol<ClientboundPacket1_21_2,
     public void init(final UserConnection connection) {
         // Register the entity tracker - used for entity id/entity data rewriting AND for tracking world data sent to the client (then used for chunk data rewriting)
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_4.PLAYER));
-        addItemHasher(connection, new ItemHasherBase(this, connection, SerializerVersion.V1_21_5, SerializerVersion.V1_21_5));
+        addItemHasher(connection, new ItemHasherBase(this, connection, SerializerVersion.V1_21_6, SerializerVersion.V1_21_6));
     }
 
     // Overriding these methods is important as they are relied on various rewriter classes
