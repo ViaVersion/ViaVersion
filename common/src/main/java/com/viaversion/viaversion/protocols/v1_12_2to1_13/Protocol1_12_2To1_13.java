@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13;
 
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
@@ -482,6 +483,31 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             String displayName = wrapper.read(Types.STRING); // Display Name
             displayName = rewriteTeamMemberName(displayName);
             wrapper.write(Types.STRING, displayName);
+        });
+        registerClientbound(ClientboundPackets1_12_1.PLAYER_INFO, wrapper -> {
+            final int action = wrapper.passthrough(Types.VAR_INT);
+            final int count = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < count; i++) {
+                wrapper.passthrough(Types.UUID); // Player UUID
+                if (action == 0) { // Add player
+                    final String playerName = wrapper.read(Types.STRING);
+                    wrapper.write(Types.STRING, rewriteTeamMemberName(playerName));
+                    wrapper.passthrough(Types.PROFILE_PROPERTY_ARRAY); // Profile properties
+                    wrapper.passthrough(Types.VAR_INT); // gamemode
+                    wrapper.passthrough(Types.VAR_INT); // ping
+                    final JsonElement displayName = wrapper.passthrough(Types.OPTIONAL_COMPONENT);
+                    if (displayName != null) {
+                        componentRewriter.processText(wrapper.user(), displayName);
+                    }
+                } else if (action == 1 || action == 2) { // Update Gamemode/Latency
+                    wrapper.passthrough(Types.VAR_INT);
+                } else if (action == 3) { // Update display name
+                    final JsonElement displayName = wrapper.passthrough(Types.OPTIONAL_COMPONENT);
+                    if (displayName != null) {
+                        componentRewriter.processText(wrapper.user(), displayName);
+                    }
+                }
+            }
         });
 
         componentRewriter.registerTitle(ClientboundPackets1_12_1.SET_TITLES);
