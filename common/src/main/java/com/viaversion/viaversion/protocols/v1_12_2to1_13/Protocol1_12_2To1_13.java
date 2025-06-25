@@ -455,12 +455,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                             colour = 21; // -1 changed to 21
                         }
 
-                        if (Via.getConfig().is1_13TeamColourFix()) {
-                            char lastColorChar = getLastColorChar(prefix);
-                            colour = ChatColorUtil.getColorOrdinal(lastColorChar);
-                            suffix = ChatColorUtil.COLOR_CHAR + Character.toString(lastColorChar) + suffix;
-                        }
-
                         wrapper.write(Types.VAR_INT, colour);
 
                         wrapper.write(Types.COMPONENT, ComponentUtil.legacyToJson(prefix)); // Prefix
@@ -859,21 +853,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         providers.register(BlockEntityProvider.class, new BlockEntityProvider());
         providers.register(PaintingProvider.class, new PaintingProvider());
         providers.register(PlayerLookTargetProvider.class, new PlayerLookTargetProvider());
-    }
-
-    // Based on method from https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/ChatColor.java
-    public char getLastColorChar(String input) {
-        int length = input.length();
-        for (int index = length - 1; index > -1; index--) {
-            char section = input.charAt(index);
-            if (section == ChatColorUtil.COLOR_CHAR && index < length - 1) {
-                char c = input.charAt(index + 1);
-                if (ChatColorUtil.isColorCode(c) && !FORMATTING_CODES.contains(c)) {
-                    return c;
-                }
-            }
-        }
-        return 'r';
     }
 
     protected String rewriteTeamMemberName(String name) {

@@ -97,8 +97,6 @@ piston-animation-patch: false
 chat-nbt-fix: true
 # Experimental - Should we fix shift quick move action for 1.12 clients (causes shift + double click not to work when moving items) (only works on 1.8-1.11.2 bukkit based servers)
 quick-move-action-fix: false
-# Should we use prefix for team color on 1.13 and above clients?
-team-colour-fix: true
 # 1.13 introduced new auto complete which can trigger "Kicked for spamming" for servers older than 1.13, the following option will disable it completely.
 disable-1_13-auto-complete: false
 # The following option will delay the tab complete request in x ticks if greater than 0, if other tab-complete is received, the previous is cancelled

@@ -73,7 +73,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean suppressConversionWarnings;
     private boolean suppressTextComponentConversionWarnings;
     private boolean disable1_13TabComplete;
-    private boolean teamColourFix;
     private boolean serversideBlockConnections;
     private boolean reduceBlockStorageMemory;
     private boolean flowerStemWhenBlockAbove;
@@ -137,7 +136,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         blockedProtocolVersions = loadBlockedProtocolVersions();
         blockedDisconnectMessage = getString("block-disconnect-msg", "You are using an unsupported Minecraft version!");
         reloadDisconnectMessage = getString("reload-disconnect-msg", "Server reload, please rejoin!");
-        teamColourFix = getBoolean("team-colour-fix", true);
         suppressConversionWarnings = getBoolean("suppress-conversion-warnings", false);
         suppressTextComponentConversionWarnings = getBoolean("suppress-text-component-conversion-warnings", true);
         disable1_13TabComplete = getBoolean("disable-1_13-auto-complete", false);
@@ -407,11 +405,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public String getReloadDisconnectMsg() {
         return reloadDisconnectMessage;
-    }
-
-    @Override
-    public boolean is1_13TeamColourFix() {
-        return teamColourFix;
     }
 
     @Override
