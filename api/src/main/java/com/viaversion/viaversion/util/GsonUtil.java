@@ -25,8 +25,8 @@ package com.viaversion.viaversion.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.viaversion.viaversion.libs.mcstructs.text.utils.JsonUtils;
 import java.util.Comparator;
-import net.lenni0451.mcstructs.text.utils.JsonUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class GsonUtil {

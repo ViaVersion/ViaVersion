@@ -19,8 +19,6 @@ package com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_4;
 import com.viaversion.viaversion.api.type.Types;
@@ -32,7 +30,6 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
-import com.viaversion.viaversion.util.Key;
 
 public final class EntityPacketRewriter1_21_4 extends EntityRewriter<ClientboundPacket1_21_2, Protocol1_21_2To1_21_4> {
 
@@ -46,34 +43,22 @@ public final class EntityPacketRewriter1_21_4 extends EntityRewriter<Clientbound
         registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA);
         registerRemoveEntities(ClientboundPackets1_21_2.REMOVE_ENTITIES);
 
-        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol) {
-            @Override
-            public RegistryEntry[] handle(final UserConnection connection, final String key, final RegistryEntry[] entries) {
-                if (Key.stripMinecraftNamespace(key).equals("worldgen/biome")) {
-                    for (final RegistryEntry entry : entries) {
-                        if (entry.tag() == null) {
-                            continue;
-                        }
-
-                        final CompoundTag effectsTag = ((CompoundTag) entry.tag()).getCompoundTag("effects");
-                        final CompoundTag musicTag = effectsTag.getCompoundTag("music");
-                        if (musicTag == null) {
-                            continue;
-                        }
-
-                        // Wrap music
-                        final ListTag<CompoundTag> weightedMusicTags = new ListTag<>(CompoundTag.class);
-                        final CompoundTag weightedMusicTag = new CompoundTag();
-                        weightedMusicTag.put("data", musicTag);
-                        weightedMusicTag.putInt("weight", 1);
-                        weightedMusicTags.add(weightedMusicTag);
-                        effectsTag.put("music", weightedMusicTags);
-                    }
-                }
-
-                return super.handle(connection, key, entries);
+        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
+        registryDataRewriter.addHandler("worldgen/biome", (key, biome) -> {
+            final CompoundTag effectsTag = biome.getCompoundTag("effects");
+            final CompoundTag musicTag = effectsTag.getCompoundTag("music");
+            if (musicTag == null) {
+                return;
             }
-        };
+
+            // Wrap music
+            final ListTag<CompoundTag> weightedMusicTags = new ListTag<>(CompoundTag.class);
+            final CompoundTag weightedMusicTag = new CompoundTag();
+            weightedMusicTag.put("data", musicTag);
+            weightedMusicTag.putInt("weight", 1);
+            weightedMusicTags.add(weightedMusicTag);
+            effectsTag.put("music", weightedMusicTags);
+        });
         protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
 
         registerLogin1_20_5(ClientboundPackets1_21_2.LOGIN);
