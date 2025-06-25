@@ -234,13 +234,6 @@ public interface ViaVersionConfig extends Config {
     boolean isChunkBorderFix();
 
     /**
-     * Should we fix nbt array's in json chat messages for 1.12 clients
-     *
-     * @return true if enabled
-     */
-    boolean is1_12NBTArrayFix();
-
-    /**
      * Should we make team colours based on the last colour in team prefix
      *
      * @return true if enabled

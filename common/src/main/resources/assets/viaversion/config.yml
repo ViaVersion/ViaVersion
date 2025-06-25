@@ -93,8 +93,6 @@ hologram-y: -0.96
 # Should we disable piston animation for 1.11/1.11.1 clients?
 # In some cases, when firing lots of pistons, it crashes them.
 piston-animation-patch: false
-# Should we fix nbt for 1.12 and above clients in chat messages (causes invalid item)
-chat-nbt-fix: true
 # Experimental - Should we fix shift quick move action for 1.12 clients (causes shift + double click not to work when moving items) (only works on 1.8-1.11.2 bukkit based servers)
 quick-move-action-fix: false
 # Should we use prefix for team color on 1.13 and above clients?
