@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_12_2to1_13;
 
-import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -74,7 +73,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 
 public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_12_1, ClientboundPackets1_13, ServerboundPackets1_12_1, ServerboundPackets1_13> {
@@ -83,7 +81,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
     public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_12_2To1_13.class);
     // These are arbitrary rewrite values, it just needs an invalid color code character.
     private static final Map<Character, Character> SCOREBOARD_TEAM_NAME_REWRITE = new HashMap<>();
-    private static final Set<Character> FORMATTING_CODES = Sets.newHashSet('k', 'l', 'm', 'n', 'o', 'r');
     private final EntityPacketRewriter1_13 entityRewriter = new EntityPacketRewriter1_13(this);
     private final ItemPacketRewriter1_13 itemRewriter = new ItemPacketRewriter1_13(this);
     private final ComponentRewriter1_13<ClientboundPackets1_12_1> componentRewriter = new ComponentRewriter1_13<>(this);
