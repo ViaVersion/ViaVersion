@@ -183,7 +183,7 @@ public final class ComponentUtil {
     }
 
     public static JsonElement legacyToJson(final String message) {
-        return SerializerVersion.V1_12.toJson(StringFormat.vanilla().fromString(message, ColorHandling.RESET, DeserializerUnknownHandling.WHITE));
+        return SerializerVersion.V1_14.toJson(LegacyToComponent.convertToComponent(message));
     }
 
     public static String legacyToJsonString(final String message) {
