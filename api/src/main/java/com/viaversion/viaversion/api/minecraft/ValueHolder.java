@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.minecraft;
 
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 record ValueHolder<T>(T value) implements Holder<T> {
 
@@ -43,7 +44,7 @@ record ValueHolder<T>(T value) implements Holder<T> {
     }
 
     @Override
-    public Holder<T> updateId(final Int2IntFunction rewriteFunction) {
+    public Holder<T> updateId(final Int2IntFunction rewriteFunction, final Supplier<Holder<T>> ifMissing) {
         return this;
     }
 

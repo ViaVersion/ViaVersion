@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.minecraft;
 
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public interface Holder<T> {
 
@@ -89,7 +90,18 @@ public interface Holder<T> {
      * @param rewriteFunction the function to rewrite the id
      * @return a new holder with the id rewritten, or self
      */
-    Holder<T> updateId(final Int2IntFunction rewriteFunction);
+    default Holder<T> updateId(final Int2IntFunction rewriteFunction) {
+        return this.updateId(rewriteFunction, null);
+    }
+
+    /**
+     * Returns a new holder with the id rewritten using the given function, or self if this is a direct holder or the id did not change.
+     *
+     * @param rewriteFunction the function to rewrite the id
+     * @param ifMissing       a supplier that provides a new holder if the id is missing (i.e. -1)
+     * @return a new holder with the id rewritten, or self
+     */
+    Holder<T> updateId(Int2IntFunction rewriteFunction, Supplier<Holder<T>> ifMissing);
 
     /**
      * Returns a new holder with the value rewritten using the given function, or self if this is an id holder or the value did not change.

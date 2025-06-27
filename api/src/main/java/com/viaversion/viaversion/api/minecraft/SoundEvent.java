@@ -22,11 +22,21 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record SoundEvent(String identifier, @Nullable Float fixedRange) {
 
+    private static final Holder<SoundEvent> UNKNOWN = Holder.of(new SoundEvent("viaversion:unknown", 0F));
+
     public SoundEvent withIdentifier(final String identifier) {
         return new SoundEvent(identifier, this.fixedRange);
+    }
+
+    public static @Nullable Holder<SoundEvent> rewriteHolder(@Nullable final Holder<SoundEvent> holder, final Int2IntFunction soundRewriteFunction) {
+        if (holder == null) {
+            return null;
+        }
+        return holder.updateId(soundRewriteFunction, () -> UNKNOWN);
     }
 }

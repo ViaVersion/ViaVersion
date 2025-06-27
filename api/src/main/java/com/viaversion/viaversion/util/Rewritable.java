@@ -67,7 +67,7 @@ public interface Rewritable {
 
     static Int2IntFunction soundRewriteFunction(final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         return protocol.getMappingData().getSoundMappings() == null ? Int2IntFunction.identity()
-            : (clientbound ? protocol.getMappingData()::getNewSoundId : protocol.getMappingData()::getOldSoundId);
+            : (clientbound ? protocol.getMappingData().getSoundMappings()::getNewId : protocol.getMappingData()::getOldSoundId);
     }
 
     static @Nullable String mappedIdentifier(final FullMappings mappings, final String identifier) {

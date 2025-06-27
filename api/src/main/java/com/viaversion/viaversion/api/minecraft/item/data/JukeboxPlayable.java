@@ -111,7 +111,7 @@ public record JukeboxPlayable(EitherHolder<JukeboxSong> song, boolean showInTool
 
         @Override
         public JukeboxSong rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
-            final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(Rewritable.soundRewriteFunction(protocol, clientbound));
+            final Holder<SoundEvent> soundEvent = SoundEvent.rewriteHolder(this.soundEvent, Rewritable.soundRewriteFunction(protocol, clientbound));
             return soundEvent == this.soundEvent ? this : new JukeboxSong(soundEvent, description, lengthInSeconds, comparatorOutput);
         }
     }

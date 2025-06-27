@@ -22,12 +22,15 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -39,7 +42,7 @@ public record BlocksAttacks(
     @Nullable String bypassedByTag,
     @Nullable Holder<SoundEvent> blockSound,
     @Nullable Holder<SoundEvent> disableSound
-) {
+) implements Rewritable {
 
     public static final Type<BlocksAttacks> TYPE = new Type<>(BlocksAttacks.class) {
 
@@ -66,6 +69,13 @@ public record BlocksAttacks(
             Types.OPTIONAL_SOUND_EVENT.write(buffer, value.disableSound());
         }
     };
+
+    @Override
+    public BlocksAttacks rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        final Holder<SoundEvent> blockSound = SoundEvent.rewriteHolder(this.blockSound, Rewritable.soundRewriteFunction(protocol, clientbound));
+        final Holder<SoundEvent> disableSound = SoundEvent.rewriteHolder(this.disableSound, Rewritable.soundRewriteFunction(protocol, clientbound));
+        return new BlocksAttacks(this.blockDelaySeconds, this.disableCooldownScale, this.damageReductions, this.itemDamage, this.bypassedByTag, blockSound, disableSound);
+    }
 
     public record DamageReduction(float horizontalBlockingAngle, @Nullable HolderSet type, float base, float factor) {
 

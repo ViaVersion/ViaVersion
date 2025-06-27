@@ -208,8 +208,8 @@ public class MappingDataBase implements MappingData {
     }
 
     @Override
-    public int getOldSoundId(final int i) {
-        return soundMappings.getNewIdOrDefault(i, 0);
+    public int getOldSoundId(final int id) {
+        return soundMappings.inverse().getNewIdOrDefault(id, 0);
     }
 
     @Override

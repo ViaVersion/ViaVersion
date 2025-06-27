@@ -52,7 +52,7 @@ public record Instrument1_20_5(Holder<SoundEvent> soundEvent, int useDuration, f
 
     @Override
     public Instrument1_20_5 rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
-        final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(Rewritable.soundRewriteFunction(protocol, clientbound));
+        final Holder<SoundEvent> soundEvent = SoundEvent.rewriteHolder(this.soundEvent, Rewritable.soundRewriteFunction(protocol, clientbound));
         return soundEvent == this.soundEvent ? this : new Instrument1_20_5(soundEvent, useDuration, range);
     }
 }
