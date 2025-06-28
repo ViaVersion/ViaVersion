@@ -133,6 +133,10 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                     final int gamemode = wrapper.read(Types.VAR_INT);
                     final int ping = wrapper.read(Types.VAR_INT);
                     final JsonElement displayName = wrapper.read(Types.OPTIONAL_COMPONENT);
+                    if (displayName != null) {
+                        protocol.getComponentRewriter().processText(wrapper.user(), displayName);
+                    }
+
                     wrapper.read(Types.OPTIONAL_PROFILE_KEY);
 
                     wrapper.write(Types.BOOLEAN, false); // No chat session data
@@ -143,7 +147,10 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                 } else if (action == 1 || action == 2) { // Update gamemode/update latency
                     wrapper.passthrough(Types.VAR_INT);
                 } else if (action == 3) { // Update display name
-                    wrapper.passthrough(Types.OPTIONAL_COMPONENT);
+                    final JsonElement displayName = wrapper.passthrough(Types.OPTIONAL_COMPONENT);
+                    if (displayName != null) {
+                        protocol.getComponentRewriter().processText(wrapper.user(), displayName);
+                    }
                 }
             }
         });

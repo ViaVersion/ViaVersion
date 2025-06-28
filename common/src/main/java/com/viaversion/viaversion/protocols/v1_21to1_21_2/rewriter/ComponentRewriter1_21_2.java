@@ -94,6 +94,18 @@ public final class ComponentRewriter1_21_2 extends JsonNBTComponentRewriter<Clie
         }
     }
 
+    @Override
+    protected void handleTranslate(final UserConnection connection, final CompoundTag parentTag, final StringTag translateTag) {
+        switch (translateTag.getValue()) {
+            case "commands.drop.no_loot_table" -> translateTag.setValue("Entity %s has no loot table");
+            case "commands.advancement.advancementNotFound" -> translateTag.setValue("No advancement was found by the name '%1$s'");
+
+            // TODO the ones below exist in both versions in the en_us.json, but for some reason 1.21.2+ can't lookup them
+            case "commands.function.success.single" -> translateTag.setValue("Test Executed %s command(s) from function '%s'");
+            case "commands.function.success.multiple" -> translateTag.setValue("Test Executed %s command(s) from %s functions");
+        }
+    }
+
     public static void convertAttributes(final CompoundTag componentsTag, final FullMappings mappings) {
         final CompoundTag attributeModifiers = TagUtil.getNamespacedCompoundTag(componentsTag, "attribute_modifiers");
         if (attributeModifiers == null) {

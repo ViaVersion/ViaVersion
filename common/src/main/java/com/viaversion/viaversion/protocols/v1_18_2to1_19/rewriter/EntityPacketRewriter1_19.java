@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter;
 
 import com.google.common.collect.Maps;
-import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
@@ -230,38 +229,6 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
                 map(Types.BOOLEAN); // Keep player attributes
                 create(Types.OPTIONAL_GLOBAL_POSITION, null); // Last death location
                 handler(worldDataTrackerHandlerByKey());
-            }
-        });
-
-        protocol.registerClientbound(ClientboundPackets1_18.PLAYER_INFO, wrapper -> {
-            final int action = wrapper.passthrough(Types.VAR_INT);
-            final int entries = wrapper.passthrough(Types.VAR_INT);
-            for (int i = 0; i < entries; i++) {
-                wrapper.passthrough(Types.UUID); // UUID
-                if (action == 0) { // Add player
-                    wrapper.passthrough(Types.STRING); // Player Name
-                    wrapper.passthrough(Types.PROFILE_PROPERTY_ARRAY);
-                    wrapper.passthrough(Types.VAR_INT); // Gamemode
-                    wrapper.passthrough(Types.VAR_INT); // Ping
-                    final JsonElement displayName = wrapper.read(Types.OPTIONAL_COMPONENT); // Display name
-                    if (!Protocol1_18_2To1_19.isTextComponentNull(displayName)) {
-                        wrapper.write(Types.OPTIONAL_COMPONENT, displayName);
-                    } else {
-                        wrapper.write(Types.OPTIONAL_COMPONENT, null);
-                    }
-
-                    // No public profile signature
-                    wrapper.write(Types.OPTIONAL_PROFILE_KEY, null);
-                } else if (action == 1 || action == 2) { // Update gamemode/update latency
-                    wrapper.passthrough(Types.VAR_INT);
-                } else if (action == 3) { // Update display name
-                    final JsonElement displayName = wrapper.read(Types.OPTIONAL_COMPONENT); // Display name
-                    if (!Protocol1_18_2To1_19.isTextComponentNull(displayName)) {
-                        wrapper.write(Types.OPTIONAL_COMPONENT, displayName);
-                    } else {
-                        wrapper.write(Types.OPTIONAL_COMPONENT, null);
-                    }
-                }
             }
         });
     }
