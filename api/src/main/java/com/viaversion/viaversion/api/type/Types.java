@@ -108,6 +108,7 @@ import com.viaversion.viaversion.api.type.types.misc.GameProfileType;
 import com.viaversion.viaversion.api.type.types.misc.HolderSetType;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import com.viaversion.viaversion.api.type.types.misc.KeyType;
+import com.viaversion.viaversion.api.type.types.misc.LengthPrefixedTagType;
 import com.viaversion.viaversion.api.type.types.misc.NamedCompoundTagType;
 import com.viaversion.viaversion.api.type.types.misc.PlayerMessageSignatureType;
 import com.viaversion.viaversion.api.type.types.misc.ProfileKeyType;
@@ -199,6 +200,7 @@ public final class Types {
     public static final Type<Tag> TAG = new TagType();
     public static final Type<Tag[]> TAG_ARRAY = new ArrayType<>(TAG);
     public static final Type<Tag> OPTIONAL_TAG = new TagType.OptionalTagType();
+    public static final Type<Tag> CUSTOM_CLICK_ACTION_TAG = new LengthPrefixedTagType(65536);
 
     public static final Type<GlobalBlockPosition> GLOBAL_POSITION = new GlobalBlockPositionType();
     public static final Type<GlobalBlockPosition> OPTIONAL_GLOBAL_POSITION = new GlobalBlockPositionType.OptionalGlobalPositionType();
