@@ -40,9 +40,6 @@ public final class LengthPrefixedTagType extends Type<Tag> {
     @Override
     public Tag read(final ByteBuf buffer) {
         final int length = Types.VAR_INT.readPrimitive(buffer);
-        if (length <= 0) {
-            return null;
-        }
 
         Preconditions.checkArgument(length <= maxLength,
             "Cannot receive tag longer than %s bytes (got %s bytes)", maxLength, length);
@@ -52,11 +49,6 @@ public final class LengthPrefixedTagType extends Type<Tag> {
 
     @Override
     public void write(final ByteBuf buffer, final Tag tag) {
-        if (tag == null) {
-            Types.VAR_INT.writePrimitive(buffer, 0);
-            return;
-        }
-
         final ByteBuf tempBuf = buffer.alloc().buffer();
         try {
             Types.TAG.write(tempBuf, tag);
