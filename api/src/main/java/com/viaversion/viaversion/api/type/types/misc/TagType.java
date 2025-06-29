@@ -22,7 +22,6 @@
  */
 package com.viaversion.viaversion.api.type.types.misc;
 
-import com.google.common.base.Preconditions;
 import com.viaversion.nbt.io.TagRegistry;
 import com.viaversion.nbt.limiter.TagLimiter;
 import com.viaversion.nbt.tag.ByteArrayTag;
@@ -130,49 +129,6 @@ public class TagType extends Type<Tag> {
 
         public OptionalTagType() {
             super(Types.TAG);
-        }
-    }
-
-    public static final class LengthPrefixedTagType extends Type<Tag> {
-        private final int maxLength;
-
-        public LengthPrefixedTagType(int maxLength) {
-            super(Tag.class);
-            this.maxLength = maxLength;
-        }
-
-        @Override
-        public Tag read(final ByteBuf buffer) {
-            final int length = Types.VAR_INT.readPrimitive(buffer);
-            if (length <= 0) {
-                return null;
-            }
-
-            Preconditions.checkArgument(length <= maxLength,
-                "Cannot receive tag longer than %s bytes (got %s bytes)", maxLength, length);
-
-            return Types.TAG.read(buffer.readSlice(length));
-        }
-
-        @Override
-        public void write(final ByteBuf buffer, final Tag tag) {
-            if (tag == null) {
-                Types.VAR_INT.writePrimitive(buffer, 0);
-                return;
-            }
-
-            final ByteBuf tempBuf = buffer.alloc().buffer();
-            try {
-                Types.TAG.write(tempBuf, tag);
-
-                Preconditions.checkArgument(tempBuf.readableBytes() <= maxLength,
-                    "Cannot send tag longer than %s bytes (got %s bytes)", maxLength, tempBuf.readableBytes());
-
-                Types.VAR_INT.writePrimitive(buffer, tempBuf.readableBytes());
-                buffer.writeBytes(tempBuf);
-            } finally {
-                tempBuf.release();
-            }
         }
     }
 }
