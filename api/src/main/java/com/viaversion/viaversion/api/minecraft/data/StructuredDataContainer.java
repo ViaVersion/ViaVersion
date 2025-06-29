@@ -241,7 +241,7 @@ public final class StructuredDataContainer implements Copyable {
     /**
      * Sets the lookup for serializer ids. Required to call most of the other methods.
      *
-     * @param protocol    protocol to retreive the id of the serializer from
+     * @param protocol    protocol to retrieve the id of the serializer from
      * @param mappedNames if the names are mapped (true if structures from the mapped version are added, false for the unmapped version)
      */
     public void setIdLookup(final Protocol<?, ?, ?, ?> protocol, final boolean mappedNames) {
