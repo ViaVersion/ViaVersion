@@ -34,6 +34,7 @@ import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ServerboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
+import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.ComponentRewriter1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.EntityPacketRewriter1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.ItemPacketRewriter1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.WorldPacketRewriter1_17;
@@ -41,6 +42,7 @@ import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_17> {
 
@@ -48,6 +50,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
     private final EntityPacketRewriter1_17 entityRewriter = new EntityPacketRewriter1_17(this);
     private final ItemPacketRewriter1_17 itemRewriter = new ItemPacketRewriter1_17(this);
     private final ParticleRewriter<ClientboundPackets1_16_2> particleRewriter = new ParticleRewriter<>(this);
+    private final ComponentRewriter1_17 componentRewriter = new ComponentRewriter1_17(this);
     private final TagRewriter<ClientboundPackets1_16_2> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_16_4To1_17() {
@@ -83,6 +86,13 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
         });
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_16_2.AWARD_STATS);
+
+        componentRewriter.registerComponentPacket(ClientboundPackets1_16_2.CHAT);
+        componentRewriter.registerBossEvent(ClientboundPackets1_16_2.BOSS_EVENT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_16_2.DISCONNECT);
+        componentRewriter.registerTabList(ClientboundPackets1_16_2.TAB_LIST);
+        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_16_2.OPEN_SCREEN);
+        componentRewriter.registerPing();
 
         SoundRewriter<ClientboundPackets1_16_2> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND);
@@ -133,6 +143,9 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
                 default -> throw new IllegalArgumentException("Invalid title type received: " + type);
             }
 
+            if (type < 3) {
+                componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
+            }
             wrapper.setPacketType(packetType);
         });
 
@@ -215,6 +228,11 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
     @Override
     public ParticleRewriter<ClientboundPackets1_16_2> getParticleRewriter() {
         return particleRewriter;
+    }
+
+    @Override
+    public @Nullable ComponentRewriter1_17 getComponentRewriter() {
+        return componentRewriter;
     }
 
     @Override

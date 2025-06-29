@@ -65,6 +65,8 @@ public class ComponentRewriter1_16 extends JsonNBTComponentRewriter<ClientboundP
         mappings.put("advancements.husbandry.break_diamond_hoe.description", "Completely use up a diamond hoe, and then reevaluate your life choices");
         mappings.put("biome.minecraft.nether", "Nether");
         mappings.put("key.swapHands", "key.swapOffhand");
+        mappings.put("commands.datapack.enable.success", "commands.datapack.modify.enable");
+        mappings.put("commands.datapack.disable.success", "commands.datapack.modify.disable");
     }
 
     @Override
