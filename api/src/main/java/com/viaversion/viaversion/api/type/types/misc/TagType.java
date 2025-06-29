@@ -105,13 +105,13 @@ public class TagType extends Type<Tag> {
         } else if (value instanceof CompoundTag compoundTag) {
             ops.writeMap(map -> {
                 for (final Map.Entry<String, Tag> entry : compoundTag.entrySet()) {
-                    map.write(entry.getKey(), Types.TAG, entry.getValue());
+                    map.write(entry.getKey(), this, entry.getValue());
                 }
             });
         } else if (value instanceof ListTag<?> listTag) {
             ops.writeList(list -> {
                 for (final Tag tag : listTag) {
-                    list.write(Types.TAG, tag);
+                    list.write(this, tag);
                 }
             });
         } else if (value instanceof IntArrayTag intArrayTag) {

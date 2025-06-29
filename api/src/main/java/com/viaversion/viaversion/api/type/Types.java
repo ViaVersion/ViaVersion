@@ -116,6 +116,7 @@ import com.viaversion.viaversion.api.type.types.misc.ProfilePropertyType;
 import com.viaversion.viaversion.api.type.types.misc.SoundEventType;
 import com.viaversion.viaversion.api.type.types.misc.TagKeyType;
 import com.viaversion.viaversion.api.type.types.misc.TagType;
+import com.viaversion.viaversion.api.type.types.misc.TextComponentTagType;
 import com.viaversion.viaversion.api.type.types.misc.VillagerDataType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.util.Key;
@@ -200,6 +201,7 @@ public final class Types {
     public static final Type<Tag> TAG = new TagType();
     public static final Type<Tag[]> TAG_ARRAY = new ArrayType<>(TAG);
     public static final Type<Tag> OPTIONAL_TAG = new TagType.OptionalTagType();
+    public static final Type<Tag> TEXT_COMPONENT_TAG = new TextComponentTagType(); // only strictly needed for hashing
     public static final Type<Tag> CUSTOM_CLICK_ACTION_TAG = new LengthPrefixedTagType(65536);
 
     public static final Type<GlobalBlockPosition> GLOBAL_POSITION = new GlobalBlockPositionType();

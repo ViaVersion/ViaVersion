@@ -95,10 +95,10 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> DAMAGE = new StructuredDataKey<>("damage", Types.VAR_INT);
     public static final StructuredDataKey<Unbreakable> UNBREAKABLE1_20_5 = new StructuredDataKey<>("unbreakable", Unbreakable.TYPE);
     public static final StructuredDataKey<Unit> UNBREAKABLE1_21_5 = new StructuredDataKey<>("unbreakable", Types.EMPTY);
-    public static final StructuredDataKey<Tag> CUSTOM_NAME = new StructuredDataKey<>("custom_name", Types.TAG);
-    public static final StructuredDataKey<Tag> ITEM_NAME = new StructuredDataKey<>("item_name", Types.TAG);
+    public static final StructuredDataKey<Tag> CUSTOM_NAME = new StructuredDataKey<>("custom_name", Types.TEXT_COMPONENT_TAG);
+    public static final StructuredDataKey<Tag> ITEM_NAME = new StructuredDataKey<>("item_name", Types.TEXT_COMPONENT_TAG);
     public static final StructuredDataKey<Key> ITEM_MODEL = new StructuredDataKey<>("item_model", Types.RESOURCE_LOCATION);
-    public static final StructuredDataKey<Tag[]> LORE = new StructuredDataKey<>("lore", new ArrayType<>(Types.TAG, 256));
+    public static final StructuredDataKey<Tag[]> LORE = new StructuredDataKey<>("lore", new ArrayType<>(Types.TEXT_COMPONENT_TAG, 256));
     public static final StructuredDataKey<Integer> RARITY = new StructuredDataKey<>("rarity", EnumTypes.RARITY);
     public static final StructuredDataKey<Enchantments> ENCHANTMENTS1_20_5 = new StructuredDataKey<>("enchantments", Enchantments.TYPE1_20_5);
     public static final StructuredDataKey<Enchantments> ENCHANTMENTS1_21_5 = new StructuredDataKey<>("enchantments", Enchantments.TYPE1_21_5);

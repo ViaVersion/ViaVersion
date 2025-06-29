@@ -173,7 +173,7 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
                     map.writeMap("display", display -> {
                         display.write("type", Types.STRING, Display.DISPLAY_TYPES[value.display.id()]);
                         if (value.display instanceof final OverrideText overrideText) {
-                            display.write("value", Types.TAG, overrideText.component);
+                            display.write("value", Types.TEXT_COMPONENT_TAG, overrideText.component);
                         }
                     });
                 });
