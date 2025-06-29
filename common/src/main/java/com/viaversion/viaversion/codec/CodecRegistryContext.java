@@ -35,7 +35,7 @@ public record CodecRegistryContext(Protocol<?, ?, ?, ?> protocol, SerializerVers
         StructuredDataKey.TRIM1_21_5, StructuredDataKey.TOOL1_21_5, StructuredDataKey.PROVIDES_TRIM_MATERIAL,
         StructuredDataKey.CONSUMABLE1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.INSTRUMENT1_21_5,
         StructuredDataKey.EQUIPPABLE1_21_5, StructuredDataKey.REPAIRABLE, StructuredDataKey.DEATH_PROTECTION,
-        StructuredDataKey.BLOCKS_ATTACKS, StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, StructuredDataKey.POTION_CONTENTS1_21_2,
+        StructuredDataKey.BLOCKS_ATTACKS, StructuredDataKey.SUSPICIOUS_STEW_EFFECTS,
         StructuredDataKey.BANNER_PATTERNS, StructuredDataKey.POT_DECORATIONS, StructuredDataKey.BREAK_SOUND,
         StructuredDataKey.WOLF_VARIANT, StructuredDataKey.WOLF_SOUND_VARIANT, StructuredDataKey.PIG_VARIANT,
         StructuredDataKey.COW_VARIANT, StructuredDataKey.CHICKEN_VARIANT, StructuredDataKey.FROG_VARIANT,

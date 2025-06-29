@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.codec.hash;
 
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
+import com.viaversion.viaversion.api.minecraft.codec.ThrowingOps;
 import com.viaversion.viaversion.api.minecraft.codec.hash.Hasher;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -218,6 +219,18 @@ public class HashOps extends OpsBase implements Hasher {
         @Override
         public MapSerializer writeMap(final String key, final Consumer<MapSerializer> consumer) {
             entries.add(new Entry(hash(Types.STRING, key), mapHash(consumer)));
+            return this;
+        }
+
+        @Override
+        public <T> MapSerializer writeInlinedMap(final Type<T> valueType, final T value) {
+            // Only allow writeMap calls here
+            valueType.write(new ThrowingOps() {
+                @Override
+                public void writeMap(final Consumer<MapSerializer> consumer) {
+                    consumer.accept(MapHashBuilder.this);
+                }
+            }, value);
             return this;
         }
 

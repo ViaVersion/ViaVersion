@@ -129,5 +129,7 @@ public interface Ops {
         MapSerializer writeList(String key, Consumer<ListSerializer> consumer);
 
         MapSerializer writeMap(String key, Consumer<MapSerializer> consumer);
+
+        <T> MapSerializer writeInlinedMap(Type<T> valueType, T value);
     }
 }

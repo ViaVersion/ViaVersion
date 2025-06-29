@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -51,6 +52,17 @@ public record PotionEffectData(int amplifier, int duration, boolean ambient, boo
             buffer.writeBoolean(value.showParticles);
             buffer.writeBoolean(value.showIcon);
             OPTIONAL_TYPE.write(buffer, value.hiddenEffect);
+        }
+
+        @Override
+        public void write(final Ops ops, final PotionEffectData value) {
+            ops.writeMap(map -> map
+                .writeOptional("amplifier", Types.UNSIGNED_BYTE, (short) value.amplifier, (short) 0)
+                .writeOptional("duration", Types.INT, value.duration, 0)
+                .writeOptional("ambient", Types.BOOLEAN, value.ambient, false)
+                .writeOptional("show_particles", Types.BOOLEAN, value.showParticles, true)
+                .writeOptional("show_icon", Types.BOOLEAN, value.showIcon)
+                .writeOptional("hidden_effect", TYPE, value.hiddenEffect));
         }
     };
     public static final Type<PotionEffectData> OPTIONAL_TYPE = new OptionalType<>(TYPE) {

@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
@@ -84,6 +85,15 @@ public record PotionContents(@Nullable Integer potion, @Nullable Integer customC
 
             PotionEffect.ARRAY_TYPE.write(buffer, value.customEffects);
             Types.OPTIONAL_STRING.write(buffer, value.customName);
+        }
+
+        @Override
+        public void write(final Ops ops, final PotionContents value) {
+            ops.writeMap(map -> map
+                .writeOptional("potion", EnumTypes.POTION, value.potion)
+                .writeOptional("custom_color", Types.INT, value.customColor)
+                .writeOptional("custom_effects", PotionEffect.ARRAY_TYPE, value.customEffects, new PotionEffect[0])
+                .writeOptional("custom_name", Types.STRING, value.customName));
         }
     };
 

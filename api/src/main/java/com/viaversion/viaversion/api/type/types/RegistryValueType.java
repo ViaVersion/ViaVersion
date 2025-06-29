@@ -41,4 +41,8 @@ public final class RegistryValueType extends VarIntType {
     public void write(final Ops ops, final Integer value) {
         Types.STRING.write(ops, names[value]);
     }
+
+    public String[] names() {
+        return names;
+    }
 }
