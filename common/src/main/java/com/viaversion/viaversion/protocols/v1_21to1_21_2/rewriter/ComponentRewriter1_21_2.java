@@ -94,6 +94,20 @@ public final class ComponentRewriter1_21_2 extends JsonNBTComponentRewriter<Clie
         }
     }
 
+    @Override
+    protected void handleTranslate(final UserConnection connection, final CompoundTag parentTag, final StringTag translateTag) {
+        switch (translateTag.getValue()) {
+            case "commands.drop.no_loot_table" -> translateTag.setValue("Entity %s has no loot table");
+            case "commands.advancement.advancementNotFound" -> translateTag.setValue("No advancement was found by the name '%1$s'");
+            case "commands.function.success.single" -> translateTag.setValue("Test Executed %s command(s) from function '%s'");
+            case "commands.function.success.single.result" -> translateTag.setValue("Function '%2$s' returned %1$s");
+            case "commands.function.success.multiple" -> translateTag.setValue("Test Executed %s command(s) from %s functions");
+            case "commands.function.success.multiple.result" -> translateTag.setValue("Executed %s functions");
+            case "commands.fillbiome.success" -> translateTag.setValue("%s biome entry/entries set between %s, %s, %s and %s, %s, %s");
+            case "commands.publish.success" -> translateTag.setValue("Multiplayer game is now hosted on port %s");
+        }
+    }
+
     public static void convertAttributes(final CompoundTag componentsTag, final FullMappings mappings) {
         final CompoundTag attributeModifiers = TagUtil.getNamespacedCompoundTag(componentsTag, "attribute_modifiers");
         if (attributeModifiers == null) {

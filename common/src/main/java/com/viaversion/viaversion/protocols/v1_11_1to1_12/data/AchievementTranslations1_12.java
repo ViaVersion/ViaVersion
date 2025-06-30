@@ -177,6 +177,14 @@ public class AchievementTranslations1_12 {
         add("achievement.overkill.desc", "Deal nine hearts of damage in a single hit");
         add("achievement.bookcase", "Librarian");
         add("achievement.bookcase.desc", "Build some bookshelves to improve your enchantment table");
+        add("commands.achievement.usage", "/achievement <give|take> <name|*> [player]");
+        add("commands.achievement.give.success.all", "Successfully given all achievements to %s");
+        add("commands.achievement.take.success.all", "Successfully taken all achievements from %s");
+        add("commands.achievement.unknownAchievement", "Unknown achievement '%s'");
+        add("commands.achievement.take.success.one", "Successfully taken the achievement %s from %s");
+        add("commands.achievement.dontHave", "Player %s doesn't have achievement %s");
+        add("commands.achievement.alreadyHave", "Player %s already has achievement %s");
+        add("commands.achievement.give.success.one", "Successfully given %s the achievement %s");
     }
 
     private static void add(String key, String value) {

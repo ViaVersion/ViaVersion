@@ -157,6 +157,11 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
                 default -> throw new IllegalArgumentException("Invalid combat type received: " + type);
             };
 
+            if (type == 2) {
+                wrapper.passthrough(Types.VAR_INT); // Duration/Player id
+                wrapper.passthrough(Types.INT); // Killer id
+                protocol.getComponentRewriter().processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
+            }
             wrapper.setPacketType(packetType);
         });
 

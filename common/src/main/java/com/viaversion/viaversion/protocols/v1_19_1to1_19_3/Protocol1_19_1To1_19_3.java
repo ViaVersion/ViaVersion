@@ -45,6 +45,7 @@ import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.packet.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.packet.ServerboundPackets1_19_3;
+import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.ComponentRewriter1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.EntityPacketRewriter1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.ItemPacketRewriter1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.NonceStorage1_19_3;
@@ -70,6 +71,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     private final EntityPacketRewriter1_19_3 entityRewriter = new EntityPacketRewriter1_19_3(this);
     private final ItemPacketRewriter1_19_3 itemRewriter = new ItemPacketRewriter1_19_3(this);
     private final ParticleRewriter<ClientboundPackets1_19_1> particleRewriter = new ParticleRewriter<>(this);
+    private final ComponentRewriter1_19_3 componentRewriter = new ComponentRewriter1_19_3(this);
     private final TagRewriter<ClientboundPackets1_19_1> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_19_1To1_19_3() {
@@ -104,6 +106,17 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
         });
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_19_1.AWARD_STATS);
+
+        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.SYSTEM_CHAT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.SET_ACTION_BAR_TEXT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.SET_TITLE_TEXT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.SET_SUBTITLE_TEXT);
+        componentRewriter.registerBossEvent(ClientboundPackets1_19_1.BOSS_EVENT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.DISCONNECT);
+        componentRewriter.registerTabList(ClientboundPackets1_19_1.TAB_LIST);
+        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_19_1.OPEN_SCREEN);
+        componentRewriter.registerPlayerCombatKill(ClientboundPackets1_19_1.PLAYER_COMBAT_KILL);
+        componentRewriter.registerPing();
 
         final CommandRewriter<ClientboundPackets1_19_1> commandRewriter = new CommandRewriter<>(this) {
             @Override
@@ -387,6 +400,11 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     public ParticleRewriter<ClientboundPackets1_19_1> getParticleRewriter() {
         return particleRewriter;
+    }
+
+    @Override
+    public ComponentRewriter1_19_3 getComponentRewriter() {
+        return componentRewriter;
     }
 
     @Override
