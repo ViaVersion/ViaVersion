@@ -43,7 +43,6 @@ import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<ClientboundPacket1_20_5, ServerboundPacket1_20_5, Protocol1_20_5To1_21> {
 
@@ -183,10 +182,9 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         dataContainer.replaceKey(StructuredDataKey.FOOD1_20_5, StructuredDataKey.FOOD1_21);
         dataContainer.replace(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, attributeModifiers -> {
             final AttributeModifiers1_21.AttributeModifier[] modifiers = Arrays.stream(attributeModifiers.modifiers()).map(modifier -> {
-                final int mappedAttributeId = Protocol1_20_5To1_21.MAPPINGS.getNewAttributeId(modifier.attribute());
                 final AttributeModifiers1_20_5.ModifierData modData = modifier.modifier();
                 final AttributeModifiers1_21.ModifierData updatedModData = new AttributeModifiers1_21.ModifierData(Protocol1_20_5To1_21.mapAttributeUUID(modData.uuid(), modData.name()), modData.amount(), modData.operation());
-                return new AttributeModifiers1_21.AttributeModifier(mappedAttributeId, updatedModData, modifier.slotType());
+                return new AttributeModifiers1_21.AttributeModifier(modifier.attribute(), updatedModData, modifier.slotType());
             }).toArray(AttributeModifiers1_21.AttributeModifier[]::new);
             return new AttributeModifiers1_21(modifiers, attributeModifiers.showInTooltip());
         });
@@ -219,11 +217,6 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         dataContainer.remove(StructuredDataKey.JUKEBOX_PLAYABLE1_21);
         dataContainer.replace(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, attributeModifiers -> {
             final AttributeModifiers1_20_5.AttributeModifier[] modifiers = Arrays.stream(attributeModifiers.modifiers()).map(modifier -> {
-                final int mappedAttributeId = Protocol1_20_5To1_21.MAPPINGS.getAttributeMappings().inverse().getNewId(modifier.attribute());
-                if (mappedAttributeId == -1) {
-                    return null;
-                }
-
                 final AttributeModifiers1_21.ModifierData modData = modifier.modifier();
                 final String name = AttributeModifierMappings1_21.idToName(modData.id());
                 final AttributeModifiers1_20_5.ModifierData updatedModData = new AttributeModifiers1_20_5.ModifierData(
@@ -232,8 +225,8 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
                     modData.amount(),
                     modData.operation()
                 );
-                return new AttributeModifiers1_20_5.AttributeModifier(mappedAttributeId, updatedModData, modifier.slotType());
-            }).filter(Objects::nonNull).toArray(AttributeModifiers1_20_5.AttributeModifier[]::new);
+                return new AttributeModifiers1_20_5.AttributeModifier(modifier.attribute(), updatedModData, modifier.slotType());
+            }).toArray(AttributeModifiers1_20_5.AttributeModifier[]::new);
             return new AttributeModifiers1_20_5(modifiers, attributeModifiers.showInTooltip());
         });
     }

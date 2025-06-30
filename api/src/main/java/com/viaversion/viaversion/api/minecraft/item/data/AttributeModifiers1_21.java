@@ -23,16 +23,22 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
+import java.util.ArrayList;
+import java.util.List;
 
-public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean showInTooltip) implements Copyable {
+public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean showInTooltip) implements Copyable, Rewritable {
 
     public AttributeModifiers1_21(final AttributeModifier[] modifiers) {
         this(modifiers, true);
@@ -99,6 +105,23 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
     @Override
     public AttributeModifiers1_21 copy() {
         return new AttributeModifiers1_21(Copyable.copy(modifiers), showInTooltip);
+    }
+
+    @Override
+    public AttributeModifiers1_21 rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        final FullMappings mappings = protocol.getMappingData().getAttributeMappings();
+        if (mappings == null) {
+            return this;
+        }
+
+        final List<AttributeModifier> modifiers = new ArrayList<>(this.modifiers.length);
+        for (final AttributeModifier modifier : this.modifiers) {
+            final int mappedId = clientbound ? mappings.getNewId(modifier.attribute()) : mappings.inverse().getNewId(modifier.attribute());
+            if (mappedId != -1) {
+                modifiers.add(new AttributeModifier(mappedId, modifier.modifier(), modifier.slotType(), modifier.display()));
+            }
+        }
+        return  new AttributeModifiers1_21(modifiers.toArray(AttributeModifier[]::new), this.showInTooltip);
     }
 
     public record AttributeModifier(int attribute, ModifierData modifier, int slotType, Display display) {
