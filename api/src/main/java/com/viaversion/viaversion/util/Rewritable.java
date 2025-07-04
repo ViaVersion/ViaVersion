@@ -70,6 +70,11 @@ public interface Rewritable {
             : (clientbound ? protocol.getMappingData().getSoundMappings()::getNewId : protocol.getMappingData()::getOldSoundId);
     }
 
+    static Int2IntFunction entityRewriteFunction(final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        return protocol.getMappingData().getEntityMappings() == null ? Int2IntFunction.identity()
+            : (clientbound ? protocol.getMappingData().getEntityMappings()::getNewId : protocol.getMappingData().getEntityMappings().inverse()::getNewId);
+    }
+
     static @Nullable String mappedIdentifier(final FullMappings mappings, final String identifier) {
         // Check if the original exists before mapping
         if (mappings.id(identifier) == -1) {
