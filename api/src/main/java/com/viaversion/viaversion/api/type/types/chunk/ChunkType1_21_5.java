@@ -56,7 +56,15 @@ public final class ChunkType1_21_5 extends Type<Chunk> {
         final ByteBuf sectionsBuf = buffer.readSlice(Types.VAR_INT.readPrimitive(buffer));
         final ChunkSection[] sections = new ChunkSection[ySectionCount];
         for (int i = 0; i < ySectionCount; i++) {
-            sections[i] = sectionType.read(sectionsBuf);
+            int before = sectionsBuf.readerIndex();
+            if (sectionsBuf.readableBytes() < 8) break;
+            try {
+                sections[i] = sectionType.read(sectionsBuf);
+            } catch (IndexOutOfBoundsException e) {
+                sectionsBuf.readerIndex(before);
+                sectionsBuf.readerIndex(sectionsBuf.writerIndex());
+                break;
+            }
         }
 
         final int blockEntitiesLength = Types.VAR_INT.readPrimitive(buffer);
@@ -77,6 +85,7 @@ public final class ChunkType1_21_5 extends Type<Chunk> {
 
         Types.VAR_INT.writePrimitive(buffer, sectionType.serializedSize(chunk));
         for (final ChunkSection section : chunk.getSections()) {
+            if (section == null) continue; // Skip null sections
             sectionType.write(buffer, section);
         }
 
