@@ -198,6 +198,11 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
                 final int teleportId = ThreadLocalRandom.current().nextInt();
                 wrapper.user().get(TeleportAckCancelStorage.class).cancelTeleportId(teleportId);
 
+                final PlayerPositionStorage positionStorage = wrapper.user().get(PlayerPositionStorage.class);
+                if (positionStorage != null) {
+                    positionStorage.sendPing(wrapper.user(), ThreadLocalRandom.current().nextInt());
+                }
+
                 final PacketWrapper positionPacket = wrapper.create(ClientboundPackets1_21_2.PLAYER_POSITION);
                 positionPacket.write(Types.VAR_INT, teleportId); // Teleport id
                 positionPacket.write(Types.DOUBLE, 0D); // X
@@ -260,11 +265,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
                 bundleStart.send(Protocol1_21To1_21_2.class);
             }
 
-            final int pingId = ThreadLocalRandom.current().nextInt();
-            positionStorage.addPendingPong(pingId);
-            final PacketWrapper ping = wrapper.create(ClientboundPackets1_21_2.PING);
-            ping.write(Types.INT, pingId); // id
-            ping.send(Protocol1_21To1_21_2.class);
+            positionStorage.sendPing(wrapper.user(), ThreadLocalRandom.current().nextInt());
             wrapper.send(Protocol1_21To1_21_2.class);
             wrapper.cancel();
 
@@ -396,6 +397,9 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
                 final boolean onGround = wrapper.get(Types.BOOLEAN, 0);
                 playerPositionStorage.setPlayerPosition(new PlayerPositionStorage.PlayerPosition(x, y, z, yaw, pitch, onGround));
                 wrapper.cancel();
+            } else if (wrapper.user().get(TeleportAckCancelStorage.class).checkShouldCancelPlayerPositionPacket()) {
+                // Cancel the position packet after a "fake" teleport
+                wrapper.cancel();
             }
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_ROT, wrapper -> {
@@ -428,17 +432,22 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             }
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.ACCEPT_TELEPORTATION, wrapper -> {
+            final TeleportAckCancelStorage teleportAckCancelStorage = wrapper.user().get(TeleportAckCancelStorage.class);
             final PlayerPositionStorage playerPositionStorage = wrapper.user().get(PlayerPositionStorage.class);
+            final int teleportId = wrapper.passthrough(Types.VAR_INT); // Teleport id
+            if (teleportAckCancelStorage.checkShouldCancelTeleportAck(teleportId)) {
+                wrapper.cancel();
+                if (playerPositionStorage != null && playerPositionStorage.checkHasPlayerPosition()) {
+                    playerPositionStorage.reset(); // No longer need to send the player position packet, because this was a "fake" teleport
+                    teleportAckCancelStorage.checkShouldCancelPlayerPositionPacket(); // Clear the flag
+                }
+                return;
+            }
             if (playerPositionStorage != null && playerPositionStorage.checkHasPlayerPosition()) {
                 // Send move player after accept teleportation
                 wrapper.sendToServer(Protocol1_21To1_21_2.class);
                 wrapper.cancel();
                 playerPositionStorage.sendMovePlayerPosRot(wrapper.user());
-                return;
-            }
-            final int teleportId = wrapper.passthrough(Types.VAR_INT); // Teleport id
-            if (wrapper.user().get(TeleportAckCancelStorage.class).checkShouldCancelTeleportAck(teleportId)) {
-                wrapper.cancel();
             }
         });
     }

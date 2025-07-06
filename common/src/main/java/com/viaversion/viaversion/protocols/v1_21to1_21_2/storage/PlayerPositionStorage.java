@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
@@ -32,10 +33,13 @@ public class PlayerPositionStorage implements StorableObject {
     private boolean captureNextPlayerPositionPacket;
     private PlayerPosition playerPosition;
 
-    public void addPendingPong(final int id) {
+    public void sendPing(final UserConnection connection, final int id) {
         if (!this.pendingPongs.add(id)) {
             throw new IllegalStateException("Pong already pending for id " + id);
         }
+        final PacketWrapper ping = PacketWrapper.create(ClientboundPackets1_21_2.PING, connection);
+        ping.write(Types.INT, id); // id
+        ping.send(Protocol1_21To1_21_2.class);
     }
 
     public boolean checkPong(final int id) {
@@ -83,7 +87,7 @@ public class PlayerPositionStorage implements StorableObject {
         this.reset();
     }
 
-    private void reset() {
+    public void reset() {
         this.captureNextPlayerPositionPacket = false;
         this.playerPosition = null;
     }
