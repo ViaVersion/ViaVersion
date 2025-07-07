@@ -76,9 +76,9 @@ public class ConnectionManagerImpl implements ConnectionManager {
 
         UUID id = connection.getProtocolInfo().getUuid();
         if (connection.isServerSide()) {
-            serverConnections.remove(id);
+            serverConnections.remove(id, connection);
         } else {
-            clientConnections.remove(id);
+            clientConnections.remove(id, connection);
         }
 
         connection.clearStoredObjects();
