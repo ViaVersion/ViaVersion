@@ -24,9 +24,23 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 public class TeleportAckCancelStorage implements StorableObject {
 
     private final IntSet cancelTeleportIds = new IntOpenHashSet();
+    private boolean cancelNextPlayerPositionPacket;
 
     public boolean checkShouldCancelTeleportAck(final int teleportId) {
-        return this.cancelTeleportIds.remove(teleportId);
+        final boolean shouldCancel = this.cancelTeleportIds.remove(teleportId);
+        if (shouldCancel) {
+            this.cancelNextPlayerPositionPacket = true;
+        }
+        return shouldCancel;
+    }
+
+    public boolean checkShouldCancelPlayerPositionPacket() {
+        if (this.cancelNextPlayerPositionPacket) {
+            this.cancelNextPlayerPositionPacket = false;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void cancelTeleportId(final int teleportId) {
