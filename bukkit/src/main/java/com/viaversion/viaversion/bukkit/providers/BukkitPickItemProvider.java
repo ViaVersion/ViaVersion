@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
 import com.viaversion.viaversion.bukkit.util.LegacyBlockToItem;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.provider.PickItemProvider;
-import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -40,19 +39,32 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 
+import java.lang.reflect.Method;
+import java.util.UUID;
+
 public class BukkitPickItemProvider extends PickItemProvider {
     private static final BlockToItem BLOCK_TO_ITEM = BlockToItem.build();
     private static final GetStorageContents GET_STORAGE_CONTENT = GetStorageContents.build();
     private static final SetInHand SET_IN_HAND = SetInHand.build();
 
-    private static final boolean HAS_SPAWN_EGG_METHOD = PaperViaInjector.hasMethod(ItemFactory.class, "getSpawnEgg", EntityType.class);
+    private static final boolean HAS_SPAWN_EGG_MATERIAL_METHOD = PaperViaInjector.hasMethod(ItemFactory.class, Material.class, "getSpawnEgg", EntityType.class);
+    private static final boolean HAS_SPAWN_EGG_ITEM_METHOD = PaperViaInjector.hasMethod(ItemFactory.class, ItemStack.class, "getSpawnEgg", EntityType.class);
     private static final double BLOCK_RANGE = 4.5 + 1;
     private static final double BLOCK_RANGE_SQUARED = BLOCK_RANGE * BLOCK_RANGE;
     private static final double ENTITY_RANGE = 3 + 3;
     private final ViaVersionPlugin plugin;
+    private Method getSpawnEggMethod;
 
     public BukkitPickItemProvider(final ViaVersionPlugin plugin) {
         this.plugin = plugin;
+
+        if (HAS_SPAWN_EGG_ITEM_METHOD) {
+            try {
+                getSpawnEggMethod = ItemFactory.class.getDeclaredMethod("getSpawnEgg", EntityType.class);
+            } catch (final ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
@@ -83,7 +95,7 @@ public class BukkitPickItemProvider extends PickItemProvider {
 
     @Override
     public void pickItemFromEntity(final UserConnection connection, final int entityId, final boolean includeData) {
-        if (!HAS_SPAWN_EGG_METHOD) {
+        if (!HAS_SPAWN_EGG_MATERIAL_METHOD && !HAS_SPAWN_EGG_ITEM_METHOD) {
             return;
         }
 
@@ -102,9 +114,20 @@ public class BukkitPickItemProvider extends PickItemProvider {
                 return;
             }
 
-            final Material spawnEggType = Bukkit.getItemFactory().getSpawnEgg(entity.getType());
-            if (spawnEggType != null) {
-                pickItem(player, new ItemStack(spawnEggType, 1));
+            if (HAS_SPAWN_EGG_MATERIAL_METHOD) {
+                final Material spawnEggType = Bukkit.getItemFactory().getSpawnEgg(entity.getType());
+                if (spawnEggType != null) {
+                    pickItem(player, new ItemStack(spawnEggType, 1));
+                }
+            } else {
+                try {
+                    final ItemStack spawnEggItem = (ItemStack) getSpawnEggMethod.invoke(Bukkit.getItemFactory(), entity.getType());
+                    if (spawnEggItem != null) {
+                        pickItem(player, spawnEggItem);
+                    }
+                } catch (final ReflectiveOperationException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }, player);
     }
