@@ -48,7 +48,7 @@ public class BukkitPickItemProvider extends PickItemProvider {
     private static final SetInHand SET_IN_HAND = SetInHand.build();
 
     private static final boolean HAS_SPAWN_EGG_METHOD = PaperViaInjector.hasMethod(ItemFactory.class, Material.class, "getSpawnEgg", EntityType.class);
-    private static Method GET_SPAWN_EGG_ITEMSTACK_METHOD;
+    private static final Method GET_SPAWN_EGG_ITEMSTACK_METHOD;
 
     private static final double BLOCK_RANGE = 4.5 + 1;
     private static final double BLOCK_RANGE_SQUARED = BLOCK_RANGE * BLOCK_RANGE;
@@ -62,6 +62,8 @@ public class BukkitPickItemProvider extends PickItemProvider {
             } catch (final ReflectiveOperationException e) {
                 throw new RuntimeException(e);
             }
+        } else {
+            GET_SPAWN_EGG_ITEMSTACK_METHOD = null;
         }
     }
 
