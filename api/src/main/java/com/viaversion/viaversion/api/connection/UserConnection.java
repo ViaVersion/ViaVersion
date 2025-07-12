@@ -139,17 +139,7 @@ public interface UserConnection {
     /**
      * Clear stored objects, entity trackers and client worlds.
      */
-    default void clearStoredObjects() {
-        clearStoredObjects(false);
-    }
-
-    /**
-     * Clear stored objects, entity trackers and client worlds.
-     * If cleared for a proxy server switch, some stored objects and tracker data will be retained.
-     *
-     * @param isServerSwitch whether the clear is due to a server switch
-     */
-    void clearStoredObjects(boolean isServerSwitch);
+    void clearStoredObjects();
 
     /**
      * Sends a raw packet to the connection on the current thread.

@@ -39,9 +39,4 @@ public final class ChatTypeStorage implements StorableObject {
     public void clear() {
         chatTypes.clear();
     }
-
-    @Override
-    public boolean clearOnServerSwitch() {
-        return false;
-    }
 }

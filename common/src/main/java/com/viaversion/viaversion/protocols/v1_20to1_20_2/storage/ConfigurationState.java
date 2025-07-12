@@ -92,11 +92,6 @@ public class ConfigurationState implements StorableObject {
     }
 
     @Override
-    public boolean clearOnServerSwitch() {
-        return false;
-    }
-
-    @Override
     public void onRemove() {
         for (final QueuedPacket packet : packetQueue) {
             packet.buf().release();

@@ -37,9 +37,4 @@ public final class DimensionRegistryStorage implements StorableObject {
     public Map<CompoundTag, String> dimensions() {
         return dimensions;
     }
-
-    @Override
-    public boolean clearOnServerSwitch() {
-        return false;
-    }
 }
