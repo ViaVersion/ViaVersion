@@ -47,8 +47,7 @@ public class BukkitPickItemProvider extends PickItemProvider {
     private static final GetStorageContents GET_STORAGE_CONTENT = GetStorageContents.build();
     private static final SetInHand SET_IN_HAND = SetInHand.build();
 
-    private static final boolean HAS_SPAWN_EGG_MATERIAL_METHOD = PaperViaInjector.hasMethod(ItemFactory.class, Material.class, "getSpawnEgg", EntityType.class);
-    private static final boolean HAS_SPAWN_EGG_ITEM_METHOD = PaperViaInjector.hasMethod(ItemFactory.class, ItemStack.class, "getSpawnEgg", EntityType.class);
+    private static final boolean HAS_SPAWN_EGG_METHOD = PaperViaInjector.hasMethod(ItemFactory.class, Material.class, "getSpawnEgg", EntityType.class);
     private static final double BLOCK_RANGE = 4.5 + 1;
     private static final double BLOCK_RANGE_SQUARED = BLOCK_RANGE * BLOCK_RANGE;
     private static final double ENTITY_RANGE = 3 + 3;
@@ -58,7 +57,7 @@ public class BukkitPickItemProvider extends PickItemProvider {
     public BukkitPickItemProvider(final ViaVersionPlugin plugin) {
         this.plugin = plugin;
 
-        if (HAS_SPAWN_EGG_ITEM_METHOD) {
+        if (PaperViaInjector.hasMethod(ItemFactory.class, ItemStack.class, "getSpawnEgg", EntityType.class)) {
             try {
                 getSpawnEggMethod = ItemFactory.class.getDeclaredMethod("getSpawnEgg", EntityType.class);
             } catch (final ReflectiveOperationException e) {
@@ -95,7 +94,7 @@ public class BukkitPickItemProvider extends PickItemProvider {
 
     @Override
     public void pickItemFromEntity(final UserConnection connection, final int entityId, final boolean includeData) {
-        if (!HAS_SPAWN_EGG_MATERIAL_METHOD && !HAS_SPAWN_EGG_ITEM_METHOD) {
+        if (!HAS_SPAWN_EGG_METHOD && getSpawnEggMethod == null) {
             return;
         }
 
@@ -114,7 +113,7 @@ public class BukkitPickItemProvider extends PickItemProvider {
                 return;
             }
 
-            if (HAS_SPAWN_EGG_MATERIAL_METHOD) {
+            if (getSpawnEggMethod == null) {
                 final Material spawnEggType = Bukkit.getItemFactory().getSpawnEgg(entity.getType());
                 if (spawnEggType != null) {
                     pickItem(player, new ItemStack(spawnEggType, 1));
