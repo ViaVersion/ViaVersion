@@ -114,9 +114,4 @@ public final class AcknowledgedMessagesStorage implements StorableObject {
         lastSeenMessages = new BitSet();
         delayedAckCount = 0;
     }
-
-    @Override
-    public boolean clearOnServerSwitch() {
-        return false;
-    }
 }

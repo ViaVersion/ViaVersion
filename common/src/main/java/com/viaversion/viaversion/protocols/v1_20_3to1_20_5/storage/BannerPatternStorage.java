@@ -38,9 +38,4 @@ public final class BannerPatternStorage implements StorableObject {
     public @Nullable String pattern(final int id) {
         return bannerPatterns.idToKey(id);
     }
-
-    @Override
-    public boolean clearOnServerSwitch() {
-        return false;
-    }
 }

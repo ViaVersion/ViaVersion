@@ -24,8 +24,4 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public record LastResourcePack(String url, String hash, boolean required,
                                @Nullable JsonElement prompt) implements StorableObject {
 
-    @Override
-    public boolean clearOnServerSwitch() {
-        return false;
-    }
 }

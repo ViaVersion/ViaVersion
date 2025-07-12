@@ -30,15 +30,6 @@ package com.viaversion.viaversion.api.connection;
  */
 public interface StorableObject {
 
-    /**
-     * Returns whether the object should be uncached on a server switch.
-     *
-     * @return whether the object should be uncached on a server switch
-     */
-    default boolean clearOnServerSwitch() {
-        return true;
-    }
-
     default void onRemove() {
     }
 }

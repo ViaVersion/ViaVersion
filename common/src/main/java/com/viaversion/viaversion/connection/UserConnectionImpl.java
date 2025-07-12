@@ -154,27 +154,14 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public void clearStoredObjects(boolean isServerSwitch) {
-        if (isServerSwitch) {
-            storedObjects.values().removeIf(storableObject -> {
-                if (storableObject.clearOnServerSwitch()) {
-                    storableObject.onRemove();
-                    return true;
-                }
-                return false;
-            });
-            for (EntityTracker tracker : entityTrackers.values()) {
-                tracker.clearEntities();
-            }
-        } else {
-            for (StorableObject object : storedObjects.values()) {
-                object.onRemove();
-            }
-            storedObjects.clear();
-            entityTrackers.clear();
-            itemHashers.clear();
-            clientWorlds.clear();
+    public void clearStoredObjects() {
+        for (StorableObject object : storedObjects.values()) {
+            object.onRemove();
         }
+        storedObjects.clear();
+        entityTrackers.clear();
+        itemHashers.clear();
+        clientWorlds.clear();
     }
 
     @Override
