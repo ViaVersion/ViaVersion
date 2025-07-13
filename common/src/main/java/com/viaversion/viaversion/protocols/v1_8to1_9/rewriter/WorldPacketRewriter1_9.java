@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.rewriter;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.ChunkPosition;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
@@ -50,6 +49,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientWorld1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
+
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -150,14 +150,20 @@ public class WorldPacketRewriter1_9 {
 
                 // Unload the empty chunks
                 if (Via.getConfig().isChunkBorderFix()) {
-                    for (BlockFace face : BlockFace.HORIZONTAL) {
-                        int chunkX = chunk.getX() + face.modX();
-                        int chunkZ = chunk.getZ() + face.modZ();
-                        if (!clientWorld.getLoadedChunks().contains(ChunkPosition.chunkKey(chunkX, chunkZ))) {
-                            PacketWrapper unloadChunk = wrapper.create(ClientboundPackets1_9.FORGET_LEVEL_CHUNK);
-                            unloadChunk.write(Types.INT, chunkX);
-                            unloadChunk.write(Types.INT, chunkZ);
-                            unloadChunk.send(Protocol1_8To1_9.class);
+                    for (int modX = -1; modX <= 1; modX++) {
+                        for (int modZ = -1; modZ <= 1; modZ++) {
+                            if (modX == 0 && modZ == 0) {
+                                continue; // Skip the center chunk
+                            }
+
+                            int chunkX = chunk.getX() + modX;
+                            int chunkZ = chunk.getZ() + modZ;
+                            if (!clientWorld.getLoadedChunks().contains(ChunkPosition.chunkKey(chunkX, chunkZ))) {
+                                PacketWrapper unloadChunk = wrapper.create(ClientboundPackets1_9.FORGET_LEVEL_CHUNK);
+                                unloadChunk.write(Types.INT, chunkX);
+                                unloadChunk.write(Types.INT, chunkZ);
+                                unloadChunk.send(Protocol1_8To1_9.class);
+                            }
                         }
                     }
                 }
@@ -169,14 +175,20 @@ public class WorldPacketRewriter1_9 {
 
                 // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
                 if (Via.getConfig().isChunkBorderFix()) {
-                    for (BlockFace face : BlockFace.HORIZONTAL) {
-                        int chunkX = chunk.getX() + face.modX();
-                        int chunkZ = chunk.getZ() + face.modZ();
-                        if (!clientWorld.getLoadedChunks().contains(ChunkPosition.chunkKey(chunkX, chunkZ))) {
-                            PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.LEVEL_CHUNK);
-                            Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
-                            emptyChunk.write(chunkType, c);
-                            emptyChunk.send(Protocol1_8To1_9.class);
+                    for (int modX = -1; modX <= 1; modX++) {
+                        for (int modZ = -1; modZ <= 1; modZ++) {
+                            if (modX == 0 && modZ == 0) {
+                                continue; // Skip the center chunk
+                            }
+
+                            int chunkX = chunk.getX() + modX;
+                            int chunkZ = chunk.getZ() + modZ;
+                            if (!clientWorld.getLoadedChunks().contains(ChunkPosition.chunkKey(chunkX, chunkZ))) {
+                                PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.LEVEL_CHUNK);
+                                Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
+                                emptyChunk.write(chunkType, c);
+                                emptyChunk.send(Protocol1_8To1_9.class);
+                            }
                         }
                     }
                 }
@@ -196,12 +208,23 @@ public class WorldPacketRewriter1_9 {
                 chunkData.send(Protocol1_8To1_9.class);
 
                 clientWorld.getLoadedChunks().add(ChunkPosition.chunkKey(chunk.getX(), chunk.getZ()));
+            }
 
-                // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
-                if (Via.getConfig().isChunkBorderFix()) {
-                    for (BlockFace face : BlockFace.HORIZONTAL) {
-                        int chunkX = chunk.getX() + face.modX();
-                        int chunkZ = chunk.getZ() + face.modZ();
+            if (!Via.getConfig().isChunkBorderFix()) {
+                return;
+            }
+
+            // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
+            // We do this after the bulk to prevent packet spam, as the bulk might already send surrounding chunks
+            for (Chunk chunk : chunks) {
+                for (int modX = -1; modX <= 1; modX++) {
+                    for (int modZ = -1; modZ <= 1; modZ++) {
+                        if (modX == 0 && modZ == 0) {
+                            continue; // Skip the center chunk
+                        }
+
+                        int chunkX = chunk.getX() + modX;
+                        int chunkZ = chunk.getZ() + modZ;
                         if (!clientWorld.getLoadedChunks().contains(ChunkPosition.chunkKey(chunkX, chunkZ))) {
                             PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.LEVEL_CHUNK);
                             Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
