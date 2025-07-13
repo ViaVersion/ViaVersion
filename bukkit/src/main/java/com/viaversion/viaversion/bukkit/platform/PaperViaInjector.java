@@ -19,10 +19,11 @@ package com.viaversion.viaversion.bukkit.platform;
 
 import com.viaversion.viaversion.bukkit.handlers.BukkitChannelInitializer;
 import io.netty.channel.Channel;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 public final class PaperViaInjector {
     public static final boolean PAPER_INJECTION_METHOD = hasPaperInjectionMethod();
@@ -102,6 +103,14 @@ public final class PaperViaInjector {
         try {
             clazz.getDeclaredMethod(method, params);
             return true;
+        } catch (final NoSuchMethodException e) {
+            return false;
+        }
+    }
+
+    public static boolean hasMethod(final Class<?> clazz, final Class<?> returnType, final String method, final Class<?>... params) {
+        try {
+            return clazz.getDeclaredMethod(method, params).getReturnType().equals(returnType);
         } catch (final NoSuchMethodException e) {
             return false;
         }
