@@ -478,4 +478,12 @@ public interface ViaVersionConfig extends Config {
      * @return true if enabled
      */
     boolean fix1_21PlacementRotation();
+
+    /**
+     * If enabled, cancel swing packets sent while having an inventory opened on 1.15.2 and below servers.
+     * This can cause false positives with anti-cheat plugins.
+     *
+     * @return true if enabled
+     */
+    boolean cancelSwingInInventory();
 }
