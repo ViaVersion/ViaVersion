@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.util.TagUtil;
 
 /**
  * Rewrites nbt serialized components from 1.21.5 upwards. Can also handle json components outside of hover events.

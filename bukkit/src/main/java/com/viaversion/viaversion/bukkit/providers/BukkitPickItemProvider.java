@@ -25,6 +25,8 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
 import com.viaversion.viaversion.bukkit.util.LegacyBlockToItem;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.provider.PickItemProvider;
+import java.lang.reflect.Method;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -38,9 +40,6 @@ import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
-
-import java.lang.reflect.Method;
-import java.util.UUID;
 
 public class BukkitPickItemProvider extends PickItemProvider {
     private static final BlockToItem BLOCK_TO_ITEM = BlockToItem.build();

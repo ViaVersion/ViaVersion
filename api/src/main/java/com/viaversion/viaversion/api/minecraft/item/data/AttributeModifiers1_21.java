@@ -121,7 +121,7 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
                 modifiers.add(new AttributeModifier(mappedId, modifier.modifier(), modifier.slotType(), modifier.display()));
             }
         }
-        return  new AttributeModifiers1_21(modifiers.toArray(AttributeModifier[]::new), this.showInTooltip);
+        return new AttributeModifiers1_21(modifiers.toArray(AttributeModifier[]::new), this.showInTooltip);
     }
 
     public record AttributeModifier(int attribute, ModifierData modifier, int slotType, Display display) {

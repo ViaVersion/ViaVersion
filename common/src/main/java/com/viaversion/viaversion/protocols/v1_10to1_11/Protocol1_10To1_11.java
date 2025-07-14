@@ -38,7 +38,6 @@ import com.viaversion.viaversion.protocols.v1_10to1_11.storage.EntityTracker1_11
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.util.Pair;
 
 public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
 

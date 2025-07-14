@@ -242,7 +242,7 @@ public enum EntityTypes1_20_3 implements EntityType {
 
     EntityTypes1_20_3(final EntityType parent) {
         this.parent = parent;
-        this.identifier =  Key.namespaced(name().toLowerCase(Locale.ROOT));
+        this.identifier = Key.namespaced(name().toLowerCase(Locale.ROOT));
     }
 
     EntityTypes1_20_3(final EntityType parent, @Nullable final String identifier) {

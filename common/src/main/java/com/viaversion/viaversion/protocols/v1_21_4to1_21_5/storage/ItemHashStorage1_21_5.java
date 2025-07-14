@@ -19,10 +19,10 @@ package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.storage;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext.RegistryAccess;
 import com.viaversion.viaversion.api.minecraft.codec.hash.Hasher;
-import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.codec.CodecRegistryContext;
 import com.viaversion.viaversion.codec.hash.HashFunction;

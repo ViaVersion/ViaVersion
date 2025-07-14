@@ -24,7 +24,6 @@ package com.viaversion.viaversion.api.type.types.item;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.data.FullMappings;
-import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;

@@ -18,13 +18,13 @@
 package com.viaversion.viaversion.bukkit.util;
 
 import com.viaversion.viaversion.api.Via;
+import java.lang.reflect.Method;
+import java.util.Random;
+import java.util.logging.Level;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import java.lang.reflect.Method;
-import java.util.Random;
-import java.util.logging.Level;
 
 public class LegacyBlockToItem {
     private static final LegacyBlockToItem INSTANCE;

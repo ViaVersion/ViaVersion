@@ -49,7 +49,6 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientWorld1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
-
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -323,7 +322,7 @@ public class WorldPacketRewriter1_9 {
             Item item = Via.getManager().getProviders().get(HandItemProvider.class).getHandItem(wrapper.user());
             // Blocking patch for 1.9-1.21.3 clients
             if (Via.getConfig().isShieldBlocking() &&
-                    wrapper.user().getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_21_4)) {
+                wrapper.user().getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_21_4)) {
                 EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
 
                 // Check if the shield is already there or if we have to give it here

@@ -27,14 +27,13 @@ import com.viaversion.viaversion.protocol.BlockedProtocolVersionsImpl;
 import com.viaversion.viaversion.util.Config;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractViaConfig extends Config implements ViaVersionConfig {
     public static final List<String> BUKKIT_ONLY_OPTIONS = Arrays.asList("register-userconnections-on-join", "quick-move-action-fix",

@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_21to1_21_2.storage;
 import com.viaversion.viaversion.api.connection.StorableObject;
 
 public final class ClientVehicleStorage implements StorableObject {
-    
+
     private final int vehicleId;
 
     private float sidewaysMovement;

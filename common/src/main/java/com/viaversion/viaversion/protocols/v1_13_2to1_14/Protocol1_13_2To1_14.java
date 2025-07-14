@@ -39,11 +39,11 @@ import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.PlayerPacketRe
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.WorldPacketRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.storage.EntityTracker1_14;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
-import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_13, ClientboundPackets1_14, ServerboundPackets1_13, ServerboundPackets1_14> {

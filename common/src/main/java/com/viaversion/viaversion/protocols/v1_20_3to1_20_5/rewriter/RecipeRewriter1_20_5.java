@@ -26,7 +26,7 @@ import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.RecipeRewrit
 import java.util.ArrayList;
 import java.util.List;
 
-final class RecipeRewriter1_20_5 <C extends ClientboundPacketType> extends RecipeRewriter1_20_3<C> {
+final class RecipeRewriter1_20_5<C extends ClientboundPacketType> extends RecipeRewriter1_20_3<C> {
 
     public RecipeRewriter1_20_5(final Protocol<C, ?, ?, ?> protocol) {
         super(protocol);

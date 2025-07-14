@@ -232,7 +232,7 @@ public enum EntityTypes1_19 implements EntityType {
 
     EntityTypes1_19(final EntityType parent) {
         this.parent = parent;
-        this.identifier =  Key.namespaced(name().toLowerCase(Locale.ROOT));
+        this.identifier = Key.namespaced(name().toLowerCase(Locale.ROOT));
     }
 
     EntityTypes1_19(final EntityType parent, @Nullable final String identifier) {

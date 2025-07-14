@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.codec;
 
-import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 
 public abstract class OpsBase implements Ops {
 
