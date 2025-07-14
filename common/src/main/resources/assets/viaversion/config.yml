@@ -170,6 +170,9 @@ hide-scoreboard-numbers: false
 # Fixes 1.21+ clients on 1.20.5 servers placing water/lava buckets at the wrong location when moving fast, NOTE: This may cause issues with anti-cheat plugins.
 fix-1_21-placement-rotation: true
 #
+# If enabled, cancel swing packets sent while having an inventory opened on 1.15.2 and below servers. This can cause false positives with anti-cheat plugins.
+cancel-swing-in-inventory: true
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#

@@ -37,6 +37,7 @@ import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.InventoryTracker1_16;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
+
 import java.util.UUID;
 
 public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1_15, Protocol1_15_2To1_16> {
@@ -201,6 +202,10 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
         });
 
         protocol.registerServerbound(ServerboundPackets1_16.SWING, wrapper -> {
+            if (!Via.getConfig().cancelSwingInInventory()) {
+                return;
+            }
+
             InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
             // Don't send an arm swing if the player has an inventory opened.
             if (inventoryTracker.isInventoryOpen()) {
