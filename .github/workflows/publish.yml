@@ -23,8 +23,15 @@ jobs:
           distribution: 'temurin'
           java-version: 17
           check-latest: true
-      - name: Publish
+      - name: Build
+        run: ./gradlew build
+      - name: Publish to Hangar
         env:
           HANGAR_TOKEN: ${{ secrets.HANGAR_TOKEN }}
+        run: ./gradlew publishAllPublicationsToHangar --stacktrace
+        continue-on-error: true
+      - name: Publish to Modrinth
+        env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: ./gradlew build modrinth publishAllPublicationsToHangar --stacktrace
+        run: ./gradlew modrinth --stacktrace
+        continue-on-error: true
