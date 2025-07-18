@@ -1434,7 +1434,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
     }
 
     protected ModifierData modifierDataFromTag(final CompoundTag tag) {
-        final UUID uuid = UUIDUtil.fromIntArray(tag.getIntArrayTag("uuid").getValue());
+        final IntArrayTag uuidTag = tag.getIntArrayTag("uuid");
+        final UUID uuid = (uuidTag == null) ? UUID.randomUUID() : UUIDUtil.fromIntArray(uuidTag.getValue());
         final String name = tag.getString("name");
         final double amount = tag.getDouble("amount");
 
@@ -1445,7 +1446,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
                 break;
             }
         }
-        return new ModifierData(uuid, name, amount, operation);
+        return new ModifierData(uuid, name == null ? "null" : name, amount, operation);
     }
 
     protected void potionEffectToTag(final CompoundTag tag, final PotionEffect effect) {
