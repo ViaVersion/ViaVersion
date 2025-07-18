@@ -92,7 +92,7 @@ public final class AttributeModifierMappings1_21 {
     }
 
     public static @Nullable String idToName(final String id) {
-        return ATTRIBUTE_MODIFIER_NAMES.inverse().get(id);
+        return ATTRIBUTE_MODIFIER_NAMES.inverse().get(Key.stripMinecraftNamespace(id));
     }
 
     private static void add(final long msb, final long lsb, final String id) {
