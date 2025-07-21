@@ -23,18 +23,19 @@ import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
+import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPackets1_9_3;
+import com.viaversion.viaversion.protocols.v1_9_3to1_10.rewriter.EntityPacketRewriter1_10;
 import com.viaversion.viaversion.protocols.v1_9_3to1_10.rewriter.ItemPacketRewriter1_10;
 import com.viaversion.viaversion.protocols.v1_9_3to1_10.storage.ResourcePackTracker;
-import java.util.List;
 
 public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
 
@@ -44,17 +45,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
             return inputValue / 63.0F;
         }
     };
-    public static final ValueTransformer<List<EntityData>, List<EntityData>> TRANSFORM_ENTITY_DATA = new ValueTransformer<>(Types.ENTITY_DATA_LIST1_9) {
-        @Override
-        public List<EntityData> transform(PacketWrapper wrapper, List<EntityData> inputValue) {
-            for (EntityData data : inputValue) {
-                if (data.id() >= 5) {
-                    data.setId(data.id() + 1);
-                }
-            }
-            return inputValue;
-        }
-    };
+    private final EntityPacketRewriter1_10 entityRewriter = new EntityPacketRewriter1_10(this);
     private final ItemPacketRewriter1_10 itemRewriter = new ItemPacketRewriter1_10(this);
 
     public Protocol1_9_3To1_10() {
@@ -63,7 +54,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
 
     @Override
     protected void registerPackets() {
-        itemRewriter.register();
+        super.registerPackets();
 
         // Named sound effect
         registerClientbound(ClientboundPackets1_9_3.CUSTOM_SOUND, new PacketHandlers() {
@@ -95,50 +86,6 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
                     int id = wrapper.get(Types.VAR_INT, 0);
                     wrapper.set(Types.VAR_INT, 0, getNewSoundId(id));
                 });
-            }
-        });
-
-        // Entity data packet
-        registerClientbound(ClientboundPackets1_9_3.SET_ENTITY_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity ID
-                map(Types.ENTITY_DATA_LIST1_9, TRANSFORM_ENTITY_DATA); // 1 - Entity data list
-            }
-        });
-
-        // Spawn Mob
-        registerClientbound(ClientboundPackets1_9_3.ADD_MOB, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity id
-                map(Types.UUID); // 1 - UUID
-                map(Types.UNSIGNED_BYTE); // 2 - Entity Type
-                map(Types.DOUBLE); // 3 - X
-                map(Types.DOUBLE); // 4 - Y
-                map(Types.DOUBLE); // 5 - Z
-                map(Types.BYTE); // 6 - Yaw
-                map(Types.BYTE); // 7 - Pitch
-                map(Types.BYTE); // 8 - Head Pitch
-                map(Types.SHORT); // 9 - Velocity X
-                map(Types.SHORT); // 10 - Velocity Y
-                map(Types.SHORT); // 11 - Velocity Z
-                map(Types.ENTITY_DATA_LIST1_9, TRANSFORM_ENTITY_DATA); // 12 - Entity data
-            }
-        });
-
-        // Spawn Player
-        registerClientbound(ClientboundPackets1_9_3.ADD_PLAYER, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity ID
-                map(Types.UUID); // 1 - Player UUID
-                map(Types.DOUBLE); // 2 - X
-                map(Types.DOUBLE); // 3 - Y
-                map(Types.DOUBLE); // 4 - Z
-                map(Types.BYTE); // 5 - Yaw
-                map(Types.BYTE); // 6 - Pitch
-                map(Types.ENTITY_DATA_LIST1_9, TRANSFORM_ENTITY_DATA); // 7 - Entity data list
             }
         });
 
@@ -232,6 +179,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
 
     @Override
     public void init(UserConnection userConnection) {
+        addEntityTracker(userConnection, new EntityTrackerBase(userConnection, EntityTypes1_9.EntityType.PLAYER));
         userConnection.addClientWorld(this.getClass(), new ClientWorld());
 
         userConnection.put(new ResourcePackTracker());
@@ -240,5 +188,10 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
     @Override
     public ItemPacketRewriter1_10 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public EntityPacketRewriter1_10 getEntityRewriter() {
+        return entityRewriter;
     }
 }
