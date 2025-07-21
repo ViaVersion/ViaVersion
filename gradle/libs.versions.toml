@@ -2,7 +2,7 @@ metadata.format.version = "1.1"
 
 [versions]
 
-gson = "2.12.1"
+gson = "2.13.1"
 fastutil = "8.5.15"
 vianbt = "5.1.2"
 mcstructs = "5-3.1.1-SNAPSHOT"
@@ -12,9 +12,9 @@ netty = "4.0.20.Final"
 guava = "17.0"
 snakeYaml = "2.2"
 
-junit = "5.11.4"
-platformLauncher = "1.12.2"
-checkerQual = "3.49.1"
+junit = "5.13.3"
+platformLauncher = "1.13.3"
+checkerQual = "3.49.5"
 
 # Platforms
 paper = "1.20.4-R0.1-SNAPSHOT"

@@ -74,8 +74,9 @@ public final class HashBuilder {
     }
 
     public HashBuilder writeString(final CharSequence sequence) {
-        this.ensureSize(sequence.length());
-        for (int i = 0; i < sequence.length(); i++) {
+        final int length = sequence.length();
+        this.ensureSize(length);
+        for (int i = 0; i < length; i++) {
             this.writeChar(sequence.charAt(i));
         }
         return this;
