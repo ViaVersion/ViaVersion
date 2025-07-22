@@ -21,7 +21,6 @@ import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
-
 import java.util.HashMap;
 import java.util.Map;
 
