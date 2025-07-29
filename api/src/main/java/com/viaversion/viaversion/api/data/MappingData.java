@@ -140,8 +140,6 @@ public interface MappingData {
 
     @Nullable Mappings getBlockMappings();
 
-    @Nullable Mappings getBlockEntityMappings();
-
     @Nullable Mappings getBlockStateMappings();
 
     @Nullable Mappings getSoundMappings();
@@ -153,6 +151,8 @@ public interface MappingData {
     @Nullable Mappings getEnchantmentMappings();
 
     @Nullable Mappings getPaintingMappings();
+
+    @Nullable FullMappings getBlockEntityMappings();
 
     @Nullable FullMappings getAttributeMappings();
 

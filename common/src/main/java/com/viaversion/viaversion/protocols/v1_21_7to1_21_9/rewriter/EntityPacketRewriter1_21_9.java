@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.template;
+package com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter;
 
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_9;
@@ -23,21 +23,18 @@ import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundConfigurationPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPacket1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPackets1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.Protocol1_21_7To1_21_9;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 
-// Replace if needed
-//  VersionedTypes
-//  EntityTypes1_21_9
-final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPacket1_21_6, Protocol1_98To1_99> {
+public final class EntityPacketRewriter1_21_9 extends EntityRewriter<ClientboundPacket1_21_6, Protocol1_21_7To1_21_9> {
 
-    public EntityPacketRewriter1_99(final Protocol1_98To1_99 protocol) {
+    public EntityPacketRewriter1_21_9(final Protocol1_21_7To1_21_9 protocol) {
         super(protocol);
     }
 
     @Override
     public void registerPackets() {
-        // Tracks entities, applies entity data rewrites registered below, untracks entities
         registerTrackerWithData1_19(ClientboundPackets1_21_6.ADD_ENTITY, EntityTypes1_21_9.FALLING_BLOCK);
         registerSetEntityData(ClientboundPackets1_21_6.SET_ENTITY_DATA);
         registerRemoveEntities(ClientboundPackets1_21_6.REMOVE_ENTITIES);
@@ -53,16 +50,14 @@ final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPacket1_2
     @Override
     protected void registerRewrites() {
         final EntityDataTypes1_21_9 entityDataTypes = protocol.mappedTypes().entityDataTypes();
-        /* Uncomment if entity data classes changed
         filter().mapDataType(typeId -> {
             int id = typeId;
-            if (id >= SomeAddedIndex) {
-                id++;
+            if (id > entityDataTypes.armadilloState.typeId()) {
+                id += 2; // copper golem and weathering copper state
             }
             return entityDataTypes.byId(id);
-        });*/
+        });
 
-        // Registers registry type id changes
         registerEntityDataTypeHandler(
             entityDataTypes.itemType,
             entityDataTypes.blockStateType,
@@ -76,7 +71,6 @@ final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPacket1_2
 
     @Override
     public void onMappingDataLoaded() {
-        // IF ENTITY TYPES CHANGED: Automatically map entity id changes AFTER entity ids have been loaded
         mapTypes();
     }
 

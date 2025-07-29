@@ -480,7 +480,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
 
             if (entityTag.contains("id")) {
-                data.set(StructuredDataKey.ENTITY_DATA, entityTag);
+                data.set(StructuredDataKey.ENTITY_DATA1_20_5, entityTag);
             }
         }
 
@@ -502,7 +502,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             // Not always needed, e.g. shields that had the base color in a block entity tag before
             if (clonedTag.contains("id")) {
-                item.dataContainer().set(StructuredDataKey.BLOCK_ENTITY_DATA, clonedTag);
+                item.dataContainer().set(StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, clonedTag);
             }
         }
 

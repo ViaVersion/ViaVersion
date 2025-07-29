@@ -156,9 +156,9 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         register(StructuredDataKey.WRITTEN_BOOK_CONTENT, this::writtenBookContentToTag, this::writtenBookContentFromTag);
         register(StructuredDataKey.TRIM1_20_5, this::trimToTag, this::trimFromTag);
         register(StructuredDataKey.DEBUG_STICK_STATE, this::debugStickRateToTag, this::debugStickRateFromTag);
-        register(StructuredDataKey.ENTITY_DATA, this::entityDataToTag, this::entityDataFromTag);
+        register(StructuredDataKey.ENTITY_DATA1_20_5, this::entityDataToTag, this::entityDataFromTag);
         register(StructuredDataKey.BUCKET_ENTITY_DATA, this::bucketEntityDataToTag, this::bucketEntityDataFromTag);
-        register(StructuredDataKey.BLOCK_ENTITY_DATA, this::blockEntityDataToTag, this::blockEntityDataFromTag);
+        register(StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, this::blockEntityDataToTag, this::blockEntityDataFromTag);
         register(StructuredDataKey.INSTRUMENT1_20_5, this::instrumentToTag, this::instrumentFromTag);
         register(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, this::ominousBottleAmplifierToTag, this::ominousBottleAmplifierFromTag);
         register(StructuredDataKey.RECIPES, this::recipesToTag, this::recipesFromTag);

@@ -343,7 +343,7 @@ public final class StructuredDataConverter {
         });
         register(StructuredDataKey.DEBUG_STICK_STATE, (data, tag) -> tag.put("DebugProperty", data));
         register(StructuredDataKey.RECIPES, (data, tag) -> tag.put("Recipes", data));
-        register(StructuredDataKey.ENTITY_DATA, (data, tag) -> tag.put("EntityTag", data));
+        register(StructuredDataKey.ENTITY_DATA1_20_5, (data, tag) -> tag.put("EntityTag", data));
         register(StructuredDataKey.BUCKET_ENTITY_DATA, (data, tag) -> {
             for (final String mobTagName : BlockItemPacketRewriter1_20_5.MOB_TAGS) {
                 if (data.contains(mobTagName)) {
@@ -351,7 +351,7 @@ public final class StructuredDataConverter {
                 }
             }
         });
-        register(StructuredDataKey.BLOCK_ENTITY_DATA, (data, tag) -> {
+        register(StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, (data, tag) -> {
             // Handling of previously block entity tags is done using the getBlockEntityTag method
             // Merge with already added tag if needed
             final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");

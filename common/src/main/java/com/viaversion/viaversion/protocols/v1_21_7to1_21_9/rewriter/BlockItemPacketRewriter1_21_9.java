@@ -15,37 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.template;
+package com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter;
 
-import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.BlockEntityData;
+import com.viaversion.viaversion.api.minecraft.item.data.EntityData;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPacket1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPacket1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
+import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.Protocol1_21_7To1_21_9;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 
-// To replace if needed:
-//   ChunkType1_21_5
-//   RecipeDisplayRewriter
-//   Types1_21_4, Types1_OLD
-final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<ClientboundPacket1_21_6, ServerboundPacket1_21_6, Protocol1_98To1_99> {
+public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<ClientboundPacket1_21_6, ServerboundPacket1_21_6, Protocol1_21_7To1_21_9> {
 
-    public BlockItemPacketRewriter1_99(final Protocol1_98To1_99 protocol) {
+    public BlockItemPacketRewriter1_21_9(final Protocol1_21_7To1_21_9 protocol) {
         super(protocol);
     }
 
     @Override
     public void registerPackets() {
-        // Register block and block state id changes
-        // Other places using block state id mappings: Spawn particle, entity data, entity spawn (falling blocks)
-        // Tags and statistics use block (!) ids
         final BlockRewriter<ClientboundPacket1_21_6> blockRewriter = BlockRewriter.for1_20_2(protocol);
         blockRewriter.registerBlockEvent(ClientboundPackets1_21_6.BLOCK_EVENT);
         blockRewriter.registerBlockUpdate(ClientboundPackets1_21_6.BLOCK_UPDATE);
@@ -54,9 +50,6 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         blockRewriter.registerLevelChunk1_19(ClientboundPackets1_21_6.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_21_5::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_21_6.BLOCK_ENTITY_DATA);
 
-        // Registers item id changes
-        // Other places using item ids are: Entity data, tags, statistics, effect
-        // registerOpenScreen(ClientboundPackets1_21_6.OPEN_SCREEN); If a new container type was added; also remove from the component rewriter registration
         registerSetCursorItem(ClientboundPackets1_21_6.SET_CURSOR_ITEM);
         registerSetPlayerInventory(ClientboundPackets1_21_6.SET_PLAYER_INVENTORY);
         registerCooldown1_21_2(ClientboundPackets1_21_6.COOLDOWN);
@@ -72,14 +65,6 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_6.UPDATE_RECIPES);
         recipeRewriter.registerRecipeBookAdd(ClientboundPackets1_21_6.RECIPE_BOOK_ADD);
         recipeRewriter.registerPlaceGhostRecipe(ClientboundPackets1_21_6.PLACE_GHOST_RECIPE);
-        // OR do this if serialization of recipes changed and override the relevant method
-        // Add new serializers to RecipeDisplayRewriter, or extend the last one for changes
-    }
-
-    @Override
-    protected void backupInconvertibleData(final UserConnection connection, final Item item, final StructuredDataContainer dataContainer, final CompoundTag backupTag) {
-        super.backupInconvertibleData(connection, item, dataContainer, backupTag);
-        // back up any data if needed here, called before the method below
     }
 
     @Override
@@ -88,7 +73,15 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         super.handleItemDataComponentsToClient(connection, item, container);
     }
 
-    public static void upgradeData(final Item item, final StructuredDataContainer container) { // public for VB
+    public static void upgradeData(final Item item, final StructuredDataContainer container) {
+        container.replace(StructuredDataKey.ENTITY_DATA1_20_5, StructuredDataKey.ENTITY_DATA1_21_9, tag -> {
+            final int id = Protocol1_21_7To1_21_9.MAPPINGS.getEntityMappings().mappedId(tag.getString("id", "pig"));
+            return new EntityData(id, tag);
+        });
+        container.replace(StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, StructuredDataKey.BLOCK_ENTITY_DATA1_21_9, tag -> {
+            final int id = Protocol1_21_7To1_21_9.MAPPINGS.getBlockEntityMappings().mappedId(tag.getString("id", "furnace"));
+            return new BlockEntityData(id, tag);
+        });
     }
 
     @Override
@@ -98,11 +91,7 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
     }
 
     public static void downgradeData(final Item item, final StructuredDataContainer container) {
-    }
-
-    @Override
-    protected void restoreBackupData(final Item item, final StructuredDataContainer container, final CompoundTag customData) {
-        super.restoreBackupData(item, container, customData);
-        // restore any data if needed here
+        container.replace(StructuredDataKey.ENTITY_DATA1_21_9, StructuredDataKey.ENTITY_DATA1_20_5, EntityData::tag);
+        container.replace(StructuredDataKey.BLOCK_ENTITY_DATA1_21_9, StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, BlockEntityData::tag);
     }
 }

@@ -49,7 +49,7 @@ public final class EntityPacketRewriter1_21_7 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
-        final EntityDataTypes1_21_5 entityDataTypes = protocol.types().entityDataTypes();
+        final EntityDataTypes1_21_5 entityDataTypes = protocol.mappedTypes().entityDataTypes();
         registerEntityDataTypeHandler(
             entityDataTypes.itemType,
             entityDataTypes.blockStateType,

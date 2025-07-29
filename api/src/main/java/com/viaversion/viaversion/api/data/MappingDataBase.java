@@ -44,11 +44,11 @@ public class MappingDataBase implements MappingData {
     protected FullMappings recipeSerializerMappings;
     protected FullMappings itemDataSerializerMappings;
     protected FullMappings attributeMappings;
+    protected FullMappings blockEntityMappings;
     protected ParticleMappings particleMappings;
     protected BiMappings itemMappings;
     protected BiMappings blockMappings;
     protected Mappings blockStateMappings;
-    protected Mappings blockEntityMappings;
     protected Mappings soundMappings;
     protected Mappings statisticsMappings;
     protected Mappings enchantmentMappings;
@@ -70,7 +70,6 @@ public class MappingDataBase implements MappingData {
         final CompoundTag data = readMappingsFile("mappings-" + unmappedVersion + "to" + mappedVersion + ".nbt");
         blockMappings = loadBiMappings(data, "blocks");
         blockStateMappings = loadMappings(data, "blockstates");
-        blockEntityMappings = loadMappings(data, "blockentities");
         soundMappings = loadMappings(data, "sounds");
         statisticsMappings = loadMappings(data, "statistics");
         menuMappings = loadMappings(data, "menus");
@@ -86,6 +85,7 @@ public class MappingDataBase implements MappingData {
             recipeSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "recipe_serializers");
             itemDataSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "data_component_type");
             attributeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "attributes");
+            blockEntityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "blockentities");
 
             final List<String> unmappedParticles = identifiersFromGlobalIds(unmappedIdentifierData, "particles");
             final List<String> mappedParticles = identifiersFromGlobalIds(mappedIdentifierData, "particles");
@@ -241,7 +241,7 @@ public class MappingDataBase implements MappingData {
     }
 
     @Override
-    public @Nullable Mappings getBlockEntityMappings() {
+    public @Nullable FullMappings getBlockEntityMappings() {
         return blockEntityMappings;
     }
 
