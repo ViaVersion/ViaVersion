@@ -167,7 +167,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
     protected void updateConfig() {
         ConfigSection original = originalRootSection();
-        if (original.contains("max-pps")) {
+        if (original != null && original.contains("max-pps")) {
             // 5.5.0 pps changes
             ConfigSection section = getSection("packet-limiter");
             section.set("max-per-second", original.getInt("max-pps", -1));
