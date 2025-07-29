@@ -342,12 +342,6 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
 
         handleItemDataComponentsToClient(connection, item, dataContainer);
 
-        if (dataContainer.hasValue(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP)) {
-            final CompoundTag backupTag = new CompoundTag();
-            backupTag.putBoolean("hide_additional_tooltip", true);
-            saveTag(createCustomTag(item), backupTag, "backup");
-        }
-
         // Add data components to fix issues in older protocols
         appendItemDataFixComponents(connection, item);
 
@@ -366,16 +360,6 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
     protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
         downgradeItemData(item);
         super.handleItemDataComponentsToServer(connection, item, container);
-    }
-
-    @Override
-    protected void restoreBackupData(final Item item, final StructuredDataContainer container, final CompoundTag customData) {
-        super.restoreBackupData(item, container, customData);
-        if (customData.remove(nbtTagName("backup")) instanceof final CompoundTag backupTag) {
-            if (backupTag.getBoolean("hide_additional_tooltip")) {
-                container.set(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP);
-            }
-        }
     }
 
     public static void updateItemData(final Item item) {
@@ -472,8 +456,15 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         dataContainer.replace(StructuredDataKey.INSTRUMENT1_21_5, StructuredDataKey.INSTRUMENT1_21_2, instrument -> instrument.hasHolder() ? instrument.holder() : null);
 
         final TooltipDisplay tooltipDisplay = dataContainer.get(StructuredDataKey.TOOLTIP_DISPLAY);
-        if (tooltipDisplay != null && tooltipDisplay.hideTooltip()) {
-            dataContainer.set(StructuredDataKey.HIDE_TOOLTIP);
+        if (tooltipDisplay != null) {
+            if (tooltipDisplay.hideTooltip()) {
+                dataContainer.set(StructuredDataKey.HIDE_TOOLTIP);
+            }
+
+            final FullMappings mappings = Protocol1_21_4To1_21_5.MAPPINGS.getDataComponentSerializerMappings();
+            if (tooltipDisplay.hiddenComponents().containsAll(HIDE_ADDITIONAL_KEYS.stream().map(key -> mappings.id(key.identifier())).toList())) {
+                dataContainer.set(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP);
+            }
         }
 
         dataContainer.replace(StructuredDataKey.UNBREAKABLE1_21_5, StructuredDataKey.UNBREAKABLE1_20_5, unbreakable -> new Unbreakable(shouldShowToServer(tooltipDisplay, StructuredDataKey.UNBREAKABLE1_20_5)));
