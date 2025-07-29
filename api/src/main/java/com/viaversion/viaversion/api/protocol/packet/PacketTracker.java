@@ -23,152 +23,189 @@
 package com.viaversion.viaversion.api.protocol.packet;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.configuration.RateLimitConfig;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import java.util.Arrays;
 
 public class PacketTracker {
-    private final UserConnection connection;
+    private static final long SECOND_NANOS = 1_000_000_000L;
+
+    private final RateTracker packetTracker = new RateTracker(5);
+    private final RateTracker packetSizeTracker = new RateTracker(3);
+    private long startTime = System.nanoTime();
     private boolean packetLimiterEnabled = true;
-    private long sentPackets;
-    private long receivedPackets;
-    // Used for tracking pps
-    private long startTime;
-    private long intervalPackets;
-    private long packetsPerSecond = -1L;
-    // Used for handling warnings (over time)
-    private int secondsObserved;
-    private int warnings;
+    private final UserConnection connection;
+    private long sentPacketsTotal;
+    private long receivedPacketsTotal;
 
     public PacketTracker(UserConnection connection) {
         this.connection = connection;
     }
 
     /**
-     * Used for incrementing the number of packets sent to the client.
+     * Increments the number of packets sent to the client.
      */
     public void incrementSent() {
-        this.sentPackets++;
+        this.sentPacketsTotal++;
     }
 
     /**
-     * Used for incrementing the number of packets received from the client.
+     * Increments the number of packets received from the client.
      *
-     * @return true if the interval has reset and can now be checked for the packets sent
+     * @return true if the interval has reset
      */
-    public boolean incrementReceived() {
-        // handle stats
-        long diff = System.currentTimeMillis() - startTime;
-        if (diff >= 1000) {
-            packetsPerSecond = intervalPackets;
-            startTime = System.currentTimeMillis();
-            intervalPackets = 1;
-            return true;
-        } else {
-            intervalPackets++;
-        }
-        // increase total
-        this.receivedPackets++;
-        return false;
-    }
+    public boolean incrementReceived(int packetSize) {
+        receivedPacketsTotal++;
 
-    /**
-     * Checks for packet flood with the packets sent in the last second.
-     * ALWAYS check for {@link #incrementReceived()} before using this method.
-     *
-     * @return true if the packet should be cancelled
-     * @see #incrementReceived()
-     */
-    public boolean exceedsMaxPPS() {
-        if (connection.isClientSide()) return false; // Don't apply PPS limiting for client-side
-        ViaVersionConfig conf = Via.getConfig();
-        // Max PPS Checker
-        if (conf.getMaxPPS() > 0 && packetsPerSecond >= conf.getMaxPPS()) {
-            connection.disconnect(conf.getMaxPPSKickMessage().replace("%pps", Long.toString(packetsPerSecond)));
-            return true; // don't send current packet
-        }
-
-        // Tracking PPS Checker
-        if (conf.getMaxWarnings() > 0 && conf.getTrackingPeriod() > 0) {
-            if (secondsObserved > conf.getTrackingPeriod()) {
-                // Reset
-                warnings = 0;
-                secondsObserved = 1;
-            } else {
-                secondsObserved++;
-                if (packetsPerSecond >= conf.getWarningPPS()) {
-                    warnings++;
-                }
-
-                if (warnings >= conf.getMaxWarnings()) {
-                    connection.disconnect(conf.getMaxWarningsKickMessage().replace("%pps", Long.toString(packetsPerSecond)));
-                    return true; // don't send current packet
-                }
+        ViaVersionConfig config = Via.getConfig();
+        long currentTime = System.nanoTime();
+        long elapsed = currentTime - startTime;
+        if (elapsed < SECOND_NANOS) {
+            // Add to current interval
+            if (config.getPacketTrackerConfig().enabled()) {
+                packetTracker.addIntervalValue(1);
             }
+            if (config.getPacketSizeTrackerConfig().enabled()) {
+                packetSizeTracker.addIntervalValue(packetSize);
+            }
+            return false;
         }
-        return false;
+
+        // Reset interval tracking
+        if (config.getPacketTrackerConfig().enabled()) {
+            packetTracker.updateRate(elapsed);
+            packetTracker.addIntervalValue(1);
+        }
+        if (config.getPacketSizeTrackerConfig().enabled()) {
+            packetSizeTracker.updateRate(elapsed);
+            packetSizeTracker.addIntervalValue(packetSize);
+        }
+        startTime = currentTime;
+        return true;
+    }
+
+    public boolean exceedsLimits() {
+        if (connection.isClientSide()) {
+            return false;
+        }
+
+        ViaVersionConfig config = Via.getConfig();
+        return packetTracker.exceedsLimit(connection, config.getPacketTrackerConfig())
+            && packetSizeTracker.exceedsLimit(connection, config.getPacketSizeTrackerConfig());
     }
 
     public long getSentPackets() {
-        return sentPackets;
-    }
-
-    public void setSentPackets(long sentPackets) {
-        this.sentPackets = sentPackets;
+        return sentPacketsTotal;
     }
 
     public long getReceivedPackets() {
-        return receivedPackets;
+        return receivedPacketsTotal;
     }
 
-    public void setReceivedPackets(long receivedPackets) {
-        this.receivedPackets = receivedPackets;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    public long getIntervalPackets() {
-        return intervalPackets;
-    }
-
-    public void setIntervalPackets(long intervalPackets) {
-        this.intervalPackets = intervalPackets;
-    }
-
-    public long getPacketsPerSecond() {
-        return packetsPerSecond;
-    }
-
-    public void setPacketsPerSecond(long packetsPerSecond) {
-        this.packetsPerSecond = packetsPerSecond;
-    }
-
-    public int getSecondsObserved() {
-        return secondsObserved;
-    }
-
-    public void setSecondsObserved(int secondsObserved) {
-        this.secondsObserved = secondsObserved;
-    }
-
-    public int getWarnings() {
-        return warnings;
-    }
-
-    public void setWarnings(int warnings) {
-        this.warnings = warnings;
+    public int getPacketsPerSecond() {
+        return packetTracker.currentRate;
     }
 
     public boolean isPacketLimiterEnabled() {
-        return packetLimiterEnabled;
+        ViaVersionConfig config = Via.getConfig();
+        return packetLimiterEnabled && config.getPacketTrackerConfig().enabled() && config.getPacketSizeTrackerConfig().enabled();
     }
 
     public void setPacketLimiterEnabled(boolean packetLimiterEnabled) {
         this.packetLimiterEnabled = packetLimiterEnabled;
+    }
+
+    private static final class RateTracker {
+        private final int[] history;
+        private int historyIndex;
+        private int historyCount;
+        private int currentRate = -1;
+
+        // Interval tracking
+        private int intervalValue;
+
+        // Warning system
+        private long warningPeriodStart = System.nanoTime();
+        private int warnings;
+
+        public RateTracker(int windowSize) {
+            this.history = new int[windowSize];
+        }
+
+        public void addIntervalValue(int value) {
+            intervalValue += value;
+        }
+
+        public void updateRate(long elapsedNanos) {
+            // Update sliding window
+            history[historyIndex] = (int) ((intervalValue * SECOND_NANOS) / elapsedNanos);
+            historyIndex = (historyIndex + 1) % history.length;
+            if (historyCount < history.length) {
+                historyCount++;
+            }
+
+            // Calculate smoothed average
+            int sum = 0;
+            for (int i = 0; i < historyCount; i++) {
+                sum += history[i];
+            }
+
+            currentRate = sum / historyCount;
+            intervalValue = 0; // Reset
+        }
+
+        public boolean exceedsLimit(UserConnection connection, RateLimitConfig limitConfig) {
+            if (!limitConfig.enabled() || currentRate < 0) {
+                return false;
+            }
+
+            // Immediate limit check
+            if (limitConfig.maxRate() > 0 && currentRate >= limitConfig.maxRate()) {
+                connection.disconnect(limitConfig.maxRateKickMessage().replace(limitConfig.ratePlaceholder(), Integer.toString(currentRate)));
+                return true;
+            }
+
+            // Interval warnings
+            if (limitConfig.maxWarnings() > 0 && limitConfig.trackingPeriodNanos() > 0) {
+                return checkTrackedInterval(connection, limitConfig);
+            }
+
+            return false;
+        }
+
+        private boolean checkTrackedInterval(UserConnection connection, RateLimitConfig config) {
+            long currentTime = System.nanoTime();
+            if (currentTime - warningPeriodStart >= config.trackingPeriodNanos()) {
+                // Reset
+                warnings = 0;
+                warningPeriodStart = currentTime;
+                return false;
+            }
+
+            if (currentRate >= config.warningRate() && ++warnings >= config.maxWarnings()) {
+                connection.disconnect(config.warningKickMessage().replace(config.ratePlaceholder(), Integer.toString(currentRate)));
+                return true;
+            }
+            return false;
+        }
+
+        public void reset() {
+            intervalValue = 0;
+            currentRate = -1;
+            warnings = 0;
+            warningPeriodStart = System.nanoTime();
+            historyIndex = 0;
+            historyCount = 0;
+            Arrays.fill(history, 0);
+        }
+    }
+
+    public void reset() {
+        sentPacketsTotal = 0;
+        receivedPacketsTotal = 0;
+        startTime = System.nanoTime();
+        packetTracker.reset();
+        packetSizeTracker.reset();
     }
 }

@@ -55,41 +55,49 @@ velocity-servers: {}
 #----------------------------------------------------------#
 #                  GLOBAL PACKET LIMITER                   #
 #----------------------------------------------------------#
-# THIS FEATURE IS DISABLED ON 1.17.1+ PAPER SERVERS, SINCE IT HAS A BETTER PACKET-LIMITER INBUILT
+# Packets Per Second (PPS) and kilobyte packet size limiters.
+# Setting 'max-per-second' or 'sustained-max-per-second' to -1 will disable the individual limit.
+# Kick messages may include the %pps or %kbps placeholders respectively.
 #
-# Packets Per Second (PPS) limiter (Use -1 on max-pps and tracking-period to disable)
+# Limits the amount of packets sent per second.
 # Clients by default send around 20-90 packets per second.
-#
-# What is the maximum per second a client can send (Use %pps to display their pps)
-# Use -1 to disable.
-max-pps: 800
-max-pps-kick-msg: "You are sending too many packets!"
-#
-# We can also kick them if over a period they send over a threshold a certain amount of times.
-#
-# Period to track (in seconds)
-# Use -1 to disable.
-tracking-period: 6
-# How many packets per second count as a warning?
-tracking-warning-pps: 120
-# How many warnings over the interval can we have
-# This can never be higher than "tracking-period"?
-tracking-max-warnings: 4
-# The kick message sent if the user hits the max packets per second.
-tracking-max-kick-msg: "You are sending too many packets, :("
+packet-limiter:
+  enabled: true
+  # The maximum packets a client can send per second.
+  max-per-second: 800
+  max-per-second-kick-message: "You are sending too many packets!"
+  #
+  # We can also kick them if they repeatedly send too many packets over a longer period of time.
+  # E.g. if a player sends over 150 packets per second for 4 out of 7 seconds, we kick them.
+  # The maximum packets per second a client can send over a longer period of time.
+  sustained-max-per-second: 150
+  # Period to track in seconds.
+  sustained-period-seconds: 7
+  # The number of seconds within the interval that the client can exceed the limit before being kicked.
+  sustained-threshold: 4
+  sustained-kick-message: "You are sending too many packets, :("
+# Limits the size of packets in kilobytes sent per second.
+packet-size-limiter:
+  enabled: false
+  max-per-second: -1
+  max-per-second-kick-message: "You are sending too large packets!"
+  sustained-max-per-second: -1
+  sustained-period-seconds: 5
+  sustained-threshold: 3
+  sustained-kick-message: "You are sending too large packets, :("
 #
 #----------------------------------------------------------#
 #                 MULTIPLE VERSIONS OPTIONS                #
 #----------------------------------------------------------#
 #
-# Whether to make sure ViaVersion's UserConnection object is already available in the PlayerJoinEvent.
-# You may disable this for faster startup/join time if you are 100% sure no plugin requires this.
-register-userconnections-on-join: true
 # Should we enable our hologram patch?
 # If they're in the wrong place, enable this
 hologram-patch: false
 # This is the offset, should work as default when enabled.
 hologram-y: -0.96
+# Whether to make sure ViaVersion's UserConnection object is already available in the PlayerJoinEvent.
+# You may disable this for faster startup/join time if you are 100% sure no plugin requires this.
+register-userconnections-on-join: true
 # Should we disable piston animation for 1.11/1.11.1 clients?
 # In some cases, when firing lots of pistons, it crashes them.
 piston-animation-patch: false

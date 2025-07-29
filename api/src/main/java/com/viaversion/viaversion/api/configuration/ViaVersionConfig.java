@@ -147,6 +147,7 @@ public interface ViaVersionConfig extends Config {
      *
      * @return The number of packets a client can send per second.
      */
+    @Deprecated(forRemoval = true)
     int getMaxPPS();
 
     /**
@@ -154,6 +155,7 @@ public interface ViaVersionConfig extends Config {
      *
      * @return Kick message, with colour codes using '&amp;amp;'
      */
+    @Deprecated(forRemoval = true)
     String getMaxPPSKickMessage();
 
     /**
@@ -161,6 +163,7 @@ public interface ViaVersionConfig extends Config {
      *
      * @return Time in seconds that should be tracked for warnings
      */
+    @Deprecated(forRemoval = true)
     int getTrackingPeriod();
 
     /**
@@ -168,6 +171,7 @@ public interface ViaVersionConfig extends Config {
      *
      * @return The number of packets per second to count as a warning.
      */
+    @Deprecated(forRemoval = true)
     int getWarningPPS();
 
     /**
@@ -175,6 +179,7 @@ public interface ViaVersionConfig extends Config {
      *
      * @return The number of packets a client can send per second.
      */
+    @Deprecated(forRemoval = true)
     int getMaxWarnings();
 
     /**
@@ -182,7 +187,12 @@ public interface ViaVersionConfig extends Config {
      *
      * @return Kick message, with colour codes using '&amp;amp;'
      */
+    @Deprecated(forRemoval = true)
     String getMaxWarningsKickMessage();
+
+    RateLimitConfig getPacketTrackerConfig();
+
+    RateLimitConfig getPacketSizeTrackerConfig();
 
     /**
      * Send supported versions in the status response packet

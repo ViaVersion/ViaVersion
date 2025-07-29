@@ -27,7 +27,6 @@ import org.bukkit.Bukkit;
 public final class PaperViaInjector {
     public static final boolean PAPER_INJECTION_METHOD = hasPaperInjectionMethod();
     public static final boolean PAPER_PROTOCOL_METHOD = hasServerProtocolMethod();
-    public static final boolean PAPER_PACKET_LIMITER = hasPacketLimiter();
     public static final boolean PAPER_IS_STOPPING_METHOD = hasIsStoppingMethod();
 
     private PaperViaInjector() {
@@ -74,10 +73,6 @@ public final class PaperViaInjector {
 
     private static boolean hasIsStoppingMethod() {
         return hasMethod(Bukkit.class, "isStopping");
-    }
-
-    private static boolean hasPacketLimiter() {
-        return hasClass("com.destroystokyo.paper.PaperConfig$PacketLimit") || hasClass("io.papermc.paper.configuration.GlobalConfiguration$PacketLimiter");
     }
 
     public static boolean hasClass(final String className) {

@@ -41,7 +41,7 @@ public final class BukkitDecodeHandler extends MessageToMessageDecoder<ByteBuf> 
 
     @Override
     protected void decode(final ChannelHandlerContext ctx, final ByteBuf bytebuf, final List<Object> out) {
-        if (!connection.checkServerboundPacket()) {
+        if (!connection.checkServerboundPacket(bytebuf.readableBytes())) {
             throw CancelDecoderException.generate(null);
         }
         if (!connection.shouldTransformPacket()) {

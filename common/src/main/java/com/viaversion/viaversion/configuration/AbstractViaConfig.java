@@ -19,12 +19,14 @@ package com.viaversion.viaversion.configuration;
 
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.configuration.RateLimitConfig;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocol.BlockedProtocolVersionsImpl;
 import com.viaversion.viaversion.util.Config;
+import com.viaversion.viaversion.util.ConfigSection;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import java.io.File;
@@ -32,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -54,12 +57,8 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean bossbarPatch;
     private boolean bossbarAntiFlicker;
     private double hologramOffset;
-    private int maxPPS;
-    private String maxPPSKickMessage;
-    private int trackingPeriod;
-    private int warningPPS;
-    private int maxPPSWarnings;
-    private String maxPPSWarningsKickMessage;
+    private RateLimitConfig packetTrackerConfig;
+    private RateLimitConfig packetSizeTrackerConfig;
     private boolean sendSupportedVersions;
     private boolean simulatePlayerTick;
     private boolean replacePistons;
@@ -105,6 +104,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public void reload() {
         super.reload();
+        updateConfig();
         loadFields();
     }
 
@@ -121,12 +121,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         bossbarPatch = getBoolean("bossbar-patch", true);
         bossbarAntiFlicker = getBoolean("bossbar-anti-flicker", false);
         hologramOffset = getDouble("hologram-y", -0.96D);
-        maxPPS = getInt("max-pps", 800);
-        maxPPSKickMessage = getString("max-pps-kick-msg", "Sending packets too fast? lag?");
-        trackingPeriod = getInt("tracking-period", 6);
-        warningPPS = getInt("tracking-warning-pps", 120);
-        maxPPSWarnings = getInt("tracking-max-warnings", 3);
-        maxPPSWarningsKickMessage = getString("tracking-max-kick-msg", "You are sending too many packets, :(");
         sendSupportedVersions = getBoolean("send-supported-versions", false);
         simulatePlayerTick = getBoolean("simulate-pt", true);
         replacePistons = getBoolean("replace-pistons", false);
@@ -167,6 +161,23 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         hideScoreboardNumbers = getBoolean("hide-scoreboard-numbers", false);
         fix1_21PlacementRotation = getBoolean("fix-1_21-placement-rotation", true);
         cancelSwingInInventory = getBoolean("cancel-swing-in-inventory", true);
+        packetTrackerConfig = loadRateLimitConfig(getSection("packet-limiter"), "%pps");
+        packetSizeTrackerConfig = loadRateLimitConfig(getSection("packet-size-limiter"), "%kbps");
+    }
+
+    protected void updateConfig() {
+        ConfigSection original = originalRootSection();
+        if (original.contains("max-pps")) {
+            // 5.5.0 pps changes
+            ConfigSection section = getSection("packet-limiter");
+            section.set("max-per-second", original.getInt("max-pps", -1));
+            section.set("max-per-second-kick-message", original.getString("max-pps-kick-msg", "You are sending too many packets!"));
+            section.set("sustained-max-per-second", original.getInt("tracking-warning-pps", -1));
+            section.set("sustained-threshold", original.getInt("tracking-max-warnings", 3));
+            section.set("sustained-period-seconds", original.getInt("tracking-period", 6));
+            section.set("sustained-kick-message", original.getString("tracking-max-kick-msg", "You are sending too many packets, :("));
+            save();
+        }
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
@@ -226,6 +237,19 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
             });
         }
         return new BlockedProtocolVersionsImpl(blockedProtocols, lowerBound, upperBound);
+    }
+
+    private RateLimitConfig loadRateLimitConfig(ConfigSection section, String placeholder) {
+        return new RateLimitConfig(
+            section.getBoolean("enabled", true),
+            section.getInt("max-per-second", -1),
+            section.getString("max-per-second-kick-message", "You are sending too many packets!"),
+            section.getInt("sustained-max-per-second", -1),
+            section.getInt("sustained-threshold", 3),
+            TimeUnit.SECONDS.toNanos(section.getInt("sustained-period-seconds", 6)),
+            section.getString("sustained-kick-message", "You are sending too many packets, :("),
+            placeholder
+        );
     }
 
     private @Nullable ProtocolVersion protocolVersion(String s) {
@@ -310,32 +334,42 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
     @Override
     public int getMaxPPS() {
-        return maxPPS;
+        return packetTrackerConfig.maxRate();
     }
 
     @Override
     public String getMaxPPSKickMessage() {
-        return maxPPSKickMessage;
+        return packetTrackerConfig.maxRateKickMessage();
     }
 
     @Override
     public int getTrackingPeriod() {
-        return trackingPeriod;
+        return (int) TimeUnit.NANOSECONDS.toSeconds(packetTrackerConfig.trackingPeriodNanos());
     }
 
     @Override
     public int getWarningPPS() {
-        return warningPPS;
+        return packetTrackerConfig.warningRate();
     }
 
     @Override
     public int getMaxWarnings() {
-        return maxPPSWarnings;
+        return packetTrackerConfig.maxWarnings();
     }
 
     @Override
     public String getMaxWarningsKickMessage() {
-        return maxPPSWarningsKickMessage;
+        return packetTrackerConfig.warningKickMessage();
+    }
+
+    @Override
+    public RateLimitConfig getPacketTrackerConfig() {
+        return packetTrackerConfig;
+    }
+
+    @Override
+    public RateLimitConfig getPacketSizeTrackerConfig() {
+        return packetSizeTrackerConfig;
     }
 
     @Override

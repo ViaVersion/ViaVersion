@@ -17,14 +17,11 @@
  */
 package com.viaversion.viaversion.util;
 
-import com.google.gson.JsonElement;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -38,8 +35,7 @@ import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
 
-@SuppressWarnings("VulnerableCodeUsages")
-public abstract class Config {
+public abstract class Config extends ConfigSection {
     private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
@@ -60,7 +56,7 @@ public abstract class Config {
     private final CommentStore commentStore = new CommentStore('.', 2);
     private final File configFile;
     protected final Logger logger;
-    private Map<String, Object> config;
+    private ConfigSection originalRoot;
 
     /**
      * Create a new Config instance, this will *not* load the config by default.
@@ -70,6 +66,7 @@ public abstract class Config {
      * @param logger     The logger to use.
      */
     protected Config(File configFile, Logger logger) {
+        super(null, "");
         this.configFile = configFile;
         this.logger = logger;
     }
@@ -95,6 +92,8 @@ public abstract class Config {
     }
 
     private synchronized Map<String, Object> loadConfig(File location, InputStreamSupplier configSupplier) {
+        originalRoot = null;
+
         List<String> unsupported = getUnsupportedOptions();
         try (InputStream inputStream = configSupplier.get()) {
             commentStore.storeComments(inputStream);
@@ -109,11 +108,10 @@ public abstract class Config {
         }
 
         // Load actual file data
-        Map<String, Object> config = null;
+        Map<String, Object> existingConfig = null;
         if (location.exists()) {
             try (FileInputStream input = new FileInputStream(location)) {
-                //noinspection unchecked
-                config = (Map<String, Object>) YAML.get().load(input);
+                existingConfig = YAML.get().load(input);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to load config", e);
             } catch (Exception e) {
@@ -121,30 +119,45 @@ public abstract class Config {
                 throw new RuntimeException("Failed to load config (malformed input?)", e);
             }
         }
-        if (config == null) {
-            config = new HashMap<>();
-        }
 
         // Load default config and merge with current to make sure we always have an up-to-date/correct config
         Map<String, Object> mergedConfig;
         try (InputStream stream = configSupplier.get()) {
-            //noinspection unchecked
-            mergedConfig = (Map<String, Object>) YAML.get().load(stream);
+            mergedConfig = YAML.get().load(stream);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load default config", e);
         }
         for (String option : unsupported) {
             mergedConfig.remove(option);
         }
-        for (Map.Entry<String, Object> entry : config.entrySet()) {
-            // Set option in new conf if it exists
-            mergedConfig.computeIfPresent(entry.getKey(), (key, value) -> entry.getValue());
+
+        if (existingConfig != null) {
+            merge(existingConfig, mergedConfig);
         }
 
         handleConfig(mergedConfig);
-        save(location, mergedConfig);
+
+        if (existingConfig == null || !existingConfig.equals(mergedConfig)) {
+            originalRoot = existingConfig != null ? new ConfigSection(this, "", existingConfig) : null;
+
+            // Also updates comments once values need to be saved
+            save(location, mergedConfig);
+        }
 
         return mergedConfig;
+    }
+
+    private void merge(Map<String, Object> loadedConfig, Map<String, Object> mergedConfig) {
+        for (Map.Entry<String, Object> entry : loadedConfig.entrySet()) {
+            // Set option in new config if it exists
+            Object value = entry.getValue();
+            if (value instanceof Map<?, ?> mapValue && mergedConfig.get(entry.getKey()) instanceof Map<?, ?> mergedMapValue) {
+                //noinspection unchecked
+                merge((Map<String, Object>) mapValue, (Map<String, Object>) mergedMapValue);
+            } else {
+                mergedConfig.computeIfPresent(entry.getKey(), (k, v) -> value);
+            }
+        }
     }
 
     protected abstract void handleConfig(Map<String, Object> config);
@@ -159,109 +172,40 @@ public abstract class Config {
 
     public abstract List<String> getUnsupportedOptions();
 
-    public void set(String path, Object value) {
-        config.put(path, value);
-    }
-
     public void save() {
         if (this.configFile.getParentFile() != null) {
             this.configFile.getParentFile().mkdirs();
         }
-        save(this.configFile, this.config);
+        save(this.configFile, this.values);
     }
 
     public void save(final File file) {
-        save(file, this.config);
+        save(file, this.values);
     }
 
     public void reload() {
         if (this.configFile.getParentFile() != null) {
             this.configFile.getParentFile().mkdirs();
         }
-        this.config = new ConcurrentSkipListMap<>(loadConfig(this.configFile));
+        this.values = new ConcurrentSkipListMap<>(loadConfig(this.configFile));
     }
 
-    public Map<String, Object> getValues() {
-        return this.config;
+    @Override
+    public Config root() {
+        return this;
     }
 
-    public @Nullable <T> T get(String key, T def) {
-        Object o = this.config.get(key);
-        if (o != null) {
-            return (T) o;
-        } else {
-            return def;
-        }
+    @Override
+    public Logger logger() {
+        return logger;
     }
 
-    public boolean getBoolean(String key, boolean def) {
-        Object o = this.config.get(key);
-        if (o instanceof Boolean) {
-            return (boolean) o;
-        } else {
-            return def;
-        }
-    }
-
-    public @Nullable String getString(String key, @Nullable String def) {
-        final Object o = this.config.get(key);
-        if (o instanceof String) {
-            return (String) o;
-        } else {
-            return def;
-        }
-    }
-
-    public int getInt(String key, int def) {
-        Object o = this.config.get(key);
-        if (o instanceof Number) {
-            return ((Number) o).intValue();
-        } else {
-            return def;
-        }
-    }
-
-    public double getDouble(String key, double def) {
-        Object o = this.config.get(key);
-        if (o instanceof Number) {
-            return ((Number) o).doubleValue();
-        } else {
-            return def;
-        }
-    }
-
-    public List<Integer> getIntegerList(String key) {
-        Object o = this.config.get(key);
-        return o != null ? (List<Integer>) o : new ArrayList<>();
-    }
-
-    public List<String> getStringList(String key) {
-        Object o = this.config.get(key);
-        return o != null ? (List<String>) o : new ArrayList<>();
-    }
-
-    public <T> List<T> getListSafe(String key, Class<T> type, String invalidValueMessage) {
-        Object o = this.config.get(key);
-        if (o instanceof List<?> list) {
-            List<T> filteredValues = new ArrayList<>();
-            for (Object o1 : list) {
-                if (type.isInstance(o1)) {
-                    filteredValues.add(type.cast(o1));
-                } else if (invalidValueMessage != null) {
-                    logger.warning(String.format(invalidValueMessage, o1));
-                }
-            }
-            return filteredValues;
-        }
-        return new ArrayList<>();
-    }
-
-    public @Nullable JsonElement getSerializedComponent(String key) {
-        final Object o = this.config.get(key);
-        if (o != null && !((String) o).isEmpty()) {
-            return ComponentUtil.legacyToJson((String) o);
-        } else {
-            return null;
-        }
+    /**
+     * Returns the pre-modification root section of the config if present.
+     *
+     * @return pre-modification root section, or null if no config existed or it did not require changes on load
+     */
+    public @Nullable ConfigSection originalRootSection() {
+        return originalRoot;
     }
 }

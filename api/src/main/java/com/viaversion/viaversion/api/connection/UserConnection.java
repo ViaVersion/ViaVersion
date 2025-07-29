@@ -194,9 +194,15 @@ public interface UserConnection {
     /**
      * Monitors serverbound packets and returns whether a packet can/should be processed.
      *
+     * @param bytes the number of bytes in the packet
      * @return false if this packet should be cancelled
      */
-    boolean checkServerboundPacket();
+    boolean checkServerboundPacket(int bytes);
+
+    @Deprecated(forRemoval = true)
+    default boolean checkServerboundPacket() {
+        return checkServerboundPacket(0);
+    }
 
     /**
      * Monitors clientbound packets and returns whether a packet can/should be processed.
@@ -209,6 +215,11 @@ public interface UserConnection {
      * @see #checkClientboundPacket()
      * @see #checkServerboundPacket()
      */
+    default boolean checkIncomingPacket(final int bytes) {
+        return isClientSide() ? checkClientboundPacket() : checkServerboundPacket(bytes);
+    }
+
+    @Deprecated(forRemoval = true)
     default boolean checkIncomingPacket() {
         return isClientSide() ? checkClientboundPacket() : checkServerboundPacket();
     }

@@ -3,6 +3,7 @@ metadata.format.version = "1.1"
 [versions]
 
 gson = "2.13.1"
+snakeYaml = "2.4"
 fastutil = "8.5.15"
 vianbt = "5.1.2"
 mcstructs = "5-3.1.1-SNAPSHOT"
@@ -10,7 +11,6 @@ mcstructs = "5-3.1.1-SNAPSHOT"
 # Common provided
 netty = "4.0.20.Final"
 guava = "17.0"
-snakeYaml = "2.2"
 
 junit = "5.13.3"
 platformLauncher = "1.13.3"

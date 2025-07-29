@@ -307,12 +307,16 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public boolean checkServerboundPacket() {
+    public boolean checkServerboundPacket(final int bytes) {
         if (pendingDisconnect) {
-            return false;
+            return false; // Cancel everything while disconnecting
         }
-        // Increment received + Check PPS
-        return !packetTracker.isPacketLimiterEnabled() || !packetTracker.incrementReceived() || !packetTracker.exceedsMaxPPS();
+        if (!packetTracker.isPacketLimiterEnabled()) {
+            return true;
+        }
+
+        packetTracker.incrementReceived(bytes);
+        return !packetTracker.exceedsLimits();
     }
 
     @Override
