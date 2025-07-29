@@ -92,7 +92,7 @@ public class PacketTracker {
 
         ViaVersionConfig config = Via.getConfig();
         return packetTracker.exceedsLimit(connection, config.getPacketTrackerConfig())
-            && packetSizeTracker.exceedsLimit(connection, config.getPacketSizeTrackerConfig());
+            || packetSizeTracker.exceedsLimit(connection, config.getPacketSizeTrackerConfig());
     }
 
     public long getSentPackets() {
@@ -167,7 +167,7 @@ public class PacketTracker {
             }
 
             // Interval warnings
-            if (limitConfig.maxWarnings() > 0 && limitConfig.trackingPeriodNanos() > 0) {
+            if (limitConfig.maxWarnings() > 0 && limitConfig.trackingPeriodNanos() > 0 && limitConfig.warningRate() > 0) {
                 return checkTrackedInterval(connection, limitConfig);
             }
 

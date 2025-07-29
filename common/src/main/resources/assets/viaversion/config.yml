@@ -57,7 +57,7 @@ velocity-servers: {}
 #----------------------------------------------------------#
 # Packets Per Second (PPS) and kilobyte packet size limiters.
 # Setting 'max-per-second' or 'sustained-max-per-second' to -1 will disable the individual limit.
-# Kick messages may include the %pps or %kbps placeholders respectively.
+# Kick messages may include the %pps or %bps placeholders respectively, though they are more intended for debugging purposes.
 #
 # Limits the amount of packets sent per second.
 # Clients by default send around 20-90 packets per second.

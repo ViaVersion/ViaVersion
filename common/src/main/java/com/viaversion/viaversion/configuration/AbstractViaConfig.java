@@ -161,8 +161,8 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         hideScoreboardNumbers = getBoolean("hide-scoreboard-numbers", false);
         fix1_21PlacementRotation = getBoolean("fix-1_21-placement-rotation", true);
         cancelSwingInInventory = getBoolean("cancel-swing-in-inventory", true);
-        packetTrackerConfig = loadRateLimitConfig(getSection("packet-limiter"), "%pps");
-        packetSizeTrackerConfig = loadRateLimitConfig(getSection("packet-size-limiter"), "%kbps");
+        packetTrackerConfig = loadRateLimitConfig(getSection("packet-limiter"), "%pps", 1);
+        packetSizeTrackerConfig = loadRateLimitConfig(getSection("packet-size-limiter"), "%bps", 1024);
     }
 
     protected void updateConfig() {
@@ -239,12 +239,14 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         return new BlockedProtocolVersionsImpl(blockedProtocols, lowerBound, upperBound);
     }
 
-    private RateLimitConfig loadRateLimitConfig(ConfigSection section, String placeholder) {
+    private RateLimitConfig loadRateLimitConfig(ConfigSection section, String placeholder, int countMultiplier) {
+        final int maxPerSecond = section.getInt("max-per-second", -1);
+        final int sustainedMaxPerSecond = section.getInt("sustained-max-per-second", -1);
         return new RateLimitConfig(
             section.getBoolean("enabled", true),
-            section.getInt("max-per-second", -1),
+            maxPerSecond != -1 ? maxPerSecond * countMultiplier : -1,
             section.getString("max-per-second-kick-message", "You are sending too many packets!"),
-            section.getInt("sustained-max-per-second", -1),
+            sustainedMaxPerSecond != -1 ? sustainedMaxPerSecond * countMultiplier : -1,
             section.getInt("sustained-threshold", 3),
             TimeUnit.SECONDS.toNanos(section.getInt("sustained-period-seconds", 6)),
             section.getString("sustained-kick-message", "You are sending too many packets, :("),
