@@ -50,6 +50,11 @@ public class PacketTracker {
         this.sentPacketsTotal++;
     }
 
+    @Deprecated(forRemoval = true)
+    public boolean incrementReceived() {
+        return incrementReceived(0);
+    }
+
     /**
      * Increments the number of packets received from the client.
      *
@@ -99,8 +104,28 @@ public class PacketTracker {
         return sentPacketsTotal;
     }
 
+    @Deprecated(forRemoval = true)
+    public void setSentPackets(long sentPackets) {
+        this.sentPacketsTotal = sentPackets;
+    }
+
     public long getReceivedPackets() {
         return receivedPacketsTotal;
+    }
+
+    @Deprecated(forRemoval = true)
+    public void setReceivedPackets(long receivedPackets) {
+        this.receivedPacketsTotal = receivedPackets;
+    }
+
+    @Deprecated(forRemoval = true)
+    public long getIntervalPackets() {
+        return this.packetTracker.intervalValue;
+    }
+
+    @Deprecated(forRemoval = true)
+    public void setIntervalPackets(long intervalPackets) {
+        this.packetTracker.intervalValue = Math.toIntExact(intervalPackets);
     }
 
     public int getPacketsPerSecond() {
@@ -116,6 +141,11 @@ public class PacketTracker {
         this.packetLimiterEnabled = packetLimiterEnabled;
     }
 
+    @Deprecated(forRemoval = true)
+    public void setWarnings(int warnings) {
+        this.packetTracker.warnings = warnings;
+    }
+
     private static final class RateTracker {
         private final int[] history;
         private int historyIndex;
@@ -123,7 +153,7 @@ public class PacketTracker {
         private int currentRate = -1;
 
         // Interval tracking
-        private int intervalValue;
+        int intervalValue;
 
         // Warning system
         private long warningPeriodStart = System.nanoTime();
