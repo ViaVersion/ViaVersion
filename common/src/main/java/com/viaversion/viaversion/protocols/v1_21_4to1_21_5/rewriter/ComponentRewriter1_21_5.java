@@ -204,9 +204,9 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
     }
 
     private void updateShowTextHover(final UserConnection connection, final CompoundTag hoverEventTag) {
-        if (hoverEventTag.remove("value") instanceof final StringTag value) {
-            final Tag contents = uglyJsonToTag(connection, value.getValue());
-            hoverEventTag.put("value", contents);
+        final Tag value = hoverEventTag.get("value");
+        if (value != null) {
+            processTag(connection, value);
             return;
         }
 
