@@ -26,7 +26,7 @@ tasks.named<Jar>("sourcesJar") {
 val prepareViaProxyFiles by tasks.registering(Copy::class) {
     dependsOn(project.tasks.shadowJar)
 
-    from(project.tasks.shadowJar.get().archiveFile.get().asFile)
+    from(project.tasks.shadowJar.map { it.archiveFile.get().asFile })
     into(layout.projectDirectory.dir("run/jars"))
 
     val projectName = project.name

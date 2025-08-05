@@ -20,48 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.util;
+package com.viaversion.viaversion.api.minecraft;
 
-public final class MathUtil {
+public record Vector3d(double x, double y, double z) {
 
-    /**
-     * Miniscule value below which positive floats are considered zero
-     */
-    public static final float EPSILON = 1.0E-5F;
-
-    /**
-     * Returns the ceiled integer value of the given float.
-     *
-     * @param value float value to ceil
-     * @return ceiled integer value
-     */
-    public static int ceil(final float value) {
-        final int intValue = (int) value;
-        return value > intValue ? intValue + 1 : intValue;
-    }
-
-    /**
-     * Returns the ceiled log to the base of 2 for the given number.
-     *
-     * @param i positive number to ceillog
-     * @return ceiled log2 of the given number
-     */
-    public static int ceilLog2(final int i) {
-        return i > 0 ? 32 - Integer.numberOfLeadingZeros(i - 1) : 0;
-    }
-
-    /**
-     * Returns the clamped number within the given range.
-     *
-     * @param i   number to clamp
-     * @param min minimum value
-     * @param max maximum value
-     * @return clamped number
-     */
-    public static int clamp(final int i, final int min, final int max) {
-        if (i < min) {
-            return min;
-        }
-        return i > max ? max : i;
-    }
+    public static final Vector3d ZERO = new Vector3d(0, 0, 0);
 }

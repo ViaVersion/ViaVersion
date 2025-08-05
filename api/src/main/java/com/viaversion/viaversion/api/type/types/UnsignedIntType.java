@@ -20,48 +20,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.util;
+package com.viaversion.viaversion.api.type.types;
 
-public final class MathUtil {
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.TypeConverter;
+import io.netty.buffer.ByteBuf;
 
-    /**
-     * Miniscule value below which positive floats are considered zero
-     */
-    public static final float EPSILON = 1.0E-5F;
-
-    /**
-     * Returns the ceiled integer value of the given float.
-     *
-     * @param value float value to ceil
-     * @return ceiled integer value
-     */
-    public static int ceil(final float value) {
-        final int intValue = (int) value;
-        return value > intValue ? intValue + 1 : intValue;
+public class UnsignedIntType extends Type<Long> implements TypeConverter<Long> {
+    public UnsignedIntType() {
+        super(Long.class);
     }
 
-    /**
-     * Returns the ceiled log to the base of 2 for the given number.
-     *
-     * @param i positive number to ceillog
-     * @return ceiled log2 of the given number
-     */
-    public static int ceilLog2(final int i) {
-        return i > 0 ? 32 - Integer.numberOfLeadingZeros(i - 1) : 0;
+    @Override
+    public Long read(ByteBuf buffer) {
+        return buffer.readUnsignedInt();
     }
 
-    /**
-     * Returns the clamped number within the given range.
-     *
-     * @param i   number to clamp
-     * @param min minimum value
-     * @param max maximum value
-     * @return clamped number
-     */
-    public static int clamp(final int i, final int min, final int max) {
-        if (i < min) {
-            return min;
+    public long readPrimitive(ByteBuf buffer) {
+        return buffer.readUnsignedInt();
+    }
+
+    @Override
+    public void write(ByteBuf buffer, Long l) {
+        buffer.writeInt(l.intValue());
+    }
+
+    public void writePrimitive(ByteBuf buffer, long l) {
+        buffer.writeInt((int) l);
+    }
+
+    @Override
+    public Long from(Object o) {
+        if (o instanceof Number number) {
+            return number.longValue();
+        } else if (o instanceof Boolean boo) {
+            return boo ? 1L : 0L;
         }
-        return i > max ? max : i;
+        throw new UnsupportedOperationException();
     }
 }

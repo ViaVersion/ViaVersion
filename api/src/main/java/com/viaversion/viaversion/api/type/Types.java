@@ -38,6 +38,7 @@ import com.viaversion.viaversion.api.minecraft.Quaternion;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.Vector;
+import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.Vector3f;
 import com.viaversion.viaversion.api.minecraft.VillagerData;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
@@ -70,6 +71,7 @@ import com.viaversion.viaversion.api.type.types.ShortType;
 import com.viaversion.viaversion.api.type.types.StringType;
 import com.viaversion.viaversion.api.type.types.UUIDType;
 import com.viaversion.viaversion.api.type.types.UnsignedByteType;
+import com.viaversion.viaversion.api.type.types.UnsignedIntType;
 import com.viaversion.viaversion.api.type.types.UnsignedShortType;
 import com.viaversion.viaversion.api.type.types.VarIntArrayType;
 import com.viaversion.viaversion.api.type.types.VarIntType;
@@ -100,6 +102,7 @@ import com.viaversion.viaversion.api.type.types.math.BlockPositionType1_8;
 import com.viaversion.viaversion.api.type.types.math.ChunkPositionType;
 import com.viaversion.viaversion.api.type.types.math.EulerAngleType;
 import com.viaversion.viaversion.api.type.types.math.GlobalBlockPositionType;
+import com.viaversion.viaversion.api.type.types.math.MovementVectorType;
 import com.viaversion.viaversion.api.type.types.math.QuaternionType;
 import com.viaversion.viaversion.api.type.types.math.Vector3fType;
 import com.viaversion.viaversion.api.type.types.math.VectorType;
@@ -144,6 +147,7 @@ public final class Types {
 
     public static final IntType INT = new IntType();
     public static final Type<int[]> INT_ARRAY_PRIMITIVE = new IntArrayType();
+    public static final UnsignedIntType UNSIGNED_INT = new UnsignedIntType();
 
     public static final FloatType FLOAT = new FloatType();
     public static final FloatType.OptionalFloatType OPTIONAL_FLOAT = new FloatType.OptionalFloatType();
@@ -192,6 +196,7 @@ public final class Types {
     public static final Type<Vector> VECTOR = new VectorType();
     public static final Type<Vector3f> VECTOR3F = new Vector3fType();
     public static final Type<Quaternion> QUATERNION = new QuaternionType();
+    public static final Type<Vector3d> MOVEMENT_VECTOR = new MovementVectorType();
 
     public static final Type<CompoundTag> NAMED_COMPOUND_TAG = new NamedCompoundTagType();
     public static final Type<CompoundTag> OPTIONAL_NAMED_COMPOUND_TAG = new NamedCompoundTagType.OptionalNamedCompoundTagType();
