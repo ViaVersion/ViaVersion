@@ -25,6 +25,7 @@ import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
@@ -40,6 +41,7 @@ import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.Protocol1_18_2To1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.packet.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.DimensionRegistryStorage;
+import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.SequenceStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Pair;
@@ -228,6 +230,13 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
                 map(Types.BOOLEAN); // Flat
                 map(Types.BOOLEAN); // Keep player attributes
                 create(Types.OPTIONAL_GLOBAL_POSITION, null); // Last death location
+                handler(wrapper -> {
+                    final String world = wrapper.get(Types.STRING, 1);
+                    final EntityTracker tracker = tracker(wrapper.user());
+                    if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
+                        wrapper.user().get(SequenceStorage.class).clearPendingBlockChanges();
+                    }
+                });
                 handler(worldDataTrackerHandlerByKey());
             }
         });
