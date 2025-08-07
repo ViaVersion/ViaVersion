@@ -25,14 +25,14 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacke
 public enum ServerboundConfigurationPackets1_20_5 implements ServerboundPacket1_20_5, ServerboundPacket1_21_2,
     ServerboundPacket1_21_4, ServerboundPacket1_21_5 {
 
-    CLIENT_INFORMATION, // 0x00
-    COOKIE_RESPONSE, // 0x01
-    CUSTOM_PAYLOAD, // 0x02
-    FINISH_CONFIGURATION, // 0x03
-    KEEP_ALIVE, // 0x04
-    PONG, // 0x05
-    RESOURCE_PACK, // 0x06
-    SELECT_KNOWN_PACKS; // 0x07
+    CLIENT_INFORMATION,
+    COOKIE_RESPONSE,
+    CUSTOM_PAYLOAD,
+    FINISH_CONFIGURATION,
+    KEEP_ALIVE,
+    PONG,
+    RESOURCE_PACK,
+    SELECT_KNOWN_PACKS;
 
     @Override
     public int getId() {

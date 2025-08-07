@@ -21,8 +21,8 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
 
 public enum ServerboundStatusPackets implements BaseServerboundPacket {
-    STATUS_REQUEST, // 0x00
-    PING_REQUEST; // 0x01
+    STATUS_REQUEST,
+    PING_REQUEST;
 
     @Override
     public final int getId() {

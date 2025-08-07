@@ -21,21 +21,21 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 
 public enum ClientboundConfigurationPackets1_20_5 implements ClientboundPacket1_20_5 {
 
-    COOKIE_REQUEST, // 0x00
-    CUSTOM_PAYLOAD, // 0x01
-    DISCONNECT, // 0x02
-    FINISH_CONFIGURATION, // 0x03
-    KEEP_ALIVE, // 0x04
-    PING, // 0x05
-    RESET_CHAT, // 0x06
-    REGISTRY_DATA, // 0x07
-    RESOURCE_PACK_POP, // 0x08
-    RESOURCE_PACK_PUSH, // 0x09
-    STORE_COOKIE, // 0x0A
-    TRANSFER, // 0x0B
-    UPDATE_ENABLED_FEATURES, // 0x0C
-    UPDATE_TAGS, // 0x0D
-    SELECT_KNOWN_PACKS; // 0x0E
+    COOKIE_REQUEST,
+    CUSTOM_PAYLOAD,
+    DISCONNECT,
+    FINISH_CONFIGURATION,
+    KEEP_ALIVE,
+    PING,
+    RESET_CHAT,
+    REGISTRY_DATA,
+    RESOURCE_PACK_POP,
+    RESOURCE_PACK_PUSH,
+    STORE_COOKIE,
+    TRANSFER,
+    UPDATE_ENABLED_FEATURES,
+    UPDATE_TAGS,
+    SELECT_KNOWN_PACKS;
 
     @Override
     public int getId() {

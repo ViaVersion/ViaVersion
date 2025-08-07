@@ -21,15 +21,15 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 
 public enum ClientboundConfigurationPackets1_20_2 implements ClientboundPacket1_20_2 {
 
-    CUSTOM_PAYLOAD, // 0x00
-    DISCONNECT, // 0x01
-    FINISH_CONFIGURATION, // 0x02
-    KEEP_ALIVE, // 0x03
-    PING, // 0x04
-    REGISTRY_DATA, // 0x05
-    RESOURCE_PACK, // 0x06
-    UPDATE_ENABLED_FEATURES, // 0x07
-    UPDATE_TAGS; // 0x08
+    CUSTOM_PAYLOAD,
+    DISCONNECT,
+    FINISH_CONFIGURATION,
+    KEEP_ALIVE,
+    PING,
+    REGISTRY_DATA,
+    RESOURCE_PACK,
+    UPDATE_ENABLED_FEATURES,
+    UPDATE_TAGS;
 
     @Override
     public int getId() {

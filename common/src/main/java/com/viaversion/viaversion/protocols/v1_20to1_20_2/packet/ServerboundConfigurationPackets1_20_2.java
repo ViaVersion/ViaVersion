@@ -22,12 +22,12 @@ import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ServerboundPac
 
 public enum ServerboundConfigurationPackets1_20_2 implements ServerboundPacket1_20_2, ServerboundPacket1_20_3 {
 
-    CLIENT_INFORMATION, // 0x00
-    CUSTOM_PAYLOAD, // 0x01
-    FINISH_CONFIGURATION, // 0x02
-    KEEP_ALIVE, // 0x03
-    PONG, // 0x04
-    RESOURCE_PACK; // 0x05
+    CLIENT_INFORMATION,
+    CUSTOM_PAYLOAD,
+    FINISH_CONFIGURATION,
+    KEEP_ALIVE,
+    PONG,
+    RESOURCE_PACK;
 
     @Override
     public int getId() {

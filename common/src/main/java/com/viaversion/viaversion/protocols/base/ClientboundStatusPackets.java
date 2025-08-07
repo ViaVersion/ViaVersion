@@ -21,8 +21,8 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 
 public enum ClientboundStatusPackets implements BaseClientboundPacket {
-    STATUS_RESPONSE, // 0x00
-    PONG_RESPONSE; // 0x01
+    STATUS_RESPONSE,
+    PONG_RESPONSE;
 
     @Override
     public final int getId() {

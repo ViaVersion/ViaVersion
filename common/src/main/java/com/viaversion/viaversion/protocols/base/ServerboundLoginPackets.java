@@ -21,11 +21,11 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
 
 public enum ServerboundLoginPackets implements BaseServerboundPacket {
-    HELLO, // 0x00
-    ENCRYPTION_KEY, // 0x01
-    CUSTOM_QUERY_ANSWER, // 0x02
-    LOGIN_ACKNOWLEDGED, // 0x03
-    COOKIE_RESPONSE; // 0x04
+    HELLO,
+    ENCRYPTION_KEY,
+    CUSTOM_QUERY_ANSWER,
+    LOGIN_ACKNOWLEDGED,
+    COOKIE_RESPONSE;
 
     @Override
     public final int getId() {

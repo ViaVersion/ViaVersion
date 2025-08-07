@@ -21,12 +21,12 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 
 public enum ClientboundLoginPackets implements BaseClientboundPacket {
-    LOGIN_DISCONNECT, // 0x00
-    HELLO, // 0x01
-    LOGIN_FINISHED, // 0x02
-    LOGIN_COMPRESSION, // 0x03
-    CUSTOM_QUERY, // 0x04
-    COOKIE_REQUEST; // 0x05
+    LOGIN_DISCONNECT,
+    HELLO,
+    LOGIN_FINISHED,
+    LOGIN_COMPRESSION,
+    CUSTOM_QUERY,
+    COOKIE_REQUEST;
 
     @Deprecated(forRemoval = true)
     public static final ClientboundLoginPackets GAME_PROFILE = LOGIN_FINISHED;

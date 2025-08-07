@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
 
 public enum ServerboundHandshakePackets implements BaseServerboundPacket {
-    CLIENT_INTENTION; // 0x00
+    CLIENT_INTENTION;
 
     @Override
     public final int getId() {

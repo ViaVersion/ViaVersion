@@ -21,15 +21,15 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 
 public enum ServerboundConfigurationPackets1_21_6 implements ServerboundPacket1_21_6 {
 
-    CLIENT_INFORMATION, // 0x00
-    COOKIE_RESPONSE, // 0x01
-    CUSTOM_PAYLOAD, // 0x02
-    FINISH_CONFIGURATION, // 0x03
-    KEEP_ALIVE, // 0x04
-    PONG, // 0x05
-    RESOURCE_PACK, // 0x06
-    SELECT_KNOWN_PACKS, // 0x07
-    CUSTOM_CLICK_ACTION; // 0x08
+    CLIENT_INFORMATION,
+    COOKIE_RESPONSE,
+    CUSTOM_PAYLOAD,
+    FINISH_CONFIGURATION,
+    KEEP_ALIVE,
+    PONG,
+    RESOURCE_PACK,
+    SELECT_KNOWN_PACKS,
+    CUSTOM_CLICK_ACTION;
 
     @Override
     public int getId() {
