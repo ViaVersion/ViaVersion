@@ -100,9 +100,9 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         Preconditions.checkArgument(!initialized, "Protocol has already been initialized");
         initialized = true;
 
-        // Create logger if protocol does not have one
-        if (getLogger() == null) {
-            logger = new ProtocolLogger(getClass());
+        // Create logger if the protocol doesn't have one
+        if (logger == null) {
+            logger = createLogger();
         }
         registerPackets();
         registerConfigurationChangeHandlers();
@@ -126,6 +126,10 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
                 this::registerServerbound
             );
         }
+    }
+
+    protected ProtocolLogger createLogger() {
+        return new ProtocolLogger(getClass());
     }
 
     protected void registerConfigurationChangeHandlers() {
