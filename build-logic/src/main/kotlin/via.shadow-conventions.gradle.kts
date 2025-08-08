@@ -13,6 +13,7 @@ tasks {
         from(project.rootProject.file("LICENSE"))
     }
     val shadowJar = named<ShadowJar>("shadowJar") {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         archiveClassifier.set("")
         configureRelocations()
         configureExcludes()
