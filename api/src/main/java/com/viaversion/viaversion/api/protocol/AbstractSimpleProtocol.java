@@ -27,7 +27,6 @@ package com.viaversion.viaversion.api.protocol;
  * <p>
  * {@link AbstractProtocol} should be preferred over this class in most cases.
  */
-@Deprecated(forRemoval = true)
 public abstract class AbstractSimpleProtocol extends AbstractProtocol<SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes,
     SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes> implements SimpleProtocol {
 

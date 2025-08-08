@@ -32,7 +32,6 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
  *
  * @see Protocol
  */
-@Deprecated(forRemoval = true)
 public interface SimpleProtocol extends Protocol<SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes> {
 
     enum DummyPacketTypes implements ClientboundPacketType, ServerboundPacketType {
