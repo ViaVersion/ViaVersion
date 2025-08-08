@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.debug.DebugHandler;
-import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
@@ -40,7 +39,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements ProtocolPipeline {
+public class ProtocolPipelineImpl implements ProtocolPipeline {
     private final List<Protocol> protocolList = new ArrayList<>();
     private final Set<Class<? extends Protocol>> protocolSet = new HashSet<>();
     private final UserConnection userConnection;
@@ -50,18 +49,7 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     public ProtocolPipelineImpl(UserConnection userConnection) {
         this.userConnection = userConnection;
         userConnection.getProtocolInfo().setPipeline(this);
-        registerPackets(); // Not registered as a standard "protocol", so we have to call the method manually
-    }
-
-    @Override
-    protected void registerPackets() {
-        // This is a pipeline so we register basic pipes
         this.add(Via.getManager().getProtocolManager().getBaseProtocol());
-    }
-
-    @Override
-    public void init(UserConnection userConnection) {
-        throw new UnsupportedOperationException("ProtocolPipeline can only be initialized once");
     }
 
     @Override
@@ -120,7 +108,6 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
 
         // Apply protocols
         packetWrapper.apply(direction, state, protocolListFor(direction));
-        super.transform(direction, state, packetWrapper);
 
         if (debug && debugHandler.logPostPacketTransform() && debugHandler.shouldLog(packetWrapper, direction)) {
             logPacket(direction, state, packetWrapper, originalID, true);
@@ -235,7 +222,7 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
         protocolSet.clear();
         baseProtocols = 0;
 
-        registerPackets();
+        this.add(Via.getManager().getProtocolManager().getBaseProtocol());
     }
 
     @Override

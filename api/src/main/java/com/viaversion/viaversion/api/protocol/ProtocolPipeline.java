@@ -24,11 +24,15 @@ package com.viaversion.viaversion.api.protocol;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.exception.CancelException;
+import com.viaversion.viaversion.exception.InformativeException;
 import java.util.Collection;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface ProtocolPipeline extends SimpleProtocol {
+public interface ProtocolPipeline {
 
     /**
      * Adds a protocol to the current pipeline.
@@ -66,6 +70,15 @@ public interface ProtocolPipeline extends SimpleProtocol {
      */
     @Deprecated
     @Nullable <P extends Protocol> P getProtocol(Class<P> pipeClass);
+
+    /**
+     * Transform a packet using the protocols in this pipeline.
+     *
+     * @param direction     The direction the packet is going in
+     * @param state         The current protocol state
+     * @param packetWrapper The packet wrapper to transform
+     */
+    void transform(Direction direction, State state, PacketWrapper packetWrapper) throws InformativeException, CancelException;
 
     List<Protocol> pipes(@Nullable Class<? extends Protocol> protocolClass, boolean skipCurrentPipeline, Direction direction);
 
