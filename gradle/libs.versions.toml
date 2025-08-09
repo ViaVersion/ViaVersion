@@ -12,8 +12,8 @@ mcstructs = "5-3.1.1-SNAPSHOT"
 netty = "4.0.20.Final"
 guava = "17.0"
 
-junit = "5.13.3"
-platformLauncher = "1.13.3"
+junit = "5.13.4"
+platformLauncher = "1.13.4"
 checkerQual = "3.49.5"
 
 # Platforms
