@@ -273,6 +273,8 @@ public interface ViaVersionConfig extends Config {
      */
     String getBlockedDisconnectMsg();
 
+    boolean logBlockedJoins();
+
     /**
      * Get the message sent to players being kicked on reload.
      * Players are kicked to stop the server crashing

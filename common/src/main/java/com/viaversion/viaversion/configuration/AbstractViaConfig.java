@@ -67,6 +67,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean autoTeam;
     private BlockedProtocolVersions blockedProtocolVersions;
     private String blockedDisconnectMessage;
+    private boolean logBlockedJoins;
     private String reloadDisconnectMessage;
     private boolean suppressConversionWarnings;
     private boolean suppressTextComponentConversionWarnings;
@@ -129,6 +130,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         autoTeam = getBoolean("auto-team", true);
         blockedProtocolVersions = loadBlockedProtocolVersions();
         blockedDisconnectMessage = getString("block-disconnect-msg", "You are using an unsupported Minecraft version!");
+        logBlockedJoins = getBoolean("log-blocked-joins", false);
         reloadDisconnectMessage = getString("reload-disconnect-msg", "Server reload, please rejoin!");
         teamColourFix = getBoolean("team-colour-fix", true);
         suppressConversionWarnings = getBoolean("suppress-conversion-warnings", false);
@@ -433,6 +435,11 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public String getBlockedDisconnectMsg() {
         return blockedDisconnectMessage;
+    }
+
+    @Override
+    public boolean logBlockedJoins() {
+        return logBlockedJoins;
     }
 
     @Override

@@ -21,6 +21,8 @@ block-versions: []
 block-protocols: []
 # Change the blocked disconnect message
 block-disconnect-msg: "You are using an unsupported Minecraft version!"
+# Whether to log more info about kicks due to blocked protocol versions to the console.
+log-blocked-joins: false
 # If you use ProtocolLib, we can't reload without kicking the players.
 # (We don't suggest using reload either, use a plugin manager)
 # You can customize the message we kick people with if you use ProtocolLib here.

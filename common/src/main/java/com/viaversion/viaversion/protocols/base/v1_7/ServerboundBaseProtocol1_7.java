@@ -35,6 +35,7 @@ import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
 import io.netty.channel.ChannelFuture;
+import java.util.logging.Level;
 
 public class ServerboundBaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, BaseClientboundPacket, BaseServerboundPacket, BaseServerboundPacket> {
 
@@ -74,6 +75,10 @@ public class ServerboundBaseProtocol1_7 extends AbstractProtocol<BaseClientbound
                 // Send and close
                 final ChannelFuture future = disconnectPacket.sendFutureRaw();
                 future.addListener(f -> user.getChannel().close());
+
+                if (Via.getConfig().logBlockedJoins()) {
+                    Via.getPlatform().getLogger().log(Level.INFO, "Blocked join due to unsupported version from " + user.getChannel().remoteAddress() + " (" + protocol.getName() + ")");
+                }
             }
         });
     }
