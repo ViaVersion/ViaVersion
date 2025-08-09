@@ -585,12 +585,17 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         dataContainer.replace(StructuredDataKey.LOCK, StructuredDataKey.LOCK, lock -> {
             final CompoundTag predicateTag = (CompoundTag) lock;
             final CompoundTag itemComponentsTag = predicateTag.getCompoundTag("components");
-            if (itemComponentsTag != null) {
-                // Back from json in the string tag to plain text
-                final StringTag customName = TagUtil.getNamespacedStringTag(itemComponentsTag, "custom_name");
-                return new StringTag(SerializerVersion.V1_20_5.toComponent(customName.getValue()).asUnformattedString());
+            if (itemComponentsTag == null) {
+                return null;
             }
-            return null;
+
+            // Back from json in the string tag to plain text
+            final StringTag customName = TagUtil.getNamespacedStringTag(itemComponentsTag, "custom_name");
+            if (customName == null) {
+                return null;
+            }
+
+            return new StringTag(SerializerVersion.V1_20_5.toComponent(customName.getValue()).asUnformattedString());
         });
         dataContainer.replace(StructuredDataKey.INSTRUMENT1_21_2, StructuredDataKey.INSTRUMENT1_20_5, instrument -> {
             if (instrument.hasId()) {
