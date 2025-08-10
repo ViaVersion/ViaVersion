@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.common.dummy;
 
 import com.viaversion.viaversion.ViaAPIBase;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.platform.PlatformTask;
@@ -25,6 +26,7 @@ import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import io.netty.buffer.ByteBuf;
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public final class TestPlatform implements ViaPlatform {
@@ -54,27 +56,27 @@ public final class TestPlatform implements ViaPlatform {
 
     @Override
     public PlatformTask runAsync(Runnable runnable) {
-        return null;
+        return new TestTask(Via.getManager().getScheduler().execute(runnable));
     }
 
     @Override
     public PlatformTask runRepeatingAsync(final Runnable runnable, final long ticks) {
-        return null;
+        return new TestTask(Via.getManager().getScheduler().scheduleRepeating(runnable, ticks * 50, ticks * 50, TimeUnit.MILLISECONDS));
     }
 
     @Override
     public PlatformTask runSync(Runnable runnable) {
-        return null;
+        return runAsync(runnable);
     }
 
     @Override
     public PlatformTask runSync(Runnable runnable, long delay) {
-        return null;
+        return new TestTask(Via.getManager().getScheduler().schedule(runnable, delay * 50, TimeUnit.MILLISECONDS));
     }
 
     @Override
     public PlatformTask runRepeatingSync(Runnable runnable, long period) {
-        return null;
+        return runRepeatingAsync(runnable, period);
     }
 
     @Override

@@ -15,30 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.common.dummy;
+package com.viaversion.viaversion.common;
 
-import com.google.gson.JsonObject;
-import com.viaversion.viaversion.api.platform.ViaInjector;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.common.dummy.DummyInitializer;
+import org.junit.jupiter.api.BeforeAll;
 
-public class TestInjector implements ViaInjector {
+public abstract class PlatformTestBase {
 
-    @Override
-    public void inject() {
-    }
-
-    @Override
-    public void uninject() {
-
-    }
-
-    @Override
-    public ProtocolVersion getServerProtocolVersion() {
-        return ProtocolVersion.v1_21_7;
-    }
-
-    @Override
-    public JsonObject getDump() {
-        return null;
+    @BeforeAll
+    static void loadPlatform() throws InterruptedException {
+        DummyInitializer.init();
+        while (!Via.getManager().getProtocolManager().hasLoadedMappings()) {
+            Thread.sleep(100);
+        }
     }
 }

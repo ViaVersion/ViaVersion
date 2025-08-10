@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.data;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.util.ArrayUtil;
 import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 import java.util.Objects;
@@ -102,7 +103,7 @@ final class FilledStructuredData<T> implements StructuredData<T> {
     public String toString() {
         return "FilledStructuredData{" +
             "key=" + key +
-            ", value=" + value +
+            ", value=" + ArrayUtil.toString(value) +
             ", id=" + id +
             '}';
     }

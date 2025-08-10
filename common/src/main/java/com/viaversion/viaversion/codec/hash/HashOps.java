@@ -182,7 +182,7 @@ public class HashOps extends OpsBase implements Hasher {
             final ListHashBuilder listHasher = hasher.new ListHashBuilder();
             consumer.accept(listHasher);
             listHasher.applyHashToParent();
-            return HashOps.this.hash();
+            return hasher.hash();
         }
 
         protected int mapHash(final Consumer<MapSerializer> consumer) {
@@ -190,7 +190,7 @@ public class HashOps extends OpsBase implements Hasher {
             final MapHashBuilder mapHasher = hasher.new MapHashBuilder();
             consumer.accept(mapHasher);
             mapHasher.applyHashToParent();
-            return HashOps.this.hash();
+            return hasher.hash();
         }
 
         protected <V> int hash(final Type<V> type, final V value) {

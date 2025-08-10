@@ -20,43 +20,86 @@ package com.viaversion.viaversion.common.hash;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.FloatTag;
 import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.UseCooldown;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.codec.CodecRegistryContext;
 import com.viaversion.viaversion.codec.hash.HashFunction;
 import com.viaversion.viaversion.codec.hash.HashOps;
+import com.viaversion.viaversion.common.PlatformTestBase;
+import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.Protocol1_21_7To1_21_9;
 import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ItemHashTest {
+public class ItemHashTest extends PlatformTestBase {
 
-    private static final CodecRegistryContext CONTEXT = new CodecRegistryContext(null, SerializerVersion.V1_21_5, SerializerVersion.V1_21_5, CodecContext.RegistryAccess.of(List.of(), null), true);
+    private static CodecRegistryContext context;
+    private static Protocol<?, ?, ?, ?> protocol;
+    private static HashOps hasher;
+
+    @BeforeAll
+    static void loadContext() {
+        protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_21_7To1_21_9.class);
+        context = new CodecRegistryContext(null, SerializerVersion.V1_21_6, SerializerVersion.V1_21_6, CodecContext.RegistryAccess.of(List.of(), protocol.getMappingData()), false);
+        hasher = new HashOps(context, HashFunction.CRC32C);
+    }
+
+    @BeforeEach
+    void resetHasher() {
+        hasher.reset();
+    }
 
     @Test
-    void testDataHashes() {
-        final HashOps hasher = new HashOps(CONTEXT, HashFunction.CRC32C);
-
+    void testNumberAndKey() {
         final UseCooldown useCooldown = new UseCooldown(0.5f, ":stick");
         hasher.write(UseCooldown.TYPE, useCooldown);
-        Assertions.assertEquals(-524579578, hasher.hash(), "UseCooldown hash mismatch");
+        Assertions.assertEquals(-524579578, hasher.hash(), "use_cooldown hash mismatch");
+    }
 
-        hasher.reset();
+    @Test
+    void testCompoundTag() {
         hasher.write(Types.COMPOUND_TAG, createCompoundTag());
         Assertions.assertEquals(-859008863, hasher.hash(), "CompoundTag hash mismatch");
+    }
 
-        hasher.reset();
-        hasher.write(LodestoneTracker.TYPE, new LodestoneTracker(new GlobalBlockPosition("wow", 5, 6, 7), true));
-        Assertions.assertEquals(1876575779, hasher.hash(), "LodestoneTracker hash mismatch");
-
-        hasher.reset();
+    @Test
+    void testArrays() {
         hasher.write(CustomModelData1_21_4.TYPE, new CustomModelData1_21_4(new float[]{1f}, new boolean[0], new String[0], new int[0]));
-        Assertions.assertEquals(2007278159, hasher.hash(), "CustomModelData hash mismatch");
+        Assertions.assertEquals(2007278159, hasher.hash(), "custom_model_Data hash mismatch");
+    }
+
+    @Test
+    void testNestedMap() {
+        hasher.write(LodestoneTracker.TYPE, new LodestoneTracker(new GlobalBlockPosition("wow", 5, 6, 7), true));
+        Assertions.assertEquals(1876575779, hasher.hash(), "lodestone_tracker hash mismatch");
+    }
+
+    @Test
+    void testMapInList() {
+        final StructuredItem useRemainder = new StructuredItem(1, 1);
+        useRemainder.dataContainer().setIdLookup(protocol, false);
+        useRemainder.dataContainer().set(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, true);
+        hasher.write(VersionedTypes.V1_21_6.item(), useRemainder);
+        Assertions.assertEquals(-95388252, hasher.hash(), "use_remainder hash mismatch");
+    }
+
+    @Test
+    void testMapInList2() {
+        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys.container.type(), new Item[]{new StructuredItem(1, 1)});
+        Assertions.assertEquals(231516551, hasher.hash(), "container hash mismatch");
     }
 
     private CompoundTag createCompoundTag() {
@@ -67,7 +110,7 @@ public class ItemHashTest {
         final ListTag<FloatTag> list = new ListTag<>(FloatTag.class);
         list.add(new FloatTag(0.3f));
         tag.put("list", list);
-        tag.put("emptylist", new ListTag<>());
+        tag.put("emptylist", new ListTag<>(CompoundTag.class));
         return tag;
     }
 }

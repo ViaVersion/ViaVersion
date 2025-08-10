@@ -17,28 +17,18 @@
  */
 package com.viaversion.viaversion.common.dummy;
 
-import com.google.gson.JsonObject;
-import com.viaversion.viaversion.api.platform.ViaInjector;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.platform.PlatformTask;
+import com.viaversion.viaversion.api.scheduler.Task;
 
-public class TestInjector implements ViaInjector {
+public final class TestTask implements PlatformTask<Task> {
+    private final Task task;
 
-    @Override
-    public void inject() {
+    public TestTask(final Task task) {
+        this.task = task;
     }
 
     @Override
-    public void uninject() {
-
-    }
-
-    @Override
-    public ProtocolVersion getServerProtocolVersion() {
-        return ProtocolVersion.v1_21_7;
-    }
-
-    @Override
-    public JsonObject getDump() {
-        return null;
+    public void cancel() {
+        task.cancel();
     }
 }

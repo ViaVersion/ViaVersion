@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.util;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 /**
@@ -75,5 +76,22 @@ public final class ArrayUtil {
             boxedArray[i] = array[i];
         }
         return boxedArray;
+    }
+
+    public static String toString(final Object o) {
+        if (o == null || !o.getClass().isArray()) {
+            return String.valueOf(o);
+        }
+
+        final int length = Array.getLength(o);
+        final StringBuilder builder = new StringBuilder("[");
+        for (int i = 0; i < length; i++) {
+            if (i > 0) {
+                builder.append(", ");
+            }
+            builder.append(Array.get(o, i));
+        }
+        builder.append("]");
+        return builder.toString();
     }
 }

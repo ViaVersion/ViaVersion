@@ -137,7 +137,7 @@ public abstract class Config extends ConfigSection {
 
         handleConfig(mergedConfig);
 
-        if (existingConfig == null || !existingConfig.equals(mergedConfig)) {
+        if (!mergedConfig.equals(existingConfig)) {
             originalRoot = existingConfig != null ? new ConfigSection(this, "", existingConfig) : null;
 
             // Also updates comments once values need to be saved
