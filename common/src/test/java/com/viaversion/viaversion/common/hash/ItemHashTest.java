@@ -36,7 +36,7 @@ import com.viaversion.viaversion.codec.CodecRegistryContext;
 import com.viaversion.viaversion.codec.hash.HashFunction;
 import com.viaversion.viaversion.codec.hash.HashOps;
 import com.viaversion.viaversion.common.PlatformTestBase;
-import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.Protocol1_21_7To1_21_9;
+import com.viaversion.viaversion.protocols.v1_21_6to1_21_7.Protocol1_21_6To1_21_7;
 import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -52,7 +52,7 @@ public class ItemHashTest extends PlatformTestBase {
 
     @BeforeAll
     static void loadContext() {
-        protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_21_7To1_21_9.class);
+        protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_21_6To1_21_7.class);
         context = new CodecRegistryContext(null, SerializerVersion.V1_21_6, SerializerVersion.V1_21_6, CodecContext.RegistryAccess.of(List.of(), protocol.getMappingData()), false);
         hasher = new HashOps(context, HashFunction.CRC32C);
     }
