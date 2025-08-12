@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
@@ -177,12 +178,43 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
                 wrapper.passthrough(Types.DOUBLE); // Knockback Z
             }
 
-            final Particle explosionParticle = wrapper.read(particleType);
-            wrapper.write(mappedParticleType, explosionParticle);
-            rewriteParticle(wrapper.user(), explosionParticle);
-
+            passthroughParticle(wrapper); // Explosion particle
             soundRewriter.soundHolderHandler().handle(wrapper);
         });
+    }
+
+    public void registerExplode1_21_9(final C packetType) {
+        final SoundRewriter<C> soundRewriter = new SoundRewriter<>(protocol);
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+            wrapper.passthrough(Types.FLOAT); // Power
+            wrapper.passthrough(Types.INT); // Block count
+            if (wrapper.passthrough(Types.BOOLEAN)) {
+                wrapper.passthrough(Types.DOUBLE); // Knockback X
+                wrapper.passthrough(Types.DOUBLE); // Knockback Y
+                wrapper.passthrough(Types.DOUBLE); // Knockback Z
+            }
+
+            passthroughParticle(wrapper); // Explosion particle
+            soundRewriter.soundHolderHandler().handle(wrapper);
+
+            final int blockParticles = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < blockParticles; i++) {
+                passthroughParticle(wrapper);
+                wrapper.passthrough(Types.FLOAT); // Scaling
+                wrapper.passthrough(Types.FLOAT); // Speed
+                wrapper.passthrough(Types.VAR_INT); // Weight
+            }
+        });
+    }
+
+    public Particle passthroughParticle(final PacketWrapper wrapper) {
+        final Particle particle = wrapper.read(particleType);
+        wrapper.write(mappedParticleType, particle);
+        rewriteParticle(wrapper.user(), particle);
+        return particle;
     }
 
     @Override
@@ -205,5 +237,13 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
         }
 
         particle.setId(protocol.getMappingData().getNewParticleId(id));
+    }
+
+    public Type<Particle> particleType() {
+        return particleType;
+    }
+
+    public Type<Particle> mappedParticleType() {
+        return mappedParticleType;
     }
 }

@@ -58,6 +58,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracker;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.LastExplosionPowerStorage;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -205,6 +206,12 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 final int y = centerY + wrapper.read(Types.BYTE); // Relative Y
                 final int z = centerZ + wrapper.read(Types.BYTE); // Relative Z
                 affectedBlocks.add(new BlockPosition(x, y, z));
+            }
+
+            final LastExplosionPowerStorage lastExplosionPowerStorage = wrapper.user().get(LastExplosionPowerStorage.class);
+            if (lastExplosionPowerStorage != null) {
+                lastExplosionPowerStorage.setPower(power);
+                lastExplosionPowerStorage.setAffectedBlocks(affectedBlocks.size());
             }
 
             final float knockbackX = wrapper.read(Types.FLOAT);

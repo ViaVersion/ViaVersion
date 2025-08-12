@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_21_7to1_21_9;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_5;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_9;
@@ -28,6 +29,7 @@ import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
@@ -42,6 +44,7 @@ import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter.BlockItemPacketRewriter1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter.ComponentRewriter1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter.EntityPacketRewriter1_21_9;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.LastExplosionPowerStorage;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -86,10 +89,35 @@ public final class Protocol1_21_7To1_21_9 extends AbstractProtocol<ClientboundPa
         componentRewriter.registerPlayerChat1_21_5(ClientboundPackets1_21_6.PLAYER_CHAT);
         componentRewriter.registerPing();
 
-        particleRewriter.registerLevelParticles1_21_4(ClientboundPackets1_21_6.LEVEL_PARTICLES);
-        particleRewriter.registerExplode1_21_2(ClientboundPackets1_21_6.EXPLODE);
-
         final SoundRewriter<ClientboundPacket1_21_6> soundRewriter = new SoundRewriter<>(this);
+        particleRewriter.registerLevelParticles1_21_4(ClientboundPackets1_21_6.LEVEL_PARTICLES);
+        registerClientbound(ClientboundPackets1_21_6.EXPLODE, wrapper -> {
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+
+            final LastExplosionPowerStorage lastExplosionPowerStorage = wrapper.user().get(LastExplosionPowerStorage.class);
+            float radius = 0;
+            int affectedBlocks = 0;
+            if (lastExplosionPowerStorage != null) {
+                radius = lastExplosionPowerStorage.power();
+                affectedBlocks = lastExplosionPowerStorage.affectedBlocks();
+            }
+            wrapper.write(Types.FLOAT, radius);
+            wrapper.write(Types.INT, affectedBlocks); // For some reason a plain int
+
+            if (wrapper.passthrough(Types.BOOLEAN)) {
+                wrapper.passthrough(Types.DOUBLE); // Knockback X
+                wrapper.passthrough(Types.DOUBLE); // Knockback Y
+                wrapper.passthrough(Types.DOUBLE); // Knockback Z
+            }
+
+            particleRewriter.passthroughParticle(wrapper); // Explosion particle
+            soundRewriter.soundHolderHandler().handle(wrapper);
+
+            wrapper.write(Types.VAR_INT, 0); // Number of block particles
+        });
+
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21_6.SOUND);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21_6.SOUND_ENTITY);
 
