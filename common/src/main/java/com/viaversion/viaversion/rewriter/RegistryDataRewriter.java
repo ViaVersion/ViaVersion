@@ -23,6 +23,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
@@ -179,7 +180,14 @@ public class RegistryDataRewriter {
                 }
             }
 
-            updateAttributesFields(effects);
+            final MappingData mappingData = protocol.getMappingData();
+            if (mappingData == null) {
+                continue;
+            }
+
+            if (mappingData.getAttributeMappings() != null) {
+                updateAttributesFields(effects);
+            }
         }
 
         final ItemHasher itemHasher = connection.getItemHasher(protocol.getClass());
@@ -230,51 +238,53 @@ public class RegistryDataRewriter {
     }
 
     private void updateAttributesFields(final CompoundTag effects) {
-        if (!hasAttributeMappings()) {
-            return;
-        }
-
         final ListTag<CompoundTag> attributesList = TagUtil.getNamespacedCompoundTagList(effects, "attributes");
         if (attributesList == null) {
             return;
         }
 
         for (final CompoundTag attributeData : attributesList) {
-            updateAttributeField(attributeData);
+            updateType(attributeData, "attribute", protocol.getMappingData().getAttributeMappings());
+        }
+    }
+
+    private void updateParticleField(final CompoundTag effectTag) {
+        final CompoundTag particleData = effectTag.getCompoundTag("particle");
+        if (particleData != null) {
+            updateType(particleData, "type", protocol.getMappingData().getParticleMappings());
         }
     }
 
     private void runEffectRewriters(final CompoundTag effectTag) {
-        final String effect = effectTag.getString("type");
+        String effect = effectTag.getString("type");
         if (effect == null) {
             return;
         }
 
-        updateAttributeField(effectTag);
+        effect = Key.stripMinecraftNamespace(effect);
+        if (effect.equals("attribute")) {
+            updateType(effectTag, "attribute", protocol.getMappingData().getAttributeMappings());
+        } else if (effect.equals("spawn_particle")) {
+            updateParticleField(effectTag);
+        }
 
-        final Consumer<CompoundTag> rewriter = enchantmentEffectHandlers.get(Key.stripMinecraftNamespace(effect));
+        final Consumer<CompoundTag> rewriter = enchantmentEffectHandlers.get(effect);
         if (rewriter != null) {
             rewriter.accept(effectTag);
         }
     }
 
-    private void updateAttributeField(final CompoundTag attributeData) {
-        final StringTag attributeTag = attributeData.getStringTag("attribute");
-        if (attributeTag == null) {
+    protected void updateType(final CompoundTag tag, final String key, final FullMappings mappings) {
+        final StringTag typeTag = tag.getStringTag(key);
+        if (typeTag == null || mappings == null) {
             return;
         }
 
-        final FullMappings mappings = protocol.getMappingData().getAttributeMappings();
-        final String attribute = Key.stripMinecraftNamespace(attributeTag.getValue());
-        String mappedAttribute = mappings.mappedIdentifier(attribute);
-        if (mappedAttribute == null) {
-            mappedAttribute = mappings.mappedIdentifier(0); // Dummy
+        String mappedType = mappings.mappedIdentifier(typeTag.getValue());
+        if (mappedType == null) {
+            mappedType = mappings.mappedIdentifier(0); // Dummy
         }
-        attributeTag.setValue(mappedAttribute);
-    }
-
-    private boolean hasAttributeMappings() {
-        return protocol.getMappingData() != null && protocol.getMappingData().getAttributeMappings() != null;
+        typeTag.setValue(mappedType);
     }
 
     private void updateItemList(final ListTag<StringTag> listTag) {
