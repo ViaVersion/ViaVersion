@@ -264,7 +264,7 @@ public class RegistryDataRewriter {
         effect = Key.stripMinecraftNamespace(effect);
         if (effect.equals("attribute")) {
             updateType(effectTag, "attribute", protocol.getMappingData().getAttributeMappings());
-        } else if (effect.equals("spawn_particle")) {
+        } else if (effect.equals("spawn_particles")) {
             updateParticleField(effectTag);
         }
 
