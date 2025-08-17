@@ -290,9 +290,18 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
 
     private void handleBlockEntity(final UserConnection connection, final BlockEntity blockEntity) {
         final CompoundTag tag = blockEntity.tag();
-        if (tag != null && (blockEntity.typeId() == SIGN_BOCK_ENTITY_ID || blockEntity.typeId() == HANGING_SIGN_BOCK_ENTITY_ID)) {
+        if (tag == null) {
+            return;
+        }
+
+        if (blockEntity.typeId() == SIGN_BOCK_ENTITY_ID || blockEntity.typeId() == HANGING_SIGN_BOCK_ENTITY_ID) {
             updateSignMessages(connection, tag.getCompoundTag("front_text"));
             updateSignMessages(connection, tag.getCompoundTag("back_text"));
+        }
+
+        final String customName = tag.getString("CustomName");
+        if (customName != null) {
+            tag.put("CustomName", protocol.getComponentRewriter().uglyJsonToTag(connection, customName));
         }
     }
 
