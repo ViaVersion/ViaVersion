@@ -27,6 +27,8 @@ import com.viaversion.viaversion.api.type.TypeConverter;
 import io.netty.buffer.ByteBuf;
 
 public class UnsignedIntType extends Type<Long> implements TypeConverter<Long> {
+    public static final long MAX_UNSIGNED_INT = 0xFFFFFFFFL;
+
     public UnsignedIntType() {
         super(Long.class);
     }

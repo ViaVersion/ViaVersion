@@ -117,6 +117,7 @@ import com.viaversion.viaversion.api.type.types.misc.PlayerMessageSignatureType;
 import com.viaversion.viaversion.api.type.types.misc.ProfileKeyType;
 import com.viaversion.viaversion.api.type.types.misc.ProfilePropertyType;
 import com.viaversion.viaversion.api.type.types.misc.SoundEventType;
+import com.viaversion.viaversion.api.type.types.misc.GameProfileType1_21_9;
 import com.viaversion.viaversion.api.type.types.misc.TagKeyType;
 import com.viaversion.viaversion.api.type.types.misc.TagType;
 import com.viaversion.viaversion.api.type.types.misc.TextComponentTagType;
@@ -229,6 +230,7 @@ public final class Types {
     public static final Type<VillagerData> VILLAGER_DATA = new VillagerDataType();
 
     public static final Type<GameProfile> GAME_PROFILE = new GameProfileType();
+    public static final Type<GameProfile> GAME_PROFILE1_21_9 = new GameProfileType1_21_9(); // possibly non-null name and id, no dynamic filling
     public static final Type<GameProfile.Property> PROFILE_PROPERTY = new ProfilePropertyType();
     public static final Type<GameProfile.Property[]> PROFILE_PROPERTY_ARRAY = new ArrayType<>(PROFILE_PROPERTY);
     public static final Type<ProfileKey> PROFILE_KEY = new ProfileKeyType();

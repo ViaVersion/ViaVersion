@@ -175,7 +175,8 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<LodestoneTracker> LODESTONE_TRACKER = new StructuredDataKey<>("lodestone_tracker", LodestoneTracker.TYPE);
     public static final StructuredDataKey<FireworkExplosion> FIREWORK_EXPLOSION = new StructuredDataKey<>("firework_explosion", FireworkExplosion.TYPE);
     public static final StructuredDataKey<Fireworks> FIREWORKS = new StructuredDataKey<>("fireworks", Fireworks.TYPE);
-    public static final StructuredDataKey<GameProfile> PROFILE = new StructuredDataKey<>("profile", Types.GAME_PROFILE);
+    public static final StructuredDataKey<GameProfile> PROFILE1_20_5 = new StructuredDataKey<>("profile", Types.GAME_PROFILE);
+    public static final StructuredDataKey<GameProfile> PROFILE1_21_9 = new StructuredDataKey<>("profile", Types.GAME_PROFILE1_21_9);
     public static final StructuredDataKey<Key> NOTE_BLOCK_SOUND = new StructuredDataKey<>("note_block_sound", Types.RESOURCE_LOCATION);
     public static final StructuredDataKey<BannerPatternLayer[]> BANNER_PATTERNS = new StructuredDataKey<>("banner_patterns", BannerPatternLayer.ARRAY_TYPE);
     public static final StructuredDataKey<Integer> BASE_COLOR = new StructuredDataKey<>("base_color", EnumTypes.DYE_COLOR);

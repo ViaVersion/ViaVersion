@@ -27,14 +27,14 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPacket1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPackets1_21_6;
-import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPacket1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.Protocol1_21_7To1_21_9;
+import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundPacket1_21_9;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 
-public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<ClientboundPacket1_21_6, ServerboundPacket1_21_6, Protocol1_21_7To1_21_9> {
+public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<ClientboundPacket1_21_6, ServerboundPacket1_21_9, Protocol1_21_7To1_21_9> {
 
     public BlockItemPacketRewriter1_21_9(final Protocol1_21_7To1_21_9 protocol) {
         super(protocol);
@@ -82,6 +82,7 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
             final int id = Protocol1_21_7To1_21_9.MAPPINGS.getBlockEntityMappings().mappedId(tag.getString("id", "furnace"));
             return new BlockEntityData(id, tag);
         });
+        container.replaceKey(StructuredDataKey.PROFILE1_20_5, StructuredDataKey.PROFILE1_21_9);
     }
 
     @Override
@@ -93,5 +94,6 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
     public static void downgradeData(final Item item, final StructuredDataContainer container) {
         container.replace(StructuredDataKey.ENTITY_DATA1_21_9, StructuredDataKey.ENTITY_DATA1_20_5, EntityData::tag);
         container.replace(StructuredDataKey.BLOCK_ENTITY_DATA1_21_9, StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, BlockEntityData::tag);
+        container.replaceKey(StructuredDataKey.PROFILE1_21_9, StructuredDataKey.PROFILE1_20_5);
     }
 }

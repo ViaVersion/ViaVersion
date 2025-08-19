@@ -25,13 +25,18 @@ package com.viaversion.viaversion.api.type.types.math;
 import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.UnsignedIntType;
 import com.viaversion.viaversion.util.MathUtil;
 import io.netty.buffer.ByteBuf;
 
 public class MovementVectorType extends Type<Vector3d> {
-    private static final int MAPPED_MAX_VALUE = Short.MAX_VALUE >> 1;
+    // Using 15 bits, steal short constants for it
+    private static final double MAX_QUANTIZED_VALUE = Short.MAX_VALUE - 1;
     private static final int SCALE_BITS_MASK = 3; // first 2 bits for the scale
-    private static final int CONTINUATION_BIT_MASK = 1 << 2; // 3rd bit to indicate more scale data
+    private static final int CONTINUATION_FLAG = 1 << 2; // 3rd bit to indicate more scale data
+    // This allows for a scale of up to 2^19... or something???
+    private static final double ABS_MAX_VALUE = 1.7179869183E10;
+    private static final double ABS_MIN_VALUE = 3.051944088384301E-5;
 
     public MovementVectorType() {
         super(Vector3d.class);
@@ -46,47 +51,42 @@ public class MovementVectorType extends Type<Vector3d> {
         }
 
         final int second = Types.UNSIGNED_BYTE.read(buffer);
-        final long third = Types.UNSIGNED_INT.read(buffer);
-        final long packed = third << 16 | second << 8 | first;
+        final long remaining = Types.UNSIGNED_INT.read(buffer);
+        final long packed = remaining << 16 | second << 8 | first;
 
-        // 15 bits for each part after removing the scale bits
-        final double encodedX = packed >> (0 + SCALE_BITS_MASK) & Short.MAX_VALUE;
-        final double encodedY = packed >> (15 + SCALE_BITS_MASK) & Short.MAX_VALUE;
-        final double encodedZ = packed >> (30 + SCALE_BITS_MASK) & Short.MAX_VALUE;
-
-        int scale = first & SCALE_BITS_MASK;
-        if ((first & CONTINUATION_BIT_MASK) != 0) {
+        long scale = first & SCALE_BITS_MASK;
+        if ((first & CONTINUATION_FLAG) != 0) {
             // Read the remaining bits and add them to the first two
-            scale |= Types.VAR_INT.readPrimitive(buffer) << 2;
+            scale |= (Types.VAR_INT.readPrimitive(buffer) & UnsignedIntType.MAX_UNSIGNED_INT) << 2;
         }
 
+        // 15 bits for each part after removing the scale bits
         return new Vector3d(
-            (encodedX / MAPPED_MAX_VALUE - 1) * scale,
-            (encodedY / MAPPED_MAX_VALUE - 1) * scale,
-            (encodedZ / MAPPED_MAX_VALUE - 1) * scale
+            unpack(packed >> (0 + SCALE_BITS_MASK)) * scale,
+            unpack(packed >> (15 + SCALE_BITS_MASK)) * scale,
+            unpack(packed >> (30 + SCALE_BITS_MASK)) * scale
         );
     }
 
     @Override
     public void write(final ByteBuf buffer, final Vector3d vec) {
-        final double maxPart = Math.max(Math.abs(vec.x()), Math.max(Math.abs(vec.y()), Math.abs(vec.z())));
-        if (maxPart < MathUtil.EPSILON) {
+        final double x = sanitize(vec.x());
+        final double y = sanitize(vec.y());
+        final double z = sanitize(vec.z());
+
+        final double maxPart = Math.max(Math.abs(x), Math.max(Math.abs(y), Math.abs(z)));
+        if (maxPart < ABS_MIN_VALUE) {
             buffer.writeByte(0);
             return;
         }
 
-        final int scale = (int) Math.ceil(maxPart);
-        final double quantizationFactor = 0.5 / scale;
-        final long encodedX = (long) ((vec.x() * quantizationFactor + 0.5) * Short.MAX_VALUE);
-        final long encodedY = (long) ((vec.y() * quantizationFactor + 0.5) * Short.MAX_VALUE);
-        final long encodedZ = (long) ((vec.z() * quantizationFactor + 0.5) * Short.MAX_VALUE);
-
-        final boolean scaleTooLargeForBits = scale > 3;
-        final int scaleBits = scaleTooLargeForBits ? (scale & SCALE_BITS_MASK) | CONTINUATION_BIT_MASK : scale;
+        final long scale = MathUtil.ceilLong(maxPart);
+        final boolean scaleTooLargeForBits = (scale & SCALE_BITS_MASK) != scale;
+        final long scaleBits = scaleTooLargeForBits ? (scale & SCALE_BITS_MASK) | CONTINUATION_FLAG : scale;
         final long packed = scaleBits
-            | (encodedX << (0 + SCALE_BITS_MASK))
-            | (encodedY << (15 + SCALE_BITS_MASK))
-            | (encodedZ << (30 + SCALE_BITS_MASK));
+            | (pack(x / scale) << (0 + SCALE_BITS_MASK))
+            | (pack(y / scale) << (15 + SCALE_BITS_MASK))
+            | (pack(z / scale) << (30 + SCALE_BITS_MASK));
 
         buffer.writeByte((byte) packed);
         buffer.writeByte((byte) (packed >> 8));
@@ -94,7 +94,23 @@ public class MovementVectorType extends Type<Vector3d> {
 
         if (scaleTooLargeForBits) {
             // First two bits have already been written
-            Types.VAR_INT.writePrimitive(buffer, scale >> 2);
+            Types.VAR_INT.writePrimitive(buffer, (int) (scale >> 2));
         }
+    }
+
+    private double sanitize(final double value) {
+        return Double.isNaN(value) ? 0 : MathUtil.clamp(value, -ABS_MAX_VALUE, ABS_MAX_VALUE);
+    }
+
+    private long pack(final double value) {
+        // Shift to [0, 1] and quantize to 15 bits
+        final double shifted = (value * 0.5) + 0.5;
+        return Math.round(shifted * MAX_QUANTIZED_VALUE);
+    }
+
+    private double unpack(final long value) {
+        // Normalize to [-1, 1]
+        final double clamped = Math.min(value & Short.MAX_VALUE, MAX_QUANTIZED_VALUE);
+        return (clamped * 2) / MAX_QUANTIZED_VALUE - 1;
     }
 }

@@ -17,7 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet;
 
-public enum ServerboundPackets1_21_6 implements ServerboundPacket1_21_6 {
+import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundPacket1_21_9;
+
+public enum ServerboundPackets1_21_6 implements ServerboundPacket1_21_6, ServerboundPacket1_21_9 {
 
     ACCEPT_TELEPORTATION, // 0x00
     BLOCK_ENTITY_TAG_QUERY, // 0x01

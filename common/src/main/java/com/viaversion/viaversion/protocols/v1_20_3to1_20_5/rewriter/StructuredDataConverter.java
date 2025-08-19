@@ -250,7 +250,7 @@ public final class StructuredDataConverter {
             }
         });
         register(StructuredDataKey.FIREWORK_EXPLOSION, (data, tag) -> tag.put("Explosion", convertExplosion(data)));
-        register(StructuredDataKey.PROFILE, (data, tag) -> {
+        register(StructuredDataKey.PROFILE1_20_5, (data, tag) -> {
             if (data.name() != null && data.id() == null && data.properties().length == 0) {
                 tag.putString("SkullOwner", data.name());
                 return;

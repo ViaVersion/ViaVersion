@@ -165,7 +165,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         register(StructuredDataKey.LODESTONE_TRACKER, this::lodestoneTrackerToTag, this::lodestoneTrackerFromTag);
         register(StructuredDataKey.FIREWORK_EXPLOSION, this::fireworkExplosionToTag, this::fireworkExplosionFromTag);
         register(StructuredDataKey.FIREWORKS, this::fireworksToTag, this::fireworksFromTag);
-        register(StructuredDataKey.PROFILE, this::profileToTag, this::profileFromTag);
+        register(StructuredDataKey.PROFILE1_20_5, this::profileToTag, this::profileFromTag);
         register(StructuredDataKey.NOTE_BLOCK_SOUND, this::noteBlockSoundToTag, this::noteBlockSoundFromTag);
         register(StructuredDataKey.BANNER_PATTERNS, this::bannerPatternsToTag, this::bannerPatternsFromTag);
         register(StructuredDataKey.BASE_COLOR, this::baseColorToTag, this::baseColorFromTag);

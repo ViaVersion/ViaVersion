@@ -29,7 +29,11 @@ import java.util.Map;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public record GameProfile(@Nullable String name, @Nullable UUID id, Property[] properties) {
+public record GameProfile(@Nullable String name, @Nullable UUID id, Property[] properties, boolean dynamic) {
+
+    public GameProfile(@Nullable final String name, @Nullable final UUID id, final Property[] properties) {
+        this(name, id, properties, true);
+    }
 
     public GameProfile(@Nullable final String name, @Nullable final UUID id) {
         this(name, id, new Property[0]);

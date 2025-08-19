@@ -1300,7 +1300,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (skullOwnerTag instanceof StringTag nameTag) {
             final String name = nameTag.getValue();
             if (isValidName(name)) {
-                data.set(StructuredDataKey.PROFILE, new GameProfile(name, null, EMPTY_PROPERTIES));
+                data.set(StructuredDataKey.PROFILE1_20_5, new GameProfile(name, null, EMPTY_PROPERTIES));
             }
         } else if (skullOwnerTag instanceof CompoundTag skullOwner) {
             String name = skullOwner.getString("Name", "");
@@ -1320,7 +1320,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 updateProperties(propertiesTag, properties);
             }
 
-            data.set(StructuredDataKey.PROFILE, new GameProfile(name, uuid, properties.toArray(EMPTY_PROPERTIES)));
+            data.set(StructuredDataKey.PROFILE1_20_5, new GameProfile(name, uuid, properties.toArray(EMPTY_PROPERTIES)));
         }
     }
 
