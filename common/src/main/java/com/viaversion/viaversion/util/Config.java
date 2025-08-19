@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -132,7 +133,7 @@ public abstract class Config extends ConfigSection {
         }
 
         if (existingConfig != null) {
-            merge(existingConfig, mergedConfig);
+            merge(null, existingConfig, mergedConfig);
         }
 
         handleConfig(mergedConfig);
@@ -147,15 +148,18 @@ public abstract class Config extends ConfigSection {
         return mergedConfig;
     }
 
-    private void merge(Map<String, Object> loadedConfig, Map<String, Object> mergedConfig) {
+    private void merge(@Nullable String currentSectionKey, Map<String, Object> loadedConfig, Map<String, Object> mergedConfig) {
         for (Map.Entry<String, Object> entry : loadedConfig.entrySet()) {
             // Set option in new config if it exists
+            String key = entry.getKey();
             Object value = entry.getValue();
-            if (value instanceof Map<?, ?> mapValue && mergedConfig.get(entry.getKey()) instanceof Map<?, ?> mergedMapValue) {
+            if (value instanceof Map<?, ?> mapValue && mergedConfig.get(key) instanceof Map<?, ?> mergedMapValue) {
                 //noinspection unchecked
-                merge((Map<String, Object>) mapValue, (Map<String, Object>) mergedMapValue);
+                merge(key, (Map<String, Object>) mapValue, (Map<String, Object>) mergedMapValue);
+            } else if (currentSectionKey != null && getSectionsWithModifiableKeys().contains(currentSectionKey)) {
+                mergedConfig.put(key, value);
             } else {
-                mergedConfig.computeIfPresent(entry.getKey(), (k, v) -> value);
+                mergedConfig.computeIfPresent(key, (k, v) -> value);
             }
         }
     }
@@ -170,7 +174,23 @@ public abstract class Config extends ConfigSection {
         }
     }
 
+    /**
+     * Returns a list of options to remove from the config.
+     * This can be unused or unsupported options for this particular platform.
+     *
+     * @return list of options to remove from the config
+     */
     public abstract List<String> getUnsupportedOptions();
+
+    /**
+     * Returns a set of section keys that will have custom entry keys.
+     * These values will be kept when merging into a new config.
+     *
+     * @return set of section keys that will have custom entry keys
+     */
+    public Set<String> getSectionsWithModifiableKeys() {
+        return Set.of();
+    }
 
     public void save() {
         if (this.configFile.getParentFile() != null) {

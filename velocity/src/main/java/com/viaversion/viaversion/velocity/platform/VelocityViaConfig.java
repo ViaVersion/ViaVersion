@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class VelocityViaConfig extends AbstractViaConfig {
@@ -84,6 +85,11 @@ public class VelocityViaConfig extends AbstractViaConfig {
     @Override
     public List<String> getUnsupportedOptions() {
         return BUKKIT_ONLY_OPTIONS;
+    }
+
+    @Override
+    public Set<String> getSectionsWithModifiableKeys() {
+        return Set.of("velocity-servers");
     }
 
     /**
