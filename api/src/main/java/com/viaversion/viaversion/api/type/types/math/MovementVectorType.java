@@ -32,11 +32,11 @@ import io.netty.buffer.ByteBuf;
 public class MovementVectorType extends Type<Vector3d> {
     // Using 15 bits, steal short constants for it
     private static final double MAX_QUANTIZED_VALUE = Short.MAX_VALUE - 1;
-    private static final int SCALE_BITS_MASK = 3; // first 2 bits for the scale
+    private static final int SCALE_BITS = 2; // first 2 bits for the scale
+    private static final int SCALE_BITS_MASK = 3;
     private static final int CONTINUATION_FLAG = 1 << 2; // 3rd bit to indicate more scale data
-    // This allows for a scale of up to 2^19... or something???
-    private static final double ABS_MAX_VALUE = 1.7179869183E10;
-    private static final double ABS_MIN_VALUE = 3.051944088384301E-5;
+    private static final double ABS_MAX_VALUE = (1L << Integer.SIZE + SCALE_BITS) - 1; // Unsigned int + the first two scale bits
+    private static final double ABS_MIN_VALUE = 1 / MAX_QUANTIZED_VALUE;
 
     public MovementVectorType() {
         super(Vector3d.class);
@@ -57,7 +57,7 @@ public class MovementVectorType extends Type<Vector3d> {
         long scale = first & SCALE_BITS_MASK;
         if ((first & CONTINUATION_FLAG) != 0) {
             // Read the remaining bits and add them to the first two
-            scale |= (Types.VAR_INT.readPrimitive(buffer) & UnsignedIntType.MAX_UNSIGNED_INT) << 2;
+            scale |= (Types.VAR_INT.readPrimitive(buffer) & UnsignedIntType.MAX_UNSIGNED_INT) << SCALE_BITS;
         }
 
         // 15 bits for each part after removing the scale bits
@@ -94,7 +94,7 @@ public class MovementVectorType extends Type<Vector3d> {
 
         if (scaleTooLargeForBits) {
             // First two bits have already been written
-            Types.VAR_INT.writePrimitive(buffer, (int) (scale >> 2));
+            Types.VAR_INT.writePrimitive(buffer, (int) (scale >> SCALE_BITS));
         }
     }
 
