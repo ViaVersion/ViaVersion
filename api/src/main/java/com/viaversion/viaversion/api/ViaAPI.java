@@ -123,7 +123,7 @@ public interface ViaAPI<T> {
     boolean isInjected(UUID uuid);
 
     /**
-     * Returns whether Via injected into this player connection. Note that this method may not work on
+     * Returns the injected UserConnection if present. Note that this method may not work on
      * clientside implementations and is generally not recommended to be used. Use {@link ConnectionManager} instead.
      *
      * @param uuid uuid of the player
