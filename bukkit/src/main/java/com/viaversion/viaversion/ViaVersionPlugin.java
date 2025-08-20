@@ -61,7 +61,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     private static ViaVersionPlugin instance;
     private final BukkitCommandHandler commandHandler = new BukkitCommandHandler();
     private final BukkitViaConfig conf;
-    private final ViaAPI<Player> api = new BukkitViaAPI(this);
+    private final ViaAPI<Player> api = new BukkitViaAPI();
     private boolean lateBind;
 
     public ViaVersionPlugin() {
