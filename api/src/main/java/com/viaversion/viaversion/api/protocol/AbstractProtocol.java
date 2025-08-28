@@ -144,6 +144,12 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         final CU startConfigurationPacket = startConfigurationPacket();
         if (startConfigurationPacket != null) {
             appendClientbound(startConfigurationPacket, setServerStateHandler(State.CONFIGURATION));
+            appendClientbound(startConfigurationPacket, wrapper -> {
+                final EntityTracker entityTracker = wrapper.user().getEntityTracker(this.getClass());
+                if (entityTracker != null) {
+                    entityTracker.resetClientEntityId();
+                }
+            });
         }
 
         final SU finishConfigurationPacket = serverboundFinishConfigurationPacket();

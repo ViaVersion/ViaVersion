@@ -124,6 +124,11 @@ public interface EntityTracker {
     void setClientEntityId(int clientEntityId);
 
     /**
+     * Resets the client entity id.
+     */
+    void resetClientEntityId();
+
+    /**
      * Returns whether the client player has the "insta build" ability, usually from creative mode.
      *
      * @return whether the client player can insta build

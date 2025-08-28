@@ -133,6 +133,11 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     }
 
     @Override
+    public void resetClientEntityId() {
+        clientEntityId = null;
+    }
+
+    @Override
     public boolean canInstaBuild() {
         return instaBuild;
     }
