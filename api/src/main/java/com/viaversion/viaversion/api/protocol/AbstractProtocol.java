@@ -143,13 +143,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
 
         final CU startConfigurationPacket = startConfigurationPacket();
         if (startConfigurationPacket != null) {
-            appendClientbound(startConfigurationPacket, setServerStateHandler(State.CONFIGURATION));
-            appendClientbound(startConfigurationPacket, wrapper -> {
-                final EntityTracker entityTracker = wrapper.user().getEntityTracker(this.getClass());
-                if (entityTracker != null) {
-                    entityTracker.resetClientEntityId();
-                }
-            });
+            appendClientbound(startConfigurationPacket, startConfigurationHandler());
         }
 
         final SU finishConfigurationPacket = serverboundFinishConfigurationPacket();
@@ -484,6 +478,16 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
 
     private PacketHandler setServerStateHandler(final State state) {
         return wrapper -> wrapper.user().getProtocolInfo().setServerState(state);
+    }
+
+    private PacketHandler startConfigurationHandler() {
+        return setServerStateHandler(State.CONFIGURATION).then(wrapper -> {
+            // Mimic client behaviour
+            final EntityTracker tracker = wrapper.user().getEntityTracker(getClass());
+            if (tracker != null) {
+                tracker.clear();
+            }
+        });
     }
 
     @Override

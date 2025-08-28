@@ -107,6 +107,16 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     }
 
     @Override
+    public void clear() {
+        // Call wrapper function in case protocols need to do additional removals
+        for (final int id : entities.keySet().toIntArray()) {
+            removeEntity(id);
+        }
+
+        clientEntityId = null;
+    }
+
+    @Override
     public boolean hasClientEntityId() {
         return clientEntityId != null;
     }
@@ -130,11 +140,6 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
         }
 
         this.clientEntityId = clientEntityId;
-    }
-
-    @Override
-    public void resetClientEntityId() {
-        clientEntityId = null;
     }
 
     @Override
