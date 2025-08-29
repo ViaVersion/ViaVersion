@@ -83,6 +83,11 @@ public interface EntityTracker {
     void clearEntities();
 
     /**
+     * Clears all stored data, including entity types, entity data and client entity id.
+     */
+    void clear();
+
+    /**
      * Returns the stored entity data if an entity with the id is tracked, else null.
      * If no data has been initialized yet, it will be done and returned by this method.
      *
