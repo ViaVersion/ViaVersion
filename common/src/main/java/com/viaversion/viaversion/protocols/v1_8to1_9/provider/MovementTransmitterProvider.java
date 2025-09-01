@@ -41,7 +41,7 @@ public class MovementTransmitterProvider implements Provider {
         try {
             final PacketWrapper playerMovement = PacketWrapper.create(ServerboundPackets1_8.MOVE_PLAYER_STATUS_ONLY, userConnection);
             playerMovement.write(Types.BOOLEAN, movementTracker.isGround()); // on ground
-            playerMovement.scheduleSendToServer(Protocol1_8To1_9.class);
+            playerMovement.sendToServer(Protocol1_8To1_9.class);
         } catch (Throwable e) {
             Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send player movement packet", e);
         }

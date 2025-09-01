@@ -15,35 +15,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocol;
+package com.viaversion.viaversion.connection;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.ProtocolInfo;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 
 /**
- * Instance of {@link Runnable} that will run {@link #run(UserConnection)} for all active user connections.
+ * Instance of {@link Runnable} that will run {@link #run(UserConnection, StorableObject)} for all active user connections.
  */
-public abstract class ProtocolRunnable implements Runnable {
+public abstract class StorableObjectTask<T extends StorableObject> implements Runnable {
 
-    private final Class<? extends AbstractProtocol<?, ?, ?, ?>> protocolClass;
+    private final Class<T> storableObject;
 
-    public ProtocolRunnable(final Class<? extends AbstractProtocol<?, ?, ?, ?>> protocolClass) {
-        this.protocolClass = protocolClass;
+    public StorableObjectTask(final Class<T> storableObject) {
+        this.storableObject = storableObject;
     }
 
-    public abstract void run(final UserConnection connection);
+    public abstract void run(final UserConnection connection, final T storableObject);
 
     @Override
     public void run() {
         for (final UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
-            final ProtocolInfo protocolInfo = connection.getProtocolInfo();
-            if (!connection.isActive() || !protocolInfo.getPipeline().contains(this.protocolClass)) {
+            if (!connection.isActive()) {
                 continue;
             }
 
-            run(connection);
+            final T object = connection.get(storableObject);
+            if (object == null) {
+                continue;
+            }
+
+            connection.getChannel().eventLoop().submit(() -> this.run(connection, object));
         }
     }
 }

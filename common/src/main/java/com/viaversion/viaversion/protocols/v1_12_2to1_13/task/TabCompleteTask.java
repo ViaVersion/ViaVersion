@@ -18,18 +18,17 @@
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.task;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.protocol.ProtocolRunnable;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
+import com.viaversion.viaversion.connection.StorableObjectTask;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.TabCompleteTracker;
 
-public final class TabCompleteTask extends ProtocolRunnable {
+public final class TabCompleteTask extends StorableObjectTask<TabCompleteTracker> {
 
     public TabCompleteTask() {
-        super(Protocol1_12_2To1_13.class);
+        super(TabCompleteTracker.class);
     }
 
     @Override
-    public void run(final UserConnection connection) {
-        connection.get(TabCompleteTracker.class).sendPacketToServer(connection);
+    public void run(final UserConnection connection, final TabCompleteTracker storableObject) {
+        storableObject.sendPacketToServer(connection);
     }
 }

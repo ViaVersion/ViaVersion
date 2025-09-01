@@ -40,7 +40,7 @@ public class TabCompleteTracker implements StorableObject {
         wrapper.write(Types.BOOLEAN, false);
         final BlockPosition playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(connection);
         wrapper.write(Types.OPTIONAL_POSITION1_8, playerLookTarget);
-        wrapper.scheduleSendToServer(Protocol1_12_2To1_13.class);
+        wrapper.sendToServer(Protocol1_12_2To1_13.class);
         lastTabComplete = null;
     }
 
