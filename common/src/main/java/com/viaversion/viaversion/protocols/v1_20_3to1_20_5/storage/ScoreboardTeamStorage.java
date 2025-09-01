@@ -18,15 +18,15 @@
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public final class ScoreboardTeamStorage implements StorableObject {
 
-    private final Map<String, Set<String>> teams = new Object2ObjectArrayMap<>();
+    private final Map<String, Set<String>> teams = new HashMap<>();
 
     public void createTeam(final String name) {
         if (this.teams.containsKey(name)) {
