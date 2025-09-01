@@ -29,39 +29,39 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Compares equal to the given origin version and allows base protocol determination via {@link #getBaseProtocolVersion()}
  * which can be null for special cases where there is no base protocol.
  */
-public class RedirectProtocolVersion extends ProtocolVersion {
+public class SpecialProtocolVersion extends ProtocolVersion {
 
-    private final ProtocolVersion origin;
+    private final ProtocolVersion delegate;
 
-    public RedirectProtocolVersion(final int version, final String name, final ProtocolVersion origin) {
-        this(version, -1, name, null, origin);
+    public SpecialProtocolVersion(final int version, final String name, final ProtocolVersion delegate) {
+        this(version, -1, name, null, delegate);
     }
 
     /**
      * See {@link ProtocolVersion} for more information.
      */
-    public RedirectProtocolVersion(final int version, final int snapshotVersion, final String name, @Nullable final SubVersionRange versionRange, final ProtocolVersion origin) {
+    public SpecialProtocolVersion(final int version, final int snapshotVersion, final String name, @Nullable final SubVersionRange versionRange, final ProtocolVersion delegate) {
         super(VersionType.SPECIAL, version, snapshotVersion, name, versionRange);
-        this.origin = origin;
+        this.delegate = delegate;
     }
 
     @Override
     protected @Nullable Comparator<ProtocolVersion> customComparator() {
         return (o1, o2) -> {
-            if (o1 == this) o1 = this.origin;
-            if (o2 == this) o2 = this.origin;
+            if (o1 == this) o1 = this.delegate;
+            if (o2 == this) o2 = this.delegate;
             return o1.compareTo(o2);
         };
     }
 
-    public ProtocolVersion getOrigin() {
-        return origin;
+    public ProtocolVersion getDelegate() {
+        return delegate;
     }
 
     /**
      * @return the protocol version used to determine the base protocol, null in case there is no base protocol.
      */
     public @Nullable ProtocolVersion getBaseProtocolVersion() {
-        return origin;
+        return delegate;
     }
 }
