@@ -160,6 +160,13 @@ public class ParticleType extends DynamicType<Particle> {
             particle.add(Types.INT, Types.INT.readPrimitive(buf)); // Color
             particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Duration
         };
+        public static final DataReader<Particle> POWER = (buf, particle) -> {
+            particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf));
+        };
+        public static final DataReader<Particle> SPELL = (buf, particle) -> {
+            particle.add(Types.INT, Types.INT.readPrimitive(buf)); // Color
+            particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Power
+        };
 
         public static DataReader<Particle> item(Type<Item> item) {
             return (buf, particle) -> particle.add(item, item.read(buf));

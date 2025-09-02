@@ -17,9 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter;
 
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_9;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_5;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
@@ -29,6 +31,7 @@ import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.Protocol1_21_7To1_21_9;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
+import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandler;
 
 public final class EntityPacketRewriter1_21_9 extends EntityRewriter<ClientboundPacket1_21_6, Protocol1_21_7To1_21_9> {
 
@@ -93,13 +96,20 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
+        final EntityDataTypes1_21_5 unmappedEntityDataTypes = protocol.types().entityDataTypes();
         final EntityDataTypes1_21_9 entityDataTypes = protocol.mappedTypes().entityDataTypes();
-        filter().mapDataType(typeId -> {
-            int id = typeId;
+        filter().handler((event, data) -> {
+            int id = data.dataType().typeId();
+            if (id == unmappedEntityDataTypes.compoundTagType.typeId()) {
+                return; // Handled below
+            }
+            if (id > unmappedEntityDataTypes.compoundTagType.typeId()) {
+                id--;
+            }
             if (id > entityDataTypes.armadilloState.typeId()) {
                 id += 2; // copper golem and weathering copper state
             }
-            return entityDataTypes.byId(id);
+            data.setDataType(entityDataTypes.byId(id));
         });
 
         registerEntityDataTypeHandler(
@@ -111,6 +121,34 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
             entityDataTypes.componentType,
             entityDataTypes.optionalComponentType
         );
+
+        final EntityDataHandler shoulderDataHandler = (event, data) -> {
+            final CompoundTag value = data.value();
+            if (value == null) {
+                data.setTypeAndValue(protocol.mappedTypes().entityDataTypes.optionalVarIntType, null);
+                return;
+            }
+
+            final int variant = value.getInt("Variant", -1);
+            if (variant != -1) {
+                data.setTypeAndValue(protocol.mappedTypes().entityDataTypes.optionalVarIntType, variant);
+            } else {
+                data.setTypeAndValue(protocol.mappedTypes().entityDataTypes.optionalVarIntType, null);
+            }
+        };
+        filter().type(EntityTypes1_21_9.PLAYER).index(19).handler(shoulderDataHandler);
+        filter().type(EntityTypes1_21_9.PLAYER).index(20).handler(shoulderDataHandler);
+        filter().type(EntityTypes1_21_9.PLAYER).handler((event, data) -> {
+            // Move model customization and main hand to avatar
+            // except they've been swapped
+            if (event.index() == 17) {
+                event.setIndex(16);
+            } else if (event.index() == 18) {
+                event.setIndex(15);
+            } else if (event.index() == 15 || event.index() == 16) {
+                event.setIndex(event.index() + 2); // Move hearts and score up
+            }
+        });
     }
 
     @Override

@@ -129,7 +129,11 @@ public enum EntityTypes1_21_9 implements EntityType {
     // Living entities as a larger subclass
     LIVING_ENTITY(ENTITY, null),
     ARMOR_STAND(LIVING_ENTITY),
-    PLAYER(LIVING_ENTITY),
+
+    // Players
+    AVATAR(LIVING_ENTITY, null),
+    MANNEQUIN(AVATAR),
+    PLAYER(AVATAR),
 
     // Mobs as a larger subclass
     MOB(LIVING_ENTITY, null),

@@ -91,7 +91,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     public static final ProtocolVersion v1_21_5 = register(770, "1.21.5");
     public static final ProtocolVersion v1_21_6 = register(771, "1.21.6");
     public static final ProtocolVersion v1_21_7 = register(772, "1.21.7-1.21.8", new SubVersionRange("1.21", 7, 8));
-    public static final ProtocolVersion v1_21_9 = register(773, 265, "1.21.9");
+    public static final ProtocolVersion v1_21_9 = register(773, 267, "1.21.9");
     public static final ProtocolVersion unknown = new ProtocolVersion(VersionType.SPECIAL, -1, -1, "UNKNOWN", null);
 
     static {
