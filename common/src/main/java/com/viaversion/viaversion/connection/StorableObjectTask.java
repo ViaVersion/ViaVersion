@@ -46,7 +46,7 @@ public abstract class StorableObjectTask<T extends StorableObject> implements Ru
                 continue;
             }
 
-            connection.getChannel().eventLoop().submit(() -> this.run(connection, object));
+            connection.getChannel().eventLoop().execute(() -> this.run(connection, object));
         }
     }
 }
