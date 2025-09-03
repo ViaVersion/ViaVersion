@@ -6,7 +6,7 @@ gson = "2.13.1"
 snakeYaml = "2.4"
 fastutil = "8.5.15"
 vianbt = "5.1.2"
-mcstructs = "5-3.1.1-SNAPSHOT"
+mcstructs = "5-3.2.0-SNAPSHOT"
 
 # Common provided
 netty = "4.0.20.Final"
@@ -14,7 +14,7 @@ guava = "17.0"
 
 junit = "5.13.4"
 platformLauncher = "1.13.4"
-checkerQual = "3.49.5"
+checkerQual = "3.50.0"
 
 # Platforms
 paper = "1.20.4-R0.1-SNAPSHOT"
