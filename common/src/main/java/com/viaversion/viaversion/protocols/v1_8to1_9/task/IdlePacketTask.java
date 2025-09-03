@@ -19,21 +19,27 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.task;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.connection.StorableObjectTask;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MovementTransmitterProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
 
-public final class IdlePacketTask extends StorableObjectTask<MovementTracker> {
-
-    public IdlePacketTask() {
-        super(MovementTracker.class);
-    }
+public final class IdlePacketTask implements Runnable {
 
     @Override
-    public void run(final UserConnection connection, final MovementTracker storableObject) {
-        final long nextIdleUpdate = storableObject.getNextIdlePacket();
-        if (nextIdleUpdate <= System.currentTimeMillis()) {
-            Via.getManager().getProviders().get(MovementTransmitterProvider.class).sendPlayer(connection);
+    public void run() {
+        for (final UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
+            if (!connection.isActive()) {
+                continue;
+            }
+
+            final MovementTracker tracker = connection.get(MovementTracker.class);
+            if (tracker == null) {
+                continue;
+            }
+
+            final long nextIdleUpdate = tracker.getNextIdlePacket();
+            if (nextIdleUpdate <= System.currentTimeMillis()) {
+                Via.getManager().getProviders().get(MovementTransmitterProvider.class).sendPlayer(connection);
+            }
         }
     }
 }

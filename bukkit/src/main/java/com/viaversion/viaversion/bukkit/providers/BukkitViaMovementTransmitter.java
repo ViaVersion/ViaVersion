@@ -114,14 +114,23 @@ public class BukkitViaMovementTransmitter extends MovementTransmitterProvider {
             }
         } else {
             ChannelHandlerContext context = PipelineUtil.getContextBefore("decoder", info.getChannel().pipeline());
-            if (context != null) {
-                if (info.get(MovementTracker.class).isGround()) {
+            if (context == null) {
+                return;
+            }
+
+            info.getChannel().eventLoop().execute(() -> {
+                MovementTracker movementTracker = info.get(MovementTracker.class);
+                if (movementTracker == null) {
+                    return;
+                }
+
+                if (movementTracker.isGround()) {
                     context.fireChannelRead(getGroundPacket());
                 } else {
                     context.fireChannelRead(getFlyingPacket());
                 }
-                info.get(MovementTracker.class).incrementIdlePacket();
-            }
+                movementTracker.incrementIdlePacket();
+            });
         }
     }
 }

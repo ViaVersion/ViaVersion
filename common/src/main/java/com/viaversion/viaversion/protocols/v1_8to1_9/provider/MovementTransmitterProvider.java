@@ -31,19 +31,21 @@ import java.util.logging.Level;
 public class MovementTransmitterProvider implements Provider {
 
     public void sendPlayer(UserConnection userConnection) {
-        if (userConnection.getProtocolInfo().getClientState() != State.PLAY || !userConnection.getEntityTracker(Protocol1_8To1_9.class).hasClientEntityId()) {
-            return;
-        }
+        userConnection.getChannel().eventLoop().execute(() -> {
+            if (userConnection.getProtocolInfo().getClientState() != State.PLAY || !userConnection.getEntityTracker(Protocol1_8To1_9.class).hasClientEntityId()) {
+                return;
+            }
 
-        final MovementTracker movementTracker = userConnection.get(MovementTracker.class);
-        movementTracker.incrementIdlePacket();
+            final MovementTracker movementTracker = userConnection.get(MovementTracker.class);
+            movementTracker.incrementIdlePacket();
 
-        try {
-            final PacketWrapper playerMovement = PacketWrapper.create(ServerboundPackets1_8.MOVE_PLAYER_STATUS_ONLY, userConnection);
-            playerMovement.write(Types.BOOLEAN, movementTracker.isGround()); // on ground
-            playerMovement.sendToServer(Protocol1_8To1_9.class);
-        } catch (Throwable e) {
-            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send player movement packet", e);
-        }
+            try {
+                final PacketWrapper playerMovement = PacketWrapper.create(ServerboundPackets1_8.MOVE_PLAYER_STATUS_ONLY, userConnection);
+                playerMovement.write(Types.BOOLEAN, movementTracker.isGround()); // on ground
+                playerMovement.sendToServer(Protocol1_8To1_9.class);
+            } catch (Throwable e) {
+                Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send player movement packet", e);
+            }
+        });
     }
 }
