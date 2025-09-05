@@ -307,7 +307,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         if (currentThread) {
             sendNow(protocol, skipCurrentPipeline);
         } else {
-            connection.getChannel().eventLoop().submit(() -> sendNow(protocol, skipCurrentPipeline));
+            connection.getChannel().eventLoop().execute(() -> sendNow(protocol, skipCurrentPipeline));
         }
     }
 
@@ -524,7 +524,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             return;
         }
 
-        connection.getChannel().eventLoop().submit(() -> {
+        connection.getChannel().eventLoop().execute(() -> {
             try {
                 final ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.SERVERBOUND);
                 connection.sendRawPacketToServer(output);

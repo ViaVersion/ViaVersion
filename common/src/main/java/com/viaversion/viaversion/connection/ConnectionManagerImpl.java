@@ -78,6 +78,8 @@ public class ConnectionManagerImpl implements ConnectionManager {
     @Override
     public void onDisconnect(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
+        connection.setActive(false);
+
         connections.remove(connection);
 
         UUID id = connection.getProtocolInfo().getUuid();

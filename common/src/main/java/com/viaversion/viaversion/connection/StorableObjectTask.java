@@ -37,16 +37,16 @@ public abstract class StorableObjectTask<T extends StorableObject> implements Ru
     @Override
     public void run() {
         for (final UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
-            if (!connection.isActive()) {
+            if (!connection.isActive() || !connection.has(storableObject)) {
                 continue;
             }
 
-            final T object = connection.get(storableObject);
-            if (object == null) {
-                continue;
-            }
-
-            connection.getChannel().eventLoop().execute(() -> this.run(connection, object));
+            connection.getChannel().eventLoop().execute(() -> {
+                final T object = connection.get(storableObject);
+                if (object != null) {
+                    this.run(connection, object);
+                }
+            });
         }
     }
 }
