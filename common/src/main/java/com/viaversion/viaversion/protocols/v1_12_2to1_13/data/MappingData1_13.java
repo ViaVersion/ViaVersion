@@ -81,6 +81,14 @@ public class MappingData1_13 extends MappingDataBase {
             blockMappings.setNewId(1557, 3986); // chiseled stone bricks
         }
 
+        // Don't apply VB only mappings for purple/not-colored shulker boxes
+        // TODO Check which blocks might also be affected by inverting the VB mappings for VV
+        for (int i = 3664; i <= 3669; i++) {
+            final int index = i - 3664;
+            blockMappings.setNewId(i, 8211 + index);
+        }
+        itemMappings.setNewId(3664, 362);
+
         JsonObject object = MappingDataLoader.INSTANCE.loadFromDataDir("channelmappings-1.13.json");
         if (object != null) {
             for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
