@@ -28,7 +28,7 @@ public abstract class StorableObjectTask<T extends StorableObject> implements Ru
 
     private final Class<T> storableObject;
 
-    public StorableObjectTask(final Class<T> storableObject) {
+    protected StorableObjectTask(final Class<T> storableObject) {
         this.storableObject = storableObject;
     }
 

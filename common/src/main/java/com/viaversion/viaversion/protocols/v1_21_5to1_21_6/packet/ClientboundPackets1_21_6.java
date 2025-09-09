@@ -17,9 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet;
 
-import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPacket1_21_9;
-
-public enum ClientboundPackets1_21_6 implements ClientboundPacket1_21_6, ClientboundPacket1_21_9 {
+public enum ClientboundPackets1_21_6 implements ClientboundPacket1_21_6 {
 
     BUNDLE_DELIMITER, // 0x00
     ADD_ENTITY, // 0x01
