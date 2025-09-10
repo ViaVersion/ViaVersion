@@ -236,7 +236,7 @@ public final class Types {
     public static final Type<GameProfile> GAME_PROFILE = new GameProfileType();
     public static final Type<GameProfile> GAME_PROFILE1_21_9 = new GameProfileType1_21_9(); // possibly non-null name and id, no dynamic filling
     public static final Type<MannequinProfile> MANNEQUIN_PROFILE = new MannequinProfileType();
-    public static final Type<Either<MannequinProfile, GameProfile>> GAME_OR_MANNEQUIN_PROFILE = new EitherType<>(MANNEQUIN_PROFILE, GAME_PROFILE);
+    public static final Type<Either<MannequinProfile, GameProfile>> GAME_OR_MANNEQUIN_PROFILE = new EitherType<>(MANNEQUIN_PROFILE, GAME_PROFILE1_21_9);
     public static final Type<GameProfile.Property> PROFILE_PROPERTY = new ProfilePropertyType();
     public static final Type<GameProfile.Property[]> PROFILE_PROPERTY_ARRAY = new ArrayType<>(PROFILE_PROPERTY);
     public static final Type<ProfileKey> PROFILE_KEY = new ProfileKeyType();
