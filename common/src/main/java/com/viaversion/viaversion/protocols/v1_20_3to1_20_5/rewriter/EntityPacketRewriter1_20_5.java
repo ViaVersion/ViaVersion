@@ -48,6 +48,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundCon
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ScoreboardTeamStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.KeyMappings;
@@ -297,6 +298,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
             final byte gamemode = wrapper.passthrough(Types.BYTE);
             sendRangeAttributes(wrapper.user(), gamemode == GameMode.CREATIVE.id());
+
+            wrapper.user().put(new ScoreboardTeamStorage());
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_MOB_EFFECT, wrapper -> {

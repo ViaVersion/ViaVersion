@@ -52,6 +52,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.EntityPacket
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.ParticleRewriter1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ScoreboardTeamStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.TagKeys;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -60,6 +61,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.ProtocolLogger;
 import java.util.BitSet;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
@@ -222,6 +224,51 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             wrapper.write(Types.BOOLEAN, strictErrorHandling);
         });
 
+        registerClientbound(ClientboundPackets1_20_3.SET_PLAYER_TEAM, wrapper -> {
+            final String teamName = wrapper.passthrough(Types.STRING);
+            final byte action = wrapper.passthrough(Types.BYTE);
+            if (action == 2) {
+                return;
+            }
+
+            final ScoreboardTeamStorage storage = wrapper.user().get(ScoreboardTeamStorage.class);
+            if (action == 1) {
+                storage.removeTeam(teamName);
+                return;
+            } else if (action == 0) {
+                storage.createTeam(teamName);
+                wrapper.passthrough(Types.TAG); // Display name
+                wrapper.passthrough(Types.BYTE); // Flags
+                wrapper.passthrough(Types.STRING); // Name Tag Visibility
+                wrapper.passthrough(Types.STRING); // Collision rule
+                wrapper.passthrough(Types.VAR_INT); // Color
+                wrapper.passthrough(Types.TAG); // Prefix
+                wrapper.passthrough(Types.TAG); // Suffix
+
+                final String[] players = wrapper.passthrough(Types.STRING_ARRAY);
+                storage.addPlayerToTeam(teamName, players);
+                return;
+            }
+
+            final String[] players = wrapper.passthrough(Types.STRING_ARRAY);
+            if (action == 3) {
+                storage.addPlayerToTeam(teamName, players);
+            } else if (action != 4) {
+                return;
+            }
+
+            // Drop invalid remove packets to not break when plugins do that, since strict error handling is enforced in newer protocols.
+            for (final String player : players) {
+                final String team = storage.getPlayerTeam(player);
+                if (!Objects.equals(team, teamName)) {
+                    wrapper.cancel();
+                    return;
+                }
+
+                storage.removeFromTeam(teamName, player);
+            }
+        });
+
         cancelServerbound(State.LOGIN, ServerboundLoginPackets.COOKIE_RESPONSE.getId());
         cancelServerbound(ServerboundConfigurationPackets1_20_5.COOKIE_RESPONSE);
         cancelServerbound(ServerboundConfigurationPackets1_20_5.SELECT_KNOWN_PACKS);
@@ -300,6 +347,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_5.PLAYER));
         connection.put(new AcknowledgedMessagesStorage());
         connection.put(new ArmorTrimStorage());
+        connection.put(new ScoreboardTeamStorage());
     }
 
     @Override
