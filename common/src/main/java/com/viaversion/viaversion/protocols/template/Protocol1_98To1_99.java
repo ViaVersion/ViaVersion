@@ -42,7 +42,6 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
-import com.viaversion.viaversion.util.SerializerVersion;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
@@ -52,7 +51,6 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 //   ServerboundPacket1_21_4
 //   EntityTypes1_21_4 (MAPPED type)
 //   VersionedTypes.V1_21_5
-//   SerializerVersion.V1_21_5
 //   1.99, 1.98
 final class Protocol1_98To1_99 extends AbstractProtocol<ClientboundPacket1_21_2, ClientboundPacket1_21_2, ServerboundPacket1_21_4, ServerboundPacket1_21_4> {
 
@@ -144,7 +142,7 @@ final class Protocol1_98To1_99 extends AbstractProtocol<ClientboundPacket1_21_2,
     public void init(final UserConnection connection) {
         // Register the entity tracker - used for entity id/entity data rewriting AND for tracking world data sent to the client (then used for chunk data rewriting)
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_4.PLAYER));
-        addItemHasher(connection, new ItemHasherBase(this, connection, SerializerVersion.V1_21_6, SerializerVersion.V1_21_6));
+        addItemHasher(connection, new ItemHasherBase(this, connection));
     }
 
     // Overriding these methods is important as they are relied on various rewriter classes
