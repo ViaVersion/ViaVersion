@@ -50,7 +50,7 @@ public enum SerializerVersion {
     V1_20_3(TextComponentCodec.V1_20_3, SNbt.V1_14),
     V1_20_5(TextComponentCodec.V1_20_5, SNbt.V1_14),
     V1_21_4(TextComponentCodec.V1_21_4, SNbt.V1_14),
-    V1_21_5(TextComponentCodec.V1_21_5, null/*Currently not needed and also not implemented 100% in MCStructs*/),
+    // SNBT 1.21.5+ is not working at the moment
     V1_21_6(TextComponentCodec.V1_21_6, null);
 
     final TextComponentSerializer jsonSerializer;

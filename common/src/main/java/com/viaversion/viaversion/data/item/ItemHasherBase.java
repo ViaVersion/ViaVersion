@@ -33,7 +33,6 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.codec.CodecRegistryContext;
 import com.viaversion.viaversion.codec.hash.HashFunction;
 import com.viaversion.viaversion.codec.hash.HashOps;
-import com.viaversion.viaversion.util.SerializerVersion;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,10 +49,10 @@ public class ItemHasherBase implements ItemHasher {
     private final CodecContext context;
     private final CodecContext mappedContext;
 
-    public ItemHasherBase(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection, final SerializerVersion serializerVersion, final SerializerVersion mappedSerializerVersion) {
+    public ItemHasherBase(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection) {
         final RegistryAccess registryAccess = RegistryAccess.of(this.enchantments, protocol.getMappingData());
-        this.context = new CodecRegistryContext(protocol, serializerVersion, mappedSerializerVersion, registryAccess, false);
-        this.mappedContext = new CodecRegistryContext(protocol, serializerVersion, mappedSerializerVersion, registryAccess, true);
+        this.context = new CodecRegistryContext(protocol, registryAccess, false);
+        this.mappedContext = new CodecRegistryContext(protocol, registryAccess, true);
         this.connection = connection;
     }
 

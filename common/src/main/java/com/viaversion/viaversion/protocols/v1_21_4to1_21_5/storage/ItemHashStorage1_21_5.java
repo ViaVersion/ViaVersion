@@ -29,7 +29,6 @@ import com.viaversion.viaversion.codec.hash.HashFunction;
 import com.viaversion.viaversion.codec.hash.HashOps;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
-import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -43,7 +42,7 @@ public class ItemHashStorage1_21_5 implements ItemHasher {
 
     public ItemHashStorage1_21_5(final Protocol1_21_4To1_21_5 protocol) {
         final RegistryAccess registryAccess = RegistryAccess.of(this.enchantmentRegistry, protocol.getMappingData());
-        this.context = new CodecRegistryContext(protocol, SerializerVersion.V1_21_5, SerializerVersion.V1_21_5, registryAccess, true); // always using 1.21.5 items as input
+        this.context = new CodecRegistryContext(protocol, registryAccess, true); // always using 1.21.5 items as input
     }
 
     @Override

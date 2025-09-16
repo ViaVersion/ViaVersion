@@ -21,13 +21,11 @@ import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
-import com.viaversion.viaversion.util.SerializerVersion;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import java.util.List;
 import java.util.Set;
 
-public record CodecRegistryContext(Protocol<?, ?, ?, ?> protocol, SerializerVersion serializerVersion,
-                                   SerializerVersion mappedSerializerVersion, RegistryAccess registryAccess,
+public record CodecRegistryContext(Protocol<?, ?, ?, ?> protocol, RegistryAccess registryAccess,
                                    boolean mapped) implements CodecContext {
 
     // Generally from hardcoded, but highly variable client data
@@ -42,10 +40,8 @@ public record CodecRegistryContext(Protocol<?, ?, ?, ?> protocol, SerializerVers
         StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.CAT_VARIANT, StructuredDataKey.EQUIPPABLE1_21_6
     ));
 
-    public CodecRegistryContext(final Protocol<?, ?, ?, ?> protocol, final SerializerVersion serializerVersion, final SerializerVersion mappedSerializerVersion, final RegistryAccess registryAccess, final boolean mapped) {
+    public CodecRegistryContext(final Protocol<?, ?, ?, ?> protocol, final RegistryAccess registryAccess, final boolean mapped) {
         this.protocol = protocol;
-        this.serializerVersion = serializerVersion;
-        this.mappedSerializerVersion = mappedSerializerVersion;
         this.registryAccess = registryAccess.withMapped(mapped);
         this.mapped = mapped;
     }
