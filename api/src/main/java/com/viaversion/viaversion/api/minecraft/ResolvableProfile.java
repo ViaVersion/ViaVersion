@@ -24,6 +24,14 @@ package com.viaversion.viaversion.api.minecraft;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public record MannequinProfile(String texture, @Nullable String capeTexture, @Nullable String elytraTexture,
-                               int modelType) {
+/**
+ * Profile that can be either dynamically filled by the client or is already static.
+ * The additional fields are optional overrides.
+ */
+public record ResolvableProfile(GameProfile profile, @Nullable String bodyTexture, @Nullable String capeTexture,
+                                @Nullable String elytraTexture, @Nullable Integer modelType) {
+
+    public ResolvableProfile(final GameProfile profile) {
+        this(profile, null, null, null, null);
+    }
 }

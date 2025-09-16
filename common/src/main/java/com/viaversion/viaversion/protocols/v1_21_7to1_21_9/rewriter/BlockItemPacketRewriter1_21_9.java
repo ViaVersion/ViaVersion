@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.ResolvableProfile;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -82,7 +83,7 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
             final int id = Protocol1_21_7To1_21_9.MAPPINGS.getBlockEntityMappings().mappedId(tag.getString("id", "furnace"));
             return new BlockEntityData(id, tag);
         });
-        container.replaceKey(StructuredDataKey.PROFILE1_20_5, StructuredDataKey.PROFILE1_21_9);
+        container.replace(StructuredDataKey.PROFILE1_20_5, StructuredDataKey.PROFILE1_21_9, ResolvableProfile::new);
     }
 
     @Override
@@ -94,6 +95,6 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
     public static void downgradeData(final Item item, final StructuredDataContainer container) {
         container.replace(StructuredDataKey.ENTITY_DATA1_21_9, StructuredDataKey.ENTITY_DATA1_20_5, EntityData::tag);
         container.replace(StructuredDataKey.BLOCK_ENTITY_DATA1_21_9, StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, BlockEntityData::tag);
-        container.replaceKey(StructuredDataKey.PROFILE1_21_9, StructuredDataKey.PROFILE1_20_5);
+        container.replace(StructuredDataKey.PROFILE1_21_9, StructuredDataKey.PROFILE1_20_5, ResolvableProfile::profile);
     }
 }

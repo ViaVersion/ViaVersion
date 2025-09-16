@@ -18,6 +18,8 @@
 package com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
 import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_9;
@@ -81,6 +83,14 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
             wrapper.write(Types.BOOLEAN, false); // Relative Y rotation
             wrapper.passthrough(Types.FLOAT); // X rotation
             wrapper.write(Types.BOOLEAN, false); // Relative X rotation
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_21_6.SET_DEFAULT_SPAWN_POSITION, wrapper -> {
+            final BlockPosition pos = wrapper.read(Types.BLOCK_POSITION1_14);
+            final String dimension = tracker(wrapper.user()).currentWorld();
+            wrapper.write(Types.GLOBAL_POSITION, new GlobalBlockPosition(dimension, pos.x(), pos.y(), pos.z()));
+            wrapper.passthrough(Types.FLOAT); // Yaw
+            wrapper.write(Types.FLOAT, 0F); // Pitch
         });
 
         final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);

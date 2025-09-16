@@ -65,7 +65,7 @@ public final class EntityDataTypes1_21_9 extends AbstractEntityDataTypes {
     public final EntityDataType weatheringCopperState = add(33, Types.VAR_INT);
     public final EntityDataType vector3FType = add(34, Types.VECTOR3F);
     public final EntityDataType quaternionType = add(35, Types.QUATERNION);
-    public final EntityDataType mannequinProfileType = add(36, Types.GAME_OR_MANNEQUIN_PROFILE);
+    public final EntityDataType mannequinProfileType = add(36, Types.RESOLVABLE_PROFILE);
 
     public EntityDataTypes1_21_9(final VersionedTypesHolder types) {
         super(37);
