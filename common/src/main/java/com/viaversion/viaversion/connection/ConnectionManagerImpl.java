@@ -28,7 +28,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ConnectionManagerImpl implements ConnectionManager {
@@ -65,12 +64,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
             if (!channel.isOpen()) {
                 onDisconnect(connection);
             } else if (newlyAdded) { // Setup to clean-up on disconnect
-                channel.closeFuture().addListener((ChannelFutureListener) future -> {
-                    if (Via.getManager().isDebug() && !channel.eventLoop().inEventLoop()) {
-                        Via.getPlatform().getLogger().log(Level.WARNING, "Channel close called outside of event loop", new Exception());
-                    }
-                    onDisconnect(connection);
-                });
+                channel.closeFuture().addListener((ChannelFutureListener) future -> onDisconnect(connection));
             }
         }
     }
@@ -89,7 +83,9 @@ public class ConnectionManagerImpl implements ConnectionManager {
             clientConnections.remove(id, connection);
         }
 
-        connection.clearStoredObjects();
+        // There might be a packet still going through the handlers after we set the connection as inactive
+        // Make sure that we remove stored objects after those have been handled, otherwise this might introduce NPEs
+        connection.getChannel().eventLoop().execute(connection::clearStoredObjects);
     }
 
     @Override
