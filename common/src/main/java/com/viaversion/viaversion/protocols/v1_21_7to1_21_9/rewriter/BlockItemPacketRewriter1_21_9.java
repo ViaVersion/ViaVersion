@@ -21,7 +21,9 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ResolvableProfile;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_9;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockEntityData;
 import com.viaversion.viaversion.api.minecraft.item.data.EntityData;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
@@ -75,6 +77,13 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
     }
 
     public static void upgradeData(final Item item, final StructuredDataContainer container) {
+        container.replace(StructuredDataKey.BEES1_20_5, StructuredDataKey.BEES1_21_9, bees -> {
+            for (int i = 0; i < bees.length; i++) {
+                final Bee bee = bees[i];
+                bees[i] = new Bee(new EntityData(EntityTypes1_21_9.BEE.getId(), bee.entityData().tag()), bee.ticksInHive(), bee.minTicksInHive());
+            }
+            return bees;
+        });
         container.replace(StructuredDataKey.ENTITY_DATA1_20_5, StructuredDataKey.ENTITY_DATA1_21_9, tag -> {
             final int id = Protocol1_21_7To1_21_9.MAPPINGS.getEntityMappings().mappedId(tag.getString("id", "pig"));
             return new EntityData(id, tag);
@@ -93,6 +102,7 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
     }
 
     public static void downgradeData(final Item item, final StructuredDataContainer container) {
+        container.replaceKey(StructuredDataKey.BEES1_21_9, StructuredDataKey.BEES1_20_5);
         container.replace(StructuredDataKey.ENTITY_DATA1_21_9, StructuredDataKey.ENTITY_DATA1_20_5, EntityData::tag);
         container.replace(StructuredDataKey.BLOCK_ENTITY_DATA1_21_9, StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, BlockEntityData::tag);
         container.replace(StructuredDataKey.PROFILE1_21_9, StructuredDataKey.PROFILE1_20_5, ResolvableProfile::profile);

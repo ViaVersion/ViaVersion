@@ -1344,7 +1344,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return new Bee(entityData, ticksInHive, minOccupationTicks);
         }).filter(Objects::nonNull).toArray(Bee[]::new);
 
-        data.set(StructuredDataKey.BEES, bees);
+        data.set(StructuredDataKey.BEES1_20_5, bees);
     }
 
     private void updateProperties(final CompoundTag propertiesTag, final List<GameProfile.Property> properties) {

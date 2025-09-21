@@ -183,7 +183,8 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> BASE_COLOR = new StructuredDataKey<>("base_color", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<PotDecorations> POT_DECORATIONS = new StructuredDataKey<>("pot_decorations", PotDecorations.TYPE);
     public static final StructuredDataKey<BlockStateProperties> BLOCK_STATE = new StructuredDataKey<>("block_state", BlockStateProperties.TYPE);
-    public static final StructuredDataKey<Bee[]> BEES = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE);
+    public static final StructuredDataKey<Bee[]> BEES1_20_5 = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE1_20_5);
+    public static final StructuredDataKey<Bee[]> BEES1_21_9 = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE1_21_9);
     public static final StructuredDataKey<Tag> LOCK = new StructuredDataKey<>("lock", Types.TAG);
     public static final StructuredDataKey<CompoundTag> CONTAINER_LOOT = new StructuredDataKey<>("container_loot", Types.COMPOUND_TAG);
     public static final StructuredDataKey<Holder<SoundEvent>> BREAK_SOUND = new StructuredDataKey<>("break_sound", Types.SOUND_EVENT);

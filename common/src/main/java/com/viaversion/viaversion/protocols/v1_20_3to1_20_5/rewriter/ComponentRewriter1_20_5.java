@@ -172,7 +172,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         register(StructuredDataKey.POT_DECORATIONS, this::potDecorationsToTag, this::potDecorationsFromTag);
         register(StructuredDataKey.V1_20_5.container, this::containerToTag, this::containerFromTag);
         register(StructuredDataKey.BLOCK_STATE, this::blockStateToTag, this::blockStateFromTag);
-        register(StructuredDataKey.BEES, this::beesToTag, this::beesFromTag);
+        register(StructuredDataKey.BEES1_20_5, this::beesToTag, this::beesFromTag);
         register(StructuredDataKey.LOCK, this::lockToTag, this::lockFromTag);
         register(StructuredDataKey.CONTAINER_LOOT, this::containerLootToTag, this::containerLootFromTag);
     }
@@ -1386,8 +1386,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         final ListTag<CompoundTag> tag = new ListTag<>(CompoundTag.class);
         for (final Bee bee : value) {
             final CompoundTag beeTag = new CompoundTag();
-            if (!bee.entityData().isEmpty()) {
-                beeTag.put("entity_data", nbtToTag(bee.entityData()));
+            if (!bee.entityData().tag().isEmpty()) {
+                beeTag.put("entity_data", nbtToTag(bee.entityData().tag()));
             }
             beeTag.putInt("ticks_in_hive", bee.ticksInHive());
             beeTag.putInt("min_ticks_in_hive", bee.minTicksInHive());

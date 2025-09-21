@@ -38,6 +38,6 @@ public final class ComponentRewriter1_21_9 extends NBTComponentRewriter<Clientbo
             return;
         }
 
-        removeDataComponents(componentsTag, StructuredDataKey.ENTITY_DATA1_20_5, StructuredDataKey.BLOCK_ENTITY_DATA1_20_5);
+        removeDataComponents(componentsTag, StructuredDataKey.ENTITY_DATA1_20_5, StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, StructuredDataKey.BEES1_20_5);
     }
 }

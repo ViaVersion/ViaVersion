@@ -28,10 +28,11 @@ import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 
-public record EntityData(int type, CompoundTag tag) implements Rewritable {
+public record EntityData(int type, CompoundTag tag) implements Rewritable, Copyable {
 
     public static final Type<EntityData> TYPE = new Type<>(EntityData.class) {
         @Override
@@ -60,5 +61,10 @@ public record EntityData(int type, CompoundTag tag) implements Rewritable {
     public EntityData rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         final int mappedType = protocol.getMappingData().getEntityMappings().getNewId(type);
         return new EntityData(mappedType, tag);
+    }
+
+    @Override
+    public EntityData copy() {
+        return new EntityData(type, tag.copy());
     }
 }

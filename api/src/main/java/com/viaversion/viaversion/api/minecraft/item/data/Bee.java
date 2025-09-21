@@ -30,20 +30,24 @@ import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
 
-public record Bee(CompoundTag entityData, int ticksInHive, int minTicksInHive) implements Copyable {
+public record Bee(EntityData entityData, int ticksInHive, int minTicksInHive) implements Copyable {
 
-    public static final Type<Bee> TYPE = new Type<>(Bee.class) {
+    public Bee(final CompoundTag entityData, final int ticksInHive, final int minTicksInHive) {
+        this(new EntityData(-1, entityData), ticksInHive, minTicksInHive);
+    }
+
+    public static final Type<Bee> TYPE1_20_5 = new Type<>(Bee.class) {
         @Override
         public Bee read(final ByteBuf buffer) {
             final CompoundTag entityData = Types.COMPOUND_TAG.read(buffer);
             final int ticksInHive = Types.VAR_INT.readPrimitive(buffer);
             final int minTicksInHive = Types.VAR_INT.readPrimitive(buffer);
-            return new Bee(entityData, ticksInHive, minTicksInHive);
+            return new Bee(new EntityData(-1, entityData), ticksInHive, minTicksInHive);
         }
 
         @Override
         public void write(final ByteBuf buffer, final Bee value) {
-            Types.COMPOUND_TAG.write(buffer, value.entityData);
+            Types.COMPOUND_TAG.write(buffer, value.entityData.tag());
             Types.VAR_INT.writePrimitive(buffer, value.ticksInHive);
             Types.VAR_INT.writePrimitive(buffer, value.minTicksInHive);
         }
@@ -51,12 +55,38 @@ public record Bee(CompoundTag entityData, int ticksInHive, int minTicksInHive) i
         @Override
         public void write(final Ops ops, final Bee value) {
             ops.writeMap(map -> map
-                .writeOptional("entity_data", Types.COMPOUND_TAG, value.entityData, new CompoundTag())
+                .writeOptional("entity_data", Types.COMPOUND_TAG, value.entityData.tag(), new CompoundTag())
                 .write("ticks_in_hive", Types.INT, value.ticksInHive)
                 .write("min_ticks_in_hive", Types.INT, value.minTicksInHive));
         }
     };
-    public static final Type<Bee[]> ARRAY_TYPE = new ArrayType<>(TYPE);
+    public static final Type<Bee[]> ARRAY_TYPE1_20_5 = new ArrayType<>(TYPE1_20_5);
+
+    public static final Type<Bee> TYPE1_21_9 = new Type<>(Bee.class) {
+        @Override
+        public Bee read(final ByteBuf buffer) {
+            final EntityData entityData = EntityData.TYPE.read(buffer);
+            final int ticksInHive = Types.VAR_INT.readPrimitive(buffer);
+            final int minTicksInHive = Types.VAR_INT.readPrimitive(buffer);
+            return new Bee(entityData, ticksInHive, minTicksInHive);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final Bee value) {
+            EntityData.TYPE.write(buffer, value.entityData);
+            Types.VAR_INT.writePrimitive(buffer, value.ticksInHive);
+            Types.VAR_INT.writePrimitive(buffer, value.minTicksInHive);
+        }
+
+        @Override
+        public void write(final Ops ops, final Bee value) {
+            ops.writeMap(map -> map
+                .write("entity_data", EntityData.TYPE, value.entityData)
+                .write("ticks_in_hive", Types.INT, value.ticksInHive)
+                .write("min_ticks_in_hive", Types.INT, value.minTicksInHive));
+        }
+    };
+    public static final Type<Bee[]> ARRAY_TYPE1_21_9 = new ArrayType<>(TYPE1_21_9);
 
     @Override
     public Bee copy() {

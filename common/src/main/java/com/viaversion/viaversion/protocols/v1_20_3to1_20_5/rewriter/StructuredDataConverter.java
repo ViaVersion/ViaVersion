@@ -307,11 +307,11 @@ public final class StructuredDataConverter {
                 tag.putString("instrument", identifier);
             }
         });
-        register(StructuredDataKey.BEES, (data, tag) -> {
+        register(StructuredDataKey.BEES1_20_5, (data, tag) -> {
             final ListTag<CompoundTag> bees = new ListTag<>(CompoundTag.class);
             for (final Bee bee : data) {
                 final CompoundTag beeTag = new CompoundTag();
-                beeTag.put("EntityData", bee.entityData());
+                beeTag.put("EntityData", bee.entityData().tag());
                 beeTag.putInt("TicksInHive", bee.ticksInHive());
                 beeTag.putInt("MinOccupationTicks", bee.minTicksInHive());
                 bees.add(beeTag);
