@@ -34,6 +34,7 @@ import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.Protocol1_21_7To1_21_
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandler;
+import com.viaversion.viaversion.util.Key;
 
 public final class EntityPacketRewriter1_21_9 extends EntityRewriter<ClientboundPacket1_21_6, Protocol1_21_7To1_21_9> {
 
@@ -94,6 +95,11 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
         });
 
         final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
+        registryDataRewriter.addHandler("dimension_type", (key, dimension) -> {
+            if (Key.equals(key, "minecraft:the_end")) {
+                dimension.putFloat("ambient_light", 0.25F); // End now has actual skylight
+            }
+        });
         protocol.registerClientbound(ClientboundConfigurationPackets1_21_6.REGISTRY_DATA, registryDataRewriter::handle);
     }
 
