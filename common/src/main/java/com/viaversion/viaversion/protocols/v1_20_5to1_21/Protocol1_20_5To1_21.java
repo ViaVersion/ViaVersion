@@ -237,7 +237,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_5.PLAYER));
         connection.put(new EfficiencyAttributeStorage());
         connection.put(new PlayerPositionStorage());
-        EntityPacketRewriter1_21.receivedValidWolfVariantRegistryData = false;
+        EntityPacketRewriter1_21.receivedWolfVariantRegistryData = false;
     }
 
     @Override

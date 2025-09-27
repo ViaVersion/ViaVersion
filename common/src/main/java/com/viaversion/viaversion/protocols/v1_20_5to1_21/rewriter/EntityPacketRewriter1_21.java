@@ -39,21 +39,9 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttri
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
-import java.util.Arrays;
 
 public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPacket1_20_5, Protocol1_20_5To1_21> {
-    public static boolean receivedValidWolfVariantRegistryData = false;
-    public final String[] validWolfVariantRegistryEntryKeys = new String[]{
-        "minecraft:ashen",
-        "minecraft:black",
-        "minecraft:chestnut",
-        "minecraft:pale",
-        "minecraft:rusty",
-        "minecraft:snowy",
-        "minecraft:spotted",
-        "minecraft:striped",
-        "minecraft:woods"
-    };
+    public static boolean receivedWolfVariantRegistryData = false;
 
     public EntityPacketRewriter1_21(final Protocol1_20_5To1_21 protocol) {
         super(protocol);
@@ -71,15 +59,9 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         campfireDamageType.putString("message_id", "inFire");
         campfireDamageType.putFloat("exhaustion", 0.1F);
         registryDataRewriter.addEntries("damage_type", new RegistryEntry("minecraft:campfire", campfireDamageType));
-        registryDataRewriter.addHandler(
-            "wolf_variant", (key, value) -> {
-                if (Arrays.asList(validWolfVariantRegistryEntryKeys).contains(key)) {
-                    receivedValidWolfVariantRegistryData |= (value.contains("wild_texture") && value.contains("angry_texture") && value.contains("biomes") && value.contains("tame_texture"));
-                } else {
-                    receivedValidWolfVariantRegistryData = false;
-                }
-            }
-        );
+        registryDataRewriter.addHandler("wolf_variant", (key, value) -> {
+            receivedWolfVariantRegistryData = true;
+        });
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, registryDataRewriter::handle);
 
         protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_20_5.FINISH_CONFIGURATION, wrapper -> {
@@ -114,7 +96,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             jukeboxSongsPacket.write(Types.REGISTRY_ENTRY_ARRAY, protocol.getMappingData().jukeboxSongs());
             jukeboxSongsPacket.send(Protocol1_20_5To1_21.class);
 
-            if (!receivedValidWolfVariantRegistryData) {
+            if (!receivedWolfVariantRegistryData) {
                 createDefaultWolfVariantRegistryDataPacket(wrapper).send(Protocol1_20_5To1_21.class);
             }
         });
