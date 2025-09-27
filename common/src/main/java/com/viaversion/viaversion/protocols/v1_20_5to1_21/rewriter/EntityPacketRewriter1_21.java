@@ -43,6 +43,17 @@ import java.util.Arrays;
 
 public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPacket1_20_5, Protocol1_20_5To1_21> {
     public static boolean receivedValidWolfVariantRegistryData = false;
+    public final String[] validWolfVariantRegistryEntryKeys = new String[]{
+        "minecraft:ashen",
+        "minecraft:black",
+        "minecraft:chestnut",
+        "minecraft:pale",
+        "minecraft:rusty",
+        "minecraft:snowy",
+        "minecraft:spotted",
+        "minecraft:striped",
+        "minecraft:woods"
+    };
 
     public EntityPacketRewriter1_21(final Protocol1_20_5To1_21 protocol) {
         super(protocol);
@@ -62,7 +73,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         registryDataRewriter.addEntries("damage_type", new RegistryEntry("minecraft:campfire", campfireDamageType));
         registryDataRewriter.addHandler(
             "wolf_variant", (key, value) -> {
-                if (Arrays.asList(getValidWolfVariantRegistryEntryKeys()).contains(key)) {
+                if (Arrays.asList(validWolfVariantRegistryEntryKeys).contains(key)) {
                     receivedValidWolfVariantRegistryData |= (value.contains("wild_texture") && value.contains("angry_texture") && value.contains("biomes") && value.contains("tame_texture"));
                 } else {
                     receivedValidWolfVariantRegistryData = false;
@@ -216,20 +227,6 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             new RegistryEntry("minecraft:spotted", spottedWolfVariant),
             new RegistryEntry("minecraft:striped", stripedWolfVariant),
             new RegistryEntry("minecraft:woods", woodsWolfVariant),
-        };
-    }
-
-    private static String[] getValidWolfVariantRegistryEntryKeys() {
-        return new String[]{
-            "minecraft:ashen",
-            "minecraft:black",
-            "minecraft:chestnut",
-            "minecraft:pale",
-            "minecraft:rusty",
-            "minecraft:snowy",
-            "minecraft:spotted",
-            "minecraft:striped",
-            "minecraft:woods"
         };
     }
 
