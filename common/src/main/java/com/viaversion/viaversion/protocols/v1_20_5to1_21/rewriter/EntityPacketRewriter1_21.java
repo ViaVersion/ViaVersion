@@ -41,10 +41,14 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 
 public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPacket1_20_5, Protocol1_20_5To1_21> {
-    public static boolean receivedWolfVariantRegistryData = false;
+    public boolean receivedWolfVariantRegistryData = false;
 
     public EntityPacketRewriter1_21(final Protocol1_20_5To1_21 protocol) {
         super(protocol);
+    }
+
+    public void resetReceivedWolfVariantRegistryData() {
+        this.receivedWolfVariantRegistryData = false;
     }
 
     @Override
