@@ -39,12 +39,10 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttri
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPacket1_20_5, Protocol1_20_5To1_21> {
-    public boolean receivedValidWolfVariantRegistryData = false;
+    public static boolean receivedValidWolfVariantRegistryData = false;
 
     public EntityPacketRewriter1_21(final Protocol1_20_5To1_21 protocol) {
         super(protocol);
@@ -65,7 +63,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         registryDataRewriter.addHandler(
             "wolf_variant", (key, value) -> {
                 if (Arrays.asList(getValidWolfVariantRegistryEntryKeys()).contains(key)) {
-                    receivedValidWolfVariantRegistryData = (value.contains("wild_texture") && value.contains("angry_texture") && value.contains("biomes") && value.contains("tame_texture"));
+                    receivedValidWolfVariantRegistryData |= (value.contains("wild_texture") && value.contains("angry_texture") && value.contains("biomes") && value.contains("tame_texture"));
                 } else {
                     receivedValidWolfVariantRegistryData = false;
                 }
