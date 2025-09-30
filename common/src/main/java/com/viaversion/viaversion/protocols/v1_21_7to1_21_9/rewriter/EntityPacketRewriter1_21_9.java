@@ -117,6 +117,10 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
         filter().handler((event, data) -> {
             int id = data.dataType().typeId();
             if (id == unmappedEntityDataTypes.compoundTagType.typeId()) {
+                if (event.entityType() == null) {
+                    // Remove unhandled data from bad packets here
+                    event.cancel();
+                }
                 return; // Handled below
             }
             if (id > unmappedEntityDataTypes.compoundTagType.typeId()) {
