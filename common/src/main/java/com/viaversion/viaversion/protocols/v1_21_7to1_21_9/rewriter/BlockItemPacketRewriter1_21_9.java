@@ -84,13 +84,14 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
             }
             return bees;
         });
+        // The actual type shouldn't matter for the display of items
         container.replace(StructuredDataKey.ENTITY_DATA1_20_5, StructuredDataKey.ENTITY_DATA1_21_9, tag -> {
             final int id = Protocol1_21_7To1_21_9.MAPPINGS.getEntityMappings().mappedId(tag.getString("id", "pig"));
-            return new EntityData(id, tag);
+            return new EntityData(id == -1 ? 0 : id, tag);
         });
         container.replace(StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, StructuredDataKey.BLOCK_ENTITY_DATA1_21_9, tag -> {
             final int id = Protocol1_21_7To1_21_9.MAPPINGS.getBlockEntityMappings().mappedId(tag.getString("id", "furnace"));
-            return new BlockEntityData(id, tag);
+            return new BlockEntityData(id == -1 ? 0 : id, tag);
         });
         container.replace(StructuredDataKey.PROFILE1_20_5, StructuredDataKey.PROFILE1_21_9, ResolvableProfile::new);
     }
