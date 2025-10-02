@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
 /**
@@ -36,7 +37,7 @@ import java.util.logging.Logger;
  *
  * @param <T> - The player type for the platform, used for API related methods
  */
-public interface ViaPlatform<T> {
+public interface ViaPlatform<T> extends Executor {
 
     /**
      * Get the logger for this platform
@@ -213,5 +214,10 @@ public interface ViaPlatform<T> {
      */
     default boolean couldBeReloading() {
         return true;
+    }
+
+    @Override
+    default void execute(Runnable command) {
+        runAsync(command);
     }
 }

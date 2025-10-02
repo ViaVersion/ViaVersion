@@ -17,9 +17,8 @@
  */
 package com.viaversion.viaversion.util;
 
-import com.google.common.io.CharStreams;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -27,13 +26,12 @@ import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.dump.DumpTemplate;
 import com.viaversion.viaversion.dump.VersionInfo;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.InvalidObjectException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -43,9 +41,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class DumpUtil {
 
@@ -73,63 +71,58 @@ public final class DumpUtil {
         );
         final Map<String, Object> configuration = ((Config) Via.getConfig()).getValues();
         final DumpTemplate template = new DumpTemplate(version, configuration, platform.getDump(), Via.getManager().getInjector().getDump(), getPlayerSample(playerToSample));
-        final CompletableFuture<String> result = new CompletableFuture<>();
-        platform.runAsync(() -> {
-            final HttpURLConnection con;
-            try {
-                con = (HttpURLConnection) new URL("https://dump.viaversion.com/documents").openConnection();
-            } catch (final IOException e) {
-                platform.getLogger().log(Level.SEVERE, "Error when opening connection to ViaVersion dump service", e);
-                result.completeExceptionally(new DumpException(DumpErrorType.CONNECTION, e));
-                return;
-            }
 
-            try {
-                con.setRequestProperty("Content-Type", "application/json");
-                con.addRequestProperty("User-Agent", "ViaVersion-" + platform.getPlatformName() + "/" + version.pluginVersion());
-                con.setRequestMethod("POST");
-                con.setDoOutput(true);
+        final String requestBody = GsonUtil.getPrettyGson().toJson(template);
+        final HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("https://dump.viaversion.com/documents"))
+            .header("Content-Type", "application/json")
+            .header("User-Agent", "ViaVersion-" + platform.getPlatformName() + "/" + version.pluginVersion())
+            .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+            .build();
 
-                try (final OutputStream out = con.getOutputStream()) {
-                    out.write(new GsonBuilder().setPrettyPrinting().create().toJson(template).getBytes(StandardCharsets.UTF_8));
+        return HttpClientUtil.get(Via.getPlatform())
+            .sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
+            .thenCompose(response -> {
+                final int code = response.statusCode();
+                if (code == 429) {
+                    return CompletableFuture.failedFuture(new DumpException(DumpErrorType.RATE_LIMITED));
                 }
 
-                if (con.getResponseCode() == 429) {
-                    result.completeExceptionally(new DumpException(DumpErrorType.RATE_LIMITED));
-                    return;
+                final String body = response.body();
+                if (code < 200 || code >= 400) {
+                    platform.getLogger().severe("Page returned: " + body);
+                    return CompletableFuture.failedFuture(
+                        new DumpException(DumpErrorType.POST,
+                            new IOException("Unexpected status code " + code))
+                    );
                 }
 
-                final String rawOutput;
-                try (final InputStream inputStream = con.getInputStream()) {
-                    rawOutput = CharStreams.toString(new InputStreamReader(inputStream));
+                try {
+                    final JsonElement output = GsonUtil.getGson().fromJson(body, JsonElement.class);
+                    if (output instanceof JsonObject object && object.has("key")) {
+                        return CompletableFuture.completedFuture(urlForId(object.get("key").getAsString()));
+                    } else {
+                        return CompletableFuture.failedFuture(
+                            new DumpException(DumpErrorType.POST, new InvalidObjectException("Key is not given in Hastebin output"))
+                        );
+                    }
+                } catch (Exception e) {
+                    platform.getLogger().log(Level.SEVERE, "Error parsing ViaVersion dump response", e);
+                    return CompletableFuture.failedFuture(new DumpException(DumpErrorType.POST, e));
+                }
+            })
+            .exceptionallyCompose(ex -> {
+                final Throwable cause = (ex instanceof CompletionException) ? ex.getCause() : ex;
+
+                if ((cause instanceof java.net.ConnectException
+                    || cause instanceof java.net.UnknownHostException
+                    || cause instanceof java.net.SocketTimeoutException)) {
+                    return CompletableFuture.failedFuture(new DumpException(DumpErrorType.CONNECTION, cause));
                 }
 
-                final JsonObject output = GsonUtil.getGson().fromJson(rawOutput, JsonObject.class);
-                if (!output.has("key")) {
-                    throw new InvalidObjectException("Key is not given in Hastebin output");
-                }
-
-                result.complete(urlForId(output.get("key").getAsString()));
-            } catch (final Exception e) {
-                platform.getLogger().log(Level.SEVERE, "Error when posting ViaVersion dump", e);
-                result.completeExceptionally(new DumpException(DumpErrorType.POST, e));
-                printFailureInfo(con);
-            }
-        });
-        return result;
-    }
-
-    private static void printFailureInfo(final HttpURLConnection connection) {
-        try {
-            if (connection.getResponseCode() < 200 || connection.getResponseCode() > 400) {
-                try (final InputStream errorStream = connection.getErrorStream()) {
-                    final String rawOutput = CharStreams.toString(new InputStreamReader(errorStream));
-                    Via.getPlatform().getLogger().log(Level.SEVERE, "Page returned: " + rawOutput);
-                }
-            }
-        } catch (final IOException e) {
-            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to capture further info", e);
-        }
+                platform.getLogger().log(Level.SEVERE, "Error when posting ViaVersion dump", ex);
+                return CompletableFuture.failedFuture(new DumpException(DumpErrorType.POST, ex));
+            });
     }
 
     public static String urlForId(final String id) {

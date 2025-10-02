@@ -17,18 +17,15 @@
  */
 package com.viaversion.viaversion.update;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.util.HttpClientUtil;
 import com.viaversion.viaversion.util.Pair;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpRequest;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -39,73 +36,67 @@ public final class UpdateUtil {
     private static final String PLUGIN = "ViaVersion/";
 
     public static void sendUpdateMessage(final UserConnection connection) {
-        Via.getPlatform().runAsync(() -> {
-            final Pair<Level, String> message = getUpdateMessage(false);
+        getUpdateMessage(false).thenAcceptAsync(message -> {
             if (message != null) {
-                Via.getPlatform().runSync(() -> Via.getPlatform().sendMessage(connection, PREFIX + message.value()));
+                Via.getPlatform().sendMessage(connection, PREFIX + message.value());
             }
-        });
+        }, Via.getPlatform());
     }
 
     public static void sendUpdateMessage() {
-        Via.getPlatform().runAsync(() -> {
-            final Pair<Level, String> message = getUpdateMessage(true);
+        getUpdateMessage(true).thenAcceptAsync(message -> {
             if (message != null) {
-                Via.getPlatform().runSync(() -> Via.getPlatform().getLogger().log(message.key(), message.value()));
+                Via.getPlatform().getLogger().log(message.key(), message.value());
             }
-        });
+        }, Via.getPlatform());
     }
 
-    private static @Nullable Pair<Level, String> getUpdateMessage(boolean console) {
+    private static CompletableFuture<@Nullable Pair<Level, String>> getUpdateMessage(boolean console) {
         if (Via.getPlatform().getPluginVersion().equals("${version}")) {
-            return new Pair<>(Level.WARNING, "You are using a debug/custom version, consider updating.");
+            return CompletableFuture.completedFuture(
+                new Pair<>(Level.WARNING, "You are using a debug/custom version, consider updating.")
+            );
         }
 
-        String newestString;
-        try {
-            newestString = getNewestVersion();
-        } catch (IOException | JsonParseException ignored) {
-            return console ? new Pair<>(Level.WARNING, "Could not check for updates, check your connection.") : null;
-        }
+        return getNewestVersion().exceptionally(ex -> null)
+            .thenApply(newestString -> {
+                if (newestString == null) {
+                    return console ? new Pair<>(Level.WARNING, "Could not check for updates, check your connection.") : null;
+                }
 
-        Version current;
-        try {
-            current = new Version(Via.getPlatform().getPluginVersion());
-        } catch (IllegalArgumentException e) {
-            return new Pair<>(Level.INFO, "You are using a custom version, consider updating.");
-        }
+                Version current;
+                try {
+                    current = new Version(Via.getPlatform().getPluginVersion());
+                } catch (IllegalArgumentException e) {
+                    return new Pair<>(Level.INFO, "You are using a custom version, consider updating.");
+                }
 
-        Version newest = new Version(newestString);
-        if (current.compareTo(newest) < 0) {
-            return new Pair<>(Level.WARNING, "There is a newer plugin version available: " + newest + ", you're on: " + current);
-        } else if (console && current.compareTo(newest) != 0) {
-            String tag = current.getTag().toLowerCase(Locale.ROOT);
-            if (tag.endsWith("dev") || tag.endsWith("snapshot")) {
-                return new Pair<>(Level.INFO, "You are running a development version of the plugin, please report any bugs to GitHub.");
-            } else {
-                return new Pair<>(Level.WARNING, "You are running a newer version of the plugin than is released!");
-            }
-        }
-        return null;
+                Version newest = new Version(newestString);
+                if (current.compareTo(newest) < 0) {
+                    return new Pair<>(Level.WARNING, "There is a newer plugin version available: " + newest + ", you're on: " + current);
+                } else if (console && current.compareTo(newest) != 0) {
+                    String tag = current.getTag().toLowerCase(Locale.ROOT);
+                    if (tag.endsWith("dev") || tag.endsWith("snapshot")) {
+                        return new Pair<>(Level.INFO, "You are running a development version of the plugin, please report any bugs to GitHub.");
+                    } else {
+                        return new Pair<>(Level.WARNING, "You are running a newer version of the plugin than is released!");
+                    }
+                }
+
+                return null;
+            });
     }
 
-    private static String getNewestVersion() throws IOException {
-        URL url = new URL(URL + PLUGIN);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setUseCaches(false);
-        connection.addRequestProperty("User-Agent", "ViaVersion " + Via.getPlatform().getPluginVersion() + " " + Via.getPlatform().getPlatformName());
-        connection.addRequestProperty("Accept", "application/json");
-        connection.setDoOutput(true);
+    private static CompletableFuture<String> getNewestVersion() {
+        final HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(URL + PLUGIN))
+            .header("User-Agent", "ViaVersion " + Via.getPlatform().getPluginVersion() + " " + Via.getPlatform().getPlatformName())
+            .header("Accept", "application/json")
+            .GET()
+            .build();
 
-        StringBuilder builder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            String input;
-            while ((input = reader.readLine()) != null) {
-                builder.append(input);
-            }
-        }
-
-        JsonObject statistics = GsonUtil.getGson().fromJson(builder.toString(), JsonObject.class);
-        return statistics.get("name").getAsString();
+        return HttpClientUtil.get(Via.getPlatform())
+            .sendAsync(request, HttpClientUtil.jsonResponse(GsonUtil.getGson()))
+            .thenApplyAsync(response -> response.body().getAsJsonObject().get("name").getAsString());
     }
 }

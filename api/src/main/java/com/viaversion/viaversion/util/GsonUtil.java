@@ -30,7 +30,11 @@ import java.util.Comparator;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class GsonUtil {
-    private static final Gson GSON = new GsonBuilder().create();
+    private static final Gson GSON = new Gson();
+
+    private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    private GsonUtil() {}
 
     /**
      * Returns google's Gson magic.
@@ -39,6 +43,13 @@ public final class GsonUtil {
      */
     public static Gson getGson() {
         return GSON;
+    }
+
+    /**
+     * @return gson with pretty printing set
+     */
+    public static Gson getPrettyGson() {
+        return PRETTY_GSON;
     }
 
     public static @Nullable JsonElement sort(@Nullable final JsonElement object) {
