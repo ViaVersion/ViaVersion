@@ -239,6 +239,14 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         if (channel.equals("minecraft:brand")) {
             wrapper.passthrough(Types.STRING);
             wrapper.clearInputBuffer();
+        } else if (channel.equals("minecraft:debug/game_test_add_marker")) {
+            wrapper.passthrough(Types.BLOCK_POSITION1_14);
+            wrapper.passthrough(Types.INT);
+            wrapper.passthrough(Types.STRING);
+            wrapper.passthrough(Types.INT);
+            wrapper.clearInputBuffer();
+        } else if (channel.equals("minecraft:debug/game_test_clear")) {
+            wrapper.clearInputBuffer();
         }
     }
 
