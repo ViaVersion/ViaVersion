@@ -33,6 +33,15 @@ import java.util.Arrays;
  */
 public final class ArrayUtil {
 
+    public static <T> int indexOf(final T[] array, final T item) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == item) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public static <T> T[] add(final T[] array, final T element) {
         final int length = array.length;
         final T[] newArray = Arrays.copyOf(array, length + 1);

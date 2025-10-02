@@ -34,7 +34,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
 
     protected final Map<UUID, UserConnection> serverConnections = new ConcurrentHashMap<>();
     protected final Map<UUID, UserConnection> clientConnections = new ConcurrentHashMap<>();
-    protected final Set<UserConnection> connections = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    protected final Set<UserConnection> connections = ConcurrentHashMap.newKeySet();
 
     @Override
     public void onLoginSuccess(UserConnection connection) {

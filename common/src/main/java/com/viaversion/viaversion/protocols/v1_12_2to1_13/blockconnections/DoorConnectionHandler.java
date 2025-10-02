@@ -20,31 +20,31 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.util.ArrayUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import it.unimi.dsi.fastutil.shorts.Short2IntMap;
+import it.unimi.dsi.fastutil.shorts.Short2IntOpenHashMap;
 import java.util.Locale;
-import java.util.Map;
 
 public class DoorConnectionHandler implements ConnectionHandler {
     private static final Int2ObjectMap<DoorData> DOOR_DATA_MAP = new Int2ObjectOpenHashMap<>();
-    private static final Map<Short, Integer> CONNECTED_STATES = new HashMap<>();
+    private static final Short2IntMap CONNECTED_STATES = new Short2IntOpenHashMap();
 
     static ConnectionData.ConnectorInitAction init() {
-        final List<String> baseDoors = new LinkedList<>();
-        baseDoors.add("minecraft:oak_door");
-        baseDoors.add("minecraft:birch_door");
-        baseDoors.add("minecraft:jungle_door");
-        baseDoors.add("minecraft:dark_oak_door");
-        baseDoors.add("minecraft:acacia_door");
-        baseDoors.add("minecraft:spruce_door");
-        baseDoors.add("minecraft:iron_door");
+        final String[] baseDoors = new String[] {
+            "minecraft:oak_door",
+            "minecraft:birch_door",
+            "minecraft:jungle_door",
+            "minecraft:dark_oak_door",
+            "minecraft:acacia_door",
+            "minecraft:spruce_door",
+            "minecraft:iron_door",
+        };
 
         final DoorConnectionHandler connectionHandler = new DoorConnectionHandler();
         return blockData -> {
-            int type = baseDoors.indexOf(blockData.getMinecraftKey());
+            int type = ArrayUtil.indexOf(baseDoors, blockData.getMinecraftKey());
             if (type == -1) return;
 
             int id = blockData.getSavedBlockStateId();
@@ -100,8 +100,7 @@ public class DoorConnectionHandler implements ConnectionHandler {
             s |= lowerHalf.facing().ordinal() << 4;
         }
 
-        Integer newBlockState = CONNECTED_STATES.get(s);
-        return newBlockState == null ? blockState : newBlockState;
+        return CONNECTED_STATES.getOrDefault(s, blockState);
     }
 
     private record DoorData(boolean lower, boolean rightHinge, boolean powered,
