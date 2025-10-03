@@ -106,12 +106,12 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
         container.replaceKey(StructuredDataKey.BEES1_21_9, StructuredDataKey.BEES1_20_5);
         container.replace(StructuredDataKey.ENTITY_DATA1_21_9, StructuredDataKey.ENTITY_DATA1_20_5, entityData -> {
             final String id = Protocol1_21_7To1_21_9.MAPPINGS.getEntityMappings().mappedIdentifier(entityData.type());
-            entityData.tag().putString("id", id);
+            entityData.tag().putString("id", id == null ? "pig" : id);
             return entityData.tag();
         });
         container.replace(StructuredDataKey.BLOCK_ENTITY_DATA1_21_9, StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, blockEntityData -> {
             final String id = Protocol1_21_7To1_21_9.MAPPINGS.getBlockEntityMappings().mappedIdentifier(blockEntityData.type());
-            blockEntityData.tag().putString("id", id);
+            blockEntityData.tag().putString("id", id == null ? "furnace" : id);
             return blockEntityData.tag();
         });
         container.replace(StructuredDataKey.PROFILE1_21_9, StructuredDataKey.PROFILE1_20_5, ResolvableProfile::profile);
