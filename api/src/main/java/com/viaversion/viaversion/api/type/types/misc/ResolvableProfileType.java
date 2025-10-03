@@ -41,8 +41,8 @@ public final class ResolvableProfileType extends Type<ResolvableProfile> {
     public ResolvableProfile read(final ByteBuf buffer) {
         final GameProfile profile;
         if (buffer.readBoolean()) {
-            final String name = Types.STRING.read(buffer);
             final UUID id = Types.UUID.read(buffer);
+            final String name = Types.STRING.read(buffer);
             final GameProfile.Property[] properties = Types.PROFILE_PROPERTY_ARRAY.read(buffer);
             profile = new GameProfile(name, id, properties, false);
         } else {
@@ -62,8 +62,8 @@ public final class ResolvableProfileType extends Type<ResolvableProfile> {
         final GameProfile profile = value.profile();
         if (!profile.dynamic()) {
             buffer.writeBoolean(true);
-            Types.STRING.write(buffer, profile.name());
             Types.UUID.write(buffer, profile.id());
+            Types.STRING.write(buffer, profile.name());
             Types.PROFILE_PROPERTY_ARRAY.write(buffer, profile.properties());
         } else {
             buffer.writeBoolean(false);
