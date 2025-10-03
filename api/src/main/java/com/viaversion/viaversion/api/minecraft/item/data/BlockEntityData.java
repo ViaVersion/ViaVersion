@@ -59,6 +59,7 @@ public record BlockEntityData(int type, CompoundTag tag) implements Rewritable {
     @Override
     public BlockEntityData rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         final int mappedType = protocol.getMappingData().getBlockEntityMappings().getNewId(type);
-        return new BlockEntityData(mappedType, tag);
+        // Empty mappings might be possible for removed block entities, set a dummy value in that case. Will be handled fine by server and client without losing data
+        return new BlockEntityData(mappedType != -1 ? mappedType : 0, tag);
     }
 }
