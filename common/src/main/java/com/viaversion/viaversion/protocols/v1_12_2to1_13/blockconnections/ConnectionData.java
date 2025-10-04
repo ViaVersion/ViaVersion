@@ -167,7 +167,7 @@ public final class ConnectionData {
         }
 
         Via.getPlatform().getLogger().info("Loading block connection mappings ...");
-        ListTag<StringTag> blockStates = MappingDataLoader.INSTANCE.loadNBT("blockstates-1.13.nbt").getListTag("blockstates", StringTag.class);
+        ListTag<StringTag> blockStates = Protocol1_12_2To1_13.MAPPINGS.getBlockStates();
         for (int id = 0; id < blockStates.size(); id++) {
             String key = blockStates.get(id).getValue();
             KEY_TO_ID.put(key, id);
