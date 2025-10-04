@@ -25,6 +25,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
+import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
@@ -52,6 +53,8 @@ public class MappingData1_13 extends MappingDataBase {
     private final Map<String, String> translateMapping = new HashMap<>();
     private final Map<String, String> mojangTranslation = new HashMap<>();
     private final BiMap<String, String> channelMappings = HashBiMap.create();
+    private ListTag<StringTag> blockStates;
+    private ListTag<StringTag> items;
 
     public MappingData1_13() {
         super("1.12", "1.13");
@@ -127,6 +130,10 @@ public class MappingData1_13 extends MappingDataBase {
                 translateMapping.put(key, mappedKey != null ? mappedKey : key);
             }
         }
+
+        final CompoundTag extras = MappingDataLoader.INSTANCE.loadNBT("extras-1.13.nbt");
+        blockStates = extras.getListTag("blockstates", StringTag.class);
+        items = extras.getListTag("items", StringTag.class);
     }
 
     @Override
@@ -202,5 +209,13 @@ public class MappingData1_13 extends MappingDataBase {
 
     public BiMap<String, String> getChannelMappings() {
         return channelMappings;
+    }
+
+    public ListTag<StringTag> getBlockStates() {
+        return blockStates;
+    }
+
+    public ListTag<StringTag> getItems() {
+        return items;
     }
 }
