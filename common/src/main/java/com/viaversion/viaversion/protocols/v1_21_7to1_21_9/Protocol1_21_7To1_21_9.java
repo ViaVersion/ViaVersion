@@ -121,6 +121,18 @@ public final class Protocol1_21_7To1_21_9 extends AbstractProtocol<ClientboundPa
 
             wrapper.write(Types.VAR_INT, 0); // Number of block particles
         });
+        registerServerbound(ServerboundPackets1_21_6.DEBUG_SAMPLE_SUBSCRIPTION, wrapper -> {
+            final int count = wrapper.read(Types.VAR_INT); // subscription count
+            for (int i = 0; i < count; i++) {
+                final int id = wrapper.read(Types.VAR_INT); // subscription registry id
+                if (id == 0) { // DEDICATED_SERVER_TICK_TIME
+                    wrapper.clearPacket();
+                    wrapper.write(Types.VAR_INT, 0); // debug sample type (TICK_TIME)
+                    return;
+                }
+            }
+            wrapper.cancel();
+        });
 
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21_6.SOUND);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21_6.SOUND_ENTITY);
@@ -129,7 +141,6 @@ public final class Protocol1_21_7To1_21_9 extends AbstractProtocol<ClientboundPa
         new AttributeRewriter<>(this).register1_21(ClientboundPackets1_21_6.UPDATE_ATTRIBUTES);
 
         cancelServerbound(ServerboundConfigurationPackets1_21_9.ACCEPT_CODE_OF_CONDUCT);
-        cancelServerbound(ServerboundPackets1_21_6.DEBUG_SAMPLE_SUBSCRIPTION);
     }
 
     @Override
