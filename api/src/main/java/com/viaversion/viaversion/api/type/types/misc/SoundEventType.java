@@ -22,11 +22,18 @@
  */
 package com.viaversion.viaversion.api.type.types.misc;
 
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 
 public final class SoundEventType extends HolderType<SoundEvent> {
+
+    public SoundEventType() {
+        super(MappingData.MappingType.SOUND);
+    }
 
     @Override
     public SoundEvent readDirect(final ByteBuf buffer) {
@@ -39,6 +46,13 @@ public final class SoundEventType extends HolderType<SoundEvent> {
     public void writeDirect(final ByteBuf buffer, final SoundEvent value) {
         Types.STRING.write(buffer, value.identifier());
         Types.OPTIONAL_FLOAT.write(buffer, value.fixedRange());
+    }
+
+    @Override
+    public void writeDirect(final Ops ops, final SoundEvent object) {
+        ops.writeMap(map -> map
+            .write("sound_id", Types.RESOURCE_LOCATION, Key.of(object.identifier()))
+            .writeOptional("range", Types.FLOAT, object.fixedRange()));
     }
 
     public static final class OptionalSoundEventType extends OptionalHolderType<SoundEvent> {

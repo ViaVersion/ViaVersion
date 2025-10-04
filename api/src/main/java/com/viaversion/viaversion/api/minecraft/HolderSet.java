@@ -50,9 +50,9 @@ public interface HolderSet {
     }
 
     /**
-     * Gets the tag key.
+     * Gets the tag key, not including '#'.
      *
-     * @return the tag key
+     * @return the tag key without a '#'
      * @see #hasTagKey()
      */
     String tagKey();

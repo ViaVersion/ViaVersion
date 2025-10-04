@@ -22,11 +22,14 @@ import com.viaversion.nbt.tag.FloatTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
+import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
+import com.viaversion.viaversion.api.minecraft.item.data.Equippable;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.UseCooldown;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -105,6 +108,13 @@ public class ItemHashTest extends PlatformTestBase {
     void testContainerWithEmptyItem() {
         hasher.write(VersionedTypes.V1_21_6.structuredDataKeys.container.type(), new Item[]{StructuredItem.empty(), new StructuredItem(1, 1)});
         Assertions.assertEquals(1506540737, hasher.hash(), "container hash mismatch");
+    }
+
+    @Test
+    void testInlinedList() {
+        final HolderSet singleEntrySet = HolderSet.of(new int[]{0});
+        hasher.write(Equippable.TYPE1_21_6, new Equippable(0, Holder.of(0), null, null, singleEntrySet, true, true, true, false, false, Holder.of(0)));
+        Assertions.assertEquals(-1789860417, hasher.hash(), "equippable hash mismatch");
     }
 
     private CompoundTag createCompoundTag() {

@@ -165,4 +165,18 @@ public interface MappingData {
     @Nullable FullMappings getRecipeSerializerMappings();
 
     @Nullable FullMappings getDataComponentSerializerMappings();
+
+    default @Nullable FullMappings getFullMappings(final MappingType mappingType) {
+        return switch (mappingType) {
+            case SOUND -> getFullSoundMappings();
+            case ENTITY -> getEntityMappings();
+        };
+    }
+
+    /**
+     * Type of mappings. Currently only relevant for ops writing of generic holder classes and expanded when needed.
+     */
+    enum MappingType {
+        SOUND, ENTITY
+    }
 }

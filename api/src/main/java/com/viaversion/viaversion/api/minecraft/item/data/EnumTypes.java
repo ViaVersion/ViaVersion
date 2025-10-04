@@ -44,6 +44,7 @@ public final class EnumTypes {
     public static final EnumType HORSE_VARIANT = new EnumType(Fallback.WRAP, "white", "creamy", "chestnut", "brown", "black", "gray", "dark_brown");
     public static final EnumType LLAMA_VARIANT = new EnumType(Fallback.CLAMP, "creamy", "white", "brown", "gray");
     public static final EnumType AXOLOTL_VARIANT = new EnumType("lucy", "wild", "gold", "cyan", "blue");
+    public static final EnumType EQUIPMENT_SLOT = new EnumType("mainhand", "feet", "legs", "chest", "head", "offhand", "body", "saddle");
     // Enums with non-ordinal ids
     public static final FakeEnumType RABBIT_VARIANT = new FakeEnumType(List.of("brown", "white", "black", "white_splotched", "gold", "salt"), of(99, "evil"));
     // Pretty much enums, but with a resource location
