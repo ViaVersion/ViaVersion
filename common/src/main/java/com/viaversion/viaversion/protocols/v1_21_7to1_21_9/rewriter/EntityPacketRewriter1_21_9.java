@@ -94,7 +94,16 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
             wrapper.write(Types.FLOAT, 0F); // Pitch
         });
 
-        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
+        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol) {
+            @Override
+            protected void handleParticleData(final CompoundTag particleData) {
+                final String type = particleData.getString("type");
+                if (type != null && Key.stripMinecraftNamespace(type).equals("flash")) {
+                    particleData.putInt("color", -1);
+                }
+                super.handleParticleData(particleData);
+            }
+        };
         registryDataRewriter.addHandler("dimension_type", (key, dimension) -> {
             if (Key.equals(key, "minecraft:the_end")) {
                 dimension.putFloat("ambient_light", 0.25F); // End now has actual skylight

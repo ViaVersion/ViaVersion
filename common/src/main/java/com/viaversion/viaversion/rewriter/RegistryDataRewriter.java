@@ -74,6 +74,8 @@ public class RegistryDataRewriter {
             updateTrimMaterials(entries);
         } else if (key.equals("jukebox_song")) {
             updateJukeboxSongs(entries);
+        } else if (key.equals("worldgen/biome")) {
+            updateBiomes(entries);
         }
 
         final BiConsumer<String, CompoundTag> registryEntryHandler = this.registryEntryHandlers.get(key);
@@ -219,6 +221,24 @@ public class RegistryDataRewriter {
         // can be overridden
     }
 
+    public void updateBiomes(final RegistryEntry[] entries) {
+        for (final RegistryEntry entry : entries) {
+            if (entry.tag() == null) {
+                continue;
+            }
+
+            final CompoundTag effects = ((CompoundTag) entry.tag()).getCompoundTag("effects");
+            if (effects == null) {
+                continue;
+            }
+
+            final CompoundTag particle = effects.getCompoundTag("particle");
+            if (particle != null) {
+                handleParticleData(particle.getCompoundTag("options"));
+            }
+        }
+    }
+
     private void updateNestedEffect(final CompoundTag effectsTag) {
         final CompoundTag effect = effectsTag.getCompoundTag("effect");
         if (effect == null) {
@@ -248,11 +268,8 @@ public class RegistryDataRewriter {
         }
     }
 
-    private void updateParticleField(final CompoundTag effectTag) {
-        final CompoundTag particleData = effectTag.getCompoundTag("particle");
-        if (particleData != null) {
-            updateType(particleData, "type", protocol.getMappingData().getParticleMappings());
-        }
+    protected void handleParticleData(final CompoundTag particleData) {
+        updateType(particleData, "type", protocol.getMappingData().getParticleMappings());
     }
 
     private void runEffectRewriters(final CompoundTag effectTag) {
@@ -265,7 +282,10 @@ public class RegistryDataRewriter {
         if (effect.equals("attribute")) {
             updateType(effectTag, "attribute", protocol.getMappingData().getAttributeMappings());
         } else if (effect.equals("spawn_particles")) {
-            updateParticleField(effectTag);
+            final CompoundTag particleData = effectTag.getCompoundTag("particle");
+            if (particleData != null) {
+                handleParticleData(particleData);
+            }
         }
 
         final Consumer<CompoundTag> rewriter = enchantmentEffectHandlers.get(effect);

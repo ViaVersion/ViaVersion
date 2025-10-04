@@ -20,7 +20,7 @@ checkerQual = "3.51.0"
 paper = "1.20.4-R0.1-SNAPSHOT"
 legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
 velocity = "3.1.1"
-viaProxy = "3.4.5-SNAPSHOT"
+viaProxy = "3.4.6-SNAPSHOT"
 
 [libraries]
 
