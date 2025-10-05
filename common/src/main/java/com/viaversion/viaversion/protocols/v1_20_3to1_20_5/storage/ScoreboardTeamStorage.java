@@ -41,13 +41,16 @@ public final class ScoreboardTeamStorage implements StorableObject {
     }
 
     public void addPlayerToTeam(final String team, final String[] player) {
-        for (final Set<String> players : this.teams.values()) {
-            for (final String toRemove : player) {
-                players.remove(toRemove);
-            }
+        final Set<String> players = this.teams.get(team);
+        if (players == null) {
+            return;
         }
 
-        final Set<String> players = this.teams.computeIfAbsent(team, k -> new HashSet<>());
+        for (final Set<String> allPlayers : this.teams.values()) {
+            for (final String toRemove : player) {
+                allPlayers.remove(toRemove);
+            }
+        }
         Collections.addAll(players, player);
     }
 

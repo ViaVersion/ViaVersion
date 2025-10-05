@@ -227,18 +227,11 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         });
 
         registerClientbound(ClientboundPackets1_20_3.SET_PLAYER_TEAM, wrapper -> {
+            final ScoreboardTeamStorage storage = wrapper.user().get(ScoreboardTeamStorage.class);
+
             final String teamName = wrapper.passthrough(Types.STRING);
             final byte action = wrapper.passthrough(Types.BYTE);
-            if (action == 2) {
-                return;
-            }
-
-            final ScoreboardTeamStorage storage = wrapper.user().get(ScoreboardTeamStorage.class);
-            if (action == 1) {
-                storage.removeTeam(teamName);
-                return;
-            } else if (action == 0) {
-                storage.createTeam(teamName);
+            if (action == 0) {
                 wrapper.passthrough(Types.TAG); // Display name
                 wrapper.passthrough(Types.BYTE); // Flags
                 wrapper.passthrough(Types.STRING); // Name Tag Visibility
@@ -246,21 +239,21 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
                 wrapper.passthrough(Types.VAR_INT); // Color
                 wrapper.passthrough(Types.TAG); // Prefix
                 wrapper.passthrough(Types.TAG); // Suffix
-
+                storage.createTeam(teamName);
                 final String[] players = wrapper.passthrough(Types.STRING_ARRAY);
                 storage.addPlayerToTeam(teamName, players);
-                return;
+            } else if (action == 1) {
+                storage.removeTeam(teamName);
+            } else if (action == 3) {
+                final String[] players = wrapper.passthrough(Types.STRING_ARRAY);
+                storage.addPlayerToTeam(teamName, players);
             }
 
-            if (action == 3) {
-                final String[] players = wrapper.passthrough(Types.STRING_ARRAY);
-                storage.addPlayerToTeam(teamName, players);
-            } else if (action != 4) {
+            if (action != 4) {
                 return;
             }
 
             final String[] players = wrapper.read(Types.STRING_ARRAY);
-
             // Drop invalid remove packets to not break when plugins do that, since strict error handling is enforced in newer protocols.
             final Set<String> filteredPlayers = new HashSet<>();
             for (final String player : players) {
