@@ -37,18 +37,14 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.Paintings1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.WolfVariantRegistryCheckStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
+import com.viaversion.viaversion.util.Key;
 
 public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPacket1_20_5, Protocol1_20_5To1_21> {
-    public boolean receivedWolfVariantRegistryData = false;
-
     public EntityPacketRewriter1_21(final Protocol1_20_5To1_21 protocol) {
         super(protocol);
-    }
-
-    public void resetReceivedWolfVariantRegistryData() {
-        this.receivedWolfVariantRegistryData = false;
     }
 
     @Override
@@ -63,10 +59,18 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         campfireDamageType.putString("message_id", "inFire");
         campfireDamageType.putFloat("exhaustion", 0.1F);
         registryDataRewriter.addEntries("damage_type", new RegistryEntry("minecraft:campfire", campfireDamageType));
-        registryDataRewriter.addHandler("wolf_variant", (key, value) -> {
-            receivedWolfVariantRegistryData = true;
+        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, wrapper -> {
+            final String registryKey = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
+            RegistryEntry[] entries = wrapper.read(Types.REGISTRY_ENTRY_ARRAY);
+            entries = registryDataRewriter.handle(wrapper.user(), registryKey, entries);
+            wrapper.write(Types.REGISTRY_ENTRY_ARRAY, entries);
+            if (registryKey.equals("wolf_variant")) {
+                WolfVariantRegistryCheckStorage wolfVariantCheck = wrapper.user().get(WolfVariantRegistryCheckStorage.class);
+                if (wolfVariantCheck != null) {
+                    wolfVariantCheck.set(true);
+                }
+            }
         });
-        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, registryDataRewriter::handle);
 
         protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_20_5.FINISH_CONFIGURATION, wrapper -> {
             // Add new registries
@@ -100,7 +104,8 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             jukeboxSongsPacket.write(Types.REGISTRY_ENTRY_ARRAY, protocol.getMappingData().jukeboxSongs());
             jukeboxSongsPacket.send(Protocol1_20_5To1_21.class);
 
-            if (!receivedWolfVariantRegistryData) {
+            WolfVariantRegistryCheckStorage wolfVariantCheck = wrapper.user().get(WolfVariantRegistryCheckStorage.class);
+            if (wolfVariantCheck != null && !wolfVariantCheck.get()) {
                 createDefaultWolfVariantRegistryDataPacket(wrapper).send(Protocol1_20_5To1_21.class);
             }
         });
@@ -153,66 +158,18 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
     private static PacketWrapper createDefaultWolfVariantRegistryDataPacket(PacketWrapper wrapper) {
         final PacketWrapper wolfVariantPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
         wolfVariantPacket.write(Types.STRING, "minecraft:wolf_variant");
-        wolfVariantPacket.write(Types.REGISTRY_ENTRY_ARRAY, getWolfVariantRegistryEntries());
+        wolfVariantPacket.write(Types.REGISTRY_ENTRY_ARRAY, getDefaultWolfVariantRegistryEntries());
         return wolfVariantPacket;
     }
 
-    private static RegistryEntry[] getWolfVariantRegistryEntries() {
-        final CompoundTag ashenWolfVariant = new CompoundTag();
-        ashenWolfVariant.putString("wild_texture", "minecraft:entity/wolf/wolf_ashen");
-        ashenWolfVariant.putString("angry_texture", "minecraft:entity/wolf/wolf_ashen_angry");
-        ashenWolfVariant.putString("biomes", "minecraft:snowy_taiga");
-        ashenWolfVariant.putString("tame_texture", "minecraft:entity/wolf/wolf_ashen_tame");
-        final CompoundTag blackWolfVariant = new CompoundTag();
-        blackWolfVariant.putString("wild_texture", "minecraft:entity/wolf/wolf_black");
-        blackWolfVariant.putString("angry_texture", "minecraft:entity/wolf/wolf_black_angry");
-        blackWolfVariant.putString("biomes", "minecraft:old_growth_pine_taiga");
-        blackWolfVariant.putString("tame_texture", "minecraft:entity/wolf/wolf_black_tame");
-        final CompoundTag chestnutWolfVariant = new CompoundTag();
-        chestnutWolfVariant.putString("wild_texture", "minecraft:entity/wolf/wolf_chestnut");
-        chestnutWolfVariant.putString("angry_texture", "minecraft:entity/wolf/wolf_chestnut_angry");
-        chestnutWolfVariant.putString("biomes", "minecraft:old_growth_spruce_taiga");
-        chestnutWolfVariant.putString("tame_texture", "minecraft:entity/wolf/wolf_chestnut_tame");
+    private static RegistryEntry[] getDefaultWolfVariantRegistryEntries() {
         final CompoundTag paleWolfVariant = new CompoundTag();
         paleWolfVariant.putString("wild_texture", "minecraft:entity/wolf/wolf");
         paleWolfVariant.putString("angry_texture", "minecraft:entity/wolf/wolf_angry");
         paleWolfVariant.putString("biomes", "minecraft:taiga");
         paleWolfVariant.putString("tame_texture", "minecraft:entity/wolf/wolf_tame");
-        final CompoundTag rustyWolfVariant = new CompoundTag();
-        rustyWolfVariant.putString("wild_texture", "minecraft:entity/wolf/wolf_rusty");
-        rustyWolfVariant.putString("angry_texture", "minecraft:entity/wolf/wolf_rusty_angry");
-        rustyWolfVariant.putString("biomes", "#minecraft:is_jungle");
-        rustyWolfVariant.putString("tame_texture", "minecraft:entity/wolf/wolf_rusty_tame");
-        final CompoundTag snowyWolfVariant = new CompoundTag();
-        snowyWolfVariant.putString("wild_texture", "minecraft:entity/wolf/wolf_snowy");
-        snowyWolfVariant.putString("angry_texture", "minecraft:entity/wolf/wolf_snowy_angry");
-        snowyWolfVariant.putString("biomes", "minecraft:grove");
-        snowyWolfVariant.putString("tame_texture", "minecraft:entity/wolf/wolf_snowy_tame");
-        final CompoundTag spottedWolfVariant = new CompoundTag();
-        spottedWolfVariant.putString("wild_texture", "minecraft:entity/wolf/wolf_spotted");
-        spottedWolfVariant.putString("angry_texture", "minecraft:entity/wolf/wolf_spotted_angry");
-        spottedWolfVariant.putString("biomes", "#minecraft:is_savanna");
-        spottedWolfVariant.putString("tame_texture", "minecraft:entity/wolf/wolf_spotted_tame");
-        final CompoundTag stripedWolfVariant = new CompoundTag();
-        stripedWolfVariant.putString("wild_texture", "minecraft:entity/wolf/wolf_striped");
-        stripedWolfVariant.putString("angry_texture", "minecraft:entity/wolf/wolf_striped_angry");
-        stripedWolfVariant.putString("biomes", "#minecraft:is_badlands");
-        stripedWolfVariant.putString("tame_texture", "minecraft:entity/wolf/wolf_striped_tame");
-        final CompoundTag woodsWolfVariant = new CompoundTag();
-        woodsWolfVariant.putString("wild_texture", "minecraft:entity/wolf/wolf_woods");
-        woodsWolfVariant.putString("angry_texture", "minecraft:entity/wolf/wolf_woods_angry");
-        woodsWolfVariant.putString("biomes", "minecraft:forest");
-        woodsWolfVariant.putString("tame_texture", "minecraft:entity/wolf/wolf_woods_tame");
         return new RegistryEntry[]{
-            new RegistryEntry("minecraft:ashen", ashenWolfVariant),
-            new RegistryEntry("minecraft:black", blackWolfVariant),
-            new RegistryEntry("minecraft:chestnut", chestnutWolfVariant),
             new RegistryEntry("minecraft:pale", paleWolfVariant),
-            new RegistryEntry("minecraft:rusty", rustyWolfVariant),
-            new RegistryEntry("minecraft:snowy", snowyWolfVariant),
-            new RegistryEntry("minecraft:spotted", spottedWolfVariant),
-            new RegistryEntry("minecraft:striped", stripedWolfVariant),
-            new RegistryEntry("minecraft:woods", woodsWolfVariant),
         };
     }
 

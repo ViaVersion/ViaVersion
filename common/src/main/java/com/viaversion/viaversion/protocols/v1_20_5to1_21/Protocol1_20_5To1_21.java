@@ -47,6 +47,7 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.ComponentRewri
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.EntityPacketRewriter1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.WolfVariantRegistryCheckStorage;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -237,7 +238,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_5.PLAYER));
         connection.put(new EfficiencyAttributeStorage());
         connection.put(new PlayerPositionStorage());
-        entityRewriter.resetReceivedWolfVariantRegistryData();
+        connection.put(new WolfVariantRegistryCheckStorage());
     }
 
     @Override
