@@ -61,7 +61,9 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.ProtocolLogger;
 import java.util.BitSet;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
@@ -250,22 +252,31 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
                 return;
             }
 
-            final String[] players = wrapper.passthrough(Types.STRING_ARRAY);
             if (action == 3) {
+                final String[] players = wrapper.passthrough(Types.STRING_ARRAY);
                 storage.addPlayerToTeam(teamName, players);
             } else if (action != 4) {
                 return;
             }
 
+            final String[] players = wrapper.read(Types.STRING_ARRAY);
+
             // Drop invalid remove packets to not break when plugins do that, since strict error handling is enforced in newer protocols.
+            final Set<String> filteredPlayers = new HashSet<>();
             for (final String player : players) {
                 final String team = storage.getPlayerTeam(player);
                 if (!Objects.equals(team, teamName)) {
-                    wrapper.cancel();
-                    return;
+                    break;
                 }
 
                 storage.removeFromTeam(teamName, player);
+                filteredPlayers.add(player);
+            }
+
+            if (!filteredPlayers.isEmpty()) {
+                wrapper.write(Types.STRING_ARRAY, filteredPlayers.toArray(new String[0]));
+            } else {
+                wrapper.cancel();
             }
         });
 
