@@ -21,15 +21,15 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.util.ArrayUtil;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.shorts.Short2IntMap;
-import it.unimi.dsi.fastutil.shorts.Short2IntOpenHashMap;
 import java.util.Locale;
 
 public class DoorConnectionHandler implements ConnectionHandler {
     private static final Int2ObjectMap<DoorData> DOOR_DATA_MAP = new Int2ObjectOpenHashMap<>();
-    private static final Short2IntMap CONNECTED_STATES = new Short2IntOpenHashMap();
+    private static final Int2IntMap CONNECTED_STATES = new Int2IntOpenHashMap();
 
     static ConnectionData.ConnectorInitAction init() {
         final String[] baseDoors = new String[] {
