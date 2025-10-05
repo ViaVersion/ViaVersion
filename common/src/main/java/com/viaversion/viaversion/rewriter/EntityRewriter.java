@@ -536,6 +536,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             dimensionData = tracker.dimensionData("overworld");
             Preconditions.checkNotNull(dimensionData, "Overworld data missing");
         }
+        tracker.setCurrentDimensionId(dimensionId);
         tracker.setCurrentWorldSectionHeight(dimensionData.height() >> 4);
         tracker.setCurrentMinY(dimensionData.minY());
         trackWorld(connection, world);
