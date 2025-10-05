@@ -1,0 +1,357 @@
+/*
+ * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
+ * Copyright (C) 2016-2025 ViaVersion and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.viaversion.viaversion.protocols.v1_12_2to1_13.data;
+
+import com.viaversion.viaversion.util.Key;
+import java.util.HashMap;
+import java.util.Map;
+
+public final class ItemIds1_12_2 {
+
+    private static final Map<String, Integer> ids = new HashMap<>();
+
+    static {
+        ids.put("stone", 1);
+        ids.put("grass", 2);
+        ids.put("dirt", 3);
+        ids.put("cobblestone", 4);
+        ids.put("planks", 5);
+        ids.put("sapling", 6);
+        ids.put("bedrock", 7);
+        ids.put("flowing_water", 8);
+        ids.put("water", 9);
+        ids.put("flowing_lava", 10);
+        ids.put("lava", 11);
+        ids.put("sand", 12);
+        ids.put("gravel", 13);
+        ids.put("gold_ore", 14);
+        ids.put("iron_ore", 15);
+        ids.put("coal_ore", 16);
+        ids.put("log", 17);
+        ids.put("leaves", 18);
+        ids.put("sponge", 19);
+        ids.put("glass", 20);
+        ids.put("lapis_ore", 21);
+        ids.put("lapis_block", 22);
+        ids.put("dispenser", 23);
+        ids.put("sandstone", 24);
+        ids.put("noteblock", 25);
+        ids.put("golden_rail", 27);
+        ids.put("detector_rail", 28);
+        ids.put("sticky_piston", 29);
+        ids.put("web", 30);
+        ids.put("tallgrass", 31);
+        ids.put("deadbush", 32);
+        ids.put("piston", 33);
+        ids.put("wool", 35);
+        ids.put("yellow_flower", 37);
+        ids.put("red_flower", 38);
+        ids.put("brown_mushroom", 39);
+        ids.put("red_mushroom", 40);
+        ids.put("gold_block", 41);
+        ids.put("iron_block", 42);
+        ids.put("double_stone_slab", 43);
+        ids.put("stone_slab", 44);
+        ids.put("brick_block", 45);
+        ids.put("tnt", 46);
+        ids.put("bookshelf", 47);
+        ids.put("mossy_cobblestone", 48);
+        ids.put("obsidian", 49);
+        ids.put("torch", 50);
+        ids.put("fire", 51);
+        ids.put("mob_spawner", 52);
+        ids.put("oak_stairs", 53);
+        ids.put("chest", 54);
+        ids.put("diamond_ore", 56);
+        ids.put("diamond_block", 57);
+        ids.put("crafting_table", 58);
+        ids.put("farmland", 60);
+        ids.put("furnace", 61);
+        ids.put("lit_furnace", 62);
+        ids.put("ladder", 65);
+        ids.put("rail", 66);
+        ids.put("stone_stairs", 67);
+        ids.put("lever", 69);
+        ids.put("stone_pressure_plate", 70);
+        ids.put("wooden_pressure_plate", 72);
+        ids.put("redstone_ore", 73);
+        ids.put("redstone_torch", 76);
+        ids.put("stone_button", 77);
+        ids.put("snow_layer", 78);
+        ids.put("ice", 79);
+        ids.put("snow", 80);
+        ids.put("cactus", 81);
+        ids.put("clay", 82);
+        ids.put("jukebox", 84);
+        ids.put("fence", 85);
+        ids.put("pumpkin", 86);
+        ids.put("netherrack", 87);
+        ids.put("soul_sand", 88);
+        ids.put("glowstone", 89);
+        ids.put("portal", 90);
+        ids.put("lit_pumpkin", 91);
+        ids.put("stained_glass", 95);
+        ids.put("trapdoor", 96);
+        ids.put("monster_egg", 97);
+        ids.put("stonebrick", 98);
+        ids.put("brown_mushroom_block", 99);
+        ids.put("red_mushroom_block", 100);
+        ids.put("iron_bars", 101);
+        ids.put("glass_pane", 102);
+        ids.put("melon_block", 103);
+        ids.put("vine", 106);
+        ids.put("fence_gate", 107);
+        ids.put("brick_stairs", 108);
+        ids.put("stone_brick_stairs", 109);
+        ids.put("mycelium", 110);
+        ids.put("waterlily", 111);
+        ids.put("nether_brick", 112);
+        ids.put("nether_brick_fence", 113);
+        ids.put("nether_brick_stairs", 114);
+        ids.put("enchanting_table", 116);
+        ids.put("end_portal", 119);
+        ids.put("end_portal_frame", 120);
+        ids.put("end_stone", 121);
+        ids.put("dragon_egg", 122);
+        ids.put("redstone_lamp", 123);
+        ids.put("double_wooden_slab", 125);
+        ids.put("wooden_slab", 126);
+        ids.put("cocoa", 127);
+        ids.put("sandstone_stairs", 128);
+        ids.put("emerald_ore", 129);
+        ids.put("ender_chest", 130);
+        ids.put("tripwire_hook", 131);
+        ids.put("emerald_block", 133);
+        ids.put("spruce_stairs", 134);
+        ids.put("birch_stairs", 135);
+        ids.put("jungle_stairs", 136);
+        ids.put("command_block", 137);
+        ids.put("beacon", 138);
+        ids.put("cobblestone_wall", 139);
+        ids.put("carrots", 141);
+        ids.put("potatoes", 142);
+        ids.put("wooden_button", 143);
+        ids.put("anvil", 145);
+        ids.put("trapped_chest", 146);
+        ids.put("light_weighted_pressure_plate", 147);
+        ids.put("heavy_weighted_pressure_plate", 148);
+        ids.put("daylight_detector", 151);
+        ids.put("redstone_block", 152);
+        ids.put("quartz_ore", 153);
+        ids.put("hopper", 154);
+        ids.put("quartz_block", 155);
+        ids.put("quartz_stairs", 156);
+        ids.put("activator_rail", 157);
+        ids.put("dropper", 158);
+        ids.put("stained_hardened_clay", 159);
+        ids.put("stained_glass_pane", 160);
+        ids.put("leaves2", 161);
+        ids.put("log2", 162);
+        ids.put("acacia_stairs", 163);
+        ids.put("dark_oak_stairs", 164);
+        ids.put("hay_block", 170);
+        ids.put("carpet", 171);
+        ids.put("hardened_clay", 172);
+        ids.put("coal_block", 173);
+        ids.put("packed_ice", 174);
+        ids.put("double_plant", 175);
+        ids.put("iron_shovel", 256);
+        ids.put("iron_pickaxe", 257);
+        ids.put("iron_axe", 258);
+        ids.put("flint_and_steel", 259);
+        ids.put("apple", 260);
+        ids.put("bow", 261);
+        ids.put("arrow", 262);
+        ids.put("coal", 263);
+        ids.put("diamond", 264);
+        ids.put("iron_ingot", 265);
+        ids.put("gold_ingot", 266);
+        ids.put("iron_sword", 267);
+        ids.put("wooden_sword", 268);
+        ids.put("wooden_shovel", 269);
+        ids.put("wooden_pickaxe", 270);
+        ids.put("wooden_axe", 271);
+        ids.put("stone_sword", 272);
+        ids.put("stone_shovel", 273);
+        ids.put("stone_pickaxe", 274);
+        ids.put("stone_axe", 275);
+        ids.put("diamond_sword", 276);
+        ids.put("diamond_shovel", 277);
+        ids.put("diamond_pickaxe", 278);
+        ids.put("diamond_axe", 279);
+        ids.put("stick", 280);
+        ids.put("bowl", 281);
+        ids.put("mushroom_stew", 282);
+        ids.put("golden_sword", 283);
+        ids.put("golden_shovel", 284);
+        ids.put("golden_pickaxe", 285);
+        ids.put("golden_axe", 286);
+        ids.put("string", 287);
+        ids.put("feather", 288);
+        ids.put("gunpowder", 289);
+        ids.put("wooden_hoe", 290);
+        ids.put("stone_hoe", 291);
+        ids.put("iron_hoe", 292);
+        ids.put("diamond_hoe", 293);
+        ids.put("golden_hoe", 294);
+        ids.put("wheat_seeds", 295);
+        ids.put("wheat", 296);
+        ids.put("bread", 297);
+        ids.put("leather_helmet", 298);
+        ids.put("leather_chestplate", 299);
+        ids.put("leather_leggings", 300);
+        ids.put("leather_boots", 301);
+        ids.put("chainmail_helmet", 302);
+        ids.put("chainmail_chestplate", 303);
+        ids.put("chainmail_leggings", 304);
+        ids.put("chainmail_boots", 305);
+        ids.put("iron_helmet", 306);
+        ids.put("iron_chestplate", 307);
+        ids.put("iron_leggings", 308);
+        ids.put("iron_boots", 309);
+        ids.put("diamond_helmet", 310);
+        ids.put("diamond_chestplate", 311);
+        ids.put("diamond_leggings", 312);
+        ids.put("diamond_boots", 313);
+        ids.put("golden_helmet", 314);
+        ids.put("golden_chestplate", 315);
+        ids.put("golden_leggings", 316);
+        ids.put("golden_boots", 317);
+        ids.put("flint", 318);
+        ids.put("porkchop", 319);
+        ids.put("cooked_porkchop", 320);
+        ids.put("painting", 321);
+        ids.put("golden_apple", 322);
+        ids.put("sign", 323);
+        ids.put("wooden_door", 324);
+        ids.put("bucket", 325);
+        ids.put("water_bucket", 326);
+        ids.put("lava_bucket", 327);
+        ids.put("minecart", 328);
+        ids.put("saddle", 329);
+        ids.put("iron_door", 330);
+        ids.put("redstone", 331);
+        ids.put("snowball", 332);
+        ids.put("boat", 333);
+        ids.put("leather", 334);
+        ids.put("milk_bucket", 335);
+        ids.put("brick", 336);
+        ids.put("clay_ball", 337);
+        ids.put("reeds", 338);
+        ids.put("paper", 339);
+        ids.put("book", 340);
+        ids.put("slime_ball", 341);
+        ids.put("chest_minecart", 342);
+        ids.put("furnace_minecart", 343);
+        ids.put("egg", 344);
+        ids.put("compass", 345);
+        ids.put("fishing_rod", 346);
+        ids.put("clock", 347);
+        ids.put("glowstone_dust", 348);
+        ids.put("fish", 349);
+        ids.put("cooked_fished", 350);
+        ids.put("dye", 351);
+        ids.put("bone", 352);
+        ids.put("sugar", 353);
+        ids.put("cake", 354);
+        ids.put("bed", 355);
+        ids.put("repeater", 356);
+        ids.put("cookie", 357);
+        ids.put("filled_map", 358);
+        ids.put("shears", 359);
+        ids.put("melon", 360);
+        ids.put("pumpkin_seeds", 361);
+        ids.put("melon_seeds", 362);
+        ids.put("beef", 363);
+        ids.put("cooked_beef", 364);
+        ids.put("chicken", 365);
+        ids.put("cooked_chicken", 366);
+        ids.put("rotten_flesh", 367);
+        ids.put("ender_pearl", 368);
+        ids.put("blaze_rod", 369);
+        ids.put("ghast_tear", 370);
+        ids.put("gold_nugget", 371);
+        ids.put("nether_wart", 372);
+        ids.put("potion", 373);
+        ids.put("glass_bottle", 374);
+        ids.put("spider_eye", 375);
+        ids.put("fermented_spider_eye", 376);
+        ids.put("blaze_powder", 377);
+        ids.put("magma_cream", 378);
+        ids.put("brewing_stand", 379);
+        ids.put("cauldron", 380);
+        ids.put("ender_eye", 381);
+        ids.put("speckled_melon", 382);
+        ids.put("spawn_egg", 383);
+        ids.put("experience_bottle", 384);
+        ids.put("fire_charge", 385);
+        ids.put("writable_book", 386);
+        ids.put("written_book", 387);
+        ids.put("emerald", 388);
+        ids.put("item_frame", 389);
+        ids.put("flower_pot", 390);
+        ids.put("carrot", 391);
+        ids.put("potato", 392);
+        ids.put("baked_potato", 393);
+        ids.put("poisonous_potato", 394);
+        ids.put("map", 395);
+        ids.put("golden_carrot", 396);
+        ids.put("skull", 397);
+        ids.put("carrot_on_a_stick", 398);
+        ids.put("nether_star", 399);
+        ids.put("pumpkin_pie", 400);
+        ids.put("fireworks", 401);
+        ids.put("firework_charge", 402);
+        ids.put("enchanted_book", 403);
+        ids.put("comparator", 404);
+        ids.put("netherbrick", 405);
+        ids.put("quartz", 406);
+        ids.put("tnt_minecart", 407);
+        ids.put("hopper_minecart", 408);
+        ids.put("iron_horse_armor", 417);
+        ids.put("golden_horse_armor", 418);
+        ids.put("diamond_horse_armor", 419);
+        ids.put("lead", 420);
+        ids.put("name_tag", 421);
+        ids.put("command_block_minecart", 422);
+        ids.put("record_13", 2256);
+        ids.put("record_cat", 2257);
+        ids.put("record_blocks", 2258);
+        ids.put("record_chirp", 2259);
+        ids.put("record_far", 2260);
+        ids.put("record_mall", 2261);
+        ids.put("record_mellohi", 2262);
+        ids.put("record_stal", 2263);
+        ids.put("record_strad", 2264);
+        ids.put("record_ward", 2265);
+        ids.put("record_11", 2266);
+        ids.put("record_wait", 2267);
+    }
+
+    public static int getId(final String identifier) {
+        int id = ids.getOrDefault(Key.stripMinecraftNamespace(identifier), -1);
+        if (id == -1) {
+            try {
+                id = Integer.parseInt(identifier);
+            } catch (final NumberFormatException ignored) {
+            }
+        }
+        return id;
+    }
+
+}
