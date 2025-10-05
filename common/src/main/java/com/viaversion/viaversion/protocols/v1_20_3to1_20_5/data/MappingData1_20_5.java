@@ -21,6 +21,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
 import com.viaversion.viaversion.util.KeyMappings;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -31,7 +32,6 @@ public class MappingData1_20_5 extends MappingDataBase {
 
     private final Object2ObjectMap<String, CompoundTag> damageTypes = new Object2ObjectOpenHashMap<>();
     private KeyMappings blocks;
-    private KeyMappings sounds;
 
     public MappingData1_20_5() {
         super("1.20.3", "1.20.5");
@@ -43,7 +43,6 @@ public class MappingData1_20_5 extends MappingDataBase {
 
         final CompoundTag extraMappings = MappingDataLoader.INSTANCE.loadNBT("extra-identifiers-1.20.3.nbt");
         blocks = new KeyMappings(extraMappings.getListTag("blocks", StringTag.class));
-        sounds = new KeyMappings(extraMappings.getListTag("sounds", StringTag.class));
 
         final CompoundTag damageTypes = MappingDataLoader.INSTANCE.loadNBT("damage-types-1.20.3.nbt");
         for (final String key : damageTypes.keySet()) {
@@ -60,11 +59,11 @@ public class MappingData1_20_5 extends MappingDataBase {
     }
 
     public int soundId(final String name) {
-        return sounds.keyToId(name);
+        return Protocol1_20_3To1_20_5.MAPPINGS.getFullSoundMappings().id(name);
     }
 
     public @Nullable String soundName(final int id) {
-        return sounds.idToKey(id);
+        return Protocol1_20_3To1_20_5.MAPPINGS.getFullSoundMappings().identifier(id);
     }
 
     public CompoundTag damageType(final String key) {

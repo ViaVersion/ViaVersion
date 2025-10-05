@@ -70,7 +70,6 @@ public class MappingDataBase implements MappingData {
         final CompoundTag data = readMappingsFile("mappings-" + unmappedVersion + "to" + mappedVersion + ".nbt");
         blockMappings = loadBiMappings(data, "blocks");
         blockStateMappings = loadMappings(data, "blockstates");
-        soundMappings = loadMappings(data, "sounds");
         statisticsMappings = loadMappings(data, "statistics");
         menuMappings = loadMappings(data, "menus");
         enchantmentMappings = loadMappings(data, "enchantments");
@@ -80,6 +79,7 @@ public class MappingDataBase implements MappingData {
         final CompoundTag mappedIdentifierData = readMappedIdentifiersFile("identifiers-" + mappedVersion + ".nbt");
         if (unmappedIdentifierData != null && mappedIdentifierData != null) {
             itemMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "items");
+            soundMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "sounds");
             entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
             argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
             recipeSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "recipe_serializers");
@@ -99,6 +99,7 @@ public class MappingDataBase implements MappingData {
         } else {
             // Might not have identifiers in older versions
             itemMappings = loadBiMappings(data, "items");
+            soundMappings = loadMappings(data, "sounds");
         }
 
         final CompoundTag tagsTag = data.getCompoundTag("tags");
@@ -224,8 +225,8 @@ public class MappingDataBase implements MappingData {
 
     @Override
     public @Nullable FullMappings getFullItemMappings() {
-        if (itemMappings instanceof FullMappings) {
-            return (FullMappings) itemMappings;
+        if (itemMappings instanceof FullMappings fullItemMappings) {
+            return fullItemMappings;
         }
         return null;
     }
@@ -253,6 +254,14 @@ public class MappingDataBase implements MappingData {
     @Override
     public @Nullable Mappings getSoundMappings() {
         return soundMappings;
+    }
+
+    @Override
+    public @Nullable FullMappings getFullSoundMappings() {
+        if (soundMappings instanceof FullMappings fullSoundMappings) {
+            return fullSoundMappings;
+        }
+        return null;
     }
 
     @Override

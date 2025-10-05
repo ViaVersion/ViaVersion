@@ -144,6 +144,8 @@ public interface MappingData {
 
     @Nullable Mappings getSoundMappings();
 
+    @Nullable FullMappings getFullSoundMappings();
+
     @Nullable Mappings getStatisticsMappings();
 
     @Nullable Mappings getMenuMappings();

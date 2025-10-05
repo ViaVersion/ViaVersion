@@ -210,7 +210,7 @@ public class MappingDataLoader {
             return null;
         }
 
-        final int mappedSize = tag.getIntTag("mappedSize").asInt();
+        final int mappedSize = tag.getInt("mappedSize", -1);
         final byte strategy = tag.getByteTag("id").asByte();
         final V mappings;
         if (strategy == DIRECT_ID) {
