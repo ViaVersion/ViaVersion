@@ -47,6 +47,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
 import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant;
 import com.viaversion.viaversion.api.minecraft.item.data.DeathProtection;
+import com.viaversion.viaversion.api.minecraft.item.data.DebugStickState;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantable;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
@@ -159,7 +160,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<ArmorTrim> TRIM1_21_2 = new StructuredDataKey<>("trim", ArmorTrim.TYPE1_21_2);
     public static final StructuredDataKey<ArmorTrim> TRIM1_21_4 = new StructuredDataKey<>("trim", ArmorTrim.TYPE1_21_4);
     public static final StructuredDataKey<ArmorTrim> TRIM1_21_5 = new StructuredDataKey<>("trim", ArmorTrim.TYPE1_21_5);
-    public static final StructuredDataKey<CompoundTag> DEBUG_STICK_STATE = new StructuredDataKey<>("debug_stick_state", Types.COMPOUND_TAG);
+    public static final StructuredDataKey<DebugStickState> DEBUG_STICK_STATE = new StructuredDataKey<>("debug_stick_state", DebugStickState.TYPE);
     public static final StructuredDataKey<CompoundTag> ENTITY_DATA1_20_5 = new StructuredDataKey<>("entity_data", Types.COMPOUND_TAG);
     public static final StructuredDataKey<EntityData> ENTITY_DATA1_21_9 = new StructuredDataKey<>("entity_data", EntityData.TYPE);
     public static final StructuredDataKey<CompoundTag> BUCKET_ENTITY_DATA = new StructuredDataKey<>("bucket_entity_data", Types.COMPOUND_TAG);

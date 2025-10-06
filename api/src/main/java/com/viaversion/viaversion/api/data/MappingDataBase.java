@@ -28,6 +28,8 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -55,6 +57,10 @@ public class MappingDataBase implements MappingData {
     protected Mappings paintingMappings;
     protected Mappings menuMappings;
     protected Map<RegistryType, List<TagData>> tags;
+    /**
+     * Set of block ids that have had type or property changes.
+     */
+    protected IntSet changedBlocks;
 
     public MappingDataBase(final String unmappedVersion, final String mappedVersion) {
         this.unmappedVersion = unmappedVersion;
@@ -68,7 +74,6 @@ public class MappingDataBase implements MappingData {
         }
 
         final CompoundTag data = readMappingsFile("mappings-" + unmappedVersion + "to" + mappedVersion + ".nbt");
-        blockMappings = loadBiMappings(data, "blocks");
         blockStateMappings = loadMappings(data, "blockstates");
         statisticsMappings = loadMappings(data, "statistics");
         menuMappings = loadMappings(data, "menus");
@@ -79,6 +84,7 @@ public class MappingDataBase implements MappingData {
         final CompoundTag mappedIdentifierData = readMappedIdentifiersFile("identifiers-" + mappedVersion + ".nbt");
         if (unmappedIdentifierData != null && mappedIdentifierData != null) {
             itemMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "items");
+            blockMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "blocks");
             soundMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "sounds");
             entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
             argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
@@ -100,6 +106,7 @@ public class MappingDataBase implements MappingData {
             // Might not have identifiers in older versions
             itemMappings = loadBiMappings(data, "items");
             soundMappings = loadMappings(data, "sounds");
+            blockMappings = loadBiMappings(data, "blocks");
         }
 
         final CompoundTag tagsTag = data.getCompoundTag("tags");
@@ -108,6 +115,11 @@ public class MappingDataBase implements MappingData {
             loadTags(RegistryType.ITEM, tagsTag);
             loadTags(RegistryType.BLOCK, tagsTag);
             loadTags(RegistryType.ENTITY, tagsTag);
+        }
+
+        final IntArrayTag changedBlocks = data.getIntArrayTag("changed_blocks");
+        if (changedBlocks != null) {
+            this.changedBlocks = new IntOpenHashSet(changedBlocks.getValue());
         }
 
         loadExtras(data);
@@ -242,6 +254,14 @@ public class MappingDataBase implements MappingData {
     }
 
     @Override
+    public @Nullable FullMappings getFullBlockMappings() {
+        if (blockMappings instanceof FullMappings fullBlockMappings) {
+            return fullBlockMappings;
+        }
+        return null;
+    }
+
+    @Override
     public @Nullable FullMappings getBlockEntityMappings() {
         return blockEntityMappings;
     }
@@ -307,6 +327,11 @@ public class MappingDataBase implements MappingData {
     @Override
     public @Nullable FullMappings getRecipeSerializerMappings() {
         return recipeSerializerMappings;
+    }
+
+    @Override
+    public @Nullable IntSet changedBlocks() {
+        return changedBlocks;
     }
 
     protected Logger getLogger() {

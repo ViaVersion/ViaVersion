@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.data;
 
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -140,6 +141,8 @@ public interface MappingData {
 
     @Nullable Mappings getBlockMappings();
 
+    @Nullable FullMappings getFullBlockMappings();
+
     @Nullable Mappings getBlockStateMappings();
 
     @Nullable Mappings getSoundMappings();
@@ -172,6 +175,13 @@ public interface MappingData {
             case ENTITY -> getEntityMappings();
         };
     }
+
+    /**
+     * Set of block (not block state) ids that had their base type or properties changed.
+     *
+     * @return set of changed block ids, or null if not tracked/none are present
+     */
+    @Nullable IntSet changedBlocks();
 
     /**
      * Type of mappings. Currently only relevant for ops writing of generic holder classes and expanded when needed.
