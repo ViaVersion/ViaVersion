@@ -123,9 +123,7 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
                     }
 
                     final double coordinateScale = dimension.getDouble("coordinate_scale", 1);
-                    if (coordinateScale != 1 && coordinateScale != 0) {
-                        dimensionScaleStorage.setScale(i, coordinateScale);
-                    }
+                    dimensionScaleStorage.setScale(i, coordinateScale);
                 }
             }
         };

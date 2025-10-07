@@ -174,7 +174,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         register(StructuredDataKey.V1_20_5.container, this::containerToTag, this::containerFromTag);
         register(StructuredDataKey.BLOCK_STATE, this::blockStateToTag, this::blockStateFromTag);
         register(StructuredDataKey.BEES1_20_5, this::beesToTag, this::beesFromTag);
-        register(StructuredDataKey.LOCK, this::lockToTag, this::lockFromTag);
+        register(StructuredDataKey.LOCK1_20_5, this::lockToTag, this::lockFromTag);
         register(StructuredDataKey.CONTAINER_LOOT, this::containerLootToTag, this::containerLootFromTag);
     }
 

@@ -171,6 +171,7 @@ public interface MappingData {
 
     default @Nullable FullMappings getFullMappings(final MappingType mappingType) {
         return switch (mappingType) {
+            case ITEM -> getFullItemMappings();
             case SOUND -> getFullSoundMappings();
             case ENTITY -> getEntityMappings();
         };
@@ -187,6 +188,6 @@ public interface MappingData {
      * Type of mappings. Currently only relevant for ops writing of generic holder classes and expanded when needed.
      */
     enum MappingType {
-        SOUND, ENTITY
+        ITEM, SOUND, ENTITY
     }
 }

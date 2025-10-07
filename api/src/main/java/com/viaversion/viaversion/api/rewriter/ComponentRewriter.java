@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.rewriter;
 
 import com.google.gson.JsonElement;
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -34,4 +35,6 @@ public interface ComponentRewriter {
     void processText(UserConnection connection, @Nullable JsonElement element);
 
     JsonElement processText(UserConnection connection, @Nullable String json);
+
+    void handleShowItem(UserConnection connection, CompoundTag itemTag);
 }

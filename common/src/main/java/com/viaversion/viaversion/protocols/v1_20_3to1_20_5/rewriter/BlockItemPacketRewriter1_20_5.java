@@ -1449,7 +1449,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (data != null) {
             final StringTag lockTag = tag.getStringTag("Lock");
             if (lockTag != null) {
-                data.set(StructuredDataKey.LOCK, lockTag);
+                data.set(StructuredDataKey.LOCK1_20_5, lockTag);
             }
 
             final ListTag<CompoundTag> beesTag = tag.getListTag("Bees", CompoundTag.class);

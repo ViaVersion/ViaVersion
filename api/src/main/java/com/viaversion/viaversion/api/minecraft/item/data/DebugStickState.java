@@ -24,33 +24,16 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Rewritable;
-import io.netty.buffer.ByteBuf;
 
 public record DebugStickState(CompoundTag tag) implements Rewritable, Copyable {
 
-    public static final Type<DebugStickState> TYPE = new Type<>(DebugStickState.class) {
-        @Override
-        public DebugStickState read(final ByteBuf buffer) {
-            final CompoundTag tag = Types.COMPOUND_TAG.read(buffer);
-            return new DebugStickState(tag);
-        }
-
-        @Override
-        public void write(final ByteBuf buffer, final DebugStickState value) {
-            Types.COMPOUND_TAG.write(buffer, value.tag);
-        }
-
-        @Override
-        public void write(final Ops ops, final DebugStickState data) {
-            ops.write(Types.COMPOUND_TAG, data.tag);
-        }
-    };
+    public static final Type<DebugStickState> TYPE = TransformingType.of(Types.COMPOUND_TAG, DebugStickState.class, DebugStickState::new, DebugStickState::tag);
 
     @Override
     public DebugStickState rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {

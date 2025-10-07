@@ -318,7 +318,7 @@ public final class StructuredDataConverter {
             }
             getBlockEntityTag(tag, "beehive").put("Bees", bees);
         });
-        register(StructuredDataKey.LOCK, (data, tag) -> getBlockEntityTag(tag).put("Lock", data));
+        register(StructuredDataKey.LOCK1_20_5, (data, tag) -> getBlockEntityTag(tag).put("Lock", data));
         register(StructuredDataKey.NOTE_BLOCK_SOUND, (data, tag) -> getBlockEntityTag(tag, "player_head").putString("note_block_sound", data.original()));
         register(StructuredDataKey.POT_DECORATIONS, (data, tag) -> {
             IntArrayTag originalSherds = null;

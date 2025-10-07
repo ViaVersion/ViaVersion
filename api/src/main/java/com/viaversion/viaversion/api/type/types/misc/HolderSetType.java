@@ -77,7 +77,7 @@ public class HolderSetType extends Type<HolderSet> {
     @Override
     public void write(final Ops ops, final HolderSet value) {
         if (value.hasTagKey()) {
-            ops.write(Types.STRING, "#" + Key.namespaced(value.tagKey()));
+            ops.write(Types.TAG_KEY, Key.of(value.tagKey()));
         } else {
             Preconditions.checkArgument(mappingType != null, "Cannot write HolderSet with direct ids without a mapping type");
             if (value.ids().length == 1) {

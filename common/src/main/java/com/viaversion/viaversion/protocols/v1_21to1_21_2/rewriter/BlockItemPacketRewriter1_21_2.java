@@ -45,6 +45,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_21_2;
+import com.viaversion.viaversion.api.minecraft.item.data.LockCode;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
@@ -569,14 +570,14 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         });
         dataContainer.replaceKey(StructuredDataKey.POTION_CONTENTS1_20_5, StructuredDataKey.POTION_CONTENTS1_21_2);
         dataContainer.replace(StructuredDataKey.FIRE_RESISTANT, StructuredDataKey.DAMAGE_RESISTANT, fireResistant -> new DamageResistant(Key.of("minecraft:is_fire")));
-        dataContainer.replace(StructuredDataKey.LOCK, tag -> {
+        dataContainer.replace(StructuredDataKey.LOCK1_20_5, StructuredDataKey.LOCK1_21_2, tag -> {
             final String lock = ((StringTag) tag).getValue();
             final CompoundTag predicateTag = new CompoundTag();
             final CompoundTag itemComponentsTag = new CompoundTag();
             predicateTag.put("components", itemComponentsTag);
             // As json here...
             itemComponentsTag.putString("custom_name", ComponentUtil.plainToJson(lock).toString());
-            return predicateTag;
+            return new LockCode(predicateTag);
         });
         dataContainer.replace(StructuredDataKey.TRIM1_20_5, StructuredDataKey.TRIM1_21_2, trim -> {
             // TODO Rewrite from int to string id via sent registry
@@ -589,8 +590,8 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
     public static void downgradeItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
-        dataContainer.replace(StructuredDataKey.LOCK, StructuredDataKey.LOCK, lock -> {
-            final CompoundTag predicateTag = (CompoundTag) lock;
+        dataContainer.replace(StructuredDataKey.LOCK1_21_2, StructuredDataKey.LOCK1_20_5, lock -> {
+            final CompoundTag predicateTag = lock.tag();
             final CompoundTag itemComponentsTag = predicateTag.getCompoundTag("components");
             if (itemComponentsTag == null) {
                 return null;
