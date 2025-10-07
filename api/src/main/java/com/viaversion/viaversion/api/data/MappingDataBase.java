@@ -83,9 +83,10 @@ public class MappingDataBase implements MappingData {
         final CompoundTag unmappedIdentifierData = readUnmappedIdentifiersFile("identifiers-" + unmappedVersion + ".nbt");
         final CompoundTag mappedIdentifierData = readMappedIdentifiersFile("identifiers-" + mappedVersion + ".nbt");
         if (unmappedIdentifierData != null && mappedIdentifierData != null) {
-            itemMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "items");
-            blockMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "blocks");
-            soundMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "sounds");
+            itemMappings = loadFullOrBiMappings(data, unmappedIdentifierData, mappedIdentifierData, "items");
+            blockMappings = loadFullOrBiMappings(data, unmappedIdentifierData, mappedIdentifierData, "blocks");
+            soundMappings = loadFullOrBiMappings(data, unmappedIdentifierData, mappedIdentifierData, "sounds");
+
             entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
             argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
             recipeSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "recipe_serializers");
@@ -105,8 +106,8 @@ public class MappingDataBase implements MappingData {
         } else {
             // Might not have identifiers in older versions
             itemMappings = loadBiMappings(data, "items");
-            soundMappings = loadMappings(data, "sounds");
             blockMappings = loadBiMappings(data, "blocks");
+            soundMappings = loadMappings(data, "sounds");
         }
 
         final CompoundTag tagsTag = data.getCompoundTag("tags");
@@ -143,6 +144,11 @@ public class MappingDataBase implements MappingData {
 
     protected @Nullable Mappings loadMappings(final CompoundTag data, final String key) {
         return MappingDataLoader.INSTANCE.loadMappings(data, key);
+    }
+
+    protected @Nullable BiMappings loadFullOrBiMappings(final CompoundTag data, final CompoundTag unmappedIdentifiersTag, final CompoundTag mappedIdentifiersTag, final String key) {
+        final FullMappings mappings = loadFullMappings(data, unmappedIdentifiersTag, mappedIdentifiersTag, key);
+        return mappings != null ? mappings : loadBiMappings(data, key);
     }
 
     protected @Nullable FullMappings loadFullMappings(final CompoundTag data, final CompoundTag unmappedIdentifiersTag, final CompoundTag mappedIdentifiersTag, final String key) {
