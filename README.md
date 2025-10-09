@@ -8,7 +8,7 @@
 it works on any platform you can think of.**
 
 The base ViaVersion jar runs on Paper and Velocity. We also have projects integrating ViaVersion to run
-on Fabric, Forge, Bungee, Sponge, or as a standalone proxy to join from basically any client version on
+on Fabric, Forge, Sponge, or as a standalone proxy to join from basically any client version on
 any server version from the past decade. **See [HERE](https://viaversion.com) for an overview of the different Via\* projects.**
 
 Note that ViaVersion will be able to **run best on either Paper servers or through [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus?tab=readme-ov-file#viafabricplus)** due to having
@@ -16,7 +16,7 @@ direct access to client/server state and more extensive API.
 
 Supported Versions:
 
-![Table (https://i.imgur.com/zrQTcf0.png)](https://i.imgur.com/zrQTcf0.png)
+![Table (https://ci.viaversion.com/userContent/images/T.png)](https://ci.viaversion.com/userContent/images/T.png)
 
 **User Docs:** https://docs.viaversion.com
 
@@ -88,15 +88,10 @@ of the `build/libs` directory.
 You need JDK 17 or newer to build ViaVersion.
 
 
-Mapping Files
---------------
-Mapping files are generated and managed in our [Mappings repository](https://github.com/ViaVersion/Mappings). The generated mapping output is stored [here](./common/src/main/resources/assets/viaversion).
-
-
 Resources
 --------
 
-- **[Via Mappings Generator](https://github.com/ViaVersion/Mappings)**
+- **[Via Mappings Generator](https://github.com/ViaVersion/Mappings)**. The generated mapping output is stored [here](./common/src/main/resources/assets/viaversion).
 - **[Mojang mappings](https://minecraft.wiki/w/Obfuscation_map)** (Thank you, Mojang, very cool)
 - Previously: **[Burger](https://github.com/Pokechu22/Burger)** (see [PAaaS](https://github.com/Matsv/Paaas)) and **wiki.vg**
 
