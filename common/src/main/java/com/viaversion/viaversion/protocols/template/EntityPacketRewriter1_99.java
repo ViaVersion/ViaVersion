@@ -48,7 +48,8 @@ final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPacket1_2
     @Override
     protected void registerRewrites() {
         final EntityDataTypes1_21_9 entityDataTypes = protocol.mappedTypes().entityDataTypes();
-        /* Uncomment if entity data classes changed
+        filter().mapDataType(entityDataTypes::byId);
+        /* ... or something this if entity data classes changed
         filter().mapDataType(typeId -> {
             int id = typeId;
             if (id >= SomeAddedIndex) {

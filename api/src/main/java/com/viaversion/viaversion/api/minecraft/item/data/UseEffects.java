@@ -20,35 +20,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.data.predicate;
+package com.viaversion.viaversion.api.minecraft.item.data;
 
-import com.viaversion.viaversion.api.minecraft.data.StructuredData;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
-public record DataComponentMatchers(StructuredData<?>[] exactPredicates, DataComponentPredicate[] predicates) {
+public record UseEffects(boolean canSprint, float speedMultiplier) {
 
-    public static final class DataComponentMatchersType extends Type<DataComponentMatchers> {
-        private final Type<StructuredData<?>[]> dataArrayType;
-        private final Type<DataComponentPredicate[]> predicateArrayType;
+    public static final Type<UseEffects> TYPE = new Type<>(UseEffects.class) {
 
-        public DataComponentMatchersType(final Type<StructuredData<?>[]> dataArrayType, final Type<DataComponentPredicate[]> predicateArrayType) {
-            super(DataComponentMatchers.class);
-            this.dataArrayType = dataArrayType;
-            this.predicateArrayType = predicateArrayType;
+        @Override
+        public UseEffects read(final ByteBuf buffer) {
+            final boolean canSprint = Types.BOOLEAN.read(buffer);
+            final float speedMultiplier = Types.FLOAT.readPrimitive(buffer);
+            return new UseEffects(canSprint, speedMultiplier);
         }
 
         @Override
-        public DataComponentMatchers read(final ByteBuf buffer) {
-            final StructuredData<?>[] exactPredicates = dataArrayType.read(buffer);
-            final DataComponentPredicate[] partialPredicates = predicateArrayType.read(buffer);
-            return new DataComponentMatchers(exactPredicates, partialPredicates);
+        public void write(final ByteBuf buffer, final UseEffects value) {
+            Types.BOOLEAN.write(buffer, value.canSprint());
+            Types.FLOAT.writePrimitive(buffer, value.speedMultiplier());
         }
 
         @Override
-        public void write(final ByteBuf buffer, final DataComponentMatchers value) {
-            dataArrayType.write(buffer, value.exactPredicates());
-            predicateArrayType.write(buffer, value.predicates());
+        public void write(final Ops ops, final UseEffects value) {
+            ops.writeMap(map -> map
+                .writeOptional("can_sprint", Types.BOOLEAN, value.canSprint, false)
+                .writeOptional("speed_multiplier", Types.FLOAT, value.speedMultiplier, 0.2F));
         }
-    }
+    };
 }

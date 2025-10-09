@@ -81,6 +81,7 @@ import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.Protocol1_21_5To1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_6to1_21_7.Protocol1_21_6To1_21_7;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.Protocol1_21_7To1_21_9;
+import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.Protocol1_21_9To1_21_11;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.Protocol1_9_1To1_9_3;
@@ -211,6 +212,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
         registerProtocol(new Protocol1_21_5To1_21_6(), ProtocolVersion.v1_21_6, ProtocolVersion.v1_21_5);
         registerProtocol(new Protocol1_21_6To1_21_7(), ProtocolVersion.v1_21_7, ProtocolVersion.v1_21_6);
         registerProtocol(new Protocol1_21_7To1_21_9(), ProtocolVersion.v1_21_9, ProtocolVersion.v1_21_7);
+        registerProtocol(new Protocol1_21_9To1_21_11(), ProtocolVersion.v1_21_11, ProtocolVersion.v1_21_9);
     }
 
     @Override

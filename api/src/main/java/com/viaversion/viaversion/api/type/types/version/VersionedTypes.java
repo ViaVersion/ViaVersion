@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types.version;
 
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_20_5;
+import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_2;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_5;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_20_5;
@@ -46,4 +47,5 @@ public final class VersionedTypes {
     public static final Types1_20_5<StructuredDataKeys1_21_5, EntityDataTypes1_21_5> V1_21_5 = new Types1_20_5<>(StructuredDataKeys1_21_5::new, EntityDataTypes1_21_5::new);
     public static final Types1_20_5<StructuredDataKeys1_21_5, EntityDataTypes1_21_5> V1_21_6 = new Types1_20_5<>(StructuredDataKeys1_21_5::new, EntityDataTypes1_21_5::new);
     public static final Types1_20_5<StructuredDataKeys1_21_5, EntityDataTypes1_21_9> V1_21_9 = new Types1_20_5<>(StructuredDataKeys1_21_5::new, EntityDataTypes1_21_9::new);
+    public static final Types1_20_5<StructuredDataKeys1_21_11, EntityDataTypes1_21_9> V1_21_11 = new Types1_20_5<>(StructuredDataKeys1_21_11::new, EntityDataTypes1_21_9::new);
 }

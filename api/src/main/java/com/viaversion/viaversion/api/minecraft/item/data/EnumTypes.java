@@ -46,6 +46,7 @@ public final class EnumTypes {
     public static final EnumType LLAMA_VARIANT = new EnumType(Fallback.CLAMP, "creamy", "white", "brown", "gray");
     public static final EnumType AXOLOTL_VARIANT = new EnumType("lucy", "wild", "gold", "cyan", "blue");
     public static final EnumType EQUIPMENT_SLOT = new EnumType("mainhand", "feet", "legs", "chest", "head", "offhand", "body", "saddle");
+    public static final EnumType SWING_ANIMATION = new EnumType("none", "whack", "stab");
     public static final EnumType ITEM_USE_ANIMATION = new EnumType("none", "eat", "drink", "block", "bow", "trident", "crossbow", "spyglass", "toot_horn", "brush", "bundle", "spear");
     // Enums with non-ordinal ids
     public static final FakeEnumType RABBIT_VARIANT = new FakeEnumType(List.of("brown", "white", "black", "white_splotched", "gold", "salt"), of(99, "evil"));

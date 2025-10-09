@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.minecraft.RegistryKey;
 import com.viaversion.viaversion.api.minecraft.ResolvableProfile;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_20_5;
+import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_2;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_5;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
@@ -46,6 +47,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.BlocksAttacks;
 import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
 import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant;
+import com.viaversion.viaversion.api.minecraft.item.data.DamageType;
 import com.viaversion.viaversion.api.minecraft.item.data.DeathProtection;
 import com.viaversion.viaversion.api.minecraft.item.data.DebugStickState;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
@@ -62,18 +64,22 @@ import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.ItemModel;
 import com.viaversion.viaversion.api.minecraft.item.data.JukeboxPlayable;
+import com.viaversion.viaversion.api.minecraft.item.data.KineticWeapon;
 import com.viaversion.viaversion.api.minecraft.item.data.LockCode;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
+import com.viaversion.viaversion.api.minecraft.item.data.PiercingWeapon;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.ProvidesTrimMaterial;
 import com.viaversion.viaversion.api.minecraft.item.data.Repairable;
 import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.SwingAnimation;
 import com.viaversion.viaversion.api.minecraft.item.data.ToolProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.TooltipDisplay;
 import com.viaversion.viaversion.api.minecraft.item.data.TropicalFishPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.UseCooldown;
+import com.viaversion.viaversion.api.minecraft.item.data.UseEffects;
 import com.viaversion.viaversion.api.minecraft.item.data.Weapon;
 import com.viaversion.viaversion.api.minecraft.item.data.WritableBook;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
@@ -102,8 +108,11 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> MAX_DAMAGE = new StructuredDataKey<>("max_damage", Types.VAR_INT);
     public static final StructuredDataKey<Integer> DAMAGE = new StructuredDataKey<>("damage", Types.VAR_INT);
     public static final StructuredDataKey<Unbreakable> UNBREAKABLE1_20_5 = new StructuredDataKey<>("unbreakable", Unbreakable.TYPE);
+    public static final StructuredDataKey<UseEffects> USE_EFFECTS = new StructuredDataKey<>("use_effects", UseEffects.TYPE);
     public static final StructuredDataKey<Unit> UNBREAKABLE1_21_5 = new StructuredDataKey<>("unbreakable", Types.EMPTY);
     public static final StructuredDataKey<Tag> CUSTOM_NAME = new StructuredDataKey<>("custom_name", Types.TEXT_COMPONENT_TAG);
+    public static final StructuredDataKey<Float> MINIMUM_ATTACK_CHARGE = new StructuredDataKey<>("minimum_attack_charge", Types.FLOAT);
+    public static final StructuredDataKey<DamageType> DAMAGE_TYPE = new StructuredDataKey<>("damage_type", DamageType.TYPE);
     public static final StructuredDataKey<Tag> ITEM_NAME = new StructuredDataKey<>("item_name", Types.TEXT_COMPONENT_TAG);
     public static final StructuredDataKey<ItemModel> ITEM_MODEL = new StructuredDataKey<>("item_model", ItemModel.TYPE);
     public static final StructuredDataKey<Tag[]> LORE = new StructuredDataKey<>("lore", new ArrayType<>(Types.TEXT_COMPONENT_TAG, 256));
@@ -145,6 +154,9 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Key> TOOLTIP_STYLE = new StructuredDataKey<>("tooltip_style", Types.RESOURCE_LOCATION);
     public static final StructuredDataKey<DeathProtection> DEATH_PROTECTION = new StructuredDataKey<>("death_protection", DeathProtection.TYPE);
     public static final StructuredDataKey<BlocksAttacks> BLOCKS_ATTACKS = new StructuredDataKey<>("blocks_attacks", BlocksAttacks.TYPE);
+    public static final StructuredDataKey<PiercingWeapon> PIERCING_WEAPON = new StructuredDataKey<>("piercing_weapon", PiercingWeapon.TYPE);
+    public static final StructuredDataKey<KineticWeapon> KINETIC_WEAPON = new StructuredDataKey<>("kinetic_weapon", KineticWeapon.TYPE);
+    public static final StructuredDataKey<SwingAnimation> SWING_ANIMATION = new StructuredDataKey<>("swing_animation", SwingAnimation.TYPE);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS1_20_5 = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE1_20_5);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS1_21_5 = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE1_21_5);
     public static final StructuredDataKey<DyedColor> DYED_COLOR1_20_5 = new StructuredDataKey<>("dyed_color", DyedColor.TYPE1_20_5);
@@ -228,6 +240,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKeys1_21_5 V1_21_5 = VersionedTypes.V1_21_5.structuredDataKeys();
     public static final StructuredDataKeys1_21_5 V1_21_6 = VersionedTypes.V1_21_6.structuredDataKeys();
     public static final StructuredDataKeys1_21_5 V1_21_9 = VersionedTypes.V1_21_9.structuredDataKeys();
+    public static final StructuredDataKeys1_21_11 V1_21_11 = VersionedTypes.V1_21_11.structuredDataKeys();
 
     @Override
     public String toString() {

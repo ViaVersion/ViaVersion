@@ -28,9 +28,13 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
-public record DataComponentPredicate(int id, Tag predicate) {
+public record DataComponentPredicate(PredicateType type, Tag predicate) {
 
-    public static final Type<DataComponentPredicate> TYPE = new Type<>(DataComponentPredicate.class) {
+    public DataComponentPredicate(final int predicateType, final Tag predicate) {
+        this(PredicateType.ofPredicateType(predicateType), predicate);
+    }
+
+    public static final Type<DataComponentPredicate> TYPE1_21_5 = new Type<>(DataComponentPredicate.class) {
         @Override
         public DataComponentPredicate read(final ByteBuf buffer) {
             final int id = Types.VAR_INT.readPrimitive(buffer);
@@ -40,9 +44,38 @@ public record DataComponentPredicate(int id, Tag predicate) {
 
         @Override
         public void write(final ByteBuf buffer, final DataComponentPredicate value) {
-            Types.VAR_INT.writePrimitive(buffer, value.id());
+            Types.VAR_INT.writePrimitive(buffer, value.type().id());
             Types.TAG.write(buffer, value.predicate());
         }
     };
-    public static final Type<DataComponentPredicate[]> ARRAY_TYPE = new ArrayType<>(TYPE, 64);
+    public static final Type<DataComponentPredicate[]> ARRAY_TYPE1_21_5 = new ArrayType<>(TYPE1_21_5, 64);
+
+    public static final Type<DataComponentPredicate> TYPE1_21_11 = new Type<>(DataComponentPredicate.class) {
+        @Override
+        public DataComponentPredicate read(final ByteBuf buffer) {
+            final boolean isPredicateType = Types.BOOLEAN.read(buffer);
+            final PredicateType type = new PredicateType(Types.VAR_INT.readPrimitive(buffer), isPredicateType);
+            final Tag predicate = Types.TAG.read(buffer);
+            return new DataComponentPredicate(type, predicate);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final DataComponentPredicate value) {
+            Types.BOOLEAN.write(buffer, value.type().isPredicateType());
+            Types.VAR_INT.writePrimitive(buffer, value.type().id());
+            Types.TAG.write(buffer, value.predicate());
+        }
+    };
+    public static final Type<DataComponentPredicate[]> ARRAY_TYPE1_21_11 = new ArrayType<>(TYPE1_21_11, 64);
+
+    public record PredicateType(int id, boolean isPredicateType) {
+
+        public static PredicateType ofPredicateType(final int id) {
+            return new PredicateType(id, true);
+        }
+
+        public static PredicateType ofDataComponentType(final int id) {
+            return new PredicateType(id, false);
+        }
+    }
 }

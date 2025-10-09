@@ -20,35 +20,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.data.predicate;
+package com.viaversion.viaversion.api.minecraft.item.data;
 
-import com.viaversion.viaversion.api.minecraft.data.StructuredData;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
-public record DataComponentMatchers(StructuredData<?>[] exactPredicates, DataComponentPredicate[] predicates) {
+public record SwingAnimation(int type, int duration) {
 
-    public static final class DataComponentMatchersType extends Type<DataComponentMatchers> {
-        private final Type<StructuredData<?>[]> dataArrayType;
-        private final Type<DataComponentPredicate[]> predicateArrayType;
+    private static final int DEFAULT_TYPE = EnumTypes.SWING_ANIMATION.byName("whack");
 
-        public DataComponentMatchersType(final Type<StructuredData<?>[]> dataArrayType, final Type<DataComponentPredicate[]> predicateArrayType) {
-            super(DataComponentMatchers.class);
-            this.dataArrayType = dataArrayType;
-            this.predicateArrayType = predicateArrayType;
+    public static final Type<SwingAnimation> TYPE = new Type<>(SwingAnimation.class) {
+        @Override
+        public SwingAnimation read(final ByteBuf buffer) {
+            final int type = Types.VAR_INT.readPrimitive(buffer);
+            final int duration = Types.VAR_INT.readPrimitive(buffer);
+            return new SwingAnimation(type, duration);
         }
 
         @Override
-        public DataComponentMatchers read(final ByteBuf buffer) {
-            final StructuredData<?>[] exactPredicates = dataArrayType.read(buffer);
-            final DataComponentPredicate[] partialPredicates = predicateArrayType.read(buffer);
-            return new DataComponentMatchers(exactPredicates, partialPredicates);
+        public void write(final ByteBuf buffer, final SwingAnimation value) {
+            Types.VAR_INT.writePrimitive(buffer, value.type);
+            Types.VAR_INT.writePrimitive(buffer, value.duration);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final DataComponentMatchers value) {
-            dataArrayType.write(buffer, value.exactPredicates());
-            predicateArrayType.write(buffer, value.predicates());
+        public void write(final Ops ops, final SwingAnimation value) {
+            ops.writeMap(map -> map
+                .writeOptional("type", EnumTypes.SWING_ANIMATION, value.type, DEFAULT_TYPE)
+                .writeOptional("duration", Types.INT, value.duration, 6)
+            );
         }
-    }
+    };
 }

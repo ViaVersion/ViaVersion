@@ -28,14 +28,14 @@ import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate.AdventureModePredicateType1_21_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 
-public class StructuredDataKeys1_21_5 extends StructuredDataKeys1_21_2 {
+public class StructuredDataKeys1_21_11 extends StructuredDataKeys1_21_2 {
 
     public final StructuredDataKey<AdventureModePredicate> canPlaceOn;
     public final StructuredDataKey<AdventureModePredicate> canBreak;
 
-    public StructuredDataKeys1_21_5(final VersionedTypesHolder types) {
+    public StructuredDataKeys1_21_11(final VersionedTypesHolder types) {
         super(types);
-        final AdventureModePredicateType1_21_5 adventureModePredicateType = new AdventureModePredicateType1_21_5(types.structuredDataArray(), DataComponentPredicate.ARRAY_TYPE1_21_5);
+        final AdventureModePredicateType1_21_5 adventureModePredicateType = new AdventureModePredicateType1_21_5(types.structuredDataArray(), DataComponentPredicate.ARRAY_TYPE1_21_11);
         this.canPlaceOn = add("can_place_on", adventureModePredicateType);
         this.canBreak = add("can_break", adventureModePredicateType);
         this.unsupportedForOps.add(this.canPlaceOn);

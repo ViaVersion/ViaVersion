@@ -30,6 +30,7 @@ public record CodecRegistryContext(Protocol<?, ?, ?, ?> protocol, RegistryAccess
 
     // Generally from hardcoded, but highly variable client data
     private static final Set<StructuredDataKey<?>> NOT_IMPLEMENTED = new ReferenceOpenHashSet<>(List.of(
+        StructuredDataKey.DAMAGE_TYPE
     ));
 
     public CodecRegistryContext(final Protocol<?, ?, ?, ?> protocol, final RegistryAccess registryAccess, final boolean mapped) {

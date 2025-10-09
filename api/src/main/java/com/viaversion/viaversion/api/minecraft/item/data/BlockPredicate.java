@@ -72,9 +72,9 @@ public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher
     public static final class BlockPredicateType1_21_5 extends Type<BlockPredicate> {
         private final Type<DataComponentMatchers> matchersType;
 
-        public BlockPredicateType1_21_5(final Type<StructuredData<?>[]> dataArrayType) {
+        public BlockPredicateType1_21_5(final Type<StructuredData<?>[]> dataArrayType, final Type<DataComponentPredicate[]> predicateArrayType) {
             super(BlockPredicate.class);
-            this.matchersType = new DataComponentMatchersType(dataArrayType);
+            this.matchersType = new DataComponentMatchersType(dataArrayType, predicateArrayType);
         }
 
         @Override
