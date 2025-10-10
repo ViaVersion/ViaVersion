@@ -102,7 +102,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             jukeboxSongsPacket.write(Types.REGISTRY_ENTRY_ARRAY, protocol.getMappingData().jukeboxSongs());
             jukeboxSongsPacket.send(Protocol1_20_5To1_21.class);
 
-            if (wrapper.user().get(WolfVariantRegistryCheckStorage.class).get()) {
+            if (!wrapper.user().get(WolfVariantRegistryCheckStorage.class).get()) {
                 createDefaultWolfVariantRegistryDataPacket(wrapper).send(Protocol1_20_5To1_21.class);
             }
         });
