@@ -66,20 +66,13 @@ public final class ComponentRewriter1_14<C extends ClientboundPacketType> extend
         }
 
         final CompoundTag itemTag = tag.getCompoundTag("tag");
-        final NumberTag damageTag = tag.getNumberTag("Damage");
 
         // Call item converter
-        final short damage = damageTag != null ? damageTag.asShort() : 0;
-
         final Item item = new DataItem();
-        item.setData(damage);
         item.setTag(itemTag);
         protocol.getItemRewriter().handleItemToClient(null, item);
 
         // Serialize again
-        if (damage != item.data()) {
-            tag.put("Damage", new ShortTag(item.data()));
-        }
         if (itemTag != null) {
             tag.put("tag", itemTag);
         }
