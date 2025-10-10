@@ -43,6 +43,7 @@ import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.util.Key;
 
 public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPacket1_20_5, Protocol1_20_5To1_21> {
+
     public EntityPacketRewriter1_21(final Protocol1_20_5To1_21 protocol) {
         super(protocol);
     }
@@ -65,10 +66,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             entries = registryDataRewriter.handle(wrapper.user(), registryKey, entries);
             wrapper.write(Types.REGISTRY_ENTRY_ARRAY, entries);
             if (registryKey.equals("wolf_variant")) {
-                WolfVariantRegistryCheckStorage wolfVariantCheck = wrapper.user().get(WolfVariantRegistryCheckStorage.class);
-                if (wolfVariantCheck != null) {
-                    wolfVariantCheck.set(true);
-                }
+                wrapper.user().get(WolfVariantRegistryCheckStorage.class).set(true);
             }
         });
 
@@ -104,8 +102,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             jukeboxSongsPacket.write(Types.REGISTRY_ENTRY_ARRAY, protocol.getMappingData().jukeboxSongs());
             jukeboxSongsPacket.send(Protocol1_20_5To1_21.class);
 
-            WolfVariantRegistryCheckStorage wolfVariantCheck = wrapper.user().get(WolfVariantRegistryCheckStorage.class);
-            if (wolfVariantCheck != null && !wolfVariantCheck.get()) {
+            if (wrapper.user().get(WolfVariantRegistryCheckStorage.class).get()) {
                 createDefaultWolfVariantRegistryDataPacket(wrapper).send(Protocol1_20_5To1_21.class);
             }
         });
