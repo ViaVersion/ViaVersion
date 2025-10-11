@@ -18,6 +18,8 @@
 package com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.PaintingVariant;
@@ -163,7 +165,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         final CompoundTag paleWolfVariant = new CompoundTag();
         paleWolfVariant.putString("wild_texture", "minecraft:entity/wolf/wolf");
         paleWolfVariant.putString("angry_texture", "minecraft:entity/wolf/wolf_angry");
-        paleWolfVariant.putString("biomes", "minecraft:taiga");
+        paleWolfVariant.put("biomes", new ListTag<>(StringTag.class));
         paleWolfVariant.putString("tame_texture", "minecraft:entity/wolf/wolf_tame");
         return new RegistryEntry[]{
             new RegistryEntry("minecraft:pale", paleWolfVariant),
