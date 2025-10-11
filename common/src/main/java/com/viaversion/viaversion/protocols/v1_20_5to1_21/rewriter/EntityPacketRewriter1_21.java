@@ -18,6 +18,8 @@
 package com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.PaintingVariant;
@@ -37,8 +39,10 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.Paintings1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.WolfVariantRegistryMarker;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
+import com.viaversion.viaversion.util.Key;
 
 public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPacket1_20_5, Protocol1_20_5To1_21> {
 
@@ -58,7 +62,15 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         campfireDamageType.putString("message_id", "inFire");
         campfireDamageType.putFloat("exhaustion", 0.1F);
         registryDataRewriter.addEntries("damage_type", new RegistryEntry("minecraft:campfire", campfireDamageType));
-        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, registryDataRewriter::handle);
+        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, wrapper -> {
+            final String registryKey = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
+            RegistryEntry[] entries = wrapper.read(Types.REGISTRY_ENTRY_ARRAY);
+            entries = registryDataRewriter.handle(wrapper.user(), registryKey, entries);
+            wrapper.write(Types.REGISTRY_ENTRY_ARRAY, entries);
+            if (registryKey.equals("wolf_variant")) {
+                wrapper.user().put(new WolfVariantRegistryMarker());
+            }
+        });
 
         protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_20_5.FINISH_CONFIGURATION, wrapper -> {
             // Add new registries
@@ -91,6 +103,10 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             jukeboxSongsPacket.write(Types.STRING, "minecraft:jukebox_song");
             jukeboxSongsPacket.write(Types.REGISTRY_ENTRY_ARRAY, protocol.getMappingData().jukeboxSongs());
             jukeboxSongsPacket.send(Protocol1_20_5To1_21.class);
+
+            if (!wrapper.user().has(WolfVariantRegistryMarker.class)) {
+                createDefaultWolfVariantRegistryDataPacket(wrapper).send(Protocol1_20_5To1_21.class);
+            }
         });
 
         registerLogin1_20_5(ClientboundPackets1_20_5.LOGIN);
@@ -136,6 +152,24 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
                 storeOnGround(wrapper);
             }
         });
+    }
+
+    private static PacketWrapper createDefaultWolfVariantRegistryDataPacket(final PacketWrapper wrapper) {
+        final PacketWrapper wolfVariantPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
+        wolfVariantPacket.write(Types.STRING, "minecraft:wolf_variant");
+        wolfVariantPacket.write(Types.REGISTRY_ENTRY_ARRAY, getDefaultWolfVariantRegistryEntries());
+        return wolfVariantPacket;
+    }
+
+    private static RegistryEntry[] getDefaultWolfVariantRegistryEntries() {
+        final CompoundTag paleWolfVariant = new CompoundTag();
+        paleWolfVariant.putString("wild_texture", "minecraft:entity/wolf/wolf");
+        paleWolfVariant.putString("angry_texture", "minecraft:entity/wolf/wolf_angry");
+        paleWolfVariant.put("biomes", new ListTag<>(StringTag.class));
+        paleWolfVariant.putString("tame_texture", "minecraft:entity/wolf/wolf_tame");
+        return new RegistryEntry[]{
+            new RegistryEntry("minecraft:pale", paleWolfVariant),
+        };
     }
 
     private void storePosition(final PacketWrapper wrapper) {
