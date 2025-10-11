@@ -22,8 +22,8 @@
  */
 package com.viaversion.viaversion.api.minecraft.entities;
 
-import java.util.HashMap;
-import java.util.Map;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class EntityTypes1_8 {
 
@@ -135,7 +135,7 @@ public class EntityTypes1_8 {
         SPIDER(52, ABSTRACT_MONSTER),
         CAVE_SPIDER(59, SPIDER);
 
-        private static final Map<Integer, EntityType> TYPES = new HashMap<>();
+        private static final Int2ObjectMap<EntityType> TYPES;
 
         private final int id;
         private final EntityType parent;
@@ -176,7 +176,9 @@ public class EntityTypes1_8 {
         }
 
         static {
-            for (EntityType type : EntityType.values()) {
+            final EntityType[] values = EntityType.values();
+            TYPES = new Int2ObjectOpenHashMap<>(values.length);
+            for (EntityType type : values) {
                 TYPES.put(type.id, type);
             }
         }
@@ -218,7 +220,7 @@ public class EntityTypes1_8 {
         ARMOR_STAND(78, EntityType.ARMOR_STAND),
         FISHIHNG_HOOK(90, EntityType.FISHING_HOOK);
 
-        private static final Map<Integer, Map<Integer, ObjectType>> TYPES = new HashMap<>();
+        private static final Int2ObjectMap<Int2ObjectMap<ObjectType>> TYPES = new Int2ObjectOpenHashMap<>();
 
         private final int id;
         private final int data;
@@ -226,7 +228,7 @@ public class EntityTypes1_8 {
 
         static {
             for (ObjectType type : ObjectType.values()) {
-                TYPES.computeIfAbsent(type.id, k -> new HashMap<>()).put(type.data, type);
+                TYPES.computeIfAbsent(type.id, k -> new Int2ObjectOpenHashMap<>()).put(type.data, type);
             }
         }
 
@@ -256,7 +258,7 @@ public class EntityTypes1_8 {
         }
 
         public static ObjectType findById(final int id, final int data) {
-            final Map<Integer, ObjectType> types = TYPES.get(id);
+            final Int2ObjectMap<ObjectType> types = TYPES.get(id);
             if (types == null) {
                 return null;
             }

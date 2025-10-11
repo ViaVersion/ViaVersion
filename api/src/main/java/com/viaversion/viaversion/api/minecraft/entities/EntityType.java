@@ -39,7 +39,8 @@ public interface EntityType {
      *
      * @return parent entity type if present
      */
-    @Nullable EntityType getParent();
+    @Nullable
+    EntityType getParent();
 
     /**
      * Returns the entity type name, not necessarily matching the Vanilla type name.
