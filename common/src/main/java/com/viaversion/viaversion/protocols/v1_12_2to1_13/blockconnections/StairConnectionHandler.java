@@ -20,11 +20,12 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
-import com.viaversion.viaversion.util.ArrayUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 public class StairConnectionHandler implements ConnectionHandler {
@@ -32,7 +33,7 @@ public class StairConnectionHandler implements ConnectionHandler {
     private static final Int2IntMap CONNECTED_BLOCKS = new Int2IntOpenHashMap();
 
     static ConnectionData.ConnectorInitAction init() {
-        final String[] baseStairs = new String[] {
+        final List<String> baseStairs = Arrays.asList(
             "minecraft:oak_stairs",
             "minecraft:cobblestone_stairs",
             "minecraft:brick_stairs",
@@ -49,12 +50,12 @@ public class StairConnectionHandler implements ConnectionHandler {
             "minecraft:purpur_stairs",
             "minecraft:prismarine_stairs",
             "minecraft:prismarine_brick_stairs",
-            "minecraft:dark_prismarine_stairs",
-        };
+            "minecraft:dark_prismarine_stairs"
+        );
 
         final StairConnectionHandler connectionHandler = new StairConnectionHandler();
         return blockData -> {
-            int type = ArrayUtil.indexOf(baseStairs, blockData.getMinecraftKey());
+            int type = baseStairs.indexOf(blockData.getMinecraftKey());
             if (type == -1) return;
 
             if (blockData.getValue("waterlogged").equals("true")) return;

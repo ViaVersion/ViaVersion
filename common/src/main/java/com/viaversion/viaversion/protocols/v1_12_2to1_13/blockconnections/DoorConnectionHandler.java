@@ -20,11 +20,12 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
-import com.viaversion.viaversion.util.ArrayUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 public class DoorConnectionHandler implements ConnectionHandler {
@@ -32,19 +33,19 @@ public class DoorConnectionHandler implements ConnectionHandler {
     private static final Int2IntMap CONNECTED_STATES = new Int2IntOpenHashMap();
 
     static ConnectionData.ConnectorInitAction init() {
-        final String[] baseDoors = new String[] {
+        final List<String> baseDoors = Arrays.asList(
             "minecraft:oak_door",
             "minecraft:birch_door",
             "minecraft:jungle_door",
             "minecraft:dark_oak_door",
             "minecraft:acacia_door",
             "minecraft:spruce_door",
-            "minecraft:iron_door",
-        };
+            "minecraft:iron_door"
+        );
 
         final DoorConnectionHandler connectionHandler = new DoorConnectionHandler();
         return blockData -> {
-            int type = ArrayUtil.indexOf(baseDoors, blockData.getMinecraftKey());
+            int type = baseDoors.indexOf(blockData.getMinecraftKey());
             if (type == -1) return;
 
             int id = blockData.getSavedBlockStateId();
