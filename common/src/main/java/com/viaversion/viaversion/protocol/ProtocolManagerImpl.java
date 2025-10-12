@@ -107,6 +107,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
@@ -136,9 +137,10 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     public ProtocolManagerImpl() {
         final int parallelism = MathUtil.clamp(Runtime.getRuntime().availableProcessors(), 2, 12);
+        final AtomicInteger threadIndex = new AtomicInteger(0);
         this.mappingLoaderExecutor = new ForkJoinPool(parallelism, (pool) -> {
             final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
-            worker.setName("Via-Mappingloader-" + worker.getPoolIndex());
+            worker.setName("Via-Mappingloader-" + threadIndex.incrementAndGet());
             return worker;
         }, ForkJoinWorkerThread.getDefaultUncaughtExceptionHandler(), true);
     }
