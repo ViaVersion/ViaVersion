@@ -30,6 +30,8 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ItemIds1_12_2;
+import com.viaversion.viaversion.protocols.v1_13to1_13_1.Protocol1_13To1_13_1;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
@@ -61,18 +63,25 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Json
             return;
         }
 
+        final String idTag = tag.getString("id", "");
         final CompoundTag itemTag = tag.getCompoundTag("tag");
         final NumberTag damageTag = tag.getNumberTag("Damage");
 
         // Call item converter
+        final int id = ItemIds1_12_2.getId(idTag, 1);
+
         final short damage = damageTag != null ? damageTag.asShort() : 0;
 
         final Item item = new DataItem();
+        item.setIdentifier(id);
         item.setData(damage);
         item.setTag(itemTag);
         protocol.getItemRewriter().handleItemToClient(null, item);
 
         // Serialize again
+        if (id != item.identifier()) {
+            tag.putString("id", Protocol1_13To1_13_1.MAPPINGS.getFullItemMappings().identifier(item.identifier()));
+        }
         if (damage != item.data()) {
             tag.put("Damage", new ShortTag(item.data()));
         }
