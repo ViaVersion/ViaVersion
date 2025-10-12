@@ -87,11 +87,14 @@ of the `build/libs` directory.
 
 You need JDK 17 or newer to build ViaVersion.
 
+Mapping Files
+--------------
+Mapping files are generated and managed in our [Mappings repository](https://github.com/ViaVersion/Mappings). The generated mapping output is stored [here](./common/src/main/resources/assets/viaversion).
 
 Resources
 --------
 
-- **[Via Mappings Generator](https://github.com/ViaVersion/Mappings)**. The generated mapping output is stored [here](./common/src/main/resources/assets/viaversion).
+- **[Via Mappings Generator](https://github.com/ViaVersion/Mappings)**
 - **[Mojang mappings](https://minecraft.wiki/w/Obfuscation_map)** (Thank you, Mojang, very cool)
 - Previously: **[Burger](https://github.com/Pokechu22/Burger)** (see [PAaaS](https://github.com/Matsv/Paaas)) and **wiki.vg**
 
