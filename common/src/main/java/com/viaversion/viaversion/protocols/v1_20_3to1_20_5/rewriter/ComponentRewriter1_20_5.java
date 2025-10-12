@@ -52,6 +52,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockPredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
+import com.viaversion.viaversion.api.minecraft.item.data.DebugStickState;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
@@ -155,7 +156,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         register(StructuredDataKey.WRITABLE_BOOK_CONTENT, this::writableBookContentToTag, this::writableBookContentFromTag);
         register(StructuredDataKey.WRITTEN_BOOK_CONTENT, this::writtenBookContentToTag, this::writtenBookContentFromTag);
         register(StructuredDataKey.TRIM1_20_5, this::trimToTag, this::trimFromTag);
-        register(StructuredDataKey.DEBUG_STICK_STATE, this::debugStickRateToTag, this::debugStickRateFromTag);
+        register(StructuredDataKey.DEBUG_STICK_STATE, this::debugStickStateToTag, this::debugStickStateFromTag);
         register(StructuredDataKey.ENTITY_DATA1_20_5, this::entityDataToTag, this::entityDataFromTag);
         register(StructuredDataKey.BUCKET_ENTITY_DATA, this::bucketEntityDataToTag, this::bucketEntityDataFromTag);
         register(StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, this::blockEntityDataToTag, this::blockEntityDataFromTag);
@@ -173,7 +174,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         register(StructuredDataKey.V1_20_5.container, this::containerToTag, this::containerFromTag);
         register(StructuredDataKey.BLOCK_STATE, this::blockStateToTag, this::blockStateFromTag);
         register(StructuredDataKey.BEES1_20_5, this::beesToTag, this::beesFromTag);
-        register(StructuredDataKey.LOCK, this::lockToTag, this::lockFromTag);
+        register(StructuredDataKey.LOCK1_20_5, this::lockToTag, this::lockFromTag);
         register(StructuredDataKey.CONTAINER_LOOT, this::containerLootToTag, this::containerLootFromTag);
     }
 
@@ -1058,12 +1059,12 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         return new ArmorTrim(material, pattern, showInTooltip);
     }
 
-    protected CompoundTag debugStickRateToTag(final CompoundTag value) {
-        return value;
+    protected CompoundTag debugStickStateToTag(final DebugStickState value) {
+        return value.tag();
     }
 
-    protected CompoundTag debugStickRateFromTag(final Tag value) {
-        return (CompoundTag) value;
+    protected DebugStickState debugStickStateFromTag(final Tag value) {
+        return new DebugStickState((CompoundTag) value);
     }
 
     protected CompoundTag entityDataToTag(final CompoundTag value) {

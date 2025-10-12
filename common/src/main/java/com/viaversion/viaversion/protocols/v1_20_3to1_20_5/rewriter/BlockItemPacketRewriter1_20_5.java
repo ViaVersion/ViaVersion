@@ -54,6 +54,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockPredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
+import com.viaversion.viaversion.api.minecraft.item.data.DebugStickState;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
@@ -508,7 +509,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final CompoundTag debugProperty = tag.getCompoundTag("DebugProperty");
         if (debugProperty != null) {
-            data.set(StructuredDataKey.DEBUG_STICK_STATE, debugProperty.copy());
+            data.set(StructuredDataKey.DEBUG_STICK_STATE, new DebugStickState(debugProperty.copy()));
         }
 
         final NumberTag unbreakable = tag.getNumberTag("Unbreakable");
@@ -1448,7 +1449,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (data != null) {
             final StringTag lockTag = tag.getStringTag("Lock");
             if (lockTag != null) {
-                data.set(StructuredDataKey.LOCK, lockTag);
+                data.set(StructuredDataKey.LOCK1_20_5, lockTag);
             }
 
             final ListTag<CompoundTag> beesTag = tag.getListTag("Bees", CompoundTag.class);

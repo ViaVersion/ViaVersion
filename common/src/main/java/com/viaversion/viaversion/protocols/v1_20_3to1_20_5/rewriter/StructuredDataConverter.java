@@ -318,7 +318,7 @@ public final class StructuredDataConverter {
             }
             getBlockEntityTag(tag, "beehive").put("Bees", bees);
         });
-        register(StructuredDataKey.LOCK, (data, tag) -> getBlockEntityTag(tag).put("Lock", data));
+        register(StructuredDataKey.LOCK1_20_5, (data, tag) -> getBlockEntityTag(tag).put("Lock", data));
         register(StructuredDataKey.NOTE_BLOCK_SOUND, (data, tag) -> getBlockEntityTag(tag, "player_head").putString("note_block_sound", data.original()));
         register(StructuredDataKey.POT_DECORATIONS, (data, tag) -> {
             IntArrayTag originalSherds = null;
@@ -341,7 +341,7 @@ public final class StructuredDataConverter {
             }
             getBlockEntityTag(tag, "decorated_pot").put("sherds", sherds);
         });
-        register(StructuredDataKey.DEBUG_STICK_STATE, (data, tag) -> tag.put("DebugProperty", data));
+        register(StructuredDataKey.DEBUG_STICK_STATE, (data, tag) -> tag.put("DebugProperty", data.tag()));
         register(StructuredDataKey.RECIPES, (data, tag) -> tag.put("Recipes", data));
         register(StructuredDataKey.ENTITY_DATA1_20_5, (data, tag) -> tag.put("EntityTag", data));
         register(StructuredDataKey.BUCKET_ENTITY_DATA, (data, tag) -> {

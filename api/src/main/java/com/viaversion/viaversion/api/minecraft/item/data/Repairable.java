@@ -22,19 +22,29 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.MappingData.MappingType;
+import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.api.type.types.misc.HolderSetType;
+import com.viaversion.viaversion.util.Rewritable;
 
-public record DamageResistant(Key typesTagKey) {
+public record Repairable(HolderSet items) implements Rewritable {
 
-    public static final Type<DamageResistant> TYPE = new TransformingType<>(Types.RESOURCE_LOCATION, DamageResistant.class, DamageResistant::new, DamageResistant::typesTagKey) {
-
+    public static final Type<Repairable> TYPE = new TransformingType<>(Types.HOLDER_SET, Repairable.class, Repairable::new, Repairable::items) {
         @Override
-        public void write(final Ops ops, final DamageResistant value) {
-            ops.writeMap(map -> map.write("types", Types.TAG_KEY, value.typesTagKey));
+        public void write(final Ops ops, final Repairable value) {
+            ops.writeMap(map -> map.write("items", new HolderSetType(MappingType.ITEM), value.items));
         }
     };
+
+    @Override
+    public Repairable rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        final HolderSet items = this.items.rewrite(Rewritable.itemRewriteFunction(protocol, clientbound));
+        return this.items == items ? this : new Repairable(items);
+    }
 }

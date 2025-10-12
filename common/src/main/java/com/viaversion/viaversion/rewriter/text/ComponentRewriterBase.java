@@ -285,7 +285,8 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
 
     protected abstract void handleHoverEvent(final UserConnection connection, final CompoundTag hoverEventTag);
 
-    protected final void handleShowItem(final UserConnection connection, final CompoundTag itemTag) {
+    @Override
+    public final void handleShowItem(final UserConnection connection, final CompoundTag itemTag) {
         handleShowItem(connection, itemTag, itemTag.getCompoundTag("components"));
     }
 
@@ -309,6 +310,8 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
         if (useRemainder != null) {
             handleShowItem(connection, useRemainder);
         }
+
+        removeDataComponents(componentsTag, "lock", "debug_stick_state");
     }
 
     protected void handleAttributeModifiers(final CompoundTag tag) {

@@ -61,7 +61,9 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.ProtocolLogger;
 import java.util.BitSet;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
@@ -225,18 +227,11 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         });
 
         registerClientbound(ClientboundPackets1_20_3.SET_PLAYER_TEAM, wrapper -> {
+            final ScoreboardTeamStorage storage = wrapper.user().get(ScoreboardTeamStorage.class);
+
             final String teamName = wrapper.passthrough(Types.STRING);
             final byte action = wrapper.passthrough(Types.BYTE);
-            if (action == 2) {
-                return;
-            }
-
-            final ScoreboardTeamStorage storage = wrapper.user().get(ScoreboardTeamStorage.class);
-            if (action == 1) {
-                storage.removeTeam(teamName);
-                return;
-            } else if (action == 0) {
-                storage.createTeam(teamName);
+            if (action == 0) {
                 wrapper.passthrough(Types.TAG); // Display name
                 wrapper.passthrough(Types.BYTE); // Flags
                 wrapper.passthrough(Types.STRING); // Name Tag Visibility
@@ -244,28 +239,37 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
                 wrapper.passthrough(Types.VAR_INT); // Color
                 wrapper.passthrough(Types.TAG); // Prefix
                 wrapper.passthrough(Types.TAG); // Suffix
-
+                storage.createTeam(teamName);
                 final String[] players = wrapper.passthrough(Types.STRING_ARRAY);
                 storage.addPlayerToTeam(teamName, players);
-                return;
-            }
-
-            final String[] players = wrapper.passthrough(Types.STRING_ARRAY);
-            if (action == 3) {
+            } else if (action == 1) {
+                storage.removeTeam(teamName);
+            } else if (action == 3) {
+                final String[] players = wrapper.passthrough(Types.STRING_ARRAY);
                 storage.addPlayerToTeam(teamName, players);
-            } else if (action != 4) {
+            }
+
+            if (action != 4) {
                 return;
             }
 
+            final String[] players = wrapper.read(Types.STRING_ARRAY);
             // Drop invalid remove packets to not break when plugins do that, since strict error handling is enforced in newer protocols.
+            final Set<String> filteredPlayers = new HashSet<>();
             for (final String player : players) {
                 final String team = storage.getPlayerTeam(player);
                 if (!Objects.equals(team, teamName)) {
-                    wrapper.cancel();
-                    return;
+                    break;
                 }
 
                 storage.removeFromTeam(teamName, player);
+                filteredPlayers.add(player);
+            }
+
+            if (!filteredPlayers.isEmpty()) {
+                wrapper.write(Types.STRING_ARRAY, filteredPlayers.toArray(new String[0]));
+            } else {
+                wrapper.cancel();
             }
         });
 
@@ -330,7 +334,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             .add(StructuredDataKey.FIREWORKS).add(StructuredDataKey.PROFILE1_20_5).add(StructuredDataKey.NOTE_BLOCK_SOUND)
             .add(StructuredDataKey.BANNER_PATTERNS).add(StructuredDataKey.BASE_COLOR).add(StructuredDataKey.POT_DECORATIONS)
             .add(StructuredDataKey.BLOCK_STATE).add(StructuredDataKey.BEES1_20_5)
-            .add(StructuredDataKey.LOCK).add(StructuredDataKey.CONTAINER_LOOT).add(StructuredDataKey.TOOL1_20_5)
+            .add(StructuredDataKey.LOCK1_20_5).add(StructuredDataKey.CONTAINER_LOOT).add(StructuredDataKey.TOOL1_20_5)
             .add(StructuredDataKey.ITEM_NAME).add(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER)
             .add(VersionedTypes.V1_20_5.structuredDataKeys().keys());
 

@@ -22,7 +22,11 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
+import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.StringTag;
+import com.viaversion.nbt.tag.Tag;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
+import java.util.function.Function;
 
 /**
  * Set of ids that either holds a string tag key or an array of ids.
@@ -32,7 +36,7 @@ public interface HolderSet {
     /**
      * Creates a new holder set for the given tag.
      *
-     * @param tagKey the tag key
+     * @param tagKey the tag key, not including '#'
      * @return a new holder set
      */
     static HolderSet of(final String tagKey) {
@@ -49,10 +53,29 @@ public interface HolderSet {
         return new HolderSetImpl.Ids(ids);
     }
 
+    static HolderSet fromTag(final Tag tag, final Function<String, Integer> mappingFunction) {
+        if (tag instanceof StringTag stringTag) {
+            if (stringTag.getValue().startsWith("#")) {
+                return HolderSet.of(stringTag.getValue().substring(1));
+            }
+
+            final int id = mappingFunction.apply(stringTag.getValue());
+            return HolderSet.of(new int[]{id});
+        } else if (tag instanceof ListTag<?> listTag) {
+            final int[] ids = new int[listTag.size()];
+            for (int i = 0; i < listTag.size(); i++) {
+                final String value = ((StringTag) listTag.get(i)).getValue();
+                ids[i] = mappingFunction.apply(value);
+            }
+            return HolderSet.of(ids);
+        }
+        throw new IllegalArgumentException();
+    }
+
     /**
-     * Gets the tag key.
+     * Gets the tag key, not including '#'.
      *
-     * @return the tag key
+     * @return the tag key without a '#'
      * @see #hasTagKey()
      */
     String tagKey();

@@ -22,16 +22,27 @@
  */
 package com.viaversion.viaversion.api.type.types.misc;
 
+import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class HolderType<T> extends Type<Holder<T>> {
 
+    private final MappingData.MappingType mappingType;
+
     protected HolderType() {
+        this(null);
+    }
+
+    protected HolderType(final MappingData.MappingType mappingType) {
         super(Holder.class);
+        this.mappingType = mappingType;
     }
 
     @Override
@@ -56,6 +67,24 @@ public abstract class HolderType<T> extends Type<Holder<T>> {
     public abstract T readDirect(final ByteBuf buffer);
 
     public abstract void writeDirect(final ByteBuf buffer, final T object);
+
+    @Override
+    public void write(final Ops ops, final Holder<T> value) {
+        if (value.hasId()) {
+            ops.write(Types.RESOURCE_LOCATION, identifier(ops, value.id()));
+        } else {
+            writeDirect(ops, value.value());
+        }
+    }
+
+    protected Key identifier(final Ops ops, final int id) {
+        Preconditions.checkArgument(mappingType != null, "Mapping type is not defined for this HolderType");
+        return ops.context().registryAccess().key(mappingType, id);
+    }
+
+    public void writeDirect(final Ops ops, final T object) {
+        throw new UnsupportedOperationException("Write operation not supported for type: " + getTypeName());
+    }
 
     public abstract static class OptionalHolderType<T> extends HolderType<T> {
         private final HolderType<T> type;

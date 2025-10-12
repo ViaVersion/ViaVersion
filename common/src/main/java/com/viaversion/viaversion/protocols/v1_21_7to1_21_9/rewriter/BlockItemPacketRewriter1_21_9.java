@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.ResolvableProfile;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
@@ -26,6 +27,8 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockEntityData;
 import com.viaversion.viaversion.api.minecraft.item.data.EntityData;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPacket1_21_6;
@@ -33,6 +36,7 @@ import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.Protocol1_21_7To1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundPacket1_21_9;
+import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.storage.DimensionScaleStorage;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
@@ -68,6 +72,9 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
         recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_6.UPDATE_RECIPES);
         recipeRewriter.registerRecipeBookAdd(ClientboundPackets1_21_6.RECIPE_BOOK_ADD);
         recipeRewriter.registerPlaceGhostRecipe(ClientboundPackets1_21_6.PLACE_GHOST_RECIPE);
+
+        protocol.registerClientbound(ClientboundPackets1_21_6.INITIALIZE_BORDER, this::updateBorderCenter);
+        protocol.registerClientbound(ClientboundPackets1_21_6.SET_BORDER_CENTER, this::updateBorderCenter);
     }
 
     @Override
@@ -115,5 +122,20 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
             return blockEntityData.tag();
         });
         container.replace(StructuredDataKey.PROFILE1_21_9, StructuredDataKey.PROFILE1_20_5, ResolvableProfile::profile);
+    }
+
+    private void updateBorderCenter(final PacketWrapper wrapper) {
+        double centerX = wrapper.read(Types.DOUBLE);
+        double centerZ = wrapper.read(Types.DOUBLE);
+
+        final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
+        if (tracker.currentDimensionId() != -1) {
+            final double scale = wrapper.user().get(DimensionScaleStorage.class).getScale(tracker.currentDimensionId());
+            centerX /= scale;
+            centerZ /= scale;
+        }
+
+        wrapper.write(Types.DOUBLE, centerX);
+        wrapper.write(Types.DOUBLE, centerZ);
     }
 }

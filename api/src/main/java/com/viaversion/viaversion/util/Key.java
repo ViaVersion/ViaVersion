@@ -124,7 +124,7 @@ public final class Key {
     }
 
     public static boolean equals(final String firstIdentifier, final String secondIdentifier) {
-        return of(firstIdentifier).equals(of(secondIdentifier));
+        return firstIdentifier != null && secondIdentifier != null && of(firstIdentifier).equals(of(secondIdentifier));
     }
 
     public static String namespaced(final String identifier) {

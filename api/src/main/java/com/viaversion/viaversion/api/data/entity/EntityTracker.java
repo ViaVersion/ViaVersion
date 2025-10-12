@@ -185,6 +185,20 @@ public interface EntityTracker {
      */
     void setCurrentWorld(String currentWorld);
 
+    /**
+     * Returns the id of the current dimension, or -1 if unset (i.e. before 1.20.5).
+     *
+     * @return id of the current dimension, or -1 if unset
+     */
+    int currentDimensionId();
+
+    /**
+     * Sets the id of the current dimension.
+     *
+     * @param currentDimensionId id of the current dimension
+     */
+    void setCurrentDimensionId(int currentDimensionId);
+
     int biomesSent();
 
     void setBiomesSent(int biomesSent);

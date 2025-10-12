@@ -49,6 +49,7 @@ import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter.BlockItemPac
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter.ComponentRewriter1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter.EntityPacketRewriter1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter.ParticleRewriter1_21_9;
+import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.storage.DimensionScaleStorage;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.LastExplosionPowerStorage;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
@@ -121,6 +122,18 @@ public final class Protocol1_21_7To1_21_9 extends AbstractProtocol<ClientboundPa
 
             wrapper.write(Types.VAR_INT, 0); // Number of block particles
         });
+        registerServerbound(ServerboundPackets1_21_6.DEBUG_SAMPLE_SUBSCRIPTION, wrapper -> {
+            final int count = wrapper.read(Types.VAR_INT); // subscription count
+            for (int i = 0; i < count; i++) {
+                final int id = wrapper.read(Types.VAR_INT); // subscription registry id
+                if (id == 0) { // DEDICATED_SERVER_TICK_TIME
+                    wrapper.clearPacket();
+                    wrapper.write(Types.VAR_INT, 0); // debug sample type (TICK_TIME)
+                    return;
+                }
+            }
+            wrapper.cancel();
+        });
 
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21_6.SOUND);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21_6.SOUND_ENTITY);
@@ -129,7 +142,6 @@ public final class Protocol1_21_7To1_21_9 extends AbstractProtocol<ClientboundPa
         new AttributeRewriter<>(this).register1_21(ClientboundPackets1_21_6.UPDATE_ATTRIBUTES);
 
         cancelServerbound(ServerboundConfigurationPackets1_21_9.ACCEPT_CODE_OF_CONDUCT);
-        cancelServerbound(ServerboundPackets1_21_6.DEBUG_SAMPLE_SUBSCRIPTION);
     }
 
     @Override
@@ -166,7 +178,7 @@ public final class Protocol1_21_7To1_21_9 extends AbstractProtocol<ClientboundPa
             StructuredDataKey.BUCKET_ENTITY_DATA, StructuredDataKey.BLOCK_ENTITY_DATA1_21_9, StructuredDataKey.INSTRUMENT1_21_5,
             StructuredDataKey.RECIPES, StructuredDataKey.LODESTONE_TRACKER, StructuredDataKey.FIREWORK_EXPLOSION, StructuredDataKey.FIREWORKS,
             StructuredDataKey.PROFILE1_21_9, StructuredDataKey.NOTE_BLOCK_SOUND, StructuredDataKey.BANNER_PATTERNS, StructuredDataKey.BASE_COLOR,
-            StructuredDataKey.POT_DECORATIONS, StructuredDataKey.BLOCK_STATE, StructuredDataKey.BEES1_21_9, StructuredDataKey.LOCK,
+            StructuredDataKey.POT_DECORATIONS, StructuredDataKey.BLOCK_STATE, StructuredDataKey.BEES1_21_9, StructuredDataKey.LOCK1_21_2,
             StructuredDataKey.CONTAINER_LOOT, StructuredDataKey.TOOL1_21_5, StructuredDataKey.ITEM_NAME, StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER,
             StructuredDataKey.FOOD1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_6,
             StructuredDataKey.REPAIRABLE, StructuredDataKey.ENCHANTABLE, StructuredDataKey.CONSUMABLE1_21_2,
@@ -186,6 +198,7 @@ public final class Protocol1_21_7To1_21_9 extends AbstractProtocol<ClientboundPa
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_9.PLAYER));
         addItemHasher(connection, new ItemHasherBase(this, connection));
+        connection.put(new DimensionScaleStorage());
     }
 
     @Override

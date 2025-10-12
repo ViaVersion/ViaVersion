@@ -22,16 +22,27 @@
  */
 package com.viaversion.viaversion.api.type.types.misc;
 
+import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 
 public class HolderSetType extends Type<HolderSet> {
 
+    private final MappingDataBase.MappingType mappingType;
+
     public HolderSetType() {
+        this(null);
+    }
+
+    public HolderSetType(final MappingDataBase.MappingType mappingType) {
         super(HolderSet.class);
+        this.mappingType = mappingType;
     }
 
     @Override
@@ -60,6 +71,28 @@ public class HolderSetType extends Type<HolderSet> {
             for (final int value : values) {
                 Types.VAR_INT.writePrimitive(buffer, value);
             }
+        }
+    }
+
+    @Override
+    public void write(final Ops ops, final HolderSet value) {
+        if (value.hasTagKey()) {
+            ops.write(Types.TAG_KEY, Key.of(value.tagKey()));
+        } else {
+            Preconditions.checkArgument(mappingType != null, "Cannot write HolderSet with direct ids without a mapping type");
+            if (value.ids().length == 1) {
+                // Single entries are inlined
+                final Key key = ops.context().registryAccess().key(mappingType, value.ids()[0]);
+                ops.write(Types.RESOURCE_LOCATION, key);
+                return;
+            }
+
+            ops.writeList(list -> {
+                for (final int id : value.ids()) {
+                    final Key key = ops.context().registryAccess().key(mappingType, id);
+                    list.write(Types.RESOURCE_LOCATION, key);
+                }
+            });
         }
     }
 

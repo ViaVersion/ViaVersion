@@ -23,33 +23,16 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Rewritable;
-import io.netty.buffer.ByteBuf;
 
 public record ItemModel(Key key) implements Rewritable {
 
-    public static final Type<ItemModel> TYPE = new Type<>(ItemModel.class) {
-        @Override
-        public ItemModel read(final ByteBuf buffer) {
-            final Key key = Types.RESOURCE_LOCATION.read(buffer);
-            return new ItemModel(key);
-        }
-
-        @Override
-        public void write(final ByteBuf buffer, final ItemModel value) {
-            Types.RESOURCE_LOCATION.write(buffer, value.key());
-        }
-
-        @Override
-        public void write(final Ops ops, final ItemModel data) {
-            ops.write(Types.RESOURCE_LOCATION, data.key());
-        }
-    };
+    public static final Type<ItemModel> TYPE = TransformingType.of(Types.RESOURCE_LOCATION, ItemModel.class, ItemModel::new, ItemModel::key);
 
     @Override
     public ItemModel rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {

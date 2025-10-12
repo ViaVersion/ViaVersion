@@ -22,19 +22,35 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
-import com.viaversion.viaversion.api.minecraft.codec.Ops;
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Rewritable;
 
-public record DamageResistant(Key typesTagKey) {
+public record DebugStickState(CompoundTag tag) implements Rewritable, Copyable {
 
-    public static final Type<DamageResistant> TYPE = new TransformingType<>(Types.RESOURCE_LOCATION, DamageResistant.class, DamageResistant::new, DamageResistant::typesTagKey) {
+    public static final Type<DebugStickState> TYPE = TransformingType.of(Types.COMPOUND_TAG, DebugStickState.class, DebugStickState::new, DebugStickState::tag);
 
-        @Override
-        public void write(final Ops ops, final DamageResistant value) {
-            ops.writeMap(map -> map.write("types", Types.TAG_KEY, value.typesTagKey));
+    @Override
+    public DebugStickState rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        CompoundTag updatedTag = tag;
+        if (clientbound && protocol.getMappingData() != null && protocol.getMappingData().changedBlocks() != null) {
+            updatedTag = tag.copy();
+            // Anything beyond this isn't worth the disk space/handling
+            updatedTag.entrySet().removeIf(entry -> {
+                final int blockId = protocol.getMappingData().getFullBlockMappings().id(entry.getKey());
+                return protocol.getMappingData().changedBlocks().contains(blockId);
+            });
         }
-    };
+        return new DebugStickState(updatedTag);
+    }
+
+    @Override
+    public DebugStickState copy() {
+        return new DebugStickState(tag.copy());
+    }
 }
