@@ -20,37 +20,38 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class StairConnectionHandler implements ConnectionHandler {
     private static final Int2ObjectMap<StairData> STAIR_DATA_MAP = new Int2ObjectOpenHashMap<>();
-    private static final Map<Short, Integer> CONNECTED_BLOCKS = new HashMap<>();
+    private static final Int2IntMap CONNECTED_BLOCKS = new Int2IntOpenHashMap();
 
     static ConnectionData.ConnectorInitAction init() {
-        final List<String> baseStairs = new LinkedList<>();
-        baseStairs.add("minecraft:oak_stairs");
-        baseStairs.add("minecraft:cobblestone_stairs");
-        baseStairs.add("minecraft:brick_stairs");
-        baseStairs.add("minecraft:stone_brick_stairs");
-        baseStairs.add("minecraft:nether_brick_stairs");
-        baseStairs.add("minecraft:sandstone_stairs");
-        baseStairs.add("minecraft:spruce_stairs");
-        baseStairs.add("minecraft:birch_stairs");
-        baseStairs.add("minecraft:jungle_stairs");
-        baseStairs.add("minecraft:quartz_stairs");
-        baseStairs.add("minecraft:acacia_stairs");
-        baseStairs.add("minecraft:dark_oak_stairs");
-        baseStairs.add("minecraft:red_sandstone_stairs");
-        baseStairs.add("minecraft:purpur_stairs");
-        baseStairs.add("minecraft:prismarine_stairs");
-        baseStairs.add("minecraft:prismarine_brick_stairs");
-        baseStairs.add("minecraft:dark_prismarine_stairs");
+        final List<String> baseStairs = Arrays.asList(
+            "minecraft:oak_stairs",
+            "minecraft:cobblestone_stairs",
+            "minecraft:brick_stairs",
+            "minecraft:stone_brick_stairs",
+            "minecraft:nether_brick_stairs",
+            "minecraft:sandstone_stairs",
+            "minecraft:spruce_stairs",
+            "minecraft:birch_stairs",
+            "minecraft:jungle_stairs",
+            "minecraft:quartz_stairs",
+            "minecraft:acacia_stairs",
+            "minecraft:dark_oak_stairs",
+            "minecraft:red_sandstone_stairs",
+            "minecraft:purpur_stairs",
+            "minecraft:prismarine_stairs",
+            "minecraft:prismarine_brick_stairs",
+            "minecraft:dark_prismarine_stairs"
+        );
 
         final StairConnectionHandler connectionHandler = new StairConnectionHandler();
         return blockData -> {
@@ -104,8 +105,7 @@ public class StairConnectionHandler implements ConnectionHandler {
         s |= stairData.type() << 4;
         s |= stairData.facing().ordinal() << 9;
 
-        Integer newBlockState = CONNECTED_BLOCKS.get(s);
-        return newBlockState == null ? blockState : newBlockState;
+        return CONNECTED_BLOCKS.getOrDefault(s, blockState);
     }
 
     private int getShape(UserConnection user, BlockPosition position, StairData stair) {
