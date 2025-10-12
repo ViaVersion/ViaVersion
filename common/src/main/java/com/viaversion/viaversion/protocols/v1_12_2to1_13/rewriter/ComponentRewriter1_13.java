@@ -63,12 +63,12 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Json
             return;
         }
 
-        final String idTag = tag.getString("id");
+        final String idTag = tag.getString("id", "");
         final CompoundTag itemTag = tag.getCompoundTag("tag");
         final NumberTag damageTag = tag.getNumberTag("Damage");
 
         // Call item converter
-        final int id = ItemIds1_12_2.getId(idTag);
+        final int id = ItemIds1_12_2.getId(idTag, 1);
 
         final short damage = damageTag != null ? damageTag.asShort() : 0;
 
