@@ -118,12 +118,10 @@ public class PacketTracker {
         this.receivedPacketsTotal = receivedPackets;
     }
 
-    @Deprecated(forRemoval = true)
     public long getIntervalPackets() {
         return this.packetTracker.intervalValue;
     }
 
-    @Deprecated(forRemoval = true)
     public void setIntervalPackets(long intervalPackets) {
         this.packetTracker.intervalValue = Math.toIntExact(intervalPackets);
     }
