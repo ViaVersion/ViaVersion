@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocol;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
@@ -87,6 +86,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.Protocol1_9_1To1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_3to1_10.Protocol1_9_3To1_10;
 import com.viaversion.viaversion.protocols.v1_9to1_9_1.Protocol1_9To1_9_1;
+import com.viaversion.viaversion.util.MathUtil;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
@@ -97,7 +97,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -106,14 +105,15 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.logging.Level;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ProtocolManagerImpl implements ProtocolManager {
@@ -121,15 +121,15 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private final Object2ObjectMap<ProtocolVersion, Object2ObjectMap<ProtocolVersion, Protocol>> registryMap = new Object2ObjectOpenHashMap<>(32);
-    private final Map<Class<? extends Protocol>, Protocol<?, ?, ?, ?>> protocols = new HashMap<>(64);
+    private final Map<Class<? extends Protocol>, Protocol<?, ?, ?, ?>> protocols = new Reference2ObjectOpenHashMap<>(64);
     private final Map<ProtocolPathKey, List<ProtocolPathEntry>> pathCache = new ConcurrentHashMap<>();
     private final Set<ProtocolVersion> supportedVersions = new HashSet<>();
     private final List<Pair<Range<ProtocolVersion>, Protocol>> serverboundBaseProtocols = Lists.newCopyOnWriteArrayList();
     private final List<Pair<Range<ProtocolVersion>, Protocol>> clientboundBaseProtocols = Lists.newCopyOnWriteArrayList();
 
     private final ReadWriteLock mappingLoaderLock = new ReentrantReadWriteLock();
-    private Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
-    private ThreadPoolExecutor mappingLoaderExecutor;
+    private Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new Reference2ObjectOpenHashMap<>();
+    private ExecutorService mappingLoaderExecutor;
     private boolean mappingsLoaded;
 
     private ServerProtocolVersion serverProtocolVersion = new ServerProtocolVersionSingleton(ProtocolVersion.unknown);
@@ -137,9 +137,13 @@ public class ProtocolManagerImpl implements ProtocolManager {
     private int maxProtocolPathSize = 50;
 
     public ProtocolManagerImpl() {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("Via-Mappingloader-%d").build();
-        mappingLoaderExecutor = new ThreadPoolExecutor(12, Integer.MAX_VALUE, 30L, TimeUnit.SECONDS, new SynchronousQueue<>(), threadFactory);
-        mappingLoaderExecutor.allowCoreThreadTimeOut(true);
+        final int parallelism = MathUtil.clamp(Runtime.getRuntime().availableProcessors(), 2, 12);
+        final AtomicInteger threadIndex = new AtomicInteger(0);
+        this.mappingLoaderExecutor = new ForkJoinPool(parallelism, (pool) -> {
+            final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+            worker.setName("Via-Mappingloader-" + threadIndex.incrementAndGet());
+            return worker;
+        }, ForkJoinWorkerThread.getDefaultUncaughtExceptionHandler(), true);
     }
 
     public void registerProtocols() {
