@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_21_9to1_21_11.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
@@ -86,9 +87,15 @@ public final class BlockItemPacketRewriter1_21_11 extends StructuredItemRewriter
         super.handleItemDataComponentsToServer(connection, item, container);
     }
 
-    public static void upgradeData(final Item item, final StructuredDataContainer container) { // public for VB
+    public static void upgradeData(final Item item, final StructuredDataContainer container) {
     }
 
     public static void downgradeData(final Item item, final StructuredDataContainer container) {
+        container.remove(StructuredDataKey.SWING_ANIMATION);
+        container.remove(StructuredDataKey.KINETIC_WEAPON);
+        container.remove(StructuredDataKey.PIERCING_WEAPON);
+        container.remove(StructuredDataKey.DAMAGE_TYPE);
+        container.remove(StructuredDataKey.MINIMUM_ATTACK_CHARGE);
+        container.remove(StructuredDataKey.USE_EFFECTS);
     }
 }

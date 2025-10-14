@@ -45,6 +45,7 @@ import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.rewriter.EntityPacke
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.storage.GameTimeStorage;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
+import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -60,6 +61,7 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
     private final ParticleRewriter<ClientboundPacket1_21_9> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket1_21_9> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket1_21_9> componentRewriter = new ComponentRewriter1_21_11(this);
+    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
 
     public Protocol1_21_9To1_21_11() {
         super(ClientboundPacket1_21_9.class, ClientboundPacket1_21_9.class, ServerboundPacket1_21_9.class, ServerboundPacket1_21_9.class);
@@ -68,6 +70,8 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
     @Override
     protected void registerPackets() {
         super.registerPackets();
+
+        registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
 
         tagRewriter.registerGeneric(ClientboundPackets1_21_9.UPDATE_TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21_9.UPDATE_TAGS);
@@ -165,6 +169,11 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
     @Override
     public BlockItemPacketRewriter1_21_11 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public RegistryDataRewriter getRegistryDataRewriter() {
+        return registryDataRewriter;
     }
 
     @Override

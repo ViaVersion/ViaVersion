@@ -31,7 +31,7 @@ import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record KineticWeapon(float minReach, float maxReach, float hitboxMargin,
-                            int delayTicks, @Nullable Condition dismountConditions,
+                            int contactCooldownTicks, int delayTicks, @Nullable Condition dismountConditions,
                             @Nullable Condition knockbackConditions, @Nullable Condition damageConditions,
                             float forwardMovement, float damageMultiplier,
                             @Nullable Holder<SoundEvent> sound, @Nullable Holder<SoundEvent> hitSound) {
@@ -42,6 +42,7 @@ public record KineticWeapon(float minReach, float maxReach, float hitboxMargin,
             final float minReach = Types.FLOAT.readPrimitive(buffer);
             final float maxReach = Types.FLOAT.readPrimitive(buffer);
             final float hitboxMargin = Types.FLOAT.readPrimitive(buffer);
+            final int contactCooldownTicks = Types.VAR_INT.readPrimitive(buffer);
             final int delayTicks = Types.VAR_INT.readPrimitive(buffer);
             final Condition dismountConditions = Condition.TYPE.read(buffer);
             final Condition knockbackConditions = Condition.TYPE.read(buffer);
@@ -50,7 +51,7 @@ public record KineticWeapon(float minReach, float maxReach, float hitboxMargin,
             final float damageMultiplier = Types.FLOAT.readPrimitive(buffer);
             final Holder<SoundEvent> sound = Types.OPTIONAL_SOUND_EVENT.read(buffer);
             final Holder<SoundEvent> hitSound = Types.OPTIONAL_SOUND_EVENT.read(buffer);
-            return new KineticWeapon(minReach, maxReach, hitboxMargin, delayTicks, dismountConditions, knockbackConditions, damageConditions, forwardMovement, damageMultiplier, sound, hitSound);
+            return new KineticWeapon(minReach, maxReach, hitboxMargin, delayTicks, contactCooldownTicks, dismountConditions, knockbackConditions, damageConditions, forwardMovement, damageMultiplier, sound, hitSound);
         }
 
         @Override
@@ -58,6 +59,7 @@ public record KineticWeapon(float minReach, float maxReach, float hitboxMargin,
             Types.FLOAT.writePrimitive(buffer, value.minReach);
             Types.FLOAT.writePrimitive(buffer, value.maxReach);
             Types.FLOAT.writePrimitive(buffer, value.hitboxMargin);
+            Types.VAR_INT.writePrimitive(buffer, value.contactCooldownTicks);
             Types.VAR_INT.writePrimitive(buffer, value.delayTicks);
             Condition.TYPE.write(buffer, value.dismountConditions);
             Condition.TYPE.write(buffer, value.knockbackConditions);
@@ -74,6 +76,8 @@ public record KineticWeapon(float minReach, float maxReach, float hitboxMargin,
                 .writeOptional("min_reach", Types.FLOAT, value.minReach, 0F)
                 .writeOptional("max_reach", Types.FLOAT, value.maxReach, 3F)
                 .writeOptional("hitbox_margin", Types.FLOAT, value.hitboxMargin, 0.3F)
+                .writeOptional("contact_cooldown_ticks", Types.INT, value.contactCooldownTicks, 10)
+                .writeOptional("delay_ticks", Types.INT, value.delayTicks, 0)
                 .writeOptional("dismount_conditions", Condition.TYPE, value.dismountConditions)
                 .writeOptional("knockback_conditions", Condition.TYPE, value.knockbackConditions)
                 .writeOptional("damage_conditions", Condition.TYPE, value.damageConditions)

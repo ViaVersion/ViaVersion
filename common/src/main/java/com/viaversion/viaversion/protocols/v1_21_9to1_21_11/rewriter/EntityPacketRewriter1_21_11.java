@@ -43,9 +43,6 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
         registerGameEvent(ClientboundPackets1_21_9.GAME_EVENT);
         registerLogin1_20_5(ClientboundPackets1_21_9.LOGIN);
         registerRespawn1_20_5(ClientboundPackets1_21_9.RESPAWN);
-
-        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
-        protocol.registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
     }
 
     @Override
