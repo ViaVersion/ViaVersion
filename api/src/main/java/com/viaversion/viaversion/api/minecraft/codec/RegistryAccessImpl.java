@@ -24,36 +24,32 @@ package com.viaversion.viaversion.api.minecraft.codec;
 
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.util.Key;
-import java.util.List;
+import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class RegistryAccessImpl implements CodecContext.RegistryAccess {
-    private final List<String> enchantments;
+    private final RegistryDataRewriter registryDataRewriter;
     private final MappingData mappingData;
     private final boolean mapped;
 
-    RegistryAccessImpl(final List<String> enchantments, final MappingData mappingData) {
-        this.enchantments = enchantments;
-        this.mappingData = mappingData;
+    RegistryAccessImpl(final Protocol<?, ?, ?, ?> protocol) {
+        this.mappingData = protocol.getMappingData();
+        this.registryDataRewriter = protocol.getRegistryDataRewriter();
         this.mapped = false;
     }
 
-    private RegistryAccessImpl(final List<String> enchantments, final MappingData mappingData, final boolean mapped) {
-        this.enchantments = enchantments;
+    private RegistryAccessImpl(final MappingData mappingData, final RegistryDataRewriter registryDataRewriter, final boolean mapped) {
         this.mappingData = mappingData;
+        this.registryDataRewriter = registryDataRewriter;
         this.mapped = mapped;
     }
 
     @Override
     public Key item(final int id) {
         return key(mappingData.getFullItemMappings(), id);
-    }
-
-    @Override
-    public Key enchantment(final int id) {
-        final String identifier = id >= 0 && id < this.enchantments.size() ? this.enchantments.get(id) : null;
-        return key(identifier, id);
     }
 
     @Override
@@ -92,6 +88,13 @@ final class RegistryAccessImpl implements CodecContext.RegistryAccess {
         return mapped ? mappings.mappedId(identifier) : mappings.id(identifier);
     }
 
+    @Override
+    public Key registryKey(final String registry, final int id) {
+        final KeyMappings enchantments = registryDataRewriter.getMappings(registry);
+        final String identifier = id >= 0 && id < enchantments.size() ? enchantments.idToKey(id) : null;
+        return key(identifier, id);
+    }
+
     private Key key(final FullMappings mappings, final int id) {
         final String identifier = mapped ? mappings.mappedIdentifier(id) : mappings.identifier(id);
         return key(identifier, id);
@@ -103,6 +106,6 @@ final class RegistryAccessImpl implements CodecContext.RegistryAccess {
 
     @Override
     public CodecContext.RegistryAccess withMapped(final boolean mapped) {
-        return this.mapped == mapped ? this : new RegistryAccessImpl(this.enchantments, this.mappingData, mapped);
+        return this.mapped == mapped ? this : new RegistryAccessImpl(this.mappingData, this.registryDataRewriter, mapped);
     }
 }

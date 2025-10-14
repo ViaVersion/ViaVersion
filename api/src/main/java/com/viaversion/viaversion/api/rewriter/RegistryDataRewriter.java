@@ -20,23 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.data.item;
+package com.viaversion.viaversion.api.rewriter;
 
-/**
- * Used for converting items to hashed items and caching them for later use during serverbound packets.
- * <p>
- * Most of this stays in the internal module given non-permanent, imperfect caching as well as missing converters.
- */
-public interface ItemHasher {
+import com.viaversion.viaversion.util.KeyMappings;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-    /**
-     * Returns whether this connection is currently processing a clientbound player inventory packet.
-     * <p>
-     * Used for checking when it is necessary to track/process item data hashes.
-     *
-     * @return true if processing a clientbound inventory packet, false otherwise
-     */
-    boolean isProcessingClientboundInventoryPacket();
+public interface RegistryDataRewriter {
 
-    void setProcessingClientboundInventoryPacket(boolean processingClientboundInventoryPacket);
+    @Nullable KeyMappings getMappings(String registryKey);
 }

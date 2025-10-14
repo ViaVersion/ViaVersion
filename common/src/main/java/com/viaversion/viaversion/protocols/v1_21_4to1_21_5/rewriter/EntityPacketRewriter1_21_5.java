@@ -35,7 +35,6 @@ import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.storage.MessageIndexS
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -74,17 +73,6 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             wrapper.write(Types.SHORT, (short) 0);
             wrapper.write(Types.SHORT, (short) 0);
         });
-
-        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
-        registryDataRewriter.addHandler("wolf_variant", (key, variant) -> {
-            final CompoundTag assets = new CompoundTag();
-            variant.put("assets", assets);
-            assets.put("wild", variant.remove("wild_texture"));
-            assets.put("tame", variant.remove("tame_texture"));
-            assets.put("angry", variant.remove("angry_texture"));
-            variant.remove("biomes");
-        });
-        protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
 
         protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
             // Old registries, but now also modifiable

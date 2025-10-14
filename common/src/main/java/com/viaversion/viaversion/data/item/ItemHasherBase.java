@@ -44,22 +44,15 @@ public class ItemHasherBase implements ItemHasher {
     public static int UNKNOWN_HASH = 399825415; // some random-ish number, from hashing Integer.MIN_VALUE+1 with crc32c
     private final Map<Integer, HashedItem> hashes = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(1024).<Integer, HashedItem>build().asMap();
     protected final UserConnection connection;
-    private final List<String> enchantments = new ArrayList<>();
     private boolean processingClientboundInventoryPacket;
     private final CodecContext context;
     private final CodecContext mappedContext;
 
     public ItemHasherBase(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection) {
-        final RegistryAccess registryAccess = RegistryAccess.of(this.enchantments, protocol.getMappingData());
+        final RegistryAccess registryAccess = RegistryAccess.of(protocol);
         this.context = new CodecRegistryContext(protocol, registryAccess, false);
         this.mappedContext = new CodecRegistryContext(protocol, registryAccess, true);
         this.connection = connection;
-    }
-
-    @Override
-    public void setEnchantments(final List<String> enchantments) {
-        this.enchantments.clear();
-        this.enchantments.addAll(enchantments);
     }
 
     /**

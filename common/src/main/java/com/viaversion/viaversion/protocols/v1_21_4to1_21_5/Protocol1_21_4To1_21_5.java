@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_4to1_21_5;
 
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
@@ -50,6 +51,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
+import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -65,6 +67,7 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
     private final ParticleRewriter<ClientboundPacket1_21_2> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket1_21_2> tagRewriter = new TagRewriter<>(this);
     private final ComponentRewriter1_21_5 componentRewriter = new ComponentRewriter1_21_5(this);
+    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
 
     public Protocol1_21_4To1_21_5() {
         super(ClientboundPacket1_21_2.class, ClientboundPacket1_21_5.class, ServerboundPacket1_21_4.class, ServerboundPacket1_21_5.class);
@@ -73,6 +76,16 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
     @Override
     protected void registerPackets() {
         super.registerPackets();
+
+        registryDataRewriter.addHandler("wolf_variant", (key, variant) -> {
+            final CompoundTag assets = new CompoundTag();
+            variant.put("assets", assets);
+            assets.put("wild", variant.remove("wild_texture"));
+            assets.put("tame", variant.remove("tame_texture"));
+            assets.put("angry", variant.remove("angry_texture"));
+            variant.remove("biomes");
+        });
+        registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
 
         tagRewriter.registerGeneric(ClientboundPackets1_21_2.UPDATE_TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21.UPDATE_TAGS);
@@ -225,6 +238,11 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
     @Override
     public BlockItemPacketRewriter1_21_5 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public RegistryDataRewriter getRegistryDataRewriter() {
+        return registryDataRewriter;
     }
 
     @Override

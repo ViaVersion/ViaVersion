@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -68,6 +69,15 @@ public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int dam
             buffer.writeFloat(value.defaultMiningSpeed());
             Types.VAR_INT.writePrimitive(buffer, value.damagePerBlock());
             buffer.writeBoolean(value.canDestroyBlocksInCreative());
+        }
+
+        @Override
+        public void write(final Ops ops, final ToolProperties value) {
+            ops.writeMap(map -> map
+                .write("rules", ToolRule.ARRAY_TYPE, value.rules())
+                .writeOptional("default_mining_speed", Types.FLOAT, value.defaultMiningSpeed(), 1F)
+                .writeOptional("damage_per_block", Types.INT, value.damagePerBlock(), 1)
+                .writeOptional("can_destroy_blocks_in_creative", Types.BOOLEAN, value.canDestroyBlocksInCreative(), true));
         }
     };
 

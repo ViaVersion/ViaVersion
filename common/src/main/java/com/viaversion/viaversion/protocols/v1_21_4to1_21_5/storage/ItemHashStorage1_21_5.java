@@ -29,26 +29,17 @@ import com.viaversion.viaversion.codec.hash.HashFunction;
 import com.viaversion.viaversion.codec.hash.HashOps;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class ItemHashStorage1_21_5 implements ItemHasher {
 
     private final Cache<Long, StructuredData<?>> hashToStructuredData = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(512).build();
-    private final List<String> enchantmentRegistry = new ArrayList<>();
     private boolean processingClientboundInventoryPacket;
     private final CodecContext context;
 
     public ItemHashStorage1_21_5(final Protocol1_21_4To1_21_5 protocol) {
-        final RegistryAccess registryAccess = RegistryAccess.of(this.enchantmentRegistry, protocol.getMappingData());
+        final RegistryAccess registryAccess = RegistryAccess.of(protocol);
         this.context = new CodecRegistryContext(protocol, registryAccess, true); // always using 1.21.5 items as input
-    }
-
-    @Override
-    public void setEnchantments(final List<String> enchantments) {
-        this.enchantmentRegistry.clear();
-        this.enchantmentRegistry.addAll(enchantments);
     }
 
     public void trackStructuredData(final StructuredData<?> structuredData) {

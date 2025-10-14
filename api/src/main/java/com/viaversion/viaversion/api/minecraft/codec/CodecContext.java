@@ -24,8 +24,8 @@ package com.viaversion.viaversion.api.minecraft.codec;
 
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.util.Key;
-import java.util.List;
 
 public interface CodecContext {
 
@@ -39,7 +39,9 @@ public interface CodecContext {
 
         Key item(int id);
 
-        Key enchantment(int id);
+        default Key enchantment(int id) {
+            return registryKey("enchantment", id);
+        }
 
         Key attributeModifier(int id);
 
@@ -51,13 +53,36 @@ public interface CodecContext {
 
         Key sound(int id);
 
+        /**
+         * Returns the key for a stored mapping type and its numeric id.
+         *
+         * @param mappingType mapping type
+         * @param id numeric id
+         * @return the key
+         */
         Key key(MappingData.MappingType mappingType, int id);
 
+        /**
+         * Returns the numeric id for a stored mapping type and its identifier.
+         *
+         * @param mappingType mapping type
+         * @param identifier identifier
+         * @return the numeric id, or -1 if not found
+         */
         int id(MappingData.MappingType mappingType, String identifier);
 
-        static RegistryAccess of(final List<String> enchantments, final MappingData mappingData) {
-            return new RegistryAccessImpl(enchantments, mappingData);
+        static RegistryAccess of(final Protocol<?, ?, ?, ?> protocol) {
+            return new RegistryAccessImpl(protocol);
         }
+
+        /**
+         * Returns the key for a client-synchronized registry element.
+         *
+         * @param registry registry key
+         * @param id numeric id
+         * @return the key
+         */
+        Key registryKey(String registry, int id);
 
         RegistryAccess withMapped(boolean mapped);
     }

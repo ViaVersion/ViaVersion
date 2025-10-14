@@ -23,39 +23,30 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 
-public final class PotDecorations implements Copyable, Rewritable {
+public record PotDecorations(int[] itemIds) implements Copyable, Rewritable {
 
-    public static final Type<PotDecorations> TYPE = new Type<>(PotDecorations.class) {
+    public static final Type<PotDecorations> TYPE = new TransformingType<>(Types.VAR_INT_ARRAY_PRIMITIVE, PotDecorations.class, PotDecorations::new, PotDecorations::itemIds) {
         @Override
-        public PotDecorations read(final ByteBuf buffer) {
-            return new PotDecorations(Types.VAR_INT_ARRAY_PRIMITIVE.read(buffer));
-        }
-
-        @Override
-        public void write(final ByteBuf buffer, final PotDecorations value) {
-            Types.VAR_INT_ARRAY_PRIMITIVE.write(buffer, value.itemIds());
+        public void write(final Ops ops, final PotDecorations value) {
+            ops.writeList(list -> {
+                for (final int itemId : value.itemIds) {
+                    list.write(Types.RESOURCE_LOCATION, ops.context().registryAccess().item(itemId));
+                }
+            });
         }
     };
 
-    private final int[] itemIds;
-
-    public PotDecorations(final int[] itemIds) {
-        this.itemIds = itemIds;
-    }
-
     public PotDecorations(final int backItem, final int leftItem, final int rightItem, final int frontItem) {
-        this.itemIds = new int[]{backItem, leftItem, rightItem, frontItem};
-    }
-
-    public int[] itemIds() {
-        return itemIds;
+        this(new int[]{backItem, leftItem, rightItem, frontItem});
     }
 
     public int backItem() {

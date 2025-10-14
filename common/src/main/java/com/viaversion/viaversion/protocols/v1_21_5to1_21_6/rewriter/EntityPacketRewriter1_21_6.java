@@ -33,8 +33,6 @@ import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.Protocol1_21_5To1_21_
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.storage.SneakStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
-import com.viaversion.viaversion.util.Key;
 
 public final class EntityPacketRewriter1_21_6 extends EntityRewriter<ClientboundPacket1_21_5, Protocol1_21_5To1_21_6> {
 
@@ -51,22 +49,6 @@ public final class EntityPacketRewriter1_21_6 extends EntityRewriter<Clientbound
         registerGameEvent(ClientboundPackets1_21_5.GAME_EVENT);
         registerLogin1_20_5(ClientboundPackets1_21_5.LOGIN);
         registerRespawn1_20_5(ClientboundPackets1_21_5.RESPAWN);
-
-        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
-        registryDataRewriter.addHandler("dimension_type", (key, dimension) -> {
-            // the client will render clouds if effects aren't set to either the_nether or the_end
-            String effects = dimension.getString("effects");
-            if (effects != null) {
-                effects = Key.stripMinecraftNamespace(effects);
-                if ("the_nether".equals(effects) || "the_end".equals(effects)) {
-                    return; // don't show clouds
-                }
-            }
-            if (!dimension.contains("cloud_height")) {
-                dimension.putInt("cloud_height", 192);
-            }
-        });
-        protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
 
         protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
             // send server links dialog as vanilla doesn't show server links by default otherwise

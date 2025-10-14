@@ -25,13 +25,13 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
-import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.KeyMappings;
 import com.viaversion.viaversion.util.TagUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.ArrayList;
@@ -43,15 +43,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class RegistryDataRewriter {
+public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewriter.RegistryDataRewriter {
     private final Map<String, BiConsumer<String, CompoundTag>> registryEntryHandlers = new Object2ObjectArrayMap<>();
     private final Map<String, Consumer<CompoundTag>> enchantmentEffectHandlers = new Object2ObjectArrayMap<>(); // for nested enchantment data
     private final Map<String, List<RegistryEntry>> toAdd = new Object2ObjectArrayMap<>();
     private final Set<String> toRemove = new HashSet<>();
+    protected final Map<String, KeyMappings> registryKeyMappings = new HashMap<>();
     protected final Protocol<?, ?, ?, ?> protocol;
 
-    public RegistryDataRewriter(Protocol<?, ?, ?, ?> protocol) {
+    public RegistryDataRewriter(final Protocol<?, ?, ?, ?> protocol) {
         this.protocol = protocol;
     }
 
@@ -68,14 +70,18 @@ public class RegistryDataRewriter {
 
     public RegistryEntry[] handle(final UserConnection connection, String key, RegistryEntry[] entries) {
         key = Key.stripMinecraftNamespace(key);
-        if (key.equals("enchantment")) {
-            updateEnchantments(connection, entries);
-        } else if (key.equals("trim_material")) {
-            updateTrimMaterials(entries);
-        } else if (key.equals("jukebox_song")) {
-            updateJukeboxSongs(entries);
-        } else if (key.equals("worldgen/biome")) {
-            updateBiomes(entries);
+
+        final String[] keys = new String[entries.length];
+        for (int i = 0; i < entries.length; i++) {
+            keys[i] = Key.stripMinecraftNamespace(entries[i].key());
+        }
+        this.registryKeyMappings.put(key, new KeyMappings(keys));
+
+        switch (key) {
+            case "enchantment" -> updateEnchantments(connection, entries);
+            case "trim_material" -> updateTrimMaterials(entries);
+            case "jukebox_song" -> updateJukeboxSongs(entries);
+            case "worldgen/biome" -> updateBiomes(entries);
         }
 
         final BiConsumer<String, CompoundTag> registryEntryHandler = this.registryEntryHandlers.get(key);
@@ -190,11 +196,6 @@ public class RegistryDataRewriter {
             if (mappingData.getAttributeMappings() != null) {
                 updateAttributesFields(effects);
             }
-        }
-
-        final ItemHasher itemHasher = connection.getItemHasher(protocol.getClass());
-        if (itemHasher != null) {
-            itemHasher.setEnchantments(identifiers);
         }
     }
 
@@ -321,5 +322,10 @@ public class RegistryDataRewriter {
         if (mapped != null) {
             tag.setValue(mapped);
         }
+    }
+
+    @Override
+    public @Nullable KeyMappings getMappings(final String registryKey) {
+        return this.registryKeyMappings.get(Key.stripMinecraftNamespace(registryKey));
     }
 }

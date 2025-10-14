@@ -51,10 +51,12 @@ import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.rewriter.EntityPacket
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.storage.SneakStorage;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
+import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
+import com.viaversion.viaversion.util.Key;
 import java.util.Locale;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
@@ -67,6 +69,7 @@ public final class Protocol1_21_5To1_21_6 extends AbstractProtocol<ClientboundPa
     private final ParticleRewriter<ClientboundPacket1_21_5> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket1_21_5> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket1_21_5> componentRewriter = new ComponentRewriter1_21_6(this);
+    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
 
     public Protocol1_21_5To1_21_6() {
         super(ClientboundPacket1_21_5.class, ClientboundPacket1_21_6.class, ServerboundPacket1_21_5.class, ServerboundPacket1_21_6.class);
@@ -75,6 +78,21 @@ public final class Protocol1_21_5To1_21_6 extends AbstractProtocol<ClientboundPa
     @Override
     protected void registerPackets() {
         super.registerPackets();
+
+        registryDataRewriter.addHandler("dimension_type", (key, dimension) -> {
+            // the client will render clouds if effects aren't set to either the_nether or the_end
+            String effects = dimension.getString("effects");
+            if (effects != null) {
+                effects = Key.stripMinecraftNamespace(effects);
+                if ("the_nether".equals(effects) || "the_end".equals(effects)) {
+                    return; // don't show clouds
+                }
+            }
+            if (!dimension.contains("cloud_height")) {
+                dimension.putInt("cloud_height", 192);
+            }
+        });
+        registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
 
         tagRewriter.registerGeneric(ClientboundPackets1_21_5.UPDATE_TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21.UPDATE_TAGS);
@@ -189,6 +207,11 @@ public final class Protocol1_21_5To1_21_6 extends AbstractProtocol<ClientboundPa
     @Override
     public BlockItemPacketRewriter1_21_6 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public RegistryDataRewriter getRegistryDataRewriter() {
+        return registryDataRewriter;
     }
 
     @Override

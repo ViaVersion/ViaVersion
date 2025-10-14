@@ -37,6 +37,7 @@ import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.rewriter.ParticleRewriter;
+import com.viaversion.viaversion.api.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.api.rewriter.TagRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
@@ -373,6 +374,15 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @return item rewriter
      */
     default @Nullable ItemRewriter<?> getItemRewriter() {
+        return null;
+    }
+
+    /**
+     * Returns the protocol's registry data rewriter if present.
+     *
+     * @return registry data rewriter
+     */
+    default @Nullable RegistryDataRewriter getRegistryDataRewriter() {
         return null;
     }
 
