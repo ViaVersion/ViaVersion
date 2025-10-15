@@ -73,7 +73,8 @@ public class InformativeException extends RuntimeException {
             builder.append(entry.name()).append(": ");
             String s = String.valueOf(entry.value());
             if (!Via.getManager().isDebug() && s.length() > 10 && builder.length() + s.length() > MAX_MESSAGE_LENGTH) {
-                s = s.substring(0, MAX_MESSAGE_LENGTH - builder.length()) + "...";
+                final int remaining = Math.max(0, MAX_MESSAGE_LENGTH - builder.length());
+                s = s.substring(0, Math.min(remaining, s.length())) + "...";
             }
             builder.append(StringUtil.forLogging(s));
         }
