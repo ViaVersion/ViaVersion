@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Rewritable;
@@ -96,6 +97,13 @@ public record ArmorTrim(Holder<ArmorTrimMaterial> material, Holder<ArmorTrimPatt
         public void write(final ByteBuf buffer, final ArmorTrim value) {
             ArmorTrimMaterial.TYPE1_21_5.write(buffer, value.material);
             ArmorTrimPattern.TYPE1_21_5.write(buffer, value.pattern);
+        }
+
+        @Override
+        public void write(final Ops ops, final ArmorTrim value) {
+            ops.writeMap(map -> map
+                .write("material", ArmorTrimMaterial.TYPE1_21_5, value.material)
+                .write("pattern", ArmorTrimPattern.TYPE1_21_5, value.pattern));
         }
     };
 
