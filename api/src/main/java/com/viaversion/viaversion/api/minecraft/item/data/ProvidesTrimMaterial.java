@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.EitherHolder;
 import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.EitherHolderType;
@@ -44,6 +45,11 @@ public record ProvidesTrimMaterial(EitherHolder<ArmorTrimMaterial> material) imp
         @Override
         public void write(final ByteBuf buffer, final ProvidesTrimMaterial value) {
             EitherHolderType.write(buffer, value.material, ArmorTrimMaterial.TYPE1_21_5);
+        }
+
+        @Override
+        public void write(final Ops ops, final ProvidesTrimMaterial value) {
+            EitherHolderType.write(ops, value.material, ArmorTrimMaterial.TYPE1_21_5);
         }
     };
 
