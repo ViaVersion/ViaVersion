@@ -78,7 +78,7 @@ public record ArmorTrimPattern(String assetName, int itemId, Tag description, bo
             ops.writeMap(map -> map
                 .write("asset_id", Types.RESOURCE_LOCATION, Key.of(object.assetName()))
                 .write("description", Types.TEXT_COMPONENT_TAG, object.description())
-                .writeOptional("decal", Types.BOOLEAN, object.decal(), false));
+                .write("decal", Types.BOOLEAN, object.decal()));
         }
 
         @Override

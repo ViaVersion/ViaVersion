@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.minecraft.EitherHolder;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 
 public final class EitherHolderType<T> extends Type<EitherHolder<T>> {
@@ -67,7 +68,7 @@ public final class EitherHolderType<T> extends Type<EitherHolder<T>> {
         if (object.hasHolder()) {
             holderType.write(ops, object.holder());
         } else {
-            ops.writeString(object.key());
+            ops.write(Types.RESOURCE_LOCATION, Key.of(object.key()));
         }
     }
 }
