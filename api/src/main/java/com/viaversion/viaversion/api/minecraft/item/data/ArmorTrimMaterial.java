@@ -182,11 +182,11 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
         @Override
         public void writeDirect(final Ops ops, final ArmorTrimMaterial object) {
             ops.writeMap(map -> {
-                map.write("asset_name", Types.RESOURCE_LOCATION, Key.of(object.assetName()));
+                map.write("asset_name", Types.STRING, object.assetName());
                 if (!object.overrideArmorMaterials.isEmpty()) {
                     map.writeMap("override_armor_assets", materials -> {
                         for (final Map.Entry<String, String> entry : object.overrideArmorMaterials.entrySet()) {
-                            materials.write(Types.RESOURCE_LOCATION, Key.of(entry.getKey()), Types.STRING, entry.getValue());
+                            materials.write(Types.STRING, entry.getKey(), Types.STRING, entry.getValue());
                         }
                     });
                 }
