@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.EitherHolder;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.PaintingVariant;
+import com.viaversion.viaversion.api.minecraft.RegistryKey;
 import com.viaversion.viaversion.api.minecraft.ResolvableProfile;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_20_5;
@@ -80,6 +81,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.api.type.types.EitherType;
+import com.viaversion.viaversion.api.type.types.misc.SynchronizedRegistryValueType;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
@@ -194,7 +196,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Holder<SoundEvent>> BREAK_SOUND = new StructuredDataKey<>("break_sound", Types.SOUND_EVENT);
 
     public static final StructuredDataKey<Integer> VILLAGER_VARIANT = new StructuredDataKey<>("villager/variant", EnumTypes.VILLAGER_TYPE);
-    public static final StructuredDataKey<Integer> WOLF_VARIANT = new StructuredDataKey<>("wolf/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> WOLF_VARIANT = new StructuredDataKey<>("wolf/variant", new SynchronizedRegistryValueType(RegistryKey.of("wolf_variant")));
     public static final StructuredDataKey<Integer> WOLF_SOUND_VARIANT = new StructuredDataKey<>("wolf/sound_variant", Types.VAR_INT);
     public static final StructuredDataKey<Integer> WOLF_COLLAR = new StructuredDataKey<>("wolf/collar", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<Integer> FOX_VARIANT = new StructuredDataKey<>("fox/variant", EnumTypes.FOX_VARIANT);
@@ -205,15 +207,15 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> TROPICAL_FISH_PATTERN_COLOR = new StructuredDataKey<>("tropical_fish/pattern_color", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<Integer> MOOSHROOM_VARIANT = new StructuredDataKey<>("mooshroom/variant", EnumTypes.MUSHROOM_COW_VARIANT);
     public static final StructuredDataKey<Integer> RABBIT_VARIANT = new StructuredDataKey<>("rabbit/variant", EnumTypes.RABBIT_VARIANT);
-    public static final StructuredDataKey<Integer> PIG_VARIANT = new StructuredDataKey<>("pig/variant", Types.VAR_INT);
-    public static final StructuredDataKey<Integer> COW_VARIANT = new StructuredDataKey<>("cow/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> PIG_VARIANT = new StructuredDataKey<>("pig/variant", new SynchronizedRegistryValueType(RegistryKey.of("pig_variant")));
+    public static final StructuredDataKey<Integer> COW_VARIANT = new StructuredDataKey<>("cow/variant", new SynchronizedRegistryValueType(RegistryKey.of("cow_variant")));
     public static final StructuredDataKey<Either<Integer, String>> CHICKEN_VARIANT = new StructuredDataKey<>("chicken/variant", new EitherType<>(Types.VAR_INT, Types.STRING)); // ???
-    public static final StructuredDataKey<Integer> FROG_VARIANT = new StructuredDataKey<>("frog/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> FROG_VARIANT = new StructuredDataKey<>("frog/variant", new SynchronizedRegistryValueType(RegistryKey.of("frog_variant")));
     public static final StructuredDataKey<Integer> HORSE_VARIANT = new StructuredDataKey<>("horse/variant", EnumTypes.HORSE_VARIANT);
     public static final StructuredDataKey<Holder<PaintingVariant>> PAINTING_VARIANT = new StructuredDataKey<>("painting/variant", PaintingVariant.TYPE1_21_2);
     public static final StructuredDataKey<Integer> LLAMA_VARIANT = new StructuredDataKey<>("llama/variant", EnumTypes.LLAMA_VARIANT);
     public static final StructuredDataKey<Integer> AXOLOTL_VARIANT = new StructuredDataKey<>("axolotl/variant", EnumTypes.AXOLOTL_VARIANT);
-    public static final StructuredDataKey<Integer> CAT_VARIANT = new StructuredDataKey<>("cat/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> CAT_VARIANT = new StructuredDataKey<>("cat/variant", new SynchronizedRegistryValueType(RegistryKey.of("cat_variant")));
     public static final StructuredDataKey<Integer> CAT_COLLAR = new StructuredDataKey<>("cat/collar", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<Integer> SHEEP_COLOR = new StructuredDataKey<>("sheep/color", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<Integer> SHULKER_COLOR = new StructuredDataKey<>("shulker/color", EnumTypes.DYE_COLOR);

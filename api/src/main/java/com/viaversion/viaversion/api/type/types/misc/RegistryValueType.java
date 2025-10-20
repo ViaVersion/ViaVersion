@@ -20,23 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft;
+package com.viaversion.viaversion.api.type.types.misc;
 
-import com.viaversion.viaversion.api.data.MappingData.MappingType;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.VarIntType;
 import com.viaversion.viaversion.util.Key;
 
-/**
- * Holds a key for a registry.
- * Depending on the context, the key may be used to get registry entries from either synchronized or hardcoded registries.
- *
- * @see MappingType
- * @see #of(String)
- */
-public interface RegistryKey {
+public final class RegistryValueType extends VarIntType {
 
-    Key key();
+    private final String[] names;
 
-    static RegistryKey of(final String key) {
-        return new SimpleRegistryKey(Key.of(key));
+    public RegistryValueType(final String... names) {
+        this.names = names;
+        for (int i = 0; i < names.length; i++) {
+            names[i] = Key.namespaced(names[i]);
+        }
+    }
+
+    @Override
+    public void write(final Ops ops, final Integer value) {
+        Types.RESOURCE_LOCATION.write(ops, Key.of(names[value]));
+    }
+
+    public String[] names() {
+        return names;
     }
 }

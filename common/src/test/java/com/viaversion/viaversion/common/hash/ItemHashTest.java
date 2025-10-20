@@ -31,7 +31,6 @@ import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
-import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.EnumTypes;
 import com.viaversion.viaversion.api.minecraft.item.data.Equippable;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;

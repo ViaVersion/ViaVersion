@@ -30,11 +30,8 @@ public record CodecRegistryContext(Protocol<?, ?, ?, ?> protocol, RegistryAccess
 
     // Generally from hardcoded, but highly variable client data
     private static final Set<StructuredDataKey<?>> NOT_IMPLEMENTED = new ReferenceOpenHashSet<>(List.of(
-        StructuredDataKey.CONSUMABLE1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.INSTRUMENT1_21_5,
-        StructuredDataKey.DEATH_PROTECTION,
-        StructuredDataKey.WOLF_VARIANT, StructuredDataKey.WOLF_SOUND_VARIANT, StructuredDataKey.PIG_VARIANT,
-        StructuredDataKey.COW_VARIANT, StructuredDataKey.CHICKEN_VARIANT, StructuredDataKey.FROG_VARIANT,
-        StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.CAT_VARIANT
+        StructuredDataKey.CONSUMABLE1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5,
+        StructuredDataKey.DEATH_PROTECTION, StructuredDataKey.WOLF_SOUND_VARIANT, StructuredDataKey.CHICKEN_VARIANT, StructuredDataKey.PAINTING_VARIANT
     ));
 
     public CodecRegistryContext(final Protocol<?, ?, ?, ?> protocol, final RegistryAccess registryAccess, final boolean mapped) {

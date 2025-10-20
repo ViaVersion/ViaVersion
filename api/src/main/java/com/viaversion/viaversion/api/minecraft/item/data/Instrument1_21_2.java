@@ -26,11 +26,13 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.EitherHolderType;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 
@@ -53,6 +55,20 @@ public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration,
             Types.FLOAT.writePrimitive(buffer, value.useDuration());
             Types.FLOAT.writePrimitive(buffer, value.range());
             Types.TAG.write(buffer, value.description());
+        }
+
+        @Override
+        public void writeDirect(final Ops ops, final Instrument1_21_2 value) {
+            ops.writeMap(map -> map
+                .write("sound_event", Types.SOUND_EVENT, value.soundEvent())
+                .write("use_duration", Types.FLOAT, value.useDuration())
+                .write("range", Types.FLOAT, value.range())
+                .write("description", Types.TAG, value.description()));
+        }
+
+        @Override
+        protected Key identifier(final Ops ops, final int id) {
+            return ops.context().registryAccess().registryKey("instrument", id);
         }
     };
     public static final EitherHolderType<Instrument1_21_2> EITHER_HOLDER_TYPE = new EitherHolderType<>(TYPE);

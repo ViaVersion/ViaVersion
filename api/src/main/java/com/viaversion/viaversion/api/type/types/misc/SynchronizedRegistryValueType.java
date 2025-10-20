@@ -20,29 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types;
+package com.viaversion.viaversion.api.type.types.misc;
 
+import com.viaversion.viaversion.api.minecraft.RegistryKey;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.VarIntType;
 import com.viaversion.viaversion.util.Key;
 
-public final class RegistryValueType extends VarIntType {
+public final class SynchronizedRegistryValueType extends VarIntType {
 
-    private final String[] names;
+    private final RegistryKey registryKey;
 
-    public RegistryValueType(final String... names) {
-        this.names = names;
-        for (int i = 0; i < names.length; i++) {
-            names[i] = Key.namespaced(names[i]);
-        }
+    public SynchronizedRegistryValueType(final RegistryKey registryKey) {
+        this.registryKey = registryKey;
     }
 
     @Override
     public void write(final Ops ops, final Integer value) {
-        Types.STRING.write(ops, names[value]);
-    }
-
-    public String[] names() {
-        return names;
+        final Key key = ops.context().registryAccess().registryKey(this.registryKey.key().toString(), value);
+        Types.RESOURCE_LOCATION.write(ops, key);
     }
 }

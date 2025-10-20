@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.codec;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -91,6 +92,7 @@ final class RegistryAccessImpl implements CodecContext.RegistryAccess {
     @Override
     public Key registryKey(final String registry, final int id) {
         final KeyMappings mappings = registryDataRewriter.getMappings(registry);
+        Preconditions.checkNotNull(mappings, "No registry mappings for registry: " + registry);
         final String identifier = id >= 0 && id < mappings.size() ? mappings.idToKey(id) : null;
         return key(identifier, id);
     }

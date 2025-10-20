@@ -47,6 +47,11 @@ public final class EitherHolderType<T> extends Type<EitherHolder<T>> {
         write(buffer, object, this.holderType);
     }
 
+    @Override
+    public void write(final Ops ops, final EitherHolder<T> value) {
+        write(ops, value, this.holderType);
+    }
+
     public static <T> EitherHolder<T> read(final ByteBuf buffer, final HolderType<T> holderType) {
         if (buffer.readBoolean()) {
             return EitherHolder.of(holderType.read(buffer));

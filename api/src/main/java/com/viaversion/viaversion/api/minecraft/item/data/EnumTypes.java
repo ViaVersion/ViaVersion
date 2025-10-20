@@ -25,7 +25,7 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.type.types.EnumType;
 import com.viaversion.viaversion.api.type.types.EnumType.Fallback;
 import com.viaversion.viaversion.api.type.types.FakeEnumType;
-import com.viaversion.viaversion.api.type.types.RegistryValueType;
+import com.viaversion.viaversion.api.type.types.misc.RegistryValueType;
 import java.util.List;
 
 import static com.viaversion.viaversion.api.type.types.FakeEnumType.Entry.of;

@@ -22,21 +22,12 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.api.data.MappingData.MappingType;
 import com.viaversion.viaversion.util.Key;
 
-/**
- * Holds a key for a registry.
- * Depending on the context, the key may be used to get registry entries from either synchronized or hardcoded registries.
- *
- * @see MappingType
- * @see #of(String)
- */
-public interface RegistryKey {
+record SimpleRegistryKey(Key key) implements RegistryKey {
 
-    Key key();
-
-    static RegistryKey of(final String key) {
-        return new SimpleRegistryKey(Key.of(key));
+    @Override
+    public String toString() {
+        return key.toString();
     }
 }

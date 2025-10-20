@@ -66,7 +66,7 @@ public abstract class HolderType<T> extends Type<Holder<T>> {
 
     public abstract T readDirect(final ByteBuf buffer);
 
-    public abstract void writeDirect(final ByteBuf buffer, final T object);
+    public abstract void writeDirect(final ByteBuf buffer, final T value);
 
     @Override
     public void write(final Ops ops, final Holder<T> value) {
@@ -82,7 +82,7 @@ public abstract class HolderType<T> extends Type<Holder<T>> {
         return ops.context().registryAccess().key(mappingType, id);
     }
 
-    public void writeDirect(final Ops ops, final T object) {
+    public void writeDirect(final Ops ops, final T value) {
         throw new UnsupportedOperationException("Write operation not supported for type: " + getTypeName());
     }
 
