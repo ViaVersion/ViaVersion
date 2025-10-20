@@ -30,7 +30,6 @@ public record CodecRegistryContext(Protocol<?, ?, ?, ?> protocol, RegistryAccess
 
     // Generally from hardcoded, but highly variable client data
     private static final Set<StructuredDataKey<?>> NOT_IMPLEMENTED = new ReferenceOpenHashSet<>(List.of(
-        StructuredDataKey.TRIM1_21_5, StructuredDataKey.PROVIDES_TRIM_MATERIAL,
         StructuredDataKey.CONSUMABLE1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.INSTRUMENT1_21_5,
         StructuredDataKey.DEATH_PROTECTION, StructuredDataKey.BLOCKS_ATTACKS, StructuredDataKey.SUSPICIOUS_STEW_EFFECTS,
         StructuredDataKey.BANNER_PATTERNS,

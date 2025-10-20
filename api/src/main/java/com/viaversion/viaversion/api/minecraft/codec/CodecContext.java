@@ -39,10 +39,6 @@ public interface CodecContext {
 
         Key item(int id);
 
-        default Key enchantment(int id) {
-            return registryKey("enchantment", id);
-        }
-
         Key attributeModifier(int id);
 
         Key dataComponentType(int id);

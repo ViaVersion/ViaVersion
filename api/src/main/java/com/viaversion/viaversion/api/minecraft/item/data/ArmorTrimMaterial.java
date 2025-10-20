@@ -24,10 +24,12 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
@@ -175,6 +177,26 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             }
 
             Types.TAG.write(buffer, value.description());
+        }
+
+        @Override
+        public void writeDirect(final Ops ops, final ArmorTrimMaterial object) {
+            ops.writeMap(map -> {
+                map.write("asset_name", Types.STRING, object.assetName());
+                if (!object.overrideArmorMaterials.isEmpty()) {
+                    map.writeMap("override_armor_assets", materials -> {
+                        for (final Map.Entry<String, String> entry : object.overrideArmorMaterials.entrySet()) {
+                            materials.write(Types.RESOURCE_LOCATION, Key.of(entry.getKey()), Types.STRING, entry.getValue());
+                        }
+                    });
+                }
+                map.write("description", Types.TEXT_COMPONENT_TAG, object.description());
+            });
+        }
+
+        @Override
+        protected Key identifier(final Ops ops, final int id) {
+            return ops.context().registryAccess().registryKey("trim_material", id);
         }
     };
 
