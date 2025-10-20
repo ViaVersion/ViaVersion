@@ -335,4 +335,8 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     public @Nullable KeyMappings getMappings(final String registryKey) {
         return this.registryKeyMappings.get(Key.stripMinecraftNamespace(registryKey));
     }
+
+    public Map<String, KeyMappings> registryKeyMappings() {
+        return registryKeyMappings;
+    }
 }

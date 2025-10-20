@@ -90,8 +90,8 @@ final class RegistryAccessImpl implements CodecContext.RegistryAccess {
 
     @Override
     public Key registryKey(final String registry, final int id) {
-        final KeyMappings enchantments = registryDataRewriter.getMappings(registry);
-        final String identifier = id >= 0 && id < enchantments.size() ? enchantments.idToKey(id) : null;
+        final KeyMappings mappings = registryDataRewriter.getMappings(registry);
+        final String identifier = id >= 0 && id < mappings.size() ? mappings.idToKey(id) : null;
         return key(identifier, id);
     }
 

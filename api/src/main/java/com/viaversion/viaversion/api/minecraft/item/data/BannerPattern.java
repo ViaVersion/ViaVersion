@@ -22,8 +22,10 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 
 public record BannerPattern(String assetId, String translationKey) {
@@ -41,6 +43,17 @@ public record BannerPattern(String assetId, String translationKey) {
             Types.STRING.write(buffer, value.assetId);
             Types.STRING.write(buffer, value.translationKey);
         }
-    };
 
+        @Override
+        public void writeDirect(final Ops ops, final BannerPattern object) {
+            ops.writeMap(map -> map
+                .write("asset_id", Types.RESOURCE_LOCATION, Key.of(object.assetId))
+                .write("translation_key", Types.STRING, object.translationKey));
+        }
+
+        @Override
+        protected Key identifier(final Ops ops, final int id) {
+            return ops.context().registryAccess().registryKey("banner_pattern", id);
+        }
+    };
 }

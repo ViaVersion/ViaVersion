@@ -28,7 +28,11 @@ import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
+import com.viaversion.viaversion.api.minecraft.item.data.BannerPattern;
+import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
+import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
+import com.viaversion.viaversion.api.minecraft.item.data.EnumTypes;
 import com.viaversion.viaversion.api.minecraft.item.data.Equippable;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.UseCooldown;
@@ -40,6 +44,8 @@ import com.viaversion.viaversion.codec.hash.HashFunction;
 import com.viaversion.viaversion.codec.hash.HashOps;
 import com.viaversion.viaversion.common.PlatformTestBase;
 import com.viaversion.viaversion.protocols.v1_21_6to1_21_7.Protocol1_21_6To1_21_7;
+import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
+import com.viaversion.viaversion.util.KeyMappings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -114,6 +120,19 @@ public class ItemHashTest extends PlatformTestBase {
         final HolderSet singleEntrySet = HolderSet.of(new int[]{0});
         hasher.write(Equippable.TYPE1_21_6, new Equippable(0, Holder.of(0), null, null, singleEntrySet, true, true, true, false, false, Holder.of(0)));
         Assertions.assertEquals(-1789860417, hasher.hash(), "equippable hash mismatch");
+    }
+
+    @Test
+    void testRegistryHolderFull() {
+        hasher.write(BannerPatternLayer.ARRAY_TYPE, new BannerPatternLayer[]{new BannerPatternLayer(Holder.of(new BannerPattern("bricks", "some_key")), EnumTypes.DYE_COLOR.idFromName("cyan"))});
+        Assertions.assertEquals(-2006113844, hasher.hash(), "banner_pattern hash mismatch");
+    }
+
+    @Test
+    void testRegistryHolderId() {
+        ((RegistryDataRewriter) protocol.getRegistryDataRewriter()).registryKeyMappings().put("banner_pattern", new KeyMappings("base"));
+        hasher.write(BannerPatternLayer.ARRAY_TYPE, new BannerPatternLayer[]{new BannerPatternLayer(Holder.of(0), 0)});
+        Assertions.assertEquals(606382024, hasher.hash(), "banner_pattern hash mismatch");
     }
 
     private CompoundTag createCompoundTag() {

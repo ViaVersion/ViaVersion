@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
@@ -42,6 +43,13 @@ public record BannerPatternLayer(Holder<BannerPattern> pattern, int dyeColor) {
         public void write(final ByteBuf buffer, final BannerPatternLayer value) {
             BannerPattern.TYPE.write(buffer, value.pattern);
             Types.VAR_INT.writePrimitive(buffer, value.dyeColor);
+        }
+
+        @Override
+        public void write(final Ops ops, final BannerPatternLayer value) {
+            ops.writeMap(map -> map
+                .write("pattern", BannerPattern.TYPE, value.pattern)
+                .write("color", EnumTypes.DYE_COLOR, value.dyeColor));
         }
     };
     public static final Type<BannerPatternLayer[]> ARRAY_TYPE = new ArrayType<>(TYPE);

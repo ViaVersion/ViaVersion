@@ -25,11 +25,15 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
+import com.viaversion.viaversion.api.minecraft.RegistryKey;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.api.type.types.misc.HolderSetType;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -68,6 +72,20 @@ public record BlocksAttacks(
             Types.OPTIONAL_SOUND_EVENT.write(buffer, value.blockSound());
             Types.OPTIONAL_SOUND_EVENT.write(buffer, value.disableSound());
         }
+
+        @Override
+        public void write(final Ops ops, final BlocksAttacks value) {
+            final DamageReduction[] defaultDamageReductions = {new DamageReduction(90, null, 0, 1)};
+            final ItemDamageFunction defaultItemDamage = new ItemDamageFunction(1, 0, 1);
+            ops.writeMap(map -> map
+                .writeOptional("block_delay_seconds", Types.FLOAT, value.blockDelaySeconds(), 0F)
+                .writeOptional("disable_cooldown_scale", Types.FLOAT, value.disableCooldownScale(), 1F)
+                .writeOptional("damage_reductions", DamageReduction.ARRAY_TYPE, value.damageReductions(), defaultDamageReductions)
+                .writeOptional("item_damage", ItemDamageFunction.TYPE, value.itemDamage(), defaultItemDamage)
+                .writeOptional("bypassed_by", Types.TAG_KEY, value.bypassedByTag() != null ? Key.of(value.bypassedByTag()) : null)
+                .writeOptional("block_sound", Types.SOUND_EVENT, value.blockSound())
+                .writeOptional("disabled_sound", Types.SOUND_EVENT, value.disableSound()));
+        }
     };
 
     @Override
@@ -97,6 +115,15 @@ public record BlocksAttacks(
                 buffer.writeFloat(value.base());
                 buffer.writeFloat(value.factor());
             }
+
+            @Override
+            public void write(final Ops ops, final DamageReduction value) {
+                ops.writeMap(map -> map
+                    .writeOptional("horizontal_blocking_angle", Types.FLOAT, value.horizontalBlockingAngle(), 90F)
+                    .writeOptional("type", new HolderSetType(RegistryKey.of("damage_type")), value.type())
+                    .write("base", Types.FLOAT, value.base())
+                    .write("factor", Types.FLOAT, value.factor()));
+            }
         };
         public static final ArrayType<DamageReduction> ARRAY_TYPE = new ArrayType<>(TYPE);
     }
@@ -118,6 +145,14 @@ public record BlocksAttacks(
                 buffer.writeFloat(value.threshold());
                 buffer.writeFloat(value.base());
                 buffer.writeFloat(value.factor());
+            }
+
+            @Override
+            public void write(final Ops ops, final ItemDamageFunction value) {
+                ops.writeMap(map -> map
+                    .write("threshold", Types.FLOAT, value.threshold())
+                    .write("base", Types.FLOAT, value.base())
+                    .write("factor", Types.FLOAT, value.factor()));
             }
         };
     }

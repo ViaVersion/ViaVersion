@@ -22,10 +22,13 @@
  */
 package com.viaversion.viaversion.api.data;
 
+import com.viaversion.viaversion.api.minecraft.RegistryKey;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
+import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.List;
+import java.util.Locale;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface MappingData {
@@ -174,7 +177,7 @@ public interface MappingData {
             case ITEM -> getFullItemMappings();
             case BLOCK -> getFullBlockMappings();
             case SOUND -> getFullSoundMappings();
-            case ENTITY -> getEntityMappings();
+            case ENTITY_TYPE -> getEntityMappings();
         };
     }
 
@@ -188,7 +191,12 @@ public interface MappingData {
     /**
      * Type of mappings. Currently only relevant for ops writing of generic holder classes and expanded when needed.
      */
-    enum MappingType {
-        ITEM, BLOCK, SOUND, ENTITY
+    enum MappingType implements RegistryKey {
+        ITEM, BLOCK, SOUND, ENTITY_TYPE;
+
+        @Override
+        public Key key() {
+            return Key.of(name().toLowerCase(Locale.ROOT));
+        }
     }
 }

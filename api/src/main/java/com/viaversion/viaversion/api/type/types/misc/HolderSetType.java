@@ -23,8 +23,9 @@
 package com.viaversion.viaversion.api.type.types.misc;
 
 import com.google.common.base.Preconditions;
-import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
+import com.viaversion.viaversion.api.minecraft.RegistryKey;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
@@ -34,15 +35,20 @@ import io.netty.buffer.ByteBuf;
 
 public class HolderSetType extends Type<HolderSet> {
 
-    private final MappingDataBase.MappingType mappingType;
+    private final RegistryKey registryKey;
 
     public HolderSetType() {
         this(null);
     }
 
-    public HolderSetType(final MappingDataBase.MappingType mappingType) {
+    /**
+     * Creates a holder set type that is able to write to {@link Ops}.
+     *
+     * @param registryKey registry key
+     */
+    public HolderSetType(final RegistryKey registryKey) {
         super(HolderSet.class);
-        this.mappingType = mappingType;
+        this.registryKey = registryKey;
     }
 
     @Override
@@ -79,21 +85,26 @@ public class HolderSetType extends Type<HolderSet> {
         if (value.hasTagKey()) {
             ops.write(Types.TAG_KEY, Key.of(value.tagKey()));
         } else {
-            Preconditions.checkArgument(mappingType != null, "Cannot write HolderSet with direct ids without a mapping type");
+            Preconditions.checkArgument(registryKey != null, "Cannot write HolderSet with direct ids without a mapping type");
             if (value.ids().length == 1) {
                 // Single entries are inlined
-                final Key key = ops.context().registryAccess().key(mappingType, value.ids()[0]);
-                ops.write(Types.RESOURCE_LOCATION, key);
+                ops.write(Types.RESOURCE_LOCATION, key(ops, value.ids()[0]));
                 return;
             }
 
             ops.writeList(list -> {
                 for (final int id : value.ids()) {
-                    final Key key = ops.context().registryAccess().key(mappingType, id);
-                    list.write(Types.RESOURCE_LOCATION, key);
+                    list.write(Types.RESOURCE_LOCATION, key(ops, id));
                 }
             });
         }
+    }
+
+    private Key key(final Ops ops, final int id) {
+        if (registryKey instanceof final MappingData.MappingType mappingType) {
+            return ops.context().registryAccess().key(mappingType, id);
+        }
+        return ops.context().registryAccess().registryKey(registryKey.key().toString(), id);
     }
 
     public static final class OptionalHolderSetType extends OptionalType<HolderSet> {

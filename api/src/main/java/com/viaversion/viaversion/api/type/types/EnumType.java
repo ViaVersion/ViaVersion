@@ -42,21 +42,35 @@ public final class EnumType extends VarIntType {
 
     @Override
     public void write(final Ops ops, final Integer value) {
-        final String name;
-        if (value < 0 || value >= names.length) {
-            name = switch (fallback) {
-                case ZERO -> names[0];
-                case WRAP -> names[Math.floorMod(value, names.length)];
-                case CLAMP -> names[MathUtil.clamp(value, 0, names.length - 1)];
-            };
-        } else {
-            name = names[value];
-        }
-        Types.STRING.write(ops, name);
+        Types.STRING.write(ops, nameFromId(value));
     }
 
     public String[] names() {
         return names;
+    }
+
+    public String nameFromId(final int id) {
+        if (id < 0 || id >= names.length) {
+            return switch (fallback) {
+                case ZERO -> names[0];
+                case WRAP -> names[Math.floorMod(id, names.length)];
+                case CLAMP -> names[MathUtil.clamp(id, 0, names.length - 1)];
+            };
+        }
+        return names[id];
+    }
+
+    public int idFromName(final String name) {
+        for (int i = 0; i < names.length; i++) {
+            if (names[i].equals(name)) {
+                return i;
+            }
+        }
+        return switch (fallback) {
+            case ZERO -> 0;
+            case WRAP -> Math.floorMod(name.hashCode(), names.length);
+            case CLAMP -> names.length - 1;
+        };
     }
 
     public enum Fallback {
