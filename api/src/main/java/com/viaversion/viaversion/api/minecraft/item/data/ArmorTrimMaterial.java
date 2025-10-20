@@ -196,7 +196,7 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
 
         @Override
         protected Key identifier(final Ops ops, final int id) {
-            return ops.context().registryAccess().trimMaterial(id);
+            return ops.context().registryAccess().registryKey("trim_material", id);
         }
     };
 

@@ -83,7 +83,7 @@ public record ArmorTrimPattern(String assetName, int itemId, Tag description, bo
 
         @Override
         protected Key identifier(final Ops ops, final int id) {
-            return ops.context().registryAccess().trimPattern(id);
+            return ops.context().registryAccess().registryKey("trim_pattern", id);
         }
     };
 

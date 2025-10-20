@@ -39,18 +39,6 @@ public interface CodecContext {
 
         Key item(int id);
 
-        default Key enchantment(int id) {
-            return registryKey("enchantment", id);
-        }
-
-        default Key trimMaterial(int id) {
-            return registryKey("trim_material", id);
-        }
-
-        default Key trimPattern(int id) {
-            return registryKey("trim_pattern", id);
-        }
-
         Key attributeModifier(int id);
 
         Key dataComponentType(int id);
