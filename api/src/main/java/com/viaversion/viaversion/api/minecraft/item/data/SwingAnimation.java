@@ -29,7 +29,7 @@ import io.netty.buffer.ByteBuf;
 
 public record SwingAnimation(int type, int duration) {
 
-    private static final int DEFAULT_TYPE = EnumTypes.SWING_ANIMATION.byName("whack");
+    private static final int DEFAULT_TYPE = EnumTypes.SWING_ANIMATION.idFromName("whack");
 
     public static final Type<SwingAnimation> TYPE = new Type<>(SwingAnimation.class) {
         @Override

@@ -17,6 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_9to1_21_11;
 
+import com.viaversion.nbt.tag.ByteTag;
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.IntTag;
+import com.viaversion.nbt.tag.NumberTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
@@ -50,6 +55,8 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
+import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
@@ -71,6 +78,25 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
     protected void registerPackets() {
         super.registerPackets();
 
+        registryDataRewriter.addHandler("dimension_type", (key, tag) -> {
+            final ByteTag trueTag = new ByteTag((byte) 1);
+            final CompoundTag attributes = new CompoundTag();
+            tag.put("attributes", attributes);
+            moveAttribute(tag, attributes, "cloud_height", "visual/cloud_height", Function.identity(), null);
+            moveAttribute(tag, attributes, "has_raids", "gameplay/can_start_raid", Function.identity(), trueTag);
+            moveAttribute(tag, attributes, "piglin_safe", "gameplay/piglins_zombify", attributeTag -> ((NumberTag) attributeTag).asBoolean() ? ByteTag.ZERO : trueTag, ByteTag.ZERO);
+            moveAttribute(tag, attributes, "respawn_anchor_works", "gameplay/respawn_anchor_works", Function.identity(), trueTag);
+            moveAttribute(tag, attributes, "ultrawarm", "gameplay/fast_lava", Function.identity(), ByteTag.ZERO);
+            moveAttribute(tag, attributes, "ultrawarm", "gameplay/water_evaporates", Function.identity(), ByteTag.ZERO);
+        });
+        registryDataRewriter.addHandler("worldgen/biome", (key, tag) -> {
+            final CompoundTag effects = tag.getCompoundTag("effects");
+            final CompoundTag attributes = new CompoundTag();
+            tag.put("attributes", attributes);
+            moveAttribute(effects, attributes, "sky_color", "visual/sky_color", Function.identity(), new IntTag(0));
+            moveAttribute(effects, attributes, "water_fog_color", "visual/water_fog_color", Function.identity(), new IntTag(-16448205));
+            moveAttribute(effects, attributes, "fog_color", "visual/fog_color", Function.identity(), new IntTag(0));
+        });
         registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
 
         tagRewriter.registerGeneric(ClientboundPackets1_21_9.UPDATE_TAGS);
@@ -147,6 +173,19 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
             StructuredDataKey.USE_EFFECTS, StructuredDataKey.MINIMUM_ATTACK_CHARGE, StructuredDataKey.DAMAGE_TYPE, StructuredDataKey.PIERCING_WEAPON,
             StructuredDataKey.KINETIC_WEAPON, StructuredDataKey.SWING_ANIMATION);
         super.onMappingDataLoaded();
+    }
+
+    private void moveAttribute(
+        final CompoundTag baseTag, final CompoundTag attributes,
+        final String key, final String mappedKey,
+        final Function<Tag, Tag> tagMapper, @Nullable final Tag defaultTag
+    ) {
+        final Tag attributeTag = baseTag.get(key);
+        if (attributeTag != null) {
+            attributes.put(mappedKey, tagMapper.apply(attributeTag));
+        } else if (defaultTag != null) {
+            attributes.put(mappedKey, defaultTag);
+        }
     }
 
     @Override

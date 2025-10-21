@@ -19,14 +19,14 @@ package com.viaversion.viaversion.protocols.v1_21_9to1_21_11.rewriter;
 
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_9;
-import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPacket1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.Protocol1_21_9To1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.storage.GameTimeStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
+import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
 
 public final class EntityPacketRewriter1_21_11 extends EntityRewriter<ClientboundPacket1_21_9, Protocol1_21_9To1_21_11> {
 
@@ -59,11 +59,8 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
             entityDataTypes.optionalComponentType
         );
 
-        filter().type(EntityTypes1_21_11.WOLF).index(20).handler((event, data) -> {
-            final long currentGameTime = event.user().get(GameTimeStorage.class).gameTime();
-            final int remainingAngerTime = data.value();
-            data.setTypeAndValue(entityDataTypes.longType, currentGameTime + remainingAngerTime);
-        });
+        filter().type(EntityTypes1_21_11.WOLF).index(20).handler(this::relativeToAbsoluteTicks);
+        filter().type(EntityTypes1_21_11.BEE).index(18).handler(this::relativeToAbsoluteTicks);
     }
 
     @Override
@@ -74,5 +71,11 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
     @Override
     public EntityType typeFromId(final int type) {
         return EntityTypes1_21_11.getTypeFromId(type);
+    }
+
+    private void relativeToAbsoluteTicks(final EntityDataHandlerEvent event, final EntityData data) {
+        final long currentGameTime = event.user().get(GameTimeStorage.class).gameTime();
+        final int remainingAngerTime = data.value();
+        data.setTypeAndValue(protocol.mappedTypes().entityDataTypes().longType, currentGameTime + remainingAngerTime);
     }
 }
