@@ -20,48 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types;
+package com.viaversion.viaversion.api.type.types.misc;
 
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.minecraft.RegistryKey;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.EitherType;
 import com.viaversion.viaversion.util.Either;
-import io.netty.buffer.ByteBuf;
+import com.viaversion.viaversion.util.Key;
 
-// Yuck - only use when necessary
-public class EitherType<T, V> extends Type<Either<T, V>> {
-    private final Type<T> leftType;
-    private final Type<V> rightType;
+// ???
+public class SynchronizedRegistryEitherType extends EitherType<Integer, String> {
 
-    public EitherType(final Type<T> leftType, final Type<V> rightType) {
-        super(Either.class);
-        this.leftType = leftType;
-        this.rightType = rightType;
+    private final RegistryKey registryKey;
+
+    public SynchronizedRegistryEitherType(final RegistryKey registryKey) {
+        super(Types.VAR_INT, Types.STRING);
+        this.registryKey = registryKey;
     }
 
     @Override
-    public Either<T, V> read(final ByteBuf buffer) {
-        return read(buffer, this.leftType, this.rightType);
-    }
-
-    @Override
-    public void write(final ByteBuf buffer, final Either<T, V> value) {
-        write(buffer, value, this.leftType, this.rightType);
-    }
-
-    public static <X, Y> Either<X, Y> read(final ByteBuf buf, final Type<X> leftType, final Type<Y> rightType) {
-        if (buf.readBoolean()) {
-            return Either.left(leftType.read(buf));
-        } else {
-            return Either.right(rightType.read(buf));
-        }
-    }
-
-    public static <X, Y> void write(final ByteBuf buf, final Either<X, Y> value, final Type<X> leftType, final Type<Y> rightType) {
+    public void write(final Ops ops, final Either<Integer, String> value) {
         if (value.isLeft()) {
-            buf.writeBoolean(true);
-            leftType.write(buf, value.left());
+            final Key key = ops.context().registryAccess().registryKey(this.registryKey.key().toString(), value.left());
+            Types.RESOURCE_LOCATION.write(ops, key);
         } else {
-            buf.writeBoolean(false);
-            rightType.write(buf, value.right());
+            Types.RESOURCE_LOCATION.write(ops, Key.of(value.right()));
         }
     }
 }
