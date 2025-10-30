@@ -45,7 +45,7 @@ public final class EntityDataTypes1_19_3 extends AbstractEntityDataTypes {
     public final EntityDataType optionalBlockStateType = add(14, Types.VAR_INT);
     public final EntityDataType compoundTagType = add(15, Types.NAMED_COMPOUND_TAG);
     public final EntityDataType particleType;
-    public final EntityDataType villagerDatatType = add(17, Types.VILLAGER_DATA);
+    public final EntityDataType villagerDataType = add(17, Types.VILLAGER_DATA);
     public final EntityDataType optionalVarIntType = add(18, Types.OPTIONAL_VAR_INT);
     public final EntityDataType poseType = add(19, Types.VAR_INT);
     public final EntityDataType catVariantType = add(20, Types.VAR_INT);
