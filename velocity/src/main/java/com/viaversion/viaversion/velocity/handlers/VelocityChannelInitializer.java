@@ -54,13 +54,13 @@ public class VelocityChannelInitializer extends ChannelInitializer<Channel> {
 
     @Override
     protected void initChannel(Channel channel) throws Exception {
+        INIT_CHANNEL.invoke(original, channel);
         // When forks like VeloFlame close connection early
         // and prevent injection of Minecraft decoders on bot connections,
         // ViaVersion has to skip these conditions as these are bot attacks.
         if (!channel.isActive()) {
             return;
         }
-        INIT_CHANNEL.invoke(original, channel);
 
         UserConnection user = new UserConnectionImpl(channel, clientSide);
         new ProtocolPipelineImpl(user);
