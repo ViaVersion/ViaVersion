@@ -30,7 +30,7 @@ import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
 
 // ???
-public class SynchronizedRegistryEitherType extends EitherType<Integer, String> {
+public final class SynchronizedRegistryEitherType extends EitherType<Integer, String> {
 
     private final RegistryKey registryKey;
 
