@@ -57,7 +57,7 @@ public class VelocityChannelInitializer extends ChannelInitializer<Channel> {
         // When forks like VeloFlame close connection early
         // and prevent injection of Minecraft decoders on bot connections,
         // ViaVersion has to skip these conditions as these are bot attacks.
-        if (!channel.isActive) {
+        if (!channel.isActive()) {
             return;
         }
         INIT_CHANNEL.invoke(original, channel);
