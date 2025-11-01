@@ -23,8 +23,10 @@
 package com.viaversion.viaversion.api.minecraft;
 
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -68,6 +70,17 @@ public record PaintingVariant(int width, int height, String assetId, @Nullable T
             Types.STRING.write(buffer, variant.assetId());
             Types.OPTIONAL_TAG.write(buffer, variant.title());
             Types.OPTIONAL_TAG.write(buffer, variant.author());
+        }
+
+        @Override
+        public void writeDirect(final Ops ops, final PaintingVariant value) {
+            // Unused, cannot be direct despite having a direct network codec
+            ops.writeMap(map -> map
+                .write("width", Types.INT, value.width())
+                .write("height", Types.INT, value.height())
+                .write("asset_id", Types.RESOURCE_LOCATION, Key.of(value.assetId()))
+                .writeOptional("title", Types.TAG, value.title())
+                .writeOptional("author", Types.TAG, value.author()));
         }
     };
 }

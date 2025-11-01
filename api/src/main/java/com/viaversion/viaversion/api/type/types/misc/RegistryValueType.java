@@ -22,16 +22,19 @@
  */
 package com.viaversion.viaversion.api.type.types.misc;
 
+import com.viaversion.viaversion.api.minecraft.RegistryKey;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.VarIntType;
 import com.viaversion.viaversion.util.Key;
 
-public final class RegistryValueType extends VarIntType {
+public final class RegistryValueType extends VarIntType implements RegistryKey {
 
+    private final Key key;
     private final String[] names;
 
-    public RegistryValueType(final String... names) {
+    public RegistryValueType(final Key key, final String... names) {
+        this.key = key;
         this.names = names;
         for (int i = 0; i < names.length; i++) {
             names[i] = Key.namespaced(names[i]);
@@ -45,5 +48,14 @@ public final class RegistryValueType extends VarIntType {
 
     public String[] names() {
         return names;
+    }
+
+    public String byId(final int id) {
+        return names[id];
+    }
+
+    @Override
+    public Key key() {
+        return key;
     }
 }

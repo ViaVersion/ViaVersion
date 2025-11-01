@@ -78,7 +78,7 @@ public abstract class HolderType<T> extends Type<Holder<T>> {
     }
 
     protected Key identifier(final Ops ops, final int id) {
-        Preconditions.checkArgument(mappingType != null, "Mapping type is not defined for this HolderType");
+        Preconditions.checkArgument(mappingType != null, "Mapping type is not defined for this HolderType: " + getClass().getName());
         return ops.context().registryAccess().key(mappingType, id);
     }
 

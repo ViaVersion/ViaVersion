@@ -27,11 +27,14 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.EitherHolder;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.EitherHolderType;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 
@@ -48,9 +51,9 @@ public record JukeboxPlayable(EitherHolder<JukeboxSong> song, boolean showInTool
     public static final Type<JukeboxPlayable> TYPE1_21 = new Type<>(JukeboxPlayable.class) {
         @Override
         public JukeboxPlayable read(final ByteBuf buffer) {
-            final EitherHolder<JukeboxSong> position = EitherHolderType.read(buffer, JukeboxSong.TYPE);
+            final EitherHolder<JukeboxSong> song = EitherHolderType.read(buffer, JukeboxSong.TYPE);
             final boolean showInTooltip = buffer.readBoolean();
-            return new JukeboxPlayable(position, showInTooltip);
+            return new JukeboxPlayable(song, showInTooltip);
         }
 
         @Override
@@ -59,18 +62,10 @@ public record JukeboxPlayable(EitherHolder<JukeboxSong> song, boolean showInTool
             buffer.writeBoolean(value.showInTooltip);
         }
     };
-    public static final Type<JukeboxPlayable> TYPE1_21_5 = new Type<>(JukeboxPlayable.class) {
-        @Override
-        public JukeboxPlayable read(final ByteBuf buffer) {
-            final EitherHolder<JukeboxSong> position = EitherHolderType.read(buffer, JukeboxSong.TYPE);
-            return new JukeboxPlayable(position, true);
-        }
-
-        @Override
-        public void write(final ByteBuf buffer, final JukeboxPlayable value) {
-            EitherHolderType.write(buffer, value.song, JukeboxSong.TYPE);
-        }
-    };
+    public static final Type<JukeboxPlayable> TYPE1_21_5 = TransformingType.of(
+        new EitherHolderType<>(JukeboxSong.TYPE), JukeboxPlayable.class,
+        song -> new JukeboxPlayable(song, true), JukeboxPlayable::song
+    );
 
     @Override
     public JukeboxPlayable rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
@@ -106,6 +101,21 @@ public record JukeboxPlayable(EitherHolder<JukeboxSong> song, boolean showInTool
                 Types.TAG.write(buffer, value.description);
                 buffer.writeFloat(value.lengthInSeconds);
                 Types.VAR_INT.writePrimitive(buffer, value.comparatorOutput);
+            }
+
+            @Override
+            public void writeDirect(final Ops ops, final JukeboxSong value) {
+                // Unused, cannot be direct despite having a direct network codec
+                ops.writeMap(map -> map
+                    .write("sound_event", Types.SOUND_EVENT, value.soundEvent)
+                    .write("description", Types.TAG, value.description)
+                    .write("length_in_seconds", Types.FLOAT, value.lengthInSeconds)
+                    .write("comparator_output", Types.INT, value.comparatorOutput));
+            }
+
+            @Override
+            protected Key identifier(final Ops ops, final int id) {
+                return ops.context().registryAccess().registryKey("jukebox_song", id);
             }
         };
 

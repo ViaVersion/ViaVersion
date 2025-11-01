@@ -22,23 +22,18 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2.ConsumeEffect;
+import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Copyable;
-import io.netty.buffer.ByteBuf;
 
 public record DeathProtection(ConsumeEffect<?>[] deathEffects) implements Copyable {
 
-    public static final Type<DeathProtection> TYPE = new Type<>(DeathProtection.class) {
+    public static final Type<DeathProtection> TYPE = new TransformingType<>(ConsumeEffect.ARRAY_TYPE, DeathProtection.class, DeathProtection::new, DeathProtection::deathEffects) {
         @Override
-        public DeathProtection read(final ByteBuf buffer) {
-            final ConsumeEffect<?>[] deathEffects = ConsumeEffect.ARRAY_TYPE.read(buffer);
-            return new DeathProtection(deathEffects);
-        }
-
-        @Override
-        public void write(final ByteBuf buffer, final DeathProtection value) {
-            ConsumeEffect.ARRAY_TYPE.write(buffer, value.deathEffects);
+        public void write(final Ops ops, final DeathProtection value) {
+            ops.writeMap(map -> map.write("death_effects", ConsumeEffect.ARRAY_TYPE, value.deathEffects));
         }
     };
 

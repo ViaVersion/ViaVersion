@@ -23,12 +23,17 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.api.type.types.misc.HolderSetType;
+import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
@@ -37,12 +42,51 @@ public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<S
                                boolean hasConsumeParticles,
                                ConsumeEffect<?>[] consumeEffects) implements Copyable, Rewritable {
 
+    private static final HolderSetType REMOVE_EFFECTS_TYPE = new HolderSetType() {
+        @Override
+        public void write(final Ops ops, final HolderSet value) {
+            ops.writeMap(map -> map.write("effects", new HolderSetType(EnumTypes.MOB_EFFECT), value));
+        }
+    };
+    private static final Type<Float> TELEPORT_RANDOMLY_TYPE = new Type<>(Float.class) {
+        @Override
+        public void write(final ByteBuf buffer, final Float value) {
+            Types.FLOAT.writePrimitive(buffer, value);
+        }
+
+        @Override
+        public Float read(final ByteBuf buffer) {
+            return Types.FLOAT.readPrimitive(buffer);
+        }
+
+        @Override
+        public void write(final Ops ops, final Float value) {
+            ops.writeMap(map -> map.write("diameter", Types.FLOAT, 16F));
+        }
+    };
+    private static final HolderType<SoundEvent> PLAY_SOUND_TYPE = new HolderType<>(MappingData.MappingType.SOUND) {
+        @Override
+        public SoundEvent readDirect(final ByteBuf buffer) {
+            return Types.SOUND_EVENT.readDirect(buffer);
+        }
+
+        @Override
+        public void writeDirect(final ByteBuf buffer, final SoundEvent value) {
+            Types.SOUND_EVENT.writeDirect(buffer, value);
+        }
+
+        @Override
+        public void write(final Ops ops, final Holder<SoundEvent> value) {
+            ops.writeMap(map -> map.write("sound", Types.SOUND_EVENT, value));
+        }
+    };
+
     public static final Type<?>[] EFFECT_TYPES = {
         ApplyStatusEffects.TYPE,
-        Types.HOLDER_SET, // remove effects
+        REMOVE_EFFECTS_TYPE,
         Types.EMPTY, // clear all effects
-        Types.FLOAT, // teleport randomly
-        Types.SOUND_EVENT // play sound
+        TELEPORT_RANDOMLY_TYPE,
+        PLAY_SOUND_TYPE
     };
 
     public static final Type<Consumable1_21_2> TYPE = new Type<>(Consumable1_21_2.class) {
@@ -64,6 +108,17 @@ public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<S
             buffer.writeBoolean(value.hasConsumeParticles);
             ConsumeEffect.ARRAY_TYPE.write(buffer, value.consumeEffects);
         }
+
+        @Override
+        public void write(final Ops ops, final Consumable1_21_2 value) {
+            final Holder<SoundEvent> defaultSound = Holder.of(ops.context().registryAccess().id(MappingData.MappingType.SOUND, "entity.generic.eat"));
+            ops.writeMap(map -> map
+                .writeOptional("consume_seconds", Types.FLOAT, value.consumeSeconds, 1.6F)
+                .writeOptional("animation", EnumTypes.ITEM_USE_ANIMATION, value.animationType, 1)
+                .writeOptional("sound", Types.SOUND_EVENT, value.sound, defaultSound)
+                .writeOptional("has_consume_particles", Types.BOOLEAN, value.hasConsumeParticles, true)
+                .writeOptional("consume_effects", ConsumeEffect.ARRAY_TYPE, value.consumeEffects, new ConsumeEffect<?>[0]));
+        }
     };
 
     public record ConsumeEffect<T>(int id, Type<T> type, T value) {
@@ -82,6 +137,17 @@ public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<S
             public void write(final ByteBuf buffer, final ConsumeEffect<?> value) {
                 Types.VAR_INT.writePrimitive(buffer, value.id);
                 value.writeValue(buffer);
+            }
+
+            @Override
+            public void write(final Ops ops, final ConsumeEffect<?> value) {
+                writeGeneric(ops, value);
+            }
+
+            private <E> void writeGeneric(final Ops ops, final ConsumeEffect<E> value) {
+                ops.writeMap(map -> map
+                    .write("type", EnumTypes.CONSUME_EFFECT, value.id)
+                    .writeInlinedMap(value.type, value.value));
             }
         };
         public static final Type<ConsumeEffect<?>[]> ARRAY_TYPE = new ArrayType<>(TYPE);
@@ -110,6 +176,13 @@ public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<S
             public void write(final ByteBuf buffer, final ApplyStatusEffects value) {
                 PotionEffect.ARRAY_TYPE.write(buffer, value.effects);
                 buffer.writeFloat(value.probability);
+            }
+
+            @Override
+            public void write(final Ops ops, final ApplyStatusEffects value) {
+                ops.writeMap(map -> map
+                    .write("effects", PotionEffect.ARRAY_TYPE, value.effects)
+                    .writeOptional("probability", Types.FLOAT, value.probability, 1F));
             }
         };
     }

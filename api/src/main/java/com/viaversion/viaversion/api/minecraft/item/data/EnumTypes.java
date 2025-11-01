@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.type.types.EnumType;
 import com.viaversion.viaversion.api.type.types.EnumType.Fallback;
 import com.viaversion.viaversion.api.type.types.FakeEnumType;
 import com.viaversion.viaversion.api.type.types.misc.RegistryValueType;
+import com.viaversion.viaversion.util.Key;
 import java.util.List;
 
 import static com.viaversion.viaversion.api.type.types.FakeEnumType.Entry.of;
@@ -45,10 +46,12 @@ public final class EnumTypes {
     public static final EnumType LLAMA_VARIANT = new EnumType(Fallback.CLAMP, "creamy", "white", "brown", "gray");
     public static final EnumType AXOLOTL_VARIANT = new EnumType("lucy", "wild", "gold", "cyan", "blue");
     public static final EnumType EQUIPMENT_SLOT = new EnumType("mainhand", "feet", "legs", "chest", "head", "offhand", "body", "saddle");
+    public static final EnumType ITEM_USE_ANIMATION = new EnumType("none", "eat", "drink", "block", "bow", "trident", "crossbow", "spyglass", "toot_horn", "brush", "bundle", "spear");
     // Enums with non-ordinal ids
     public static final FakeEnumType RABBIT_VARIANT = new FakeEnumType(List.of("brown", "white", "black", "white_splotched", "gold", "salt"), of(99, "evil"));
     // Pretty much enums, but with a resource location
-    public static final RegistryValueType VILLAGER_TYPE = new RegistryValueType("desert", "jungle", "plains", "savanna", "snow", "swamp", "taiga");
-    public static final RegistryValueType POTION = new RegistryValueType("water", "mundane", "thick", "awkward", "night_vision", "long_night_vision", "invisibility", "long_invisibility", "leaping", "long_leaping", "strong_leaping", "fire_resistance", "long_fire_resistance", "swiftness", "long_swiftness", "strong_swiftness", "slowness", "long_slowness", "strong_slowness", "turtle_master", "long_turtle_master", "strong_turtle_master", "water_breathing", "long_water_breathing", "healing", "strong_healing", "harming", "strong_harming", "poison", "long_poison", "strong_poison", "regeneration", "long_regeneration", "strong_regeneration", "strength", "long_strength", "strong_strength", "weakness", "long_weakness", "luck", "slow_falling", "long_slow_falling", "wind_charged", "weaving", "oozing", "infested");
-    public static final RegistryValueType MOB_EFFECT = new RegistryValueType("speed", "slowness", "haste", "mining_fatigue", "strength", "instant_health", "instant_damage", "jump_boost", "nausea", "regeneration", "resistance", "fire_resistance", "water_breathing", "invisibility", "blindness", "night_vision", "hunger", "weakness", "poison", "wither", "health_boost", "absorption", "saturation", "glowing", "levitation", "luck", "unluck", "slow_falling", "conduit_power", "dolphins_grace", "bad_omen", "hero_of_the_village", "darkness", "trial_omen", "raid_omen", "wind_charged", "weaving", "oozing", "infested");
+    public static final RegistryValueType VILLAGER_TYPE = new RegistryValueType(Key.of("villager_type"), "desert", "jungle", "plains", "savanna", "snow", "swamp", "taiga");
+    public static final RegistryValueType POTION = new RegistryValueType(Key.of("potion"), "water", "mundane", "thick", "awkward", "night_vision", "long_night_vision", "invisibility", "long_invisibility", "leaping", "long_leaping", "strong_leaping", "fire_resistance", "long_fire_resistance", "swiftness", "long_swiftness", "strong_swiftness", "slowness", "long_slowness", "strong_slowness", "turtle_master", "long_turtle_master", "strong_turtle_master", "water_breathing", "long_water_breathing", "healing", "strong_healing", "harming", "strong_harming", "poison", "long_poison", "strong_poison", "regeneration", "long_regeneration", "strong_regeneration", "strength", "long_strength", "strong_strength", "weakness", "long_weakness", "luck", "slow_falling", "long_slow_falling", "wind_charged", "weaving", "oozing", "infested");
+    public static final RegistryValueType MOB_EFFECT = new RegistryValueType(Key.of("mob_effect"), "speed", "slowness", "haste", "mining_fatigue", "strength", "instant_health", "instant_damage", "jump_boost", "nausea", "regeneration", "resistance", "fire_resistance", "water_breathing", "invisibility", "blindness", "night_vision", "hunger", "weakness", "poison", "wither", "health_boost", "absorption", "saturation", "glowing", "levitation", "luck", "unluck", "slow_falling", "conduit_power", "dolphins_grace", "bad_omen", "hero_of_the_village", "darkness", "trial_omen", "raid_omen", "wind_charged", "weaving", "oozing", "infested");
+    public static final RegistryValueType CONSUME_EFFECT = new RegistryValueType(Key.of("consume_effect_type"), "apply_effects", "remove_effects", "clear_all_effects", "teleport_randomly", "play_sound");
 }
