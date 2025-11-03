@@ -82,5 +82,10 @@ public record PaintingVariant(int width, int height, String assetId, @Nullable T
                 .writeOptional("title", Types.TAG, value.title())
                 .writeOptional("author", Types.TAG, value.author()));
         }
+
+        @Override
+        protected Key identifier(final Ops ops, final int id) {
+            return ops.context().registryAccess().registryKey("painting_variant", id);
+        }
     };
 }
