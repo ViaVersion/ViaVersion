@@ -152,8 +152,8 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
             public void write(final Ops ops, final AttributeModifier value) {
                 final Key attribute = ops.context().registryAccess().attributeModifier(value.attribute);
                 ops.writeMap(map -> map
-                    .write("type", Types.RESOURCE_LOCATION, attribute)
-                    .write("id", Types.RESOURCE_LOCATION, Key.of(value.modifier.id()))
+                    .write("type", Types.IDENTIFIER, attribute)
+                    .write("id", Types.IDENTIFIER, Key.of(value.modifier.id()))
                     .write("amount", Types.DOUBLE, value.modifier.amount)
                     .write("operation", Types.STRING, OPERATION[value.modifier.operation()])
                     .writeOptional("slot", Types.STRING, EQUIPMENT_SLOT_GROUPS[value.slotType()], "any"));
@@ -184,8 +184,8 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
             public void write(final Ops ops, final AttributeModifier value) {
                 final Key attribute = ops.context().registryAccess().attributeModifier(value.attribute);
                 ops.writeMap(map -> {
-                    map.write("type", Types.RESOURCE_LOCATION, attribute)
-                        .write("id", Types.RESOURCE_LOCATION, Key.of(value.modifier.id()))
+                    map.write("type", Types.IDENTIFIER, attribute)
+                        .write("id", Types.IDENTIFIER, Key.of(value.modifier.id()))
                         .write("amount", Types.DOUBLE, value.modifier.amount)
                         .write("operation", Types.STRING, OPERATION[value.modifier.operation()])
                         .writeOptional("slot", Types.STRING, EQUIPMENT_SLOT_GROUPS[value.slotType()], "any");

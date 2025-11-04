@@ -54,7 +54,7 @@ public class KeyType extends Type<Key> {
     public static final class OptionalKeyType extends OptionalType<Key> {
 
         public OptionalKeyType() {
-            super(Types.RESOURCE_LOCATION);
+            super(Types.IDENTIFIER);
         }
     }
 }

@@ -63,7 +63,7 @@ public record TooltipDisplay(boolean hideTooltip,
             final Key[] hiddenComponents = value.hiddenComponents.intStream().mapToObj(id -> ops.context().registryAccess().dataComponentType(id)).toArray(Key[]::new);
             ops.writeMap(map -> map
                 .writeOptional("hide_tooltip", Types.BOOLEAN, value.hideTooltip, false)
-                .writeOptional("hidden_components", Types.RESOURCE_LOCATION_ARRAY, hiddenComponents, new Key[0]));
+                .writeOptional("hidden_components", Types.IDENTIFIER_ARRAY, hiddenComponents, new Key[0]));
         }
     };
 

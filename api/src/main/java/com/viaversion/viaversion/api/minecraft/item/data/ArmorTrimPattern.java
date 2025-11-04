@@ -76,7 +76,7 @@ public record ArmorTrimPattern(String assetName, int itemId, Tag description, bo
         @Override
         public void writeDirect(final Ops ops, final ArmorTrimPattern object) {
             ops.writeMap(map -> map
-                .write("asset_id", Types.RESOURCE_LOCATION, Key.of(object.assetName()))
+                .write("asset_id", Types.IDENTIFIER, Key.of(object.assetName()))
                 .write("description", Types.TEXT_COMPONENT_TAG, object.description())
                 .write("decal", Types.BOOLEAN, object.decal()));
         }

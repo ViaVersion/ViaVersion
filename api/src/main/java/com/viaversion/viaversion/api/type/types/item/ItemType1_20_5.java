@@ -121,7 +121,7 @@ public class ItemType1_20_5 extends Type<Item> {
     @Override
     public void write(final Ops ops, final Item item) {
         ops.writeMap(map -> {
-            map.write("id", Types.RESOURCE_LOCATION, ops.context().registryAccess().item(item.identifier()))
+            map.write("id", Types.IDENTIFIER, ops.context().registryAccess().item(item.identifier()))
                 .write("count", Types.VAR_INT, item.amount());
 
             if (item.dataContainer().isEmpty()) {

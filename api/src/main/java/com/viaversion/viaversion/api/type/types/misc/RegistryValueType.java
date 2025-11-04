@@ -43,7 +43,7 @@ public final class RegistryValueType extends VarIntType implements RegistryKey {
 
     @Override
     public void write(final Ops ops, final Integer value) {
-        Types.RESOURCE_LOCATION.write(ops, Key.of(names[value]));
+        Types.IDENTIFIER.write(ops, Key.of(names[value]));
     }
 
     public String[] names() {

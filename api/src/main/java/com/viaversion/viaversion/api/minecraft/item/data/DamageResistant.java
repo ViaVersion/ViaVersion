@@ -30,7 +30,7 @@ import com.viaversion.viaversion.util.Key;
 
 public record DamageResistant(Key typesTagKey) {
 
-    public static final Type<DamageResistant> TYPE = new TransformingType<>(Types.RESOURCE_LOCATION, DamageResistant.class, DamageResistant::new, DamageResistant::typesTagKey) {
+    public static final Type<DamageResistant> TYPE = new TransformingType<>(Types.IDENTIFIER, DamageResistant.class, DamageResistant::new, DamageResistant::typesTagKey) {
 
         @Override
         public void write(final Ops ops, final DamageResistant value) {

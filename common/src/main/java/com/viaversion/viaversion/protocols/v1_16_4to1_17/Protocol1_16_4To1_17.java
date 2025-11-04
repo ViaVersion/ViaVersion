@@ -69,7 +69,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
             wrapper.write(Types.VAR_INT, 5);
             for (RegistryType type : RegistryType.getValues()) {
                 // Prefix with resource location
-                wrapper.write(Types.STRING, type.resourceLocation());
+                wrapper.write(Types.STRING, type.identifier());
 
                 // Id conversion
                 tagRewriter.handle(wrapper, type);
@@ -81,7 +81,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
             }
 
             // New Game Event tags type
-            wrapper.write(Types.STRING, RegistryType.GAME_EVENT.resourceLocation());
+            wrapper.write(Types.STRING, RegistryType.GAME_EVENT.identifier());
             tagRewriter.appendNewTags(wrapper, RegistryType.GAME_EVENT);
         });
 

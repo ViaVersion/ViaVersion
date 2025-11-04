@@ -51,7 +51,7 @@ public class GlobalBlockPositionType extends Type<GlobalBlockPosition> {
     @Override
     public void write(final Ops ops, final GlobalBlockPosition value) {
         ops.writeMap(map -> map
-            .write("dimension", Types.RESOURCE_LOCATION, Key.of(value.dimension()))
+            .write("dimension", Types.IDENTIFIER, Key.of(value.dimension()))
             .write("pos", Types.BLOCK_POSITION1_14, value));
     }
 

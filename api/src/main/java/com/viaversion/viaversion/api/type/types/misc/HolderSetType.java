@@ -88,13 +88,13 @@ public class HolderSetType extends Type<HolderSet> {
             Preconditions.checkArgument(registryKey != null, "Cannot write HolderSet with direct ids without a mapping type");
             if (value.ids().length == 1) {
                 // Single entries are inlined
-                ops.write(Types.RESOURCE_LOCATION, key(ops, value.ids()[0]));
+                ops.write(Types.IDENTIFIER, key(ops, value.ids()[0]));
                 return;
             }
 
             ops.writeList(list -> {
                 for (final int id : value.ids()) {
-                    list.write(Types.RESOURCE_LOCATION, key(ops, id));
+                    list.write(Types.IDENTIFIER, key(ops, id));
                 }
             });
         }

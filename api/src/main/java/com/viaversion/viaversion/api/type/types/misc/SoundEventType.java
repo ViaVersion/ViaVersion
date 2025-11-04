@@ -37,9 +37,9 @@ public final class SoundEventType extends HolderType<SoundEvent> {
 
     @Override
     public SoundEvent readDirect(final ByteBuf buffer) {
-        final String resourceLocation = Types.STRING.read(buffer);
+        final String identifier = Types.STRING.read(buffer);
         final Float fixedRange = Types.OPTIONAL_FLOAT.read(buffer);
-        return new SoundEvent(resourceLocation, fixedRange);
+        return new SoundEvent(identifier, fixedRange);
     }
 
     @Override
@@ -51,7 +51,7 @@ public final class SoundEventType extends HolderType<SoundEvent> {
     @Override
     public void writeDirect(final Ops ops, final SoundEvent object) {
         ops.writeMap(map -> map
-            .write("sound_id", Types.RESOURCE_LOCATION, Key.of(object.identifier()))
+            .write("sound_id", Types.IDENTIFIER, Key.of(object.identifier()))
             .writeOptional("range", Types.FLOAT, object.fixedRange()));
     }
 

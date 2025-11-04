@@ -185,9 +185,9 @@ public final class Types {
     /* MC Types */
     public static final Type<byte[]> SERVERBOUND_CUSTOM_PAYLOAD_DATA = new RemainingBytesType(Short.MAX_VALUE);
 
-    public static final Type<Key> RESOURCE_LOCATION = new KeyType();
-    public static final Type<Key> OPTIONAL_RESOURCE_LOCATION = new KeyType.OptionalKeyType();
-    public static final Type<Key[]> RESOURCE_LOCATION_ARRAY = new ArrayType<>(RESOURCE_LOCATION);
+    public static final Type<Key> IDENTIFIER = new KeyType();
+    public static final Type<Key> OPTIONAL_IDENTIFIER = new KeyType.OptionalKeyType();
+    public static final Type<Key[]> IDENTIFIER_ARRAY = new ArrayType<>(IDENTIFIER);
     public static final Type<Key> TAG_KEY = new TagKeyType();
 
     public static final Type<BlockPosition> BLOCK_POSITION1_8 = new BlockPositionType1_8();

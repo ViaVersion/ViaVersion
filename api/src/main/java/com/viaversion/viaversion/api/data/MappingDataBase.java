@@ -172,7 +172,7 @@ public class MappingDataBase implements MappingData {
     }
 
     private void loadTags(final RegistryType type, final CompoundTag data) {
-        final CompoundTag tag = data.getCompoundTag(type.resourceLocation());
+        final CompoundTag tag = data.getCompoundTag(type.identifier());
         if (tag == null) {
             return;
         }

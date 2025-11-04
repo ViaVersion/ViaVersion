@@ -73,7 +73,7 @@ public final class EitherHolderType<T> extends Type<EitherHolder<T>> {
         if (object.hasHolder()) {
             holderType.write(ops, object.holder());
         } else {
-            ops.write(Types.RESOURCE_LOCATION, Key.of(object.key()));
+            ops.write(Types.IDENTIFIER, Key.of(object.key()));
         }
     }
 }

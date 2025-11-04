@@ -47,7 +47,7 @@ public record BannerPattern(String assetId, String translationKey) {
         @Override
         public void writeDirect(final Ops ops, final BannerPattern object) {
             ops.writeMap(map -> map
-                .write("asset_id", Types.RESOURCE_LOCATION, Key.of(object.assetId))
+                .write("asset_id", Types.IDENTIFIER, Key.of(object.assetId))
                 .write("translation_key", Types.STRING, object.translationKey));
         }
 

@@ -177,7 +177,7 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
             }
 
             // Registry wasn't present in the packet, add them here
-            wrapper.write(Types.STRING, entry.getKey().resourceLocation());
+            wrapper.write(Types.STRING, entry.getKey().identifier());
             appendNewTags(wrapper, entry.getKey());
             finalLength++;
         }

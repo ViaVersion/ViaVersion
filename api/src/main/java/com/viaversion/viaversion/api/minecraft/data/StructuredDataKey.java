@@ -86,7 +86,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
-import com.viaversion.viaversion.api.type.types.EitherType;
 import com.viaversion.viaversion.api.type.types.misc.SynchronizedRegistryEitherType;
 import com.viaversion.viaversion.api.type.types.misc.SynchronizedRegistryValueType;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
@@ -152,7 +151,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Equippable> EQUIPPABLE1_21_6 = new StructuredDataKey<>("equippable", Equippable.TYPE1_21_6);
     public static final StructuredDataKey<Repairable> REPAIRABLE = new StructuredDataKey<>("repairable", Repairable.TYPE);
     public static final StructuredDataKey<Unit> GLIDER = new StructuredDataKey<>("glider", Types.EMPTY);
-    public static final StructuredDataKey<Key> TOOLTIP_STYLE = new StructuredDataKey<>("tooltip_style", Types.RESOURCE_LOCATION);
+    public static final StructuredDataKey<Key> TOOLTIP_STYLE = new StructuredDataKey<>("tooltip_style", Types.IDENTIFIER);
     public static final StructuredDataKey<DeathProtection> DEATH_PROTECTION = new StructuredDataKey<>("death_protection", DeathProtection.TYPE);
     public static final StructuredDataKey<BlocksAttacks> BLOCKS_ATTACKS = new StructuredDataKey<>("blocks_attacks", BlocksAttacks.TYPE);
     public static final StructuredDataKey<PiercingWeapon> PIERCING_WEAPON = new StructuredDataKey<>("piercing_weapon", PiercingWeapon.TYPE);
@@ -196,7 +195,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Fireworks> FIREWORKS = new StructuredDataKey<>("fireworks", Fireworks.TYPE);
     public static final StructuredDataKey<GameProfile> PROFILE1_20_5 = new StructuredDataKey<>("profile", Types.GAME_PROFILE);
     public static final StructuredDataKey<ResolvableProfile> PROFILE1_21_9 = new StructuredDataKey<>("profile", Types.RESOLVABLE_PROFILE);
-    public static final StructuredDataKey<Key> NOTE_BLOCK_SOUND = new StructuredDataKey<>("note_block_sound", Types.RESOURCE_LOCATION);
+    public static final StructuredDataKey<Key> NOTE_BLOCK_SOUND = new StructuredDataKey<>("note_block_sound", Types.IDENTIFIER);
     public static final StructuredDataKey<BannerPatternLayer[]> BANNER_PATTERNS = new StructuredDataKey<>("banner_patterns", BannerPatternLayer.ARRAY_TYPE);
     public static final StructuredDataKey<Integer> BASE_COLOR = new StructuredDataKey<>("base_color", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<PotDecorations> POT_DECORATIONS = new StructuredDataKey<>("pot_decorations", PotDecorations.TYPE);

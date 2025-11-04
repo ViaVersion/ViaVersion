@@ -112,8 +112,8 @@ public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Null
             ops.writeMap(map -> map
                 .write("slot", EnumTypes.EQUIPMENT_SLOT, value.equipmentSlot)
                 .writeOptional("equip_sound", Types.SOUND_EVENT, value.soundEvent, defaultEquipSound)
-                .writeOptional("asset_id", Types.RESOURCE_LOCATION, value.model != null ? Key.of(value.model) : null)
-                .writeOptional("camera_overlay", Types.RESOURCE_LOCATION, value.cameraOverlay != null ? Key.of(value.cameraOverlay) : null)
+                .writeOptional("asset_id", Types.IDENTIFIER, value.model != null ? Key.of(value.model) : null)
+                .writeOptional("camera_overlay", Types.IDENTIFIER, value.cameraOverlay != null ? Key.of(value.cameraOverlay) : null)
                 .writeOptional("allowed_entities", new HolderSetType(MappingData.MappingType.ENTITY_TYPE), value.allowedEntities)
                 .writeOptional("dispensable", Types.BOOLEAN, value.dispensable, true)
                 .writeOptional("swappable", Types.BOOLEAN, value.swappable, true)
@@ -160,8 +160,8 @@ public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Null
             ops.writeMap(map -> map
                 .write("slot", EnumTypes.EQUIPMENT_SLOT, value.equipmentSlot)
                 .writeOptional("equip_sound", Types.SOUND_EVENT, value.soundEvent, defaultSound)
-                .writeOptional("asset_id", Types.RESOURCE_LOCATION, value.model != null ? Key.of(value.model) : null)
-                .writeOptional("camera_overlay", Types.RESOURCE_LOCATION, value.cameraOverlay != null ? Key.of(value.cameraOverlay) : null)
+                .writeOptional("asset_id", Types.IDENTIFIER, value.model != null ? Key.of(value.model) : null)
+                .writeOptional("camera_overlay", Types.IDENTIFIER, value.cameraOverlay != null ? Key.of(value.cameraOverlay) : null)
                 .writeOptional("allowed_entities", new HolderSetType(MappingData.MappingType.ENTITY_TYPE), value.allowedEntities)
                 .writeOptional("dispensable", Types.BOOLEAN, value.dispensable, true)
                 .writeOptional("swappable", Types.BOOLEAN, value.swappable, true)

@@ -53,7 +53,7 @@ public record UseCooldown(float seconds, @Nullable String cooldownGroup) impleme
             final Key cooldownGroup = value.cooldownGroup != null ? Key.of(value.cooldownGroup) : null;
             ops.writeMap(map -> map
                 .write("seconds", Types.FLOAT, value.seconds())
-                .writeOptional("cooldown_group", Types.RESOURCE_LOCATION, cooldownGroup));
+                .writeOptional("cooldown_group", Types.IDENTIFIER, cooldownGroup));
         }
     };
 

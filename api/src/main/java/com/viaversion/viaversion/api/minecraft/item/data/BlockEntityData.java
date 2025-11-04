@@ -50,7 +50,7 @@ public record BlockEntityData(int type, CompoundTag tag) implements Rewritable {
         @Override
         public void write(final Ops ops, final BlockEntityData data) {
             ops.writeMap(map -> map
-                .write("id", Types.RESOURCE_LOCATION, ops.context().registryAccess().blockEntity(data.type))
+                .write("id", Types.IDENTIFIER, ops.context().registryAccess().blockEntity(data.type))
                 .writeInlinedMap(Types.COMPOUND_TAG, data.tag)
             );
         }

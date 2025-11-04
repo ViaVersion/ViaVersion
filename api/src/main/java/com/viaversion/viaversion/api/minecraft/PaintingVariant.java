@@ -78,7 +78,7 @@ public record PaintingVariant(int width, int height, String assetId, @Nullable T
             ops.writeMap(map -> map
                 .write("width", Types.INT, value.width())
                 .write("height", Types.INT, value.height())
-                .write("asset_id", Types.RESOURCE_LOCATION, Key.of(value.assetId()))
+                .write("asset_id", Types.IDENTIFIER, Key.of(value.assetId()))
                 .writeOptional("title", Types.TAG, value.title())
                 .writeOptional("author", Types.TAG, value.author()));
         }

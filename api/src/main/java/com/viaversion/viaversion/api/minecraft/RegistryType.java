@@ -41,7 +41,7 @@ public enum RegistryType implements RegistryKey {
 
     static {
         for (RegistryType type : getValues()) {
-            MAP.put(type.resourceLocation, type);
+            MAP.put(type.identifier, type);
         }
     }
 
@@ -49,22 +49,22 @@ public enum RegistryType implements RegistryKey {
         return VALUES;
     }
 
-    public static @Nullable RegistryType getByKey(String resourceKey) {
-        return MAP.get(resourceKey);
+    public static @Nullable RegistryType getByKey(String identifier) {
+        return MAP.get(identifier);
     }
 
-    private final String resourceLocation;
+    private final String identifier;
 
-    RegistryType(final String resourceLocation) {
-        this.resourceLocation = resourceLocation;
+    RegistryType(final String identifier) {
+        this.identifier = identifier;
     }
 
-    public String resourceLocation() {
-        return resourceLocation;
+    public String identifier() {
+        return identifier;
     }
 
     @Override
     public Key key() {
-        return Key.of(resourceLocation);
+        return Key.of(identifier);
     }
 }

@@ -30,7 +30,6 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Rewritable;
-import io.netty.buffer.ByteBuf;
 
 public record PotDecorations(int[] itemIds) implements Copyable, Rewritable {
 
@@ -39,7 +38,7 @@ public record PotDecorations(int[] itemIds) implements Copyable, Rewritable {
         public void write(final Ops ops, final PotDecorations value) {
             ops.writeList(list -> {
                 for (final int itemId : value.itemIds) {
-                    list.write(Types.RESOURCE_LOCATION, ops.context().registryAccess().item(itemId));
+                    list.write(Types.IDENTIFIER, ops.context().registryAccess().item(itemId));
                 }
             });
         }
