@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_21_9to1_21_11.rewriter;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
-import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_9;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPacket1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.Protocol1_21_9To1_21_11;
@@ -47,8 +47,13 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
 
     @Override
     protected void registerRewrites() {
-        final EntityDataTypes1_21_9 entityDataTypes = protocol.mappedTypes().entityDataTypes();
-        filter().mapDataType(entityDataTypes::byId);
+        final EntityDataTypes1_21_11 entityDataTypes = protocol.mappedTypes().entityDataTypes();
+        filter().mapDataType(id -> {
+            if (id >= entityDataTypes.zombieNautilusVariantType.typeId()) {
+                id++;
+            }
+            return entityDataTypes.byId(id);
+        });
         registerEntityDataTypeHandler(
             entityDataTypes.itemType,
             entityDataTypes.blockStateType,
@@ -59,8 +64,12 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
             entityDataTypes.optionalComponentType
         );
 
-        filter().type(EntityTypes1_21_11.WOLF).index(20).handler(this::relativeToAbsoluteTicks);
+        filter().type(EntityTypes1_21_11.WOLF).index(21).handler(this::relativeToAbsoluteTicks);
         filter().type(EntityTypes1_21_11.BEE).index(18).handler(this::relativeToAbsoluteTicks);
+        filter().type(EntityTypes1_21_11.AVATAR).index(15).handler(((event, data) -> {
+            final byte arm = data.value();
+            data.setTypeAndValue(entityDataTypes.varIntType, (int) arm);
+        }));
     }
 
     @Override

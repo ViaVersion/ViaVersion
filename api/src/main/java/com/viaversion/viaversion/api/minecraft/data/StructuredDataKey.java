@@ -86,6 +86,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.api.type.types.EitherType;
 import com.viaversion.viaversion.api.type.types.misc.SynchronizedRegistryEitherType;
 import com.viaversion.viaversion.api.type.types.misc.SynchronizedRegistryValueType;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
@@ -222,6 +223,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> PIG_VARIANT = new StructuredDataKey<>("pig/variant", new SynchronizedRegistryValueType(RegistryKey.of("pig_variant")));
     public static final StructuredDataKey<Integer> COW_VARIANT = new StructuredDataKey<>("cow/variant", new SynchronizedRegistryValueType(RegistryKey.of("cow_variant")));
     public static final StructuredDataKey<Either<Integer, String>> CHICKEN_VARIANT = new StructuredDataKey<>("chicken/variant", new SynchronizedRegistryEitherType(RegistryKey.of("chicken_variant")));
+    public static final StructuredDataKey<Either<Integer, String>> ZOMBIE_NAUTILUS_VARIANT = new StructuredDataKey<>("zombie_nautilus/variant", new SynchronizedRegistryEitherType(RegistryKey.of("zombie_nautilus_variant"))); // ???
     public static final StructuredDataKey<Integer> FROG_VARIANT = new StructuredDataKey<>("frog/variant", new SynchronizedRegistryValueType(RegistryKey.of("frog_variant")));
     public static final StructuredDataKey<Integer> HORSE_VARIANT = new StructuredDataKey<>("horse/variant", EnumTypes.HORSE_VARIANT);
     public static final StructuredDataKey<Holder<PaintingVariant>> PAINTING_VARIANT = new StructuredDataKey<>("painting/variant", PaintingVariant.TYPE1_21_2);

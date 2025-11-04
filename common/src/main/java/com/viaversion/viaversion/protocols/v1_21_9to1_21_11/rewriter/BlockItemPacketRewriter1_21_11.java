@@ -97,5 +97,6 @@ public final class BlockItemPacketRewriter1_21_11 extends StructuredItemRewriter
         container.remove(StructuredDataKey.DAMAGE_TYPE);
         container.remove(StructuredDataKey.MINIMUM_ATTACK_CHARGE);
         container.remove(StructuredDataKey.USE_EFFECTS);
+        container.remove(StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT);
     }
 }

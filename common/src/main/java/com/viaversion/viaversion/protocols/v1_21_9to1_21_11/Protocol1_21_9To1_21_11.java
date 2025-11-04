@@ -20,19 +20,24 @@ package com.viaversion.viaversion.protocols.v1_21_9to1_21_11;
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
+import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_5;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_11;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_9;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
@@ -77,6 +82,16 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
     @Override
     protected void registerPackets() {
         super.registerPackets();
+
+        registerFinishConfiguration(ClientboundConfigurationPackets1_21_9.FINISH_CONFIGURATION, wrapper -> {
+            final PacketWrapper zombieNautilusVariantsPacket = wrapper.create(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA);
+            zombieNautilusVariantsPacket.write(Types.STRING, "zombie_nautilus_variant");
+            final CompoundTag temperateZombieNautilus = new CompoundTag();
+            temperateZombieNautilus.putString("asset_id", "entity/zombie_nautilus/temperate");
+            temperateZombieNautilus.put("spawn_conditions", new ListTag<>(CompoundTag.class));
+            zombieNautilusVariantsPacket.write(Types.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{new RegistryEntry("minecraft:pale", temperateZombieNautilus)});
+            zombieNautilusVariantsPacket.send(Protocol1_21_9To1_21_11.class);
+        });
 
         registryDataRewriter.addHandler("dimension_type", (key, tag) -> {
             final ByteTag trueTag = new ByteTag((byte) 1);
@@ -171,7 +186,7 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
             StructuredDataKey.CAT_COLLAR, StructuredDataKey.SHEEP_COLOR, StructuredDataKey.SHULKER_COLOR, StructuredDataKey.PROVIDES_TRIM_MATERIAL,
             StructuredDataKey.BREAK_SOUND, StructuredDataKey.COW_VARIANT, StructuredDataKey.CHICKEN_VARIANT, StructuredDataKey.WOLF_SOUND_VARIANT,
             StructuredDataKey.USE_EFFECTS, StructuredDataKey.MINIMUM_ATTACK_CHARGE, StructuredDataKey.DAMAGE_TYPE, StructuredDataKey.PIERCING_WEAPON,
-            StructuredDataKey.KINETIC_WEAPON, StructuredDataKey.SWING_ANIMATION);
+            StructuredDataKey.KINETIC_WEAPON, StructuredDataKey.SWING_ANIMATION, StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT);
         super.onMappingDataLoaded();
     }
 
@@ -236,7 +251,7 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
     }
 
     @Override
-    public Types1_20_5<StructuredDataKeys1_21_11, EntityDataTypes1_21_9> mappedTypes() {
+    public Types1_20_5<StructuredDataKeys1_21_11, EntityDataTypes1_21_11> mappedTypes() {
         return VersionedTypes.V1_21_11;
     }
 
