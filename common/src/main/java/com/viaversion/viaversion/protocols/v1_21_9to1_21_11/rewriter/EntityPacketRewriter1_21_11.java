@@ -68,7 +68,7 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
         filter().type(EntityTypes1_21_11.BEE).index(18).handler(this::relativeToAbsoluteTicks);
         filter().type(EntityTypes1_21_11.AVATAR).index(15).handler(((event, data) -> {
             final byte arm = data.value();
-            data.setTypeAndValue(entityDataTypes.varIntType, (int) arm);
+            data.setTypeAndValue(entityDataTypes.humanoidArmType, (int) arm);
         }));
     }
 
