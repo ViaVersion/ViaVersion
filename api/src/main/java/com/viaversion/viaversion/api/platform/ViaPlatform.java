@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import java.io.File;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -195,7 +195,7 @@ public interface ViaPlatform<T> {
      * @return immutable collection of unsupported software to be checked
      */
     default Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
-        return Collections.emptyList();
+        return List.of();
     }
 
     /**

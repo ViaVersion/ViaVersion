@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.PlatformTask;
-import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.bukkit.commands.BukkitCommandHandler;
 import com.viaversion.viaversion.bukkit.listeners.JoinListener;
@@ -35,12 +34,8 @@ import com.viaversion.viaversion.bukkit.platform.BukkitViaTaskTask;
 import com.viaversion.viaversion.bukkit.platform.FoliaViaTask;
 import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
 import com.viaversion.viaversion.dump.PluginInfo;
-import com.viaversion.viaversion.unsupported.UnsupportedPlugin;
-import com.viaversion.viaversion.unsupported.UnsupportedServerSoftware;
 import com.viaversion.viaversion.util.GsonUtil;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -262,20 +257,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     @Override
     public ViaAPI<Player> getApi() {
         return api;
-    }
-
-    @Override
-    public final Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
-        final List<UnsupportedSoftware> list = new ArrayList<>(ViaPlatform.super.getUnsupportedSoftwareClasses());
-        list.add(new UnsupportedServerSoftware.Builder().name("Yatopia").reason(UnsupportedServerSoftware.Reason.DANGEROUS_SERVER_SOFTWARE)
-            .addClassName("org.yatopiamc.yatopia.server.YatopiaConfig")
-            .addClassName("net.yatopia.api.event.PlayerAttackEntityEvent")
-            .addClassName("yatopiamc.org.yatopia.server.YatopiaConfig") // Only the best kind of software relocates its own classes to hide itself :tinfoilhat:
-            .addMethod("org.bukkit.Server", "getLastTickTime").build());
-        list.add(new UnsupportedPlugin.Builder().name("software to mess with message signing").reason(UnsupportedPlugin.Reason.SECURE_CHAT_BYPASS)
-            .addPlugin("NoEncryption").addPlugin("NoReport")
-            .addPlugin("NoChatReports").addPlugin("NoChatReport").build());
-        return Collections.unmodifiableList(list);
     }
 
     @Override
