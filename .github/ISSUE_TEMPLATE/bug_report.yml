@@ -50,21 +50,12 @@ body:
       label: Steps to Reproduce
       description: |
         List the steps on how we can reproduce the issue. Make sure we can easily understand what you mean with each step.
+        **Please always include the client version(s) with which the issue happens. Ideally also try to find out, from what specific version onward/in what version range the issue happens.**
       placeholder: |
         Example:
         1. Login with a 1.21.3 client
         2. Place a sign
-        3. The sign text is displayed wrong
-    validations:
-      required: true
-
-  - type: textarea
-    attributes:
-      label: Expected Behavior
-      description: |
-        Describe what exactly you expected to happen.
-      placeholder: |
-        Example: "Placed sign text should not disappear."
+        3. The sign text disappears
     validations:
       required: true
 
