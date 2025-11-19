@@ -30,28 +30,21 @@ import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public record PiercingWeapon(float minReach, float maxReach, float hitboxMargin,
-                             boolean dealsKnockback, boolean dismounts,
+public record PiercingWeapon(boolean dealsKnockback, boolean dismounts,
                              @Nullable Holder<SoundEvent> sound, @Nullable Holder<SoundEvent> hitSound) {
 
     public static final Type<PiercingWeapon> TYPE = new Type<>(PiercingWeapon.class) {
         @Override
         public PiercingWeapon read(final ByteBuf buffer) {
-            final float minReach = Types.FLOAT.readPrimitive(buffer);
-            final float maxReach = Types.FLOAT.readPrimitive(buffer);
-            final float hitboxMargin = Types.FLOAT.readPrimitive(buffer);
             final boolean dealsKnockback = Types.BOOLEAN.read(buffer);
             final boolean dismounts = Types.BOOLEAN.read(buffer);
             final Holder<SoundEvent> sound = Types.OPTIONAL_SOUND_EVENT.read(buffer);
             final Holder<SoundEvent> hitSound = Types.OPTIONAL_SOUND_EVENT.read(buffer);
-            return new PiercingWeapon(minReach, maxReach, hitboxMargin, dealsKnockback, dismounts, sound, hitSound);
+            return new PiercingWeapon(dealsKnockback, dismounts, sound, hitSound);
         }
 
         @Override
         public void write(final ByteBuf buffer, final PiercingWeapon value) {
-            Types.FLOAT.writePrimitive(buffer, value.minReach);
-            Types.FLOAT.writePrimitive(buffer, value.maxReach);
-            Types.FLOAT.writePrimitive(buffer, value.hitboxMargin);
             Types.BOOLEAN.write(buffer, value.dealsKnockback);
             Types.BOOLEAN.write(buffer, value.dismounts);
             Types.OPTIONAL_SOUND_EVENT.write(buffer, value.sound);
@@ -61,9 +54,6 @@ public record PiercingWeapon(float minReach, float maxReach, float hitboxMargin,
         @Override
         public void write(final Ops ops, final PiercingWeapon value) {
             ops.writeMap(map -> map
-                .writeOptional("min_reach", Types.FLOAT, value.minReach, 0F)
-                .writeOptional("max_reach", Types.FLOAT, value.maxReach, 3F)
-                .writeOptional("hitbox_margin", Types.FLOAT, value.hitboxMargin, 0.3F)
                 .writeOptional("deals_knockback", Types.BOOLEAN, value.dealsKnockback, true)
                 .writeOptional("dismounts", Types.BOOLEAN, value.dismounts, false)
                 .writeOptional("sound", Types.SOUND_EVENT, value.sound)

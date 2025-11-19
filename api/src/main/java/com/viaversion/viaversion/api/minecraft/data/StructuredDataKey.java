@@ -37,6 +37,7 @@ import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_5;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
+import com.viaversion.viaversion.api.minecraft.item.data.AttackRange;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_21;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
@@ -145,6 +146,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<ToolProperties> TOOL1_20_5 = new StructuredDataKey<>("tool", ToolProperties.TYPE1_20_5);
     public static final StructuredDataKey<ToolProperties> TOOL1_21_5 = new StructuredDataKey<>("tool", ToolProperties.TYPE1_21_5);
     public static final StructuredDataKey<Weapon> WEAPON = new StructuredDataKey<>("weapon", Weapon.TYPE);
+    public static final StructuredDataKey<AttackRange> ATTACK_RANGE = new StructuredDataKey<>("attack_range", AttackRange.TYPE);
     public static final StructuredDataKey<Enchantable> ENCHANTABLE = new StructuredDataKey<>("enchantable", Enchantable.TYPE);
     public static final StructuredDataKey<Equippable> EQUIPPABLE1_21_2 = new StructuredDataKey<>("equippable", Equippable.TYPE1_21_2);
     public static final StructuredDataKey<Equippable> EQUIPPABLE1_21_5 = new StructuredDataKey<>("equippable", Equippable.TYPE1_21_5);
