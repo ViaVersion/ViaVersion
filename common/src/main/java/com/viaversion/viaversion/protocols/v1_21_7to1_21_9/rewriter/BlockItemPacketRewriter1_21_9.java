@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.ResolvableProfile;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
@@ -112,16 +113,23 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
     public static void downgradeData(final Item item, final StructuredDataContainer container) {
         container.replaceKey(StructuredDataKey.BEES1_21_9, StructuredDataKey.BEES1_20_5);
         container.replace(StructuredDataKey.ENTITY_DATA1_21_9, StructuredDataKey.ENTITY_DATA1_20_5, entityData -> {
-            final String id = Protocol1_21_7To1_21_9.MAPPINGS.getEntityMappings().mappedIdentifier(entityData.type());
+            final String id = fixMappingId(Protocol1_21_7To1_21_9.MAPPINGS.getEntityMappings(), entityData.type());
             entityData.tag().putString("id", id);
             return entityData.tag();
         });
         container.replace(StructuredDataKey.BLOCK_ENTITY_DATA1_21_9, StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, blockEntityData -> {
-            final String id = Protocol1_21_7To1_21_9.MAPPINGS.getBlockEntityMappings().mappedIdentifier(blockEntityData.type());
+            final String id = fixMappingId(Protocol1_21_7To1_21_9.MAPPINGS.getBlockEntityMappings(), blockEntityData.type());
             blockEntityData.tag().putString("id", id);
             return blockEntityData.tag();
         });
         container.replace(StructuredDataKey.PROFILE1_21_9, StructuredDataKey.PROFILE1_20_5, ResolvableProfile::profile);
+    }
+
+    private static String fixMappingId(FullMappings mappings, int clientId) {
+        if (mappings == null) {
+            return null;
+        }
+        return mappings.mappedIdentifier(mappings.id(mappings.mappedIdentifier(clientId)));
     }
 
     private void updateBorderCenter(final PacketWrapper wrapper) {
