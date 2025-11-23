@@ -59,7 +59,7 @@ public record EntityData(int type, CompoundTag tag) implements Rewritable, Copya
 
     @Override
     public EntityData rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
-        final int mappedType = protocol.getMappingData().getEntityMappings().getNewId(type);
+        final int mappedType = Rewritable.entityRewriteFunction(protocol, clientbound).applyAsInt(type);
         return new EntityData(mappedType, tag);
     }
 
