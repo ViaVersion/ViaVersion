@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.ResolvableProfile;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
