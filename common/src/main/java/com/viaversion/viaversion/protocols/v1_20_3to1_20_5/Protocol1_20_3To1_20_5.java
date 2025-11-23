@@ -232,13 +232,13 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             final String teamName = wrapper.passthrough(Types.STRING);
             final byte action = wrapper.passthrough(Types.BYTE);
             if (action == 0) {
-                wrapper.passthrough(Types.TAG); // Display name
+                componentRewriter.passthroughAndProcess(wrapper); // Display name
                 wrapper.passthrough(Types.BYTE); // Flags
                 wrapper.passthrough(Types.STRING); // Name Tag Visibility
                 wrapper.passthrough(Types.STRING); // Collision rule
                 wrapper.passthrough(Types.VAR_INT); // Color
-                wrapper.passthrough(Types.TAG); // Prefix
-                wrapper.passthrough(Types.TAG); // Suffix
+                componentRewriter.passthroughAndProcess(wrapper); // Prefix
+                componentRewriter.passthroughAndProcess(wrapper); // Suffix
                 storage.createTeam(teamName);
                 final String[] players = wrapper.passthrough(Types.STRING_ARRAY);
                 storage.addPlayerToTeam(teamName, players);

@@ -90,6 +90,7 @@ public final class Protocol1_21_7To1_21_9 extends AbstractProtocol<ClientboundPa
         componentRewriter.registerBossEvent(ClientboundPackets1_21_6.BOSS_EVENT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_6.DISCONNECT);
         componentRewriter.registerTabList(ClientboundPackets1_21_6.TAB_LIST);
+        componentRewriter.registerSetPlayerTeam1_21_5(ClientboundPackets1_21_6.SET_PLAYER_TEAM);
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21_6.PLAYER_COMBAT_KILL);
         componentRewriter.registerPlayerInfoUpdate1_21_4(ClientboundPackets1_21_6.PLAYER_INFO_UPDATE);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_6.SYSTEM_CHAT);

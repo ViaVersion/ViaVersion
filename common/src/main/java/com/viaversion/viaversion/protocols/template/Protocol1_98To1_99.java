@@ -85,6 +85,7 @@ final class Protocol1_98To1_99 extends AbstractProtocol<ClientboundPacket1_21_6,
         componentRewriter.registerBossEvent(ClientboundPackets1_21_6.BOSS_EVENT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_6.DISCONNECT);
         componentRewriter.registerTabList(ClientboundPackets1_21_6.TAB_LIST);
+        componentRewriter.registerSetPlayerTeam1_21_5(ClientboundPackets1_21_6.SET_PLAYER_TEAM);
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21_6.PLAYER_COMBAT_KILL);
         componentRewriter.registerPlayerInfoUpdate1_21_4(ClientboundPackets1_21_6.PLAYER_INFO_UPDATE);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_6.SYSTEM_CHAT);

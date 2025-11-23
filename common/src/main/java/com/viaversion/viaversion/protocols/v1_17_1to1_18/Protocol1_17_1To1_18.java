@@ -79,6 +79,7 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
         componentRewriter.registerTabList(ClientboundPackets1_17_1.TAB_LIST);
         componentRewriter.registerOpenScreen1_14(ClientboundPackets1_17_1.OPEN_SCREEN);
         componentRewriter.registerPlayerCombatKill(ClientboundPackets1_17_1.PLAYER_COMBAT_KILL);
+        componentRewriter.registerSetPlayerTeam1_13(ClientboundPackets1_17_1.SET_PLAYER_TEAM);
         componentRewriter.registerPing();
 
         registerServerbound(ServerboundPackets1_17.CLIENT_INFORMATION, new PacketHandlers() {

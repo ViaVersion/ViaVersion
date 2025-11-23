@@ -109,6 +109,7 @@ public final class Protocol1_21_5To1_21_6 extends AbstractProtocol<ClientboundPa
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_5.SYSTEM_CHAT);
         componentRewriter.registerDisguisedChat(ClientboundPackets1_21_5.DISGUISED_CHAT);
         componentRewriter.registerPlayerChat1_21_5(ClientboundPackets1_21_5.PLAYER_CHAT);
+        componentRewriter.registerSetPlayerTeam1_21_5(ClientboundPackets1_21_5.SET_PLAYER_TEAM);
         componentRewriter.registerPing();
 
         particleRewriter.registerLevelParticles1_21_4(ClientboundPackets1_21_5.LEVEL_PARTICLES);
