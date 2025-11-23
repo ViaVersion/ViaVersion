@@ -112,12 +112,12 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
     public static void downgradeData(final Item item, final StructuredDataContainer container) {
         container.replaceKey(StructuredDataKey.BEES1_21_9, StructuredDataKey.BEES1_20_5);
         container.replace(StructuredDataKey.ENTITY_DATA1_21_9, StructuredDataKey.ENTITY_DATA1_20_5, entityData -> {
-            final String id = Protocol1_21_7To1_21_9.MAPPINGS.getEntityMappings().mappedIdentifier(entityData.type());
+            final String id = Protocol1_21_7To1_21_9.MAPPINGS.getEntityMappings().identifier(entityData.type());
             entityData.tag().putString("id", id);
             return entityData.tag();
         });
         container.replace(StructuredDataKey.BLOCK_ENTITY_DATA1_21_9, StructuredDataKey.BLOCK_ENTITY_DATA1_20_5, blockEntityData -> {
-            final String id = Protocol1_21_7To1_21_9.MAPPINGS.getBlockEntityMappings().mappedIdentifier(blockEntityData.type());
+            final String id = Protocol1_21_7To1_21_9.MAPPINGS.getBlockEntityMappings().identifier(blockEntityData.type());
             blockEntityData.tag().putString("id", id);
             return blockEntityData.tag();
         });
