@@ -27,22 +27,28 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
-public record AttackRange(float minRange, float maxRange, float hitboxMargin, float mobFactor) {
+public record AttackRange(float minRange, float maxRange,
+                          float minCreativeRange, float maxCreativeRange,
+                          float hitboxMargin, float mobFactor) {
 
     public static final Type<AttackRange> TYPE = new Type<>(AttackRange.class) {
         @Override
         public AttackRange read(final ByteBuf buffer) {
             final float minRange = Types.FLOAT.readPrimitive(buffer);
             final float maxRange = Types.FLOAT.readPrimitive(buffer);
+            final float minCreativeRange = Types.FLOAT.readPrimitive(buffer);
+            final float maxCreativeRange = Types.FLOAT.readPrimitive(buffer);
             final float hitboxMargin = Types.FLOAT.readPrimitive(buffer);
             final float mobFactor = Types.FLOAT.readPrimitive(buffer);
-            return new AttackRange(minRange, maxRange, hitboxMargin, mobFactor);
+            return new AttackRange(minRange, maxRange, minCreativeRange, maxCreativeRange, hitboxMargin, mobFactor);
         }
 
         @Override
         public void write(final ByteBuf buffer, final AttackRange value) {
             Types.FLOAT.writePrimitive(buffer, value.minRange);
             Types.FLOAT.writePrimitive(buffer, value.maxRange);
+            Types.FLOAT.writePrimitive(buffer, value.minCreativeRange);
+            Types.FLOAT.writePrimitive(buffer, value.maxCreativeRange);
             Types.FLOAT.writePrimitive(buffer, value.hitboxMargin);
             Types.FLOAT.writePrimitive(buffer, value.mobFactor);
         }
@@ -52,6 +58,8 @@ public record AttackRange(float minRange, float maxRange, float hitboxMargin, fl
             ops.writeMap(map -> map
                 .writeOptional("min_range", Types.FLOAT, AttackRange.minRange, 0F)
                 .writeOptional("max_range", Types.FLOAT, AttackRange.maxRange, 3F)
+                .writeOptional("min_creative_reach", Types.FLOAT, AttackRange.minCreativeRange, 0F)
+                .writeOptional("max_creative_reach", Types.FLOAT, AttackRange.maxCreativeRange, 5F)
                 .writeOptional("hitbox_margin", Types.FLOAT, AttackRange.hitboxMargin, 0.3F)
                 .writeOptional("mob_factor", Types.FLOAT, AttackRange.mobFactor, 1F));
         }
