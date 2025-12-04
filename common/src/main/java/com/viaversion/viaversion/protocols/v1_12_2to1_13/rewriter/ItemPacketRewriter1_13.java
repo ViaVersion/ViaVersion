@@ -19,10 +19,12 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter;
 
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Ints;
+import com.google.gson.reflect.TypeToken;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
+import com.viaversion.nbt.tag.ShortTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
@@ -32,6 +34,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.BlockIdData;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ItemIds1_12_2;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.MappingData1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.SoundSource1_12_2;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.SpawnEggMappings1_13;
@@ -40,13 +43,21 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.Pair;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
 
 public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_1, ServerboundPackets1_13, Protocol1_12_2To1_13> {
 
@@ -416,6 +427,54 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     rawId = 25100288;
                 }
             }
+
+            // Handle shulker box items
+            final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
+            if (blockEntityTag != null) {
+                ListTag<CompoundTag> listTag = blockEntityTag.getListTag("Items", CompoundTag.class);
+                if (listTag != null) {
+                    ListTag<CompoundTag> newListTag = new ListTag<>(CompoundTag.class);
+                    for (var containerItemTag : listTag) {
+                        var containerItemSlotTag = containerItemTag.getByteTag("Slot");
+                        var containerItemIdTag = containerItemTag.getStringTag("id");
+                        var containerItemId = ItemIds1_12_2.getId(containerItemIdTag.asRawString(), 1);
+                        var containerItemAmountTag = containerItemTag.getByteTag("Count");
+                        var containerItemData = containerItemTag.getShortTag("Damage").asShort();
+                        var containerItemTags = containerItemTag.getCompoundTag("tag");
+
+                        Map<String, String[]> blockIdMapping = new HashMap<>();
+                        InputStream stream = MappingData1_13.class.getClassLoader()
+                            .getResourceAsStream("assets/viaversion/data/blockIds1.12to1.13.json");
+                        try (InputStreamReader reader = new InputStreamReader(stream)) {
+                            Map<String, String[]> map = GsonUtil.getGson().fromJson(
+                                reader,
+                                new TypeToken<Map<String, String[]>>() {
+                                }.getType());
+                            blockIdMapping.putAll(map);
+                        } catch (IOException e) {
+                            Protocol1_12_2To1_13.LOGGER.log(Level.SEVERE, "Failed to load block id mappings", e);
+                        }
+                        int index = isDamageable(containerItemId) ? 0 : containerItemData;
+                        var substring = containerItemIdTag.asRawString().substring(10);
+                        var mappedBlockNameArray = blockIdMapping.get(substring);
+                        //just in case the block wasn't there (means the name did not change from 1.12.2 to 1.13)
+                        var newItemName = "minecraft:" + (mappedBlockNameArray == null ? substring : mappedBlockNameArray[index]);
+
+                        var newContainerItemTag = new CompoundTag();
+                        newContainerItemTag.put("Slot", containerItemSlotTag);
+                        newContainerItemTag.put("id", new StringTag(newItemName));
+                        newContainerItemTag.put("Count", containerItemAmountTag);
+                        newContainerItemTag.put("Damage", new ShortTag((short) 0));
+                        if (containerItemTags != null) {
+                            newContainerItemTag.put("tag", containerItemTags);
+                        }
+
+                        newListTag.add(newContainerItemTag);
+                    }
+                    blockEntityTag.put("Items", newListTag);
+                }
+            }
+
             if (tag.isEmpty()) {
                 item.setTag(tag = null);
             }
@@ -658,6 +717,63 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     }
                 }
                 tag.put("CanDestroy", newCanDestroy);
+            }
+
+            // Handle shulker box items
+            final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
+            if (blockEntityTag != null) {
+                ListTag<CompoundTag> listTag = blockEntityTag.getListTag("Items", CompoundTag.class);
+                if (listTag != null) {
+                    Map<String, String[]> blockIdMapping = new HashMap<>();
+                    InputStream stream = MappingData1_13.class.getClassLoader()
+                        .getResourceAsStream("assets/viaversion/data/blockIds1.12to1.13.json");
+                    try (InputStreamReader reader = new InputStreamReader(stream)) {
+                        Map<String, String[]> map = GsonUtil.getGson().fromJson(
+                            reader,
+                            new TypeToken<Map<String, String[]>>() {
+                            }.getType());
+                        blockIdMapping.putAll(map);
+                    } catch (IOException e) {
+                        Protocol1_12_2To1_13.LOGGER.log(Level.SEVERE, "Failed to load block id mappings", e);
+                    }
+                    Map<String, Pair<String, Short>> itemIdMap = new HashMap<>(Map.of());
+                    blockIdMapping.forEach((string12, strings13) -> {
+                        for (int i = 0; i < strings13.length; i++) {
+                            itemIdMap.put(strings13[i], new Pair<>(string12, (short) i));
+                        }
+                    });
+
+                    ListTag<CompoundTag> newListTag = new ListTag<>(CompoundTag.class);
+                    for (var containerItemTag : listTag) {
+                        var containerItemSlotTag = containerItemTag.getByteTag("Slot");
+                        var containerItemIdTag = containerItemTag.getStringTag("id");
+                        var containerItemAmountTag = containerItemTag.getByteTag("Count");
+                        var containerItemData = containerItemTag.getShortTag("Damage").asShort();
+                        var containerItemTags = containerItemTag.getCompoundTag("tag");
+                        var substring = containerItemIdTag.asRawString().substring(10);
+
+                        Pair<String, Short> mappedPair = itemIdMap.get(substring);
+                        if (mappedPair == null) {
+                            mappedPair = new Pair<>(substring, (short) 0);
+                        }
+
+                        var newItemName = mappedPair.key();
+                        boolean test = mappedPair.value() > (short) 0;
+                        var newItemData = containerItemData == 0 && test ? mappedPair.value() : containerItemData;
+
+                        var newContainerItemTag = new CompoundTag();
+                        newContainerItemTag.put("Slot", containerItemSlotTag);
+                        newContainerItemTag.put("id", new StringTag("minecraft:" + newItemName));
+                        newContainerItemTag.put("Count", containerItemAmountTag);
+                        newContainerItemTag.put("Damage", new ShortTag(newItemData));
+                        if (containerItemTags != null) {
+                            newContainerItemTag.put("tag", containerItemTags);
+                        }
+
+                        newListTag.add(newContainerItemTag);
+                    }
+                    blockEntityTag.put("Items", newListTag);
+                }
             }
         }
         return item;
