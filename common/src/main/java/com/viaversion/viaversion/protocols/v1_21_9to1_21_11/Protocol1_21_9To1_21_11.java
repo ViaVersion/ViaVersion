@@ -19,13 +19,14 @@ package com.viaversion.viaversion.protocols.v1_21_9to1_21_11;
 
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.FloatTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
-import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
@@ -49,6 +50,7 @@ import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundPacket1_21_9;
+import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.data.MappingData1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPacket1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPackets1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.rewriter.BlockItemPacketRewriter1_21_11;
@@ -62,6 +64,9 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
+import com.viaversion.viaversion.util.Key;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -69,7 +74,7 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
 public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundPacket1_21_9, ClientboundPacket1_21_11, ServerboundPacket1_21_9, ServerboundPacket1_21_9> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.21.9", "1.21.11");
+    public static final MappingData1_21_11 MAPPINGS = new MappingData1_21_11();
     private final EntityPacketRewriter1_21_11 entityRewriter = new EntityPacketRewriter1_21_11(this);
     private final BlockItemPacketRewriter1_21_11 itemRewriter = new BlockItemPacketRewriter1_21_11(this);
     private final ParticleRewriter<ClientboundPacket1_21_9> particleRewriter = new ParticleRewriter<>(this);
@@ -93,13 +98,53 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
             temperateZombieNautilus.put("spawn_conditions", new ListTag<>(CompoundTag.class));
             zombieNautilusVariantsPacket.write(Types.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{new RegistryEntry("minecraft:pale", temperateZombieNautilus)});
             zombieNautilusVariantsPacket.send(Protocol1_21_9To1_21_11.class);
+
+            final PacketWrapper timelinePacket = wrapper.create(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA);
+            timelinePacket.write(Types.STRING, "timeline");
+            final RegistryEntry[] timelineEntries = new RegistryEntry[MAPPINGS.timelineRegistry().size()];
+            int index = 0;
+            for (final Map.Entry<String, Tag> entry : MAPPINGS.timelineRegistry().entrySet()) {
+                timelineEntries[index++] = new RegistryEntry(entry.getKey(), entry.getValue());
+            }
+            timelinePacket.write(Types.REGISTRY_ENTRY_ARRAY, timelineEntries);
+            timelinePacket.send(Protocol1_21_9To1_21_11.class);
         });
 
         registryDataRewriter.addHandler("dimension_type", (key, tag) -> {
             final ByteTag trueTag = new ByteTag((byte) 1);
             final CompoundTag attributes = new CompoundTag();
             tag.put("attributes", attributes);
-            moveAttribute(tag, attributes, "cloud_height", "visual/cloud_height", Function.identity(), null);
+
+            if (Key.equals(key, "the_nether")) {
+                tag.put("timelines", new ListTag<>(List.of(new StringTag("villager_schedule"))));
+                tag.putString("skybox", "none");
+                tag.putString("cardinal_light", "nether");
+                attributes.putString("visual/sky_light_color", "#7a7aff");
+                attributes.putFloat("visual/fog_start_distance", 10F);
+                attributes.putFloat("visual/fog_end_distance", 96F);
+                attributes.putFloat("gameplay/sky_light_level", 4F);
+            } else if (Key.equals(key, "the_end")) {
+                tag.put("timelines", new ListTag<>(List.of(new StringTag("villager_schedule"))));
+                tag.putString("skybox", "end");
+                attributes.putString("visual/fog_color", "#181318");
+                attributes.putString("visual/sky_color", "#000000");
+                attributes.putString("visual/sky_light_color", "#e580ff");
+            } else {
+                final ListTag<StringTag> timelines = new ListTag<>(List.of(new StringTag("day"), new StringTag("moon"), new StringTag("early_game")));
+                tag.put("timelines", timelines);
+            }
+
+            if (!tag.getBoolean("natural")) {
+                attributes.putFloat("visual/sky_light_factor", 0F);
+            }
+
+            moveAttribute(tag, attributes, "cloud_height", "visual/cloud_height", cloudHeight -> {
+                if (cloudHeight instanceof NumberTag numberTag) {
+                    attributes.putString("visual/cloud_color", "#ccffffff");
+                    return new FloatTag(numberTag.asFloat());
+                }
+                return null;
+            }, null);
             moveAttribute(tag, attributes, "has_raids", "gameplay/can_start_raid", Function.identity(), trueTag);
             moveAttribute(tag, attributes, "piglin_safe", "gameplay/piglins_zombify", attributeTag -> ((NumberTag) attributeTag).asBoolean() ? ByteTag.ZERO : trueTag, ByteTag.ZERO);
             moveAttribute(tag, attributes, "respawn_anchor_works", "gameplay/respawn_anchor_works", Function.identity(), trueTag);
@@ -111,8 +156,10 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
             final CompoundTag attributes = new CompoundTag();
             tag.put("attributes", attributes);
             moveAttribute(effects, attributes, "sky_color", "visual/sky_color", Function.identity(), new IntTag(0));
-            moveAttribute(effects, attributes, "water_fog_color", "visual/water_fog_color", Function.identity(), new IntTag(-16448205));
-            moveAttribute(effects, attributes, "fog_color", "visual/fog_color", Function.identity(), new IntTag(0));
+            if (!Key.equals(key, "the_end")) {
+                moveAttribute(effects, attributes, "water_fog_color", "visual/water_fog_color", Function.identity(), new IntTag(-16448205));
+                moveAttribute(effects, attributes, "fog_color", "visual/fog_color", Function.identity(), new IntTag(0));
+            }
         });
         registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
 
