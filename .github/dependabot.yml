@@ -5,4 +5,4 @@ updates:
       default-days: 7
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
