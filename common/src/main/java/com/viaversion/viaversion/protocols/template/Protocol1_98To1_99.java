@@ -125,7 +125,7 @@ final class Protocol1_98To1_99 extends AbstractProtocol<ClientboundPacket1_21_6,
 
         // Uncomment if a new particle was added = ids shifted; requires a new Types_ class copied from the last
         /*mappedTypes().particle.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
+          .reader("block", ParticleType.Readers.BLOCK)
             .reader("block_marker", ParticleType.Readers.BLOCK)
             .reader("dust_pillar", ParticleType.Readers.BLOCK)
             .reader("falling_dust", ParticleType.Readers.BLOCK)
@@ -138,6 +138,10 @@ final class Protocol1_98To1_99 extends AbstractProtocol<ClientboundPacket1_21_6,
             .reader("entity_effect", ParticleType.Readers.COLOR)
             .reader("tinted_leaves", ParticleType.Readers.COLOR)
             .reader("trail", ParticleType.Readers.TRAIL1_21_4)
+            .reader("dragon_breath", ParticleType.Readers.POWER)
+            .reader("effect", ParticleType.Readers.SPELL)
+            .reader("instant_effect", ParticleType.Readers.SPELL)
+            .reader("flash", ParticleType.Readers.COLOR)
             .reader("item", ParticleType.Readers.item(itemRewriter.mappedItemType()));*/
 
         super.onMappingDataLoaded(); // Calls load methods on rewriters. Last in case the rewriters access the above filled data

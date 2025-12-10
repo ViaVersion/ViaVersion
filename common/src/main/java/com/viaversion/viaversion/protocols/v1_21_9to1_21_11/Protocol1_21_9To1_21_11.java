@@ -208,6 +208,10 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
             .reader("entity_effect", ParticleType.Readers.COLOR)
             .reader("tinted_leaves", ParticleType.Readers.COLOR)
             .reader("trail", ParticleType.Readers.TRAIL1_21_4)
+            .reader("dragon_breath", ParticleType.Readers.POWER)
+            .reader("effect", ParticleType.Readers.SPELL)
+            .reader("instant_effect", ParticleType.Readers.SPELL)
+            .reader("flash", ParticleType.Readers.COLOR)
             .reader("item", ParticleType.Readers.item(itemRewriter.mappedItemType()));
         mappedTypes().structuredData.filler(this).add(StructuredDataKey.CUSTOM_DATA, StructuredDataKey.MAX_STACK_SIZE, StructuredDataKey.MAX_DAMAGE,
             StructuredDataKey.UNBREAKABLE1_21_5, StructuredDataKey.RARITY, StructuredDataKey.TOOLTIP_DISPLAY, StructuredDataKey.DAMAGE_RESISTANT,
