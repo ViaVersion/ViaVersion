@@ -75,7 +75,10 @@ public record TooltipDisplay(boolean hideTooltip,
 
         final IntSortedSet newHiddenComponents = new IntLinkedOpenHashSet();
         for (final int hiddenComponent : hiddenComponents) {
-            newHiddenComponents.add(Rewritable.rewriteDataComponentType(protocol, clientbound, hiddenComponent));
+            final int mappedId = Rewritable.rewriteDataComponentType(protocol, clientbound, hiddenComponent);
+            if (mappedId != -1) {
+                newHiddenComponents.add(mappedId);
+            }
         }
         return new TooltipDisplay(hideTooltip, newHiddenComponents);
     }
