@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter;
 
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Ints;
-import com.google.gson.reflect.TypeToken;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
@@ -43,21 +42,14 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
-import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Pair;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
 
 public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_1, ServerboundPackets1_13, Protocol1_12_2To1_13> {
 
