@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
+import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
@@ -40,9 +41,9 @@ public record KineticWeapon(int contactCooldownTicks, int delayTicks, @Nullable 
         public KineticWeapon read(final ByteBuf buffer) {
             final int contactCooldownTicks = Types.VAR_INT.readPrimitive(buffer);
             final int delayTicks = Types.VAR_INT.readPrimitive(buffer);
-            final Condition dismountConditions = Condition.TYPE.read(buffer);
-            final Condition knockbackConditions = Condition.TYPE.read(buffer);
-            final Condition damageConditions = Condition.TYPE.read(buffer);
+            final Condition dismountConditions = Condition.OPTIONAL_TYPE.read(buffer);
+            final Condition knockbackConditions = Condition.OPTIONAL_TYPE.read(buffer);
+            final Condition damageConditions = Condition.OPTIONAL_TYPE.read(buffer);
             final float forwardMovement = Types.FLOAT.readPrimitive(buffer);
             final float damageMultiplier = Types.FLOAT.readPrimitive(buffer);
             final Holder<SoundEvent> sound = Types.OPTIONAL_SOUND_EVENT.read(buffer);
@@ -54,9 +55,9 @@ public record KineticWeapon(int contactCooldownTicks, int delayTicks, @Nullable 
         public void write(final ByteBuf buffer, final KineticWeapon value) {
             Types.VAR_INT.writePrimitive(buffer, value.contactCooldownTicks);
             Types.VAR_INT.writePrimitive(buffer, value.delayTicks);
-            Condition.TYPE.write(buffer, value.dismountConditions);
-            Condition.TYPE.write(buffer, value.knockbackConditions);
-            Condition.TYPE.write(buffer, value.damageConditions);
+            Condition.OPTIONAL_TYPE.write(buffer, value.dismountConditions);
+            Condition.OPTIONAL_TYPE.write(buffer, value.knockbackConditions);
+            Condition.OPTIONAL_TYPE.write(buffer, value.damageConditions);
             Types.FLOAT.writePrimitive(buffer, value.forwardMovement);
             Types.FLOAT.writePrimitive(buffer, value.damageMultiplier);
             Types.OPTIONAL_SOUND_EVENT.write(buffer, value.sound);
@@ -105,6 +106,8 @@ public record KineticWeapon(int contactCooldownTicks, int delayTicks, @Nullable 
                     .writeOptional("min_relative_speed", Types.FLOAT, value.minRelativeSpeed, 0F)
                 );
             }
+        };
+        public static final Type<Condition> OPTIONAL_TYPE = new OptionalType<>(TYPE) {
         };
     }
 }
