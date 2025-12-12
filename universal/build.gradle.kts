@@ -1,5 +1,5 @@
 plugins {
-    id("io.papermc.hangar-publish-plugin") version "0.1.3"
+    id("io.papermc.hangar-publish-plugin") version "0.1.4"
     id("com.modrinth.minotaur") version "2.+"
 
     // A nice no-conflict comment for patching in downgrading
