@@ -505,4 +505,12 @@ public interface ViaVersionConfig extends Config {
      * @return the max length of error messages
      */
     int maxErrorLength();
+
+    /**
+     * If enabled, 1.21.11+ clients on 1.8 (or older) servers will get wider entity hitboxes,
+     * but only when attacking with an item.
+     *
+     * @return true if enabled
+     */
+    boolean use1_8HitboxMargin();
 }
