@@ -48,6 +48,19 @@ public record BlocksAttacks(
     @Nullable Holder<SoundEvent> disableSound
 ) implements Rewritable {
 
+    /**
+     * BlocksAttacks data for old swords (1.8.x and older)
+     */
+    public static final BlocksAttacks OLD_SWORD_BLOCKING = new BlocksAttacks(
+        0F,
+        0F,
+        new BlocksAttacks.DamageReduction[]{new BlocksAttacks.DamageReduction(90F, null, -0.5F, 0.5F)},
+        new BlocksAttacks.ItemDamageFunction(0F, 0F, 0F),
+        null,
+        null,
+        null
+    );
+
     public static final Type<BlocksAttacks> TYPE = new Type<>(BlocksAttacks.class) {
 
         @Override
