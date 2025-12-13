@@ -352,7 +352,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         handleItemDataComponentsToClient(connection, item, dataContainer);
 
         // Add data components to fix issues in older protocols
-        appendOldSwordBlockingItemData(connection, item);
+        appendItemDataFixComponents(connection, item);
 
         // Store the data components if necessary for the server, the client only sends data hashes now
         final ItemHashStorage1_21_5 itemHasher = itemHasher(connection);
@@ -506,7 +506,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         return item;
     }
 
-    private void appendOldSwordBlockingItemData(final UserConnection connection, final Item item) {
+    private void appendItemDataFixComponents(final UserConnection connection, final Item item) {
         final ProtocolVersion serverVersion = connection.getProtocolInfo().serverProtocolVersion();
         if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             if (item.identifier() == 858 || item.identifier() == 863 || item.identifier() == 873 || item.identifier() == 868 || item.identifier() == 878) { // swords
