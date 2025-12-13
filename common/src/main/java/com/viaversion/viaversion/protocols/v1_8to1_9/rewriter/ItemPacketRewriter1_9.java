@@ -466,14 +466,14 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
         if (item == null) return null;
         if (item.identifier() == 61) {
             CompoundTag tag = item.tag();
-            if (tag != null && tag.removeUnchecked(nbtTagName("lit_furnace")) != null) {
+            if (tag != null && tag.remove(nbtTagName("lit_furnace")) != null) {
                 item.setIdentifier(62);
                 CompoundTag display = tag.getCompoundTag("display");
                 if (display != null) {
-                    if (display.removeUnchecked(nbtTagName("custom_name")) != null) {
+                    if (display.remove(nbtTagName("custom_name")) != null) {
                         display.remove("Name");
                     }
-                    if (display.removeUnchecked(nbtTagName()) != null) {
+                    if (display.remove(nbtTagName()) != null) {
                         tag.remove("display");
                         if (tag.isEmpty()) {
                             item.setTag(null);
