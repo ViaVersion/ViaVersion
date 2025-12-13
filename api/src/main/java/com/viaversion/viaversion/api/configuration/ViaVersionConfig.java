@@ -498,4 +498,11 @@ public interface ViaVersionConfig extends Config {
      * @return true if enabled
      */
     boolean cancelSwingInInventory();
+
+    /**
+     * Returns the max length of error messages. Longer messages will be truncated unless in debug mode.
+     *
+     * @return the max length of error messages
+     */
+    int maxErrorLength();
 }

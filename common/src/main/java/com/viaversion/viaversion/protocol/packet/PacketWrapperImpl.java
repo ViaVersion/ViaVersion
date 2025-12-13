@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.type.TypeConverter;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.util.ArrayUtil;
 import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
@@ -624,7 +625,7 @@ public class PacketWrapperImpl implements PacketWrapper {
 
         @Override
         public String toString() {
-            return "{" + type + ": " + value + "}";
+            return "{" + type + ": " + ArrayUtil.toString(value) + "}";
         }
     }
 }

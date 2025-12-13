@@ -31,6 +31,8 @@ reload-disconnect-msg: "Server reload, please rejoin!"
 suppress-conversion-warnings: false
 # This can be disabled for debugging purposes if text in chat/entities/items shows an error tag.
 suppress-text-component-conversion-warnings: true
+# Maximum length of error messages in the console.
+max-error-length: 1500
 #
 #----------------------------------------------------------#
 #                    VELOCITY OPTIONS                      #

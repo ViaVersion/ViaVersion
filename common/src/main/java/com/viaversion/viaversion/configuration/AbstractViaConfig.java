@@ -97,6 +97,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean hideScoreboardNumbers;
     private boolean fix1_21PlacementRotation;
     private boolean cancelSwingInInventory;
+    private int maxErrorLength;
 
     protected AbstractViaConfig(final File configFile, final Logger logger) {
         super(configFile, logger);
@@ -165,6 +166,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         cancelSwingInInventory = getBoolean("cancel-swing-in-inventory", true);
         packetTrackerConfig = loadRateLimitConfig(getSection("packet-limiter"), "%pps", 1);
         packetSizeTrackerConfig = loadRateLimitConfig(getSection("packet-size-limiter"), "%bps", 1024);
+        maxErrorLength = getInt("max-error-length", 1500);
     }
 
     protected void updateConfig() {
@@ -605,5 +607,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean cancelSwingInInventory() {
         return cancelSwingInInventory;
+    }
+
+    @Override
+    public int maxErrorLength() {
+        return maxErrorLength;
     }
 }
