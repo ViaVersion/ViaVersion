@@ -137,6 +137,11 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
             if (!tag.getBoolean("natural")) {
                 attributes.putFloat("visual/sky_light_factor", 0F);
             }
+            if (tag.getBoolean("ultrawarm")) {
+                final CompoundTag defaultDripstoneParticle = new CompoundTag();
+                defaultDripstoneParticle.putString("type", "dripping_dripstone_lava");
+                attributes.put("visual/default_dripstone_particle", defaultDripstoneParticle);
+            }
 
             moveAttribute(tag, attributes, "cloud_height", "visual/cloud_height", cloudHeight -> {
                 if (cloudHeight instanceof NumberTag numberTag) {
