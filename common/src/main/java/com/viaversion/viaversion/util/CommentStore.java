@@ -167,7 +167,7 @@ public class CommentStore {
 
         int currentKeyIndents = 0;
         String key = "";
-        for (final String line : rawYaml.split("\n")) {
+        for (final String line : rawYaml.lines().toList()) {
             if (line.isEmpty()) {
                 continue;
             }

@@ -41,6 +41,7 @@ public abstract class Config extends ConfigSection {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setPrettyFlow(false);
+        options.setSplitLines(false);
         options.setIndent(2);
         return new Yaml(new CustomSafeConstructor(), new Representer(options), options);
     });
