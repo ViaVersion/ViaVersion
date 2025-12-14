@@ -382,6 +382,28 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
     @Override
     public @Nullable Item handleItemToClient(final UserConnection connection, @Nullable final Item item) {
         if (item == null) return null;
+        if (item.identifier() == 62) {
+            item.setIdentifier(61);
+            CompoundTag tag = item.tag();
+            if (tag == null) {
+                tag = new CompoundTag();
+            }
+            tag.putBoolean(nbtTagName("lit_furnace"), true);
+
+            CompoundTag display = tag.getCompoundTag("display");
+            if (display == null) {
+                tag.put("display", display = new CompoundTag());
+                display.putBoolean(nbtTagName(), true);
+            }
+
+            StringTag nameTag = display.getStringTag("Name");
+            if (nameTag == null) {
+                nameTag = new StringTag("1.8 Lit Furnace");
+                display.put("Name", nameTag);
+                display.putBoolean(nbtTagName("custom_name"), true);
+            }
+            item.setTag(tag);
+        }
         if (item.identifier() == 383 && item.data() != 0) { // Monster Egg
             CompoundTag tag = item.tag();
             if (tag == null) {
@@ -442,6 +464,24 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
     @Override
     public @Nullable Item handleItemToServer(final UserConnection connection, @Nullable final Item item) {
         if (item == null) return null;
+        if (item.identifier() == 61) {
+            CompoundTag tag = item.tag();
+            if (tag != null && tag.remove(nbtTagName("lit_furnace")) != null) {
+                item.setIdentifier(62);
+                CompoundTag display = tag.getCompoundTag("display");
+                if (display != null) {
+                    if (display.remove(nbtTagName("custom_name")) != null) {
+                        display.remove("Name");
+                    }
+                    if (display.remove(nbtTagName()) != null) {
+                        tag.remove("display");
+                        if (tag.isEmpty()) {
+                            item.setTag(null);
+                        }
+                    }
+                }
+            }
+        }
         if (item.identifier() == 383 && item.data() == 0) { // Monster Egg
             CompoundTag tag = item.tag();
             int data = 0;
