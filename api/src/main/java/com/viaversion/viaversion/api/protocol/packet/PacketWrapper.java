@@ -258,9 +258,7 @@ public interface PacketWrapper {
      * @param packetType packet type of the new packet
      * @return The newly created packet wrapper
      */
-    default PacketWrapper create(PacketType packetType) {
-        return create(packetType.getId());
-    }
+    PacketWrapper create(PacketType packetType);
 
     /**
      * Creates a new packet with values.
@@ -269,9 +267,7 @@ public interface PacketWrapper {
      * @param handler    handler to write to the packet
      * @return newly created packet wrapper
      */
-    default PacketWrapper create(PacketType packetType, PacketHandler handler) throws InformativeException {
-        return create(packetType.getId(), handler);
-    }
+    PacketWrapper create(PacketType packetType, PacketHandler handler) throws InformativeException;
 
     /**
      * Creates a new packet for the target of this packet.

@@ -113,10 +113,10 @@ public class ConfigurationState implements StorableObject {
             packetQueue.add(hasJoinGamePacket ? 1 : 0, toQueuedPacket(clientInformationPacket, false, true));
         }
 
-        final ConfigurationState.QueuedPacket[] queuedPackets = packetQueue.toArray(EMPTY_PACKET_ARRAY);
+        final QueuedPacket[] queuedPackets = packetQueue.toArray(EMPTY_PACKET_ARRAY);
         packetQueue.clear();
 
-        for (final ConfigurationState.QueuedPacket packet : queuedPackets) {
+        for (final QueuedPacket packet : queuedPackets) {
             final PacketWrapper queuedWrapper;
             try {
                 if (packet.packetType() != null) {
@@ -176,7 +176,7 @@ public class ConfigurationState implements StorableObject {
         private final int packetId;
         private final boolean skipCurrentPipeline;
 
-        private QueuedPacket(final ByteBuf buf, final boolean clientbound, final PacketType packetType,
+        private QueuedPacket(final ByteBuf buf, final boolean clientbound, @Nullable final PacketType packetType,
                              final int packetId, final boolean skipCurrentPipeline) {
             this.buf = buf;
             this.clientbound = clientbound;

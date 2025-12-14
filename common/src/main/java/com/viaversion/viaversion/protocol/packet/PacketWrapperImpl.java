@@ -430,6 +430,18 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
+    public PacketWrapperImpl create(final PacketType packetType) {
+        return new PacketWrapperImpl(packetType, null, user());
+    }
+
+    @Override
+    public PacketWrapperImpl create(final PacketType packetType, final PacketHandler handler) throws InformativeException {
+        PacketWrapperImpl wrapper = create(packetType);
+        handler.handle(wrapper);
+        return wrapper;
+    }
+
+    @Override
     public void apply(Direction direction, State state, List<Protocol> pipeline) throws InformativeException, CancelException {
         // Indexed loop to allow additions to the tail
         for (int i = 0, size = pipeline.size(); i < size; i++) {
