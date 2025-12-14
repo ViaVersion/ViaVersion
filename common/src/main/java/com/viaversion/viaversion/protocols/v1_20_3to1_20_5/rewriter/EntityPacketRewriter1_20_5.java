@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
@@ -408,9 +409,18 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     private void sendRangeAttributes(final UserConnection connection, final boolean creativeMode) {
         final PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_20_5.UPDATE_ATTRIBUTES, connection);
         wrapper.write(Types.VAR_INT, tracker(connection).clientEntityId());
-        wrapper.write(Types.VAR_INT, 2); // Number of attributes
-        writeAttribute(wrapper, "player.block_interaction_range", 4.5, creativeMode ? CREATIVE_BLOCK_INTERACTION_RANGE : null, 0.5);
-        writeAttribute(wrapper, "player.entity_interaction_range", 3.0, creativeMode ? CREATIVE_ENTITY_INTERACTION_RANGE : null, 2.0);
+        if (connection.getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
+            wrapper.write(Types.VAR_INT, 3); // Number of attributes
+            this.writeAttribute(wrapper, "generic.step_height", 0.5D, null, 0D);
+        } else {
+            wrapper.write(Types.VAR_INT, 2); // Number of attributes
+        }
+        this.writeAttribute(wrapper, "player.block_interaction_range", 4.5D, creativeMode ? CREATIVE_BLOCK_INTERACTION_RANGE : null, 0.5D);
+        if (connection.getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+            this.writeAttribute(wrapper, "player.entity_interaction_range", 3D, creativeMode ? CREATIVE_ENTITY_INTERACTION_RANGE : null, 1D);
+        } else {
+            this.writeAttribute(wrapper, "player.entity_interaction_range", 3D, creativeMode ? CREATIVE_ENTITY_INTERACTION_RANGE : null, 2D);
+        }
         wrapper.scheduleSend(Protocol1_20_3To1_20_5.class);
     }
 
