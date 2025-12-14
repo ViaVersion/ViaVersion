@@ -31,7 +31,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
@@ -150,19 +149,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                 wrapper.passthrough(Types.BOOLEAN); // Send telemetry
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_19_4.SET_EQUIPMENT, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity ID
-                handler(wrapper -> {
-                    byte slot;
-                    do {
-                        slot = wrapper.passthrough(Types.BYTE);
-                        wrapper.write(Types.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_13_2)));
-                    } while ((slot & 0xFFFFFF80) != 0);
-                });
-            }
-        });
+        registerSetEquipment(ClientboundPackets1_19_4.SET_EQUIPMENT);
 
         new RecipeRewriter1_19_4<>(protocol) {
             @Override

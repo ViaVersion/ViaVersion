@@ -24,6 +24,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
+import com.viaversion.viaversion.api.minecraft.EntityEquipment;
 import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
@@ -55,7 +56,9 @@ import com.viaversion.viaversion.util.KeyMappings;
 import com.viaversion.viaversion.util.TagUtil;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -76,25 +79,6 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         registerTrackerWithData1_19(ClientboundPackets1_20_3.ADD_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
         registerSetEntityData(ClientboundPackets1_20_3.SET_ENTITY_DATA, Types1_20_3.ENTITY_DATA_LIST, VersionedTypes.V1_20_5.entityDataList);
         registerRemoveEntities(ClientboundPackets1_20_3.REMOVE_ENTITIES);
-
-        protocol.registerClientbound(ClientboundPackets1_20_3.SET_EQUIPMENT, wrapper -> {
-            final int entityId = wrapper.passthrough(Types.VAR_INT); // Entity id
-            final EntityType type = tracker(wrapper.user()).entityType(entityId);
-
-            byte slot;
-            do {
-                slot = wrapper.read(Types.BYTE);
-
-                final int rawSlot = slot & 0x7F;
-                if (type != null && type.isOrHasParent(EntityTypes1_20_5.ABSTRACT_HORSE) && rawSlot == 4) {
-                    final boolean lastSlot = (slot & 0xFFFFFF80) == 0;
-                    slot = (byte) (lastSlot ? 6 : 6 | 0xFFFFFF80); // Map chest slot index to body slot index for horses
-                }
-                wrapper.write(Types.BYTE, slot);
-                Item item = protocol.getItemRewriter().handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
-                wrapper.write(VersionedTypes.V1_20_5.item, item);
-            } while ((slot & 0xFFFFFF80) != 0);
-        });
 
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, wrapper -> {
             final PacketWrapper knownPacksPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.SELECT_KNOWN_PACKS);
@@ -483,8 +467,10 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 // Convert dyed color id to carpet item id
                 final PacketWrapper setEquipment = PacketWrapper.create(ClientboundPackets1_20_5.SET_EQUIPMENT, event.user());
                 setEquipment.write(Types.VAR_INT, event.entityId());
-                setEquipment.write(Types.BYTE, (byte) 6);
-                setEquipment.write(VersionedTypes.V1_20_5.item, new StructuredItem(color + 446, 1, new StructuredDataContainer()));
+
+                final List<EntityEquipment> equipmentList = new ArrayList<>(1);
+                equipmentList.add(new EntityEquipment(6, new StructuredItem(color + 446, 1, new StructuredDataContainer())));
+                setEquipment.write(protocol.getItemRewriter().mappedEquipmentType(), equipmentList);
                 setEquipment.scheduleSend(Protocol1_20_3To1_20_5.class);
             } else if (dataIndex > 20) {
                 event.setIndex(dataIndex - 1);

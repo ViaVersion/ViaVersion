@@ -23,6 +23,7 @@ import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.EntityEquipment;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
@@ -38,6 +39,8 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15, ServerboundPackets1_16, Protocol1_15_2To1_16> {
@@ -119,8 +122,11 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
 
                 handler(wrapper -> {
                     int slot = wrapper.read(Types.VAR_INT);
-                    wrapper.write(Types.BYTE, (byte) slot);
-                    handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2));
+                    Item item = handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_13_2));
+
+                    List<EntityEquipment> list = new ArrayList<>(1);
+                    list.add(new EntityEquipment((byte) slot, item));
+                    wrapper.write(mappedEquipmentType(), list);
                 });
             }
         });

@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.misc.EntityEquipmentType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ItemRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter<T> {
@@ -119,5 +120,13 @@ public interface ItemRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter<T
      */
     default String nbtTagName(final String nbt) {
         return nbtTagName() + "|" + nbt;
+    }
+
+    default EntityEquipmentType equipmentType() {
+        return null;
+    }
+
+    default EntityEquipmentType mappedEquipmentType() {
+        return null;
     }
 }

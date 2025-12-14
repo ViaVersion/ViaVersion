@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.item.ItemHasher;
+import com.viaversion.viaversion.api.minecraft.EntityEquipment;
 import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -35,12 +36,14 @@ import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.misc.EntityEquipmentType;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Rewritable;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
@@ -53,6 +56,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     private final Type<Item> mappedItemCostType;
     private final Type<Item> optionalItemCostType;
     private final Type<Item> mappedOptionalItemCostType;
+    private final EntityEquipmentType equipmentType;
+    private final EntityEquipmentType mappedEquipmentType;
 
     public ItemRewriter(T protocol) {
         super(protocol);
@@ -66,6 +71,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         this.mappedItemCostType = mappedTypes.itemCost();
         this.optionalItemCostType = types.optionalItemCost();
         this.mappedOptionalItemCostType = mappedTypes.optionalItemCost();
+        this.equipmentType = new EntityEquipmentType(itemType);
+        this.mappedEquipmentType = new EntityEquipmentType(mappedItemType);
     }
 
     public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType) {
@@ -78,6 +85,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         this.mappedItemCostType = null;
         this.optionalItemCostType = null;
         this.mappedOptionalItemCostType = null;
+        this.equipmentType = new EntityEquipmentType(itemType);
+        this.mappedEquipmentType = new EntityEquipmentType(mappedItemType);
     }
 
     public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType) {
@@ -219,12 +228,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Entity ID
 
-            byte slot;
-            do {
-                slot = wrapper.passthrough(Types.BYTE);
-                // & 0x7F into an extra variable if slot is needed
-                passthroughClientboundItem(wrapper);
-            } while (slot < 0);
+            final List<EntityEquipment> equipmentArray = wrapper.read(equipmentType);
+            equipmentArray.replaceAll(equipment -> equipment.rewrite(wrapper.user(), protocol, true));
+            wrapper.write(mappedEquipmentType, equipmentArray);
         });
     }
 
@@ -615,5 +621,15 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     @Override
     public Type<Item[]> mappedItemArrayType() {
         return mappedItemArrayType;
+    }
+
+    @Override
+    public EntityEquipmentType equipmentType() {
+        return equipmentType;
+    }
+
+    @Override
+    public EntityEquipmentType mappedEquipmentType() {
+        return mappedEquipmentType;
     }
 }

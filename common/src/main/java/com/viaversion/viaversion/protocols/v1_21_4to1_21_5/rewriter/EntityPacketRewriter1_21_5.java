@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.EntityEquipment;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.WolfVariant;
@@ -36,6 +37,8 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -274,8 +277,9 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
     private void sendSaddleEquipment(final EntityDataHandlerEvent event, final boolean saddled) {
         final PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_21_5.SET_EQUIPMENT, event.user());
         equipmentPacket.write(Types.VAR_INT, event.entityId());
-        equipmentPacket.write(Types.BYTE, SADDLE_EQUIPMENT_SLOT);
-        equipmentPacket.write(VersionedTypes.V1_21_5.item, saddled ? new StructuredItem(SADDLE_ITEM_ID, 1) : StructuredItem.empty());
+        final List<EntityEquipment> equipmentList = new ArrayList<>(1);
+        equipmentList.add(new EntityEquipment(SADDLE_EQUIPMENT_SLOT, saddled ? new StructuredItem(SADDLE_ITEM_ID, 1) : StructuredItem.empty()));
+        equipmentPacket.write(protocol.getItemRewriter().mappedEquipmentType(), equipmentList);
         equipmentPacket.send(Protocol1_21_4To1_21_5.class);
     }
 

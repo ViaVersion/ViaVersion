@@ -28,6 +28,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.ParticleMappings;
+import com.viaversion.viaversion.api.minecraft.EntityEquipment;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
@@ -39,6 +40,8 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
@@ -171,6 +174,22 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 tag = new CompoundTag();
             }
             wrapper.write(Types.COMPOUND_TAG, tag);
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_20_3.SET_EQUIPMENT, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.VAR_INT); // Entity id
+            final EntityType type = protocol.getEntityRewriter().tracker(wrapper.user()).entityType(entityId);
+
+            final List<EntityEquipment> equipmentArray = wrapper.read(equipmentType());
+            equipmentArray.replaceAll(equipment -> {
+                int slot = equipment.slot();
+                Item item = handleItemToClient(wrapper.user(), equipment.item());
+                if (type != null && type.isOrHasParent(EntityTypes1_20_5.ABSTRACT_HORSE) && equipment.slot() == 4) {
+                    slot = 6;
+                }
+                return new EntityEquipment(slot, item);
+            });
+            wrapper.write(mappedEquipmentType(), equipmentArray);
         });
 
         registerCooldown(ClientboundPackets1_20_3.COOLDOWN);
