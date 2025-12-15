@@ -279,11 +279,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
                     storage.clear();
 
-                    // Handle creative interaction range
                     final byte gamemode = wrapper.get(Types.BYTE, 0);
-                    if (gamemode == GameMode.CREATIVE.id()) {
-                        sendRangeAttributes(wrapper.user(), true);
-                    }
+                    sendRangeAttributes(wrapper.user(), gamemode == GameMode.CREATIVE.id());
                 });
             }
         });
