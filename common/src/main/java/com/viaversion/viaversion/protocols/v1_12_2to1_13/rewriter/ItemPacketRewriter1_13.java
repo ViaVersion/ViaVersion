@@ -309,10 +309,10 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     CompoundTag enchantmentEntry = new CompoundTag();
                     String newId = Protocol1_12_2To1_13.MAPPINGS.getOldEnchantmentsIds().get(oldId);
                     if (newId == null) {
-                        newId = "viaversion:legacy/" + oldId;
+                        continue;
                     }
                     enchantmentEntry.putString("id", newId);
-                    enchantmentEntry.putShort("lvl", enchEntry.getShort("lvl", (short) 0));
+                    enchantmentEntry.putShort("lvl", enchEntry.getShort("lvl"));
 
                     enchantments.add(enchantmentEntry);
                 }
@@ -333,7 +333,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     short oldId = idTag.asShort();
                     String newId = Protocol1_12_2To1_13.MAPPINGS.getOldEnchantmentsIds().get(oldId);
                     if (newId == null) {
-                        newId = "viaversion:legacy/" + oldId;
+                        continue;
                     }
                     enchantmentEntry.putString("id", newId);
 
