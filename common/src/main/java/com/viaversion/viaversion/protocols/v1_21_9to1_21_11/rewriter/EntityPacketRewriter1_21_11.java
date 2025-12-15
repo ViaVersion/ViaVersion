@@ -21,6 +21,8 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_11;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPacket1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.Protocol1_21_9To1_21_11;
@@ -44,6 +46,14 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
         registerGameEvent(ClientboundPackets1_21_9.GAME_EVENT);
         registerLogin1_20_5(ClientboundPackets1_21_9.LOGIN);
         registerRespawn1_20_5(ClientboundPackets1_21_9.RESPAWN);
+
+        protocol.registerServerbound(ServerboundPackets1_21_6.PLAYER_ACTION, wrapper -> {
+            final int action = wrapper.passthrough(Types.VAR_INT);
+            // cancel spear "stab" packets sent by the client
+            if (action == 7) {
+                wrapper.cancel();
+            }
+        });
 
         protocol.registerClientbound(ClientboundPackets1_21_9.HORSE_SCREEN_OPEN, ClientboundPackets1_21_11.MOUNT_SCREEN_OPEN);
     }
