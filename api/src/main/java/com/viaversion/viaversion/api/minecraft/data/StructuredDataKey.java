@@ -159,6 +159,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<PiercingWeapon> PIERCING_WEAPON = new StructuredDataKey<>("piercing_weapon", PiercingWeapon.TYPE);
     public static final StructuredDataKey<KineticWeapon> KINETIC_WEAPON = new StructuredDataKey<>("kinetic_weapon", KineticWeapon.TYPE);
     public static final StructuredDataKey<SwingAnimation> SWING_ANIMATION = new StructuredDataKey<>("swing_animation", SwingAnimation.TYPE);
+    public static final StructuredDataKey<Integer> ADDITIONAL_TRADE_COST = new StructuredDataKey<>("additional_trade_cost", Types.VAR_INT);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS1_20_5 = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE1_20_5);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS1_21_5 = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE1_21_5);
     public static final StructuredDataKey<DyedColor> DYED_COLOR1_20_5 = new StructuredDataKey<>("dyed_color", DyedColor.TYPE1_20_5);
