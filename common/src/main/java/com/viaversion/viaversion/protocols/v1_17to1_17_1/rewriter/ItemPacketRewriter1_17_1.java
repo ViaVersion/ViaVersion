@@ -34,9 +34,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPackets1_17, ServerboundPackets1_17, Protocol1_17To1_17_1> {
 
-    private static final StringType PAGE_STRING_TYPE = new StringType(8192);
-    private static final StringType TITLE_STRING_TYPE = new StringType(128);
-
     public ItemPacketRewriter1_17_1(Protocol1_17To1_17_1 protocol) {
         super(protocol, Types.ITEM1_13_2, Types.ITEM1_13_2_SHORT_ARRAY);
     }
