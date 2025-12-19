@@ -132,7 +132,7 @@ public class PacketTracker {
 
     public boolean isPacketLimiterEnabled() {
         ViaVersionConfig config = Via.getConfig();
-        return packetLimiterEnabled && config.getPacketTrackerConfig().enabled() && config.getPacketSizeTrackerConfig().enabled();
+        return packetLimiterEnabled && (config.getPacketTrackerConfig().enabled() || config.getPacketSizeTrackerConfig().enabled());
     }
 
     public void setPacketLimiterEnabled(boolean packetLimiterEnabled) {
