@@ -257,11 +257,19 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         final ListTag<CompoundTag> terms;
         if (requirements != null && (terms = requirements.getListTag("terms", CompoundTag.class)) != null) {
             for (final CompoundTag term : terms) {
-                final CompoundTag predicate = term.getCompoundTag("predicate");
-                if (predicate != null && Key.equals(term.getString("condition"), "entity_properties")) {
-                    updateType(predicate, "type", protocol.getMappingData().getEntityMappings());
-                }
+                updateEnchantmentTerm(term);
             }
+        }
+    }
+
+    private void updateEnchantmentTerm(final CompoundTag term) {
+        if (Key.equals(term.getString("condition"), "entity_properties")) {
+            final CompoundTag predicate = term.getCompoundTag("predicate");
+            if (predicate != null) {
+                updateType(predicate, "type", protocol.getMappingData().getEntityMappings());
+            }
+        } else if (Key.equals(term.getString("condition"), "block_state_property")) {
+            updateType(term, "block", protocol.getMappingData().getFullBlockMappings());
         }
     }
 
@@ -299,20 +307,34 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         final Consumer<CompoundTag> rewriter = enchantmentEffectHandlers.get(effect);
         if (rewriter != null) {
             rewriter.accept(effectTag);
+        } else if (effect.equals("play_sound")) {
+            updateType(effectTag, "sound", protocol.getMappingData().getFullSoundMappings());
         }
     }
 
     protected void updateType(final CompoundTag tag, final String key, final FullMappings mappings) {
-        final StringTag typeTag = tag.getStringTag(key);
+        final Tag typeTag = tag.get(key);
         if (typeTag == null || mappings == null) {
             return;
         }
 
-        String mappedType = mappings.mappedIdentifier(typeTag.getValue());
+        if (typeTag instanceof StringTag stringTag) {
+            setMappedOrDummyId(mappings, stringTag);
+        } else if (typeTag instanceof ListTag<?> listTag && listTag.getElementType() == StringTag.class) {
+            //noinspection unchecked
+            final ListTag<StringTag> typesTag = (ListTag<StringTag>) listTag;
+            for (final StringTag entry : typesTag) {
+                setMappedOrDummyId(mappings, entry);
+            }
+        }
+    }
+
+    private void setMappedOrDummyId(final FullMappings mappings, final StringTag tag) {
+        String mappedType = mappings.mappedIdentifier(tag.getValue());
         if (mappedType == null) {
             mappedType = mappings.mappedIdentifier(0); // Dummy
         }
-        typeTag.setValue(mappedType);
+        tag.setValue(mappedType);
     }
 
     private void updateItemList(final ListTag<StringTag> listTag) {
