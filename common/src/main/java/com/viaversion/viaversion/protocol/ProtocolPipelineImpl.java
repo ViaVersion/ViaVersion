@@ -119,12 +119,13 @@ public class ProtocolPipelineImpl implements ProtocolPipeline {
     }
 
     private void logPacket(Direction direction, State state, PacketWrapper packetWrapper, int originalID, boolean post) {
+        final String stage = post ? "[POST]" : "[PRE ]";
         ProtocolInfo protocolInfo = userConnection.getProtocolInfo();
         String actualUsername = protocolInfo.getUsername();
         String username = actualUsername != null ? actualUsername + " " : "";
         Via.getPlatform().getLogger().log(Level.INFO, "{0}: {1}{2} {3}: {4} ({5}) -> {6} ({7}) [{8}] {9}",
             new Object[]{
-                post ? "Post" : "Pre",
+                stage,
                 username,
                 direction,
                 state,
