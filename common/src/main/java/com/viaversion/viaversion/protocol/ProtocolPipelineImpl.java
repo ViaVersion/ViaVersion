@@ -119,7 +119,7 @@ public class ProtocolPipelineImpl implements ProtocolPipeline {
     }
 
     private void logPacket(Direction direction, State state, PacketWrapper packetWrapper, int originalID, boolean post) {
-        final String stage = post ? "[POST]" : "[PRE ]";
+        final String stage = post ? "POST" : "PRE ";
         ProtocolInfo protocolInfo = userConnection.getProtocolInfo();
         String actualUsername = protocolInfo.getUsername();
         String username = actualUsername != null ? actualUsername + " " : "";
