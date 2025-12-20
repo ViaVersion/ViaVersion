@@ -21,16 +21,15 @@ import com.viaversion.viaversion.api.debug.DebugHandler;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import java.util.HashSet;
 import java.util.Set;
 
 public final class DebugHandlerImpl implements DebugHandler {
 
     private final Set<String> packetTypesToLog = new HashSet<>();
-    private final IntSet clientboundPacketIdsToLog = new IntOpenHashSet();
-    private final IntSet serverboundPacketIdsToLog = new IntOpenHashSet();
+    private final Set<PacketType> clientboundPacketsToLog = new HashSet<>();
+    private final Set<PacketType> serverboundPacketsToLog = new HashSet<>();
     private boolean logPrePacketTransform = true;
     private boolean logPostPacketTransform;
     private boolean enabled;
@@ -52,7 +51,7 @@ public final class DebugHandlerImpl implements DebugHandler {
 
     @Override
     public void addPacketTypeToLog(PacketType packetType) {
-        (packetType.direction() == Direction.SERVERBOUND ? serverboundPacketIdsToLog : clientboundPacketIdsToLog).add(packetType.getId());
+        (packetType.direction() == Direction.SERVERBOUND ? serverboundPacketsToLog : clientboundPacketsToLog).add(packetType);
     }
 
     @Override
@@ -61,8 +60,15 @@ public final class DebugHandlerImpl implements DebugHandler {
     }
 
     @Override
+    public boolean removePacketTypeToLog(final PacketType packetType) {
+        return (packetType.direction() == Direction.SERVERBOUND ? serverboundPacketsToLog : clientboundPacketsToLog).remove(packetType);
+    }
+
+    @Override
     public void clearPacketTypesToLog() {
         packetTypesToLog.clear();
+        serverboundPacketsToLog.clear();
+        clientboundPacketsToLog.clear();
     }
 
     @Override
@@ -87,8 +93,21 @@ public final class DebugHandlerImpl implements DebugHandler {
 
     @Override
     public boolean shouldLog(final PacketWrapper wrapper, final Direction direction) {
-        return packetTypesToLog.isEmpty() && serverboundPacketIdsToLog.isEmpty() && clientboundPacketIdsToLog.isEmpty()
-            || (wrapper.getPacketType() != null && packetTypesToLog.contains(wrapper.getPacketType().getName()))
-            || (direction == Direction.SERVERBOUND ? serverboundPacketIdsToLog : clientboundPacketIdsToLog).contains(wrapper.getId());
+        if (packetTypesToLog.isEmpty() && serverboundPacketsToLog.isEmpty() && clientboundPacketsToLog.isEmpty()) {
+            return true;
+        }
+
+        final Set<PacketType> packetTypes = direction == Direction.SERVERBOUND ? serverboundPacketsToLog : clientboundPacketsToLog;
+        if (wrapper.getPacketType() != null) {
+            return packetTypesToLog.contains(wrapper.getPacketType().getName()) || packetTypes.contains(wrapper.getPacketType());
+        }
+
+        final State state = wrapper.user().getProtocolInfo().getState(direction);
+        for (final PacketType packetType : packetTypes) {
+            if (packetType.getId() == wrapper.getId() && packetType.state() == state) {
+                return true;
+            }
+        }
+        return false;
     }
 }
