@@ -67,6 +67,13 @@ public interface DebugHandler {
     boolean removePacketTypeNameToLog(String packetTypeName);
 
     /**
+     * Removes a packet type from the list of packet types to log.
+     *
+     * @param packetType Packet type to remove
+     */
+    boolean removePacketTypeToLog(PacketType packetType);
+
+    /**
      * Resets packet type filters.
      */
     void clearPacketTypesToLog();
@@ -121,7 +128,12 @@ public interface DebugHandler {
      */
     boolean shouldLog(PacketWrapper wrapper, Direction direction);
 
-    default void enableAndLogIds(final PacketType... packetTypes) {
+    /**
+     * Enables debug mode and adds the given packet types to the log list.
+     *
+     * @param packetTypes packet types to log
+     */
+    default void enableAndLogTypes(final PacketType... packetTypes) {
         setEnabled(true);
         for (final PacketType packetType : packetTypes) {
             addPacketTypeToLog(packetType);
