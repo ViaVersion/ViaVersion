@@ -52,7 +52,7 @@ public interface DebugHandler {
     void addPacketTypeNameToLog(String packetTypeName);
 
     /**
-     * Adds a packet id to the list of packet types to log.
+     * Adds a packet type to the list of packet types to log.
      * Packets will be checked on each protocol transformer, so this is best used on single protocol pipes.
      *
      * @param packetType packet type
