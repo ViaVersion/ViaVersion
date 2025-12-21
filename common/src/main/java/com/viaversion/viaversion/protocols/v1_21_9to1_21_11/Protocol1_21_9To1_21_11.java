@@ -177,12 +177,15 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_9.SET_SUBTITLE_TEXT);
         componentRewriter.registerBossEvent(ClientboundPackets1_21_9.BOSS_EVENT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_9.DISCONNECT);
+        componentRewriter.registerComponentPacket(ClientboundConfigurationPackets1_21_9.DISCONNECT);
         componentRewriter.registerTabList(ClientboundPackets1_21_9.TAB_LIST);
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21_9.PLAYER_COMBAT_KILL);
         componentRewriter.registerPlayerInfoUpdate1_21_4(ClientboundPackets1_21_9.PLAYER_INFO_UPDATE);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_9.SYSTEM_CHAT);
         componentRewriter.registerDisguisedChat(ClientboundPackets1_21_9.DISGUISED_CHAT);
         componentRewriter.registerPlayerChat1_21_5(ClientboundPackets1_21_9.PLAYER_CHAT);
+        componentRewriter.registerSetObjective(ClientboundPackets1_21_9.SET_OBJECTIVE);
+        componentRewriter.registerSetScore1_20_3(ClientboundPackets1_21_9.SET_SCORE);
         componentRewriter.registerPing();
 
         particleRewriter.registerLevelParticles1_21_4(ClientboundPackets1_21_9.LEVEL_PARTICLES);

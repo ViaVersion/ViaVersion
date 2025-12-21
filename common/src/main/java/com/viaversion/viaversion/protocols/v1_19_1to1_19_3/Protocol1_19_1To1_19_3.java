@@ -117,6 +117,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
         componentRewriter.registerOpenScreen1_14(ClientboundPackets1_19_1.OPEN_SCREEN);
         componentRewriter.registerPlayerCombatKill(ClientboundPackets1_19_1.PLAYER_COMBAT_KILL);
         componentRewriter.registerSetPlayerTeam1_13(ClientboundPackets1_19_1.SET_PLAYER_TEAM);
+        componentRewriter.registerSetObjective(ClientboundPackets1_19_1.SET_OBJECTIVE);
         componentRewriter.registerPing();
 
         final CommandRewriter<ClientboundPackets1_19_1> commandRewriter = new CommandRewriter<>(this) {

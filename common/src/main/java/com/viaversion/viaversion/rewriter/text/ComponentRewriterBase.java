@@ -100,6 +100,25 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
         });
     }
 
+    public void registerSetObjective(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.STRING); // Objective Name
+            final byte action = wrapper.passthrough(Types.BYTE);
+            if (action == 0 || action == 2) {
+                passthroughAndProcess(wrapper); // Display Name
+            }
+        });
+    }
+
+    public void registerSetScore1_20_3(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.STRING); // Owner
+            wrapper.passthrough(Types.STRING); // Objective name
+            wrapper.passthrough(Types.VAR_INT); // Score
+            passthroughAndProcessOptional(wrapper);
+        });
+    }
+
     public void registerSetPlayerTeam1_13(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.STRING); // Team Name
