@@ -69,13 +69,6 @@ public final class BlockItemPacketRewriter1_21_11 extends StructuredItemRewriter
         recipeRewriter.registerRecipeBookAdd(ClientboundPackets1_21_9.RECIPE_BOOK_ADD);
         recipeRewriter.registerPlaceGhostRecipe(ClientboundPackets1_21_9.PLACE_GHOST_RECIPE);
 
-        protocol.registerClientbound(ClientboundPackets1_21_9.SET_TIME, wrapper -> {
-            final long gameTime = wrapper.passthrough(Types.LONG);
-            wrapper.user().get(GameTimeStorage.class).setGameTime(gameTime);
-        });
-        protocol.registerServerbound(ServerboundPackets1_21_6.CLIENT_TICK_END, wrapper -> {
-            wrapper.user().get(GameTimeStorage.class).incrementGameTime();
-        });
         protocol.registerClientbound(ClientboundPackets1_21_9.SET_BORDER_LERP_SIZE, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // oldSize
             wrapper.passthrough(Types.DOUBLE); // newSize
@@ -90,6 +83,13 @@ public final class BlockItemPacketRewriter1_21_11 extends StructuredItemRewriter
             wrapper.passthrough(Types.VAR_INT); // newAbsoluteMaxSize
             wrapper.passthrough(Types.VAR_INT); // warningBlocks
             wrapper.passthrough(Types.VAR_INT); // warningTime
+        });
+        protocol.registerClientbound(ClientboundPackets1_21_9.SET_TIME, wrapper -> {
+            final long gameTime = wrapper.passthrough(Types.LONG);
+            wrapper.user().get(GameTimeStorage.class).setGameTime(gameTime);
+        });
+        protocol.registerServerbound(ServerboundPackets1_21_6.CLIENT_TICK_END, wrapper -> {
+            wrapper.user().get(GameTimeStorage.class).incrementGameTime();
         });
     }
 
