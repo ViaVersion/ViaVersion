@@ -23,7 +23,6 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.StringType;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.Protocol1_17To1_17_1;
@@ -53,7 +52,7 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
             wrapper.passthrough(Types.BYTE); // Container id
             wrapper.write(Types.VAR_INT, 0); // Add arbitrary state id
             wrapper.passthrough(Types.SHORT); // Slot id
-            passthroughClientboundItemAndTrackHash(wrapper);
+            passthroughClientboundItem(wrapper);
         });
 
         protocol.registerClientbound(ClientboundPackets1_17.CONTAINER_SET_CONTENT, wrapper -> {
@@ -61,7 +60,7 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
             wrapper.write(Types.VAR_INT, 0); // Add arbitrary state id
             Item[] items = wrapper.passthroughAndMap(Types.ITEM1_13_2_SHORT_ARRAY, Types.ITEM1_13_2_ARRAY);
             for (int i = 0; i < items.length; i++) {
-                items[i] = handleItemToClientAndTrackHash(wrapper.user(), items[i]);
+                items[i] = handleItemToClient(wrapper.user(), items[i]);
             }
 
             wrapper.write(Types.ITEM1_13_2, null);
@@ -95,7 +94,34 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
             return item;
         }
 
-        ListTag<CompoundTag> enchantments = tag.getListTag("Enchantments", CompoundTag.class);
+        restoreInvalidEnchantments(tag, "Enchantments");
+        restoreInvalidEnchantments(tag, "StoredEnchantments");
+
+        return item;
+    }
+
+    @Override
+    public Item handleItemToClient(UserConnection connection, Item item) {
+        if (item == null) return null;
+
+        CompoundTag tag = item.tag();
+        if (tag == null) {
+            return item;
+        }
+
+        int hideFlags = tag.getInt("HideFlags");
+        if ((hideFlags & 1) == 0) {
+            substituteInvalidEnchantments(tag, "Enchantments");
+        }
+        if ((hideFlags & 1 << 5) == 0) {
+            substituteInvalidEnchantments(tag, "StoredEnchantments");
+        }
+
+        return item;
+    }
+
+    private static void restoreInvalidEnchantments(CompoundTag tag, String tagName) {
+        ListTag<CompoundTag> enchantments = tag.getListTag(tagName, CompoundTag.class);
         if (enchantments != null) {
             int oobEnchantments = 0;
             for (final CompoundTag enchantment : enchantments) {
@@ -114,99 +140,42 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
                 }
             }
         }
+    }
 
-        enchantments = tag.getListTag("StoredEnchantments", CompoundTag.class);
-        if (enchantments != null) {
-            int oobEnchantments = 0;
-            for (final CompoundTag enchantment : enchantments) {
-                if (enchantment.contains("restore_id")) {
-                    enchantment.put("id", enchantment.remove("oob_id"));
-                    enchantment.put("lvl", enchantment.remove("oob_lvl"));
-                    oobEnchantments += 1;
-                }
+    private static void substituteInvalidEnchantments(CompoundTag tag, String tagName) {
+        ListTag<CompoundTag> enchantments = tag.getListTag(tagName, CompoundTag.class);
+        if (enchantments == null) {
+            return;
+        }
+
+        for (final CompoundTag enchantment : enchantments.getValue()) {
+            short lvl = enchantment.getShort("lvl");
+            if (lvl >= 0 && lvl <= 255) {
+                continue;
+            }
+
+            String id = enchantment.getString("id");
+            if (id == null) {
+                continue;
             }
 
             CompoundTag display = tag.getCompoundTag("display");
-            if (display != null) {
-                ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
-                if (lore != null) {
-                    lore.getValue().subList(0, oobEnchantments).clear();
-                }
+            if (display == null) {
+                tag.put("display", display = new CompoundTag());
             }
-        }
 
-        return item;
-    }
-
-    @Override
-    public Item handleItemToClient(UserConnection connection, Item item) {
-        if (item == null) return null;
-
-        CompoundTag tag = item.tag();
-        if (tag == null) {
-            return item;
-        }
-
-        int hideFlags = tag.getInt("HideFlags");
-
-        ListTag<CompoundTag> enchantments = tag.getListTag("Enchantments", CompoundTag.class);
-        if (enchantments != null && (hideFlags & 1) == 0) {
-            for (final CompoundTag enchantment : enchantments.getValue()) {
-                short lvl = enchantment.getShort("lvl");
-                if (lvl >= 0 && lvl <= 255) continue;
-
-                String id = enchantment.getString("id");
-                if (id == null) continue;
-
-                CompoundTag display = tag.getCompoundTag("display");
-                if (display == null) {
-                    tag.put("display", display = new CompoundTag());
-                }
-
-                ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
-                if (lore == null) {
-                    display.put("Lore", lore = new ListTag<>(StringTag.class));
-                }
-
-                int separator = id.indexOf(':');
-                String namespace = separator >= 1 ? id.substring(0, separator) : "minecraft";
-                String path = separator >= 0 ? id.substring(separator + 1) : id;
-                lore.getValue().add(0, new StringTag("{\"italic\":false,\"color\":\"gray\",\"translate\":\"enchantment." + namespace + "." + path + "\",\"extra\":[\" \",{\"translate\":\"enchantment.level." + lvl + "\"}]}"));
-
-                enchantment.put("oob_id", enchantment.remove("id"));
-                enchantment.put("oob_lvl", enchantment.remove("lvl"));
+            ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
+            if (lore == null) {
+                display.put("Lore", lore = new ListTag<>(StringTag.class));
             }
+
+            int separator = id.indexOf(':');
+            String namespace = separator >= 1 ? id.substring(0, separator) : "minecraft";
+            String path = separator >= 0 ? id.substring(separator + 1) : id;
+            lore.getValue().add(0, new StringTag("{\"italic\":false,\"color\":\"gray\",\"translate\":\"enchantment." + namespace + "." + path + "\",\"extra\":[\" \",{\"translate\":\"enchantment.level." + lvl + "\"}]}"));
+
+            enchantment.put("oob_id", enchantment.remove("id"));
+            enchantment.put("oob_lvl", enchantment.remove("lvl"));
         }
-
-        enchantments = tag.getListTag("StoredEnchantments", CompoundTag.class);
-        if (enchantments != null && (hideFlags & 1 << 5) == 0) {
-            for (final CompoundTag enchantment : enchantments.getValue()) {
-                short lvl = enchantment.getShort("lvl");
-                if (lvl >= 0 && lvl <= 255) continue;
-
-                String id = enchantment.getString("id");
-                if (id == null) continue;
-
-                CompoundTag display = tag.getCompoundTag("display");
-                if (display == null) {
-                    tag.put("display", display = new CompoundTag());
-                }
-
-                ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
-                if (lore == null) {
-                    display.put("Lore", lore = new ListTag<>(StringTag.class));
-                }
-
-                int separator = id.indexOf(':');
-                String namespace = separator >= 1 ? id.substring(0, separator) : "minecraft";
-                String path = separator >= 0 ? id.substring(separator + 1) : id;
-                lore.getValue().add(0, new StringTag("{\"italic\":false,\"color\":\"gray\",\"translate\":\"enchantment." + namespace + "." + path + "\",\"extra\":[\" \",{\"translate\":\"enchantment.level." + lvl + "\"}]}"));
-
-                enchantment.put("oob_id", enchantment.remove("id"));
-                enchantment.put("oob_lvl", enchantment.remove("lvl"));
-            }
-        }
-
-        return item;
     }
 }
