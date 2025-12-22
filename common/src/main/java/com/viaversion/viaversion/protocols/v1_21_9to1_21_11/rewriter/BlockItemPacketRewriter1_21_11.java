@@ -80,9 +80,6 @@ public final class BlockItemPacketRewriter1_21_11 extends StructuredItemRewriter
             wrapper.passthrough(Types.DOUBLE); // oldSize
             wrapper.passthrough(Types.DOUBLE); // newSize
             wrapper.write(Types.VAR_LONG, wrapper.read(Types.VAR_LONG) / 50); // lerpTime
-            wrapper.passthrough(Types.VAR_INT); // newAbsoluteMaxSize
-            wrapper.passthrough(Types.VAR_INT); // warningBlocks
-            wrapper.passthrough(Types.VAR_INT); // warningTime
         });
         protocol.registerClientbound(ClientboundPackets1_21_9.SET_TIME, wrapper -> {
             final long gameTime = wrapper.passthrough(Types.LONG);
