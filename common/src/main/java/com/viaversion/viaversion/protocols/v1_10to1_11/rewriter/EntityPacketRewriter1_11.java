@@ -396,7 +396,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                 }
             }
         } catch (Exception e) {
-            if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
+            if (Via.getConfig().logEntityDataErrors()) {
                 protocol.getLogger().warning("An error occurred with entity type rewriter");
                 protocol.getLogger().warning("Entity data: " + entityData);
                 protocol.getLogger().log(Level.WARNING, "Error: ", e);

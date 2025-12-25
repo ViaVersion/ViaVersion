@@ -141,7 +141,7 @@ public abstract class PacketHandlers implements PacketHandler {
             try {
                 handler.handle(h);
             } catch (Exception e) {
-                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                if (Via.getConfig().logOtherConversionWarnings()) {
                     Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
                 }
                 h.cancel();

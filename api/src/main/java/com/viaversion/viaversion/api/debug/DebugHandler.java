@@ -147,7 +147,7 @@ public interface DebugHandler {
      * @param t     thrown exception
      */
     default void error(final String error, final Throwable t) {
-        if (!Via.getConfig().isSuppressConversionWarnings() || enabled()) {
+        if (Via.getConfig().logOtherConversionWarnings() || enabled()) {
             Via.getPlatform().getLogger().log(Level.SEVERE, error, t);
         }
     }

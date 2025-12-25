@@ -321,7 +321,7 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
         try {
             return uglyJsonToTagUncaught(connection, value);
         } catch (final Exception e) {
-            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting json text component: " + StringUtil.forLogging(value), e);
             }
             return new StringTag("<error>");

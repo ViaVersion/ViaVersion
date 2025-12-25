@@ -354,7 +354,7 @@ public class MappingDataBase implements MappingData {
      */
     protected int checkValidity(final int id, final int mappedId, final String type) {
         if (mappedId == -1) {
-            if (!Via.getConfig().isSuppressConversionWarnings()) {
+            if (Via.getConfig().logOtherConversionWarnings()) {
                 getLogger().warning(String.format("Missing %s %s for %s %s %d", mappedVersion, type, unmappedVersion, type, id));
             }
             return 0;

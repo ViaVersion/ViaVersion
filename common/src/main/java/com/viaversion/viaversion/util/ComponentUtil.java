@@ -65,7 +65,7 @@ public final class ComponentUtil {
             final TextComponent component = SerializerVersion.V1_20_3.toComponent(tag);
             return component != null ? SerializerVersion.V1_19_4.toJson(component) : null;
         } catch (final Exception e) {
-            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting tag: " + StringUtil.forLogging(tag), e);
             }
             return plainToJson("<error>");
@@ -81,7 +81,7 @@ public final class ComponentUtil {
             final TextComponent component = SerializerVersion.V1_19_4.toComponent(element);
             return trimStrings(SerializerVersion.V1_20_3.toTag(component));
         } catch (final Exception e) {
-            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting component: " + StringUtil.forLogging(element), e);
             }
             return new StringTag("<error>");
@@ -110,7 +110,7 @@ public final class ComponentUtil {
             final TextComponent component = SerializerVersion.V1_20_5.toComponent(tag);
             return component != null ? SerializerVersion.V1_20_3.toString(component) : null;
         } catch (final Exception e) {
-            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting tag: " + StringUtil.forLogging(tag), e);
             }
             return plainToJson("<error>").toString();

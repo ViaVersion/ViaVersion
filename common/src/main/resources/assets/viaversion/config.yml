@@ -21,19 +21,29 @@ block-versions: []
 block-protocols: []
 # Change the blocked disconnect message
 block-disconnect-msg: "You are using an unsupported Minecraft version!"
-# Whether to log more info about kicks due to blocked protocol versions to the console.
-log-blocked-joins: false
 # If you use ProtocolLib, we can't reload without kicking the players.
 # (We don't suggest using reload either, use a plugin manager)
 # You can customize the message we kick people with if you use ProtocolLib here.
 reload-disconnect-msg: "Server reload, please rejoin!"
-# We warn when there's an error converting item/block or component/nbt data over versions, should we suppress these? (Only suggested if spamming)
-suppress-conversion-warnings: false
-# This can be disabled for debugging purposes if text in chat/entities/items shows an error tag.
-suppress-text-component-conversion-warnings: true
-# Maximum length of error messages in the console.
-max-error-length: 1500
+# Settings for logging behavior. When debugging issues, we may ask you to change some of these.
+# Most of these are disabled by default to prevent log spam from bad user input.
+logging:
+  # Whether to log more info about kicks due to blocked protocol versions to the console.
+  log-blocked-joins: false
+  # Whether to log errors during entity data conversion.
+  log-entity-data-errors: true
+  # Whether to log errors during text component conversion.
+  log-text-component-conversion-errors: false
+  # Whether to warn for other issues when converting items, blocks, or other data between server and client.
+  log-other-conversion-warnings: false
+  # Maximum length of error messages in the console.
+  max-error-length: 1500
 #
+# Used for auto updating config files. Do not touch.
+config-version: 1
+init-config-version: 1
+# Whether to update config values that were left on their default to newly changed defaults. Recommended to keep enabled.
+migrate-default-config-changes: true
 #----------------------------------------------------------#
 #                    VELOCITY OPTIONS                      #
 #----------------------------------------------------------#
@@ -72,9 +82,9 @@ packet-limiter:
   max-per-second-kick-message: "You are sending too many packets!"
   #
   # We can also kick them if they repeatedly send too many packets over a longer period of time.
-  # E.g. if a player sends over 150 packets per second for 4 out of 7 seconds, we kick them.
+  # E.g. if a player sends over 200 packets per second for 4 out of 7 seconds, we kick them.
   # The maximum packets per second a client can send over a longer period of time.
-  sustained-max-per-second: 150
+  sustained-max-per-second: 200
   # Period to track in seconds.
   sustained-period-seconds: 7
   # The number of seconds within the interval that the client can exceed the limit before being kicked.
@@ -194,8 +204,6 @@ cancel-swing-in-inventory: true
 prevent-collision: true
 # If the above is true, should we automatically team players until you do?
 auto-team: true
-# When enabled if certain entity data can't be read, we won't tell you about it
-suppress-metadata-errors: false
 # When enabled, 1.9+ will be able to block by using shields
 shield-blocking: true
 # If this setting is active, the main hand is used instead of the off-hand to trigger the blocking of the player.

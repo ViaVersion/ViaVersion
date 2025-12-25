@@ -218,7 +218,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         try {
             tagTag = tag != null ? (CompoundTag) inputSerializerVersion().toTag(tag.getValue()) : null;
         } catch (final Exception e) {
-            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 protocol.getLogger().log(Level.WARNING, "Error reading NBT in show_item: " + StringUtil.forLogging(itemTag), e);
             }
             return;
@@ -252,7 +252,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
             try {
                 components = toTag(connection, data);
             } catch (final Exception e) {
-                if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+                if (Via.getConfig().logTextComponentConversionErrors()) {
                     protocol.getLogger().log(Level.WARNING, "Error writing components in show_item!", e);
                 }
                 return;

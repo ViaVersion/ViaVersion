@@ -32,7 +32,6 @@ import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.api.minecraft.Particle;
-import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
@@ -648,7 +647,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     // ---------------------------------------------------------------------------
 
     private void logException(Exception e, @Nullable EntityType type, List<EntityData> entityDataList, EntityData entityData) {
-        if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
+        if (Via.getConfig().logEntityDataErrors()) {
             protocol.getLogger().severe("An error occurred in entity data handler " + this.getClass().getSimpleName()
                 + " for " + (type != null ? type.name() : "untracked") + " entity type: " + entityData);
             protocol.getLogger().severe(entityDataList.stream().sorted(Comparator.comparingInt(EntityData::id))

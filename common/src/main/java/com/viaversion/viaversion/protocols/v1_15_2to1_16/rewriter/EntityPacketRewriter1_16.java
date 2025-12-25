@@ -170,7 +170,7 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 if (attributeIdentifier == null) {
                     attributeIdentifier = Key.namespaced(key);
                     if (!Key.isValid(attributeIdentifier)) {
-                        if (!Via.getConfig().isSuppressConversionWarnings()) {
+                        if (Via.getConfig().logOtherConversionWarnings()) {
                             protocol.getLogger().warning("Invalid attribute: " + key);
                         }
                         actualSize--;
