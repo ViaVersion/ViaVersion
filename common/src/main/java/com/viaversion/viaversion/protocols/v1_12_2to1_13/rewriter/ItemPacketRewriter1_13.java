@@ -23,6 +23,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
+import com.viaversion.nbt.tag.ShortTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
@@ -32,6 +33,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.BlockIdData;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ItemIds1_12_2;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.MappingData1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.SoundSource1_12_2;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.SpawnEggMappings1_13;
@@ -42,6 +44,7 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.Pair;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -416,6 +419,46 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     rawId = 25100288;
                 }
             }
+
+            // Handle shulker box items
+            final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
+            if (blockEntityTag != null) {
+                ListTag<CompoundTag> listTag = blockEntityTag.getListTag("Items", CompoundTag.class);
+                if (listTag != null) {
+                    ListTag<CompoundTag> newListTag = new ListTag<>(CompoundTag.class);
+                    for (var containerItemTag : listTag) {
+                        var containerItemSlotTag = containerItemTag.getByteTag("Slot");
+                        var containerItemAmountTag = containerItemTag.getByteTag("Count");
+                        var containerItemTags = containerItemTag.getCompoundTag("tag");
+
+
+                        var containerItemIdTag = containerItemTag.getStringTag("id");
+                        var containerItemId = ItemIds1_12_2.getId(containerItemIdTag.asRawString(), 1);
+                        var containerItemData = containerItemTag.getShortTag("Damage").asShort();
+
+                        int index = isDamageable(containerItemId) ? 0 : containerItemData;
+                        var substring = containerItemIdTag.asRawString().substring(10);
+                        var mappedBlockNameArray = BlockIdData.blockIdMapping.get(substring);
+                        //just in case the block wasn't there (means the name did not change from 1.12.2 to 1.13)
+                        var newItemName = "minecraft:" + (mappedBlockNameArray == null ? substring : mappedBlockNameArray[index]);
+
+                        var newContainerItemTag = new CompoundTag();
+                        newContainerItemTag.put("id", new StringTag(newItemName));
+                        newContainerItemTag.put("Damage", new ShortTag((short) 0));
+
+
+                        newContainerItemTag.put("Slot", containerItemSlotTag);
+                        newContainerItemTag.put("Count", containerItemAmountTag);
+                        if (containerItemTags != null) {
+                            newContainerItemTag.put("tag", containerItemTags);
+                        }
+
+                        newListTag.add(newContainerItemTag);
+                    }
+                    blockEntityTag.put("Items", newListTag);
+                }
+            }
+
             if (tag.isEmpty()) {
                 item.setTag(tag = null);
             }
@@ -658,6 +701,49 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     }
                 }
                 tag.put("CanDestroy", newCanDestroy);
+            }
+
+            // Handle shulker box items
+            final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
+            if (blockEntityTag != null) {
+                ListTag<CompoundTag> listTag = blockEntityTag.getListTag("Items", CompoundTag.class);
+                if (listTag != null) {
+                    ListTag<CompoundTag> newListTag = new ListTag<>(CompoundTag.class);
+                    for (var containerItemTag : listTag) {
+                        var containerItemSlotTag = containerItemTag.getByteTag("Slot");
+                        var containerItemAmountTag = containerItemTag.getByteTag("Count");
+                        var containerItemTags = containerItemTag.getCompoundTag("tag");
+
+
+                        var containerItemIdTag = containerItemTag.getStringTag("id");
+                        var substring = containerItemIdTag.asRawString().substring(10);
+                        var containerItemData = containerItemTag.getShortTag("Damage").asShort();
+
+                        Pair<String, Short> mappedPair = BlockIdData.blockIdInverseMapping.get(substring);
+                        // in case the block was not found in the mapping (means its the same in 112 & 113)
+                        if (mappedPair == null) {
+                            mappedPair = new Pair<>(substring, (short) 0);
+                        }
+
+                        var newItemName = mappedPair.key();
+                        boolean test = mappedPair.value() > (short) 0;
+                        var newItemData = containerItemData == 0 && test ? mappedPair.value() : containerItemData;
+
+                        var newContainerItemTag = new CompoundTag();
+                        newContainerItemTag.put("id", new StringTag("minecraft:" + newItemName));
+                        newContainerItemTag.put("Damage", new ShortTag(newItemData));
+
+
+                        newContainerItemTag.put("Slot", containerItemSlotTag);
+                        newContainerItemTag.put("Count", containerItemAmountTag);
+                        if (containerItemTags != null) {
+                            newContainerItemTag.put("tag", containerItemTags);
+                        }
+
+                        newListTag.add(newContainerItemTag);
+                    }
+                    blockEntityTag.put("Items", newListTag);
+                }
             }
         }
         return item;
