@@ -21,9 +21,11 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.FloatTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
+import com.viaversion.viaversion.api.minecraft.ResolvableProfile;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -45,6 +47,7 @@ import com.viaversion.viaversion.common.PlatformTestBase;
 import com.viaversion.viaversion.protocols.v1_21_6to1_21_7.Protocol1_21_6To1_21_7;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.util.KeyMappings;
+import com.viaversion.viaversion.util.UUIDUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -132,6 +135,22 @@ public class ItemHashTest extends PlatformTestBase {
         ((RegistryDataRewriter) protocol.getRegistryDataRewriter()).registryKeyMappings().put("banner_pattern", new KeyMappings("base"));
         hasher.write(BannerPatternLayer.ARRAY_TYPE, new BannerPatternLayer[]{new BannerPatternLayer(Holder.of(0), 0)});
         Assertions.assertEquals(606382024, hasher.hash(), "banner_pattern hash mismatch");
+    }
+
+    @Test
+    void testResolableProfile() {
+        final GameProfile profile = new GameProfile(
+            "",
+            UUIDUtil.fromIntArray(new int[]{431522009, 458574629, -1388245934, -172269387}),
+            new GameProfile.Property[]{
+                new GameProfile.Property(
+                    "textures",
+                    "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjk1OWFjMjg0ZGZhY2NhNWE4ZTZjMTc5NjA5ODI1ODc1YTc2OGFmMzI5MWM3N2U4YTY4YmQ5MDM0ZGEzZWM2NCJ9fX0="
+                )
+            }
+        );
+        hasher.write(Types.RESOLVABLE_PROFILE, new ResolvableProfile(profile));
+        Assertions.assertEquals(-1192115620, hasher.hash(), "Resolvable profile hash mismatch");
     }
 
     private CompoundTag createCompoundTag() {

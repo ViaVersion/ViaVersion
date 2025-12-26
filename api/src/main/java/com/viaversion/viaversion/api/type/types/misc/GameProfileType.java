@@ -31,6 +31,8 @@ import java.util.UUID;
 
 public final class GameProfileType extends Type<GameProfile> {
 
+    private static final GameProfile.Property[] EMPTY_PROPERTIES = new GameProfile.Property[0];
+
     public GameProfileType() {
         super(GameProfile.class);
     }
@@ -54,7 +56,7 @@ public final class GameProfileType extends Type<GameProfile> {
     public void write(final Ops ops, final GameProfile value) {
         ops.writeMap(map -> map
             .writeOptional("name", Types.STRING, value.name())
-            .writeOptional("id", Types.STRING, value.id() != null ? value.id().toString() : null)
-            .write("properties", Types.PROFILE_PROPERTY_ARRAY, value.properties()));
+            .writeOptional("id", Types.UUID, value.id())
+            .writeOptional("properties", Types.PROFILE_PROPERTY_ARRAY, value.properties(), EMPTY_PROPERTIES));
     }
 }
