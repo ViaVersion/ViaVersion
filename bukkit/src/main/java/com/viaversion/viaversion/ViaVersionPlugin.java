@@ -214,8 +214,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     @Override
     public boolean kickPlayer(UserConnection connection, String message) {
         UUID uuid = connection.getProtocolInfo().getUuid();
-        Player player = Bukkit.getPlayer(uuid);
-        if (player != null) {
+        Player player;
+        if (uuid != null && (player = Bukkit.getPlayer(uuid)) != null) {
             player.kickPlayer(message);
             return true;
         } else {

@@ -183,6 +183,9 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     @Override
     public boolean kickPlayer(UserConnection connection, String message) {
         final UUID uuid = connection.getProtocolInfo().getUuid();
+        if (uuid == null) {
+            return false;
+        }
         return PROXY.getPlayer(uuid).map(it -> {
             it.disconnect(LegacyComponentSerializer.legacySection().deserialize(message));
             return true;
