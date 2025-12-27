@@ -402,13 +402,13 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
                 final Item input = wrapper.read(itemCostType);
-                wrapper.write(mappedItemCostType, handleItemToClient(wrapper.user(), input));
+                wrapper.write(mappedItemCostType, handleItemToClientAndTrackHash(wrapper.user(), input));
 
                 passthroughClientboundItem(wrapper); // Result
 
                 Item secondInput = wrapper.read(optionalItemCostType);
                 if (secondInput != null) {
-                    handleItemToClient(wrapper.user(), secondInput);
+                    handleItemToClientAndTrackHash(wrapper.user(), secondInput);
                 }
                 wrapper.write(mappedOptionalItemCostType, secondInput);
 
