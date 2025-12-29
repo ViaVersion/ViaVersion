@@ -6,7 +6,7 @@ gson = "2.13.1"
 snakeYaml = "2.5"
 fastutil = "8.5.15"
 vianbt = "5.1.2"
-mcstructs = "5-3.2.0-SNAPSHOT"
+mcstructs = "5-3.2.2-SNAPSHOT"
 
 # Common provided
 netty = "4.0.20.Final"
