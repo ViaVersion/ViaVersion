@@ -26,8 +26,17 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.configuration.RateLimitConfig;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.util.MathUtil;
 import java.util.Arrays;
 
+/**
+ * Tracks packet count/packet size.
+ * <p>
+ * Every second, the current rate of that second is put into a sliding window to be checked against a sustained max rate.
+ * After a sufficient amount of hits to the max rate during a configured time period, a connection will be kicked.
+ * <p>
+ * Next to the sustained tracking, the current count per second is also constantly checked against its respective max rate per second.
+ */
 public class PacketTracker {
     private static final long SECOND_NANOS = 1_000_000_000L;
 
@@ -56,9 +65,10 @@ public class PacketTracker {
     }
 
     /**
-     * Increments the number of packets received from the client.
+     * Increments the number of packets and packet size received by clients.
+     * This is either added to the current second, or processed into the rate over multiple seconds.
      *
-     * @return true if the interval has reset
+     * @return true if the interval has reset after a second has passed since the last update
      */
     public boolean incrementReceived(int packetSize) {
         receivedPacketsTotal++;
@@ -69,22 +79,22 @@ public class PacketTracker {
         if (elapsed < SECOND_NANOS) {
             // Add to current interval
             if (config.getPacketTrackerConfig().enabled()) {
-                packetTracker.addIntervalValue(1);
+                packetTracker.add(1);
             }
             if (config.getPacketSizeTrackerConfig().enabled()) {
-                packetSizeTracker.addIntervalValue(packetSize);
+                packetSizeTracker.add(packetSize);
             }
             return false;
         }
 
-        // Reset interval tracking
+        // Update interval tracking every second
         if (config.getPacketTrackerConfig().enabled()) {
             packetTracker.updateRate(elapsed);
-            packetTracker.addIntervalValue(1);
+            packetTracker.add(1);
         }
         if (config.getPacketSizeTrackerConfig().enabled()) {
             packetSizeTracker.updateRate(elapsed);
-            packetSizeTracker.addIntervalValue(packetSize);
+            packetSizeTracker.add(packetSize);
         }
         startTime = currentTime;
         return true;
@@ -119,15 +129,15 @@ public class PacketTracker {
     }
 
     public long getIntervalPackets() {
-        return this.packetTracker.intervalValue;
+        return this.packetTracker.count;
     }
 
     public void setIntervalPackets(long intervalPackets) {
-        this.packetTracker.intervalValue = Math.toIntExact(intervalPackets);
+        this.packetTracker.count = intervalPackets;
     }
 
     public int getPacketsPerSecond() {
-        return packetTracker.currentRate;
+        return packetTracker.smoothedRate;
     }
 
     public boolean isPacketLimiterEnabled() {
@@ -148,53 +158,55 @@ public class PacketTracker {
         private final int[] history;
         private int historyIndex;
         private int historyCount;
-        private int currentRate = -1;
+        private int smoothedRate = -1;
 
-        // Interval tracking
-        int intervalValue;
+        // Accumulated counter for the current second
+        private long count;
 
         // Warning system
         private long warningPeriodStart = System.nanoTime();
+        private long lastWarning = Long.MIN_VALUE;
         private int warnings;
 
         public RateTracker(int windowSize) {
             this.history = new int[windowSize];
         }
 
-        public void addIntervalValue(int value) {
-            intervalValue += value;
+        public void add(int value) {
+            count += value;
         }
 
         public void updateRate(long elapsedNanos) {
             // Update sliding window
-            history[historyIndex] = (int) ((intervalValue * SECOND_NANOS) / elapsedNanos);
+            final long rate = (count * SECOND_NANOS) / elapsedNanos;
+            history[historyIndex] = (int) MathUtil.clamp(rate, 0, Integer.MAX_VALUE);
             historyIndex = (historyIndex + 1) % history.length;
             if (historyCount < history.length) {
                 historyCount++;
             }
 
             // Calculate smoothed average
-            int sum = 0;
+            long sum = 0;
             for (int i = 0; i < historyCount; i++) {
                 sum += history[i];
             }
 
-            currentRate = sum / historyCount;
-            intervalValue = 0; // Reset
+            smoothedRate = (int) (sum / historyCount);
+            count = 0; // Reset
         }
 
         public boolean exceedsLimit(UserConnection connection, RateLimitConfig limitConfig) {
-            if (!limitConfig.enabled() || currentRate < 0) {
+            if (!limitConfig.enabled()) {
                 return false;
             }
 
             // Immediate limit check
-            if (limitConfig.maxRate() > 0 && currentRate >= limitConfig.maxRate()) {
-                connection.disconnect(limitConfig.maxRateKickMessage().replace(limitConfig.ratePlaceholder(), Integer.toString(currentRate)));
+            if (limitConfig.maxRate() > 0 && count >= limitConfig.maxRate()) {
+                connection.disconnect(limitConfig.maxRateKickMessage().replace(limitConfig.ratePlaceholder(), Long.toString(count)));
                 return true;
             }
 
-            // Interval warnings
+            // Sustained rate warnings
             if (limitConfig.maxWarnings() > 0 && limitConfig.trackingPeriodNanos() > 0 && limitConfig.warningRate() > 0) {
                 return checkTrackedInterval(connection, limitConfig);
             }
@@ -205,22 +217,25 @@ public class PacketTracker {
         private boolean checkTrackedInterval(UserConnection connection, RateLimitConfig config) {
             long currentTime = System.nanoTime();
             if (currentTime - warningPeriodStart >= config.trackingPeriodNanos()) {
-                // Reset
+                // Reset the number of warnings
                 warnings = 0;
                 warningPeriodStart = currentTime;
-                return false;
             }
 
-            if (currentRate >= config.warningRate() && ++warnings >= config.maxWarnings()) {
-                connection.disconnect(config.warningKickMessage().replace(config.ratePlaceholder(), Integer.toString(currentRate)));
-                return true;
+            if (smoothedRate >= config.warningRate() && currentTime - lastWarning >= SECOND_NANOS) {
+                // Add a warning if there hasn't already been one added during the last second
+                lastWarning = currentTime;
+                if (++warnings >= config.maxWarnings()) {
+                    connection.disconnect(config.warningKickMessage().replace(config.ratePlaceholder(), Integer.toString(smoothedRate)));
+                    return true;
+                }
             }
             return false;
         }
 
         public void reset() {
-            intervalValue = 0;
-            currentRate = -1;
+            count = 0;
+            smoothedRate = -1;
             warnings = 0;
             warningPeriodStart = System.nanoTime();
             historyIndex = 0;

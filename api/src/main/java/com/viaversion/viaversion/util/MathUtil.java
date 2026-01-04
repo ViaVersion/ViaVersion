@@ -76,4 +76,11 @@ public final class MathUtil {
         }
         return d > max ? max : d;
     }
+
+    public static long clamp(final long l, final long min, final long max) {
+        if (l < min) {
+            return min;
+        }
+        return l > max ? max : l;
+    }
 }
