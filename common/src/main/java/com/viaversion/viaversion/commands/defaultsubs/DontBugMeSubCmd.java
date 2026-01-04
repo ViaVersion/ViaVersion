@@ -41,7 +41,7 @@ public class DontBugMeSubCmd implements ViaSubCommand {
 
         config.setCheckForUpdates(newValue);
         config.save();
-        sendMessage(sender, "&6We will %snotify you about updates.", (newValue ? "&a" : "&cnot "));
+        sendMessage(sender, "&6We will %snotify &6you about updates.", (newValue ? "&a" : "&cnot "));
 
         return true;
     }
