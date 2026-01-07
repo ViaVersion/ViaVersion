@@ -17,6 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_11to26_1;
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.StringTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
@@ -50,6 +53,7 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
+import java.util.Map;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
@@ -71,6 +75,29 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
     protected void registerPackets() {
         super.registerPackets();
 
+        registryDataRewriter.addHandler("wolf_sound_variant", (key, tag) -> {
+            final CompoundTag sounds = new CompoundTag();
+            for (final Map.Entry<String, Tag> entry : tag.entrySet()) {
+                sounds.put(entry.getKey(), entry.getValue());
+            }
+            tag.clear();
+
+            sounds.putString("step_sound", "entity.wolf.step");
+            tag.put("adult_sounds", sounds);
+            tag.put("baby_sounds", sounds.copy());
+        });
+        registryDataRewriter.addHandler("wolf_variant", (key, tag) -> {
+            final Tag assets = tag.get("assets");
+            tag.put("baby_assets", assets.copy());
+        });
+        registryDataRewriter.addHandler("frog_variant", (key, tag) -> swapEntityNameAffix("frog", tag));
+        swapAffixAndAddAssetId("chicken_variant", "chicken");
+        swapAffixAndAddAssetId("cow_variant", "cow");
+        swapAffixAndAddAssetId("pig_variant", "pig");
+        registryDataRewriter.addHandler("cat_variant", (key, tag) -> {
+            addEntityNamePrefix("cat", tag);
+            addBabyAssetId("cat", tag);
+        });
         registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
 
         tagRewriter.registerGeneric(ClientboundPackets1_21_11.UPDATE_TAGS);
@@ -100,6 +127,32 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_21_11.AWARD_STATS);
         new AttributeRewriter<>(this).register1_21(ClientboundPackets1_21_11.UPDATE_ATTRIBUTES);
+    }
+
+    private void swapAffixAndAddAssetId(final String registryKey, final String affix) {
+        registryDataRewriter.addHandler(registryKey, (key, tag) -> {
+            swapEntityNameAffix(affix, tag);
+            addBabyAssetId(affix, tag);
+        });
+    }
+
+    private void addBabyAssetId(final String key, final CompoundTag tag) {
+        final String assetId = tag.getString("asset_id");
+        tag.putString("baby_asset_id", assetId + "_baby");
+    }
+
+    private void addEntityNamePrefix(final String key, final CompoundTag tag) {
+        final StringTag assetIdTag = tag.getStringTag("asset_id");
+        final String assetId = assetIdTag.getValue();
+        assetIdTag.setValue(key + "_" + assetId);
+    }
+
+    private void swapEntityNameAffix(final String key, final CompoundTag tag) {
+        final StringTag assetIdTag = tag.getStringTag("asset_id");
+        final String assetId = assetIdTag.getValue();
+        if (assetId.endsWith("_" + key)) {
+            assetIdTag.setValue(key + "_" + assetId.substring(key.length() + 1));
+        }
     }
 
     @Override
