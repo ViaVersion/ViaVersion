@@ -14,9 +14,9 @@ dependencyResolutionManagement {
 pluginManagement {
     // default plugin versions
     plugins {
-        id("com.gradleup.shadow") version "9.1.0"
-        id("net.kyori.blossom") version "2.1.0"
-        id("org.jetbrains.gradle.plugin.idea-ext") version "1.2"
+        id("com.gradleup.shadow") version "9.3.1"
+        id("net.kyori.blossom") version "2.2.0"
+        id("org.jetbrains.gradle.plugin.idea-ext") version "1.3"
 
         // A nice no-conflict comment for patching in downgrading
     }
