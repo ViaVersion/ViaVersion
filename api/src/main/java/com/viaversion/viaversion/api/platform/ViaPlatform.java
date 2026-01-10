@@ -151,6 +151,17 @@ public interface ViaPlatform<T> {
     }
 
     /**
+     * Send a custom payload from the server to a player.
+     *
+     * @param connection The UserConnection
+     * @param channel    The channel to send the payload on
+     * @param message    The data to send
+     */
+    default void sendCustomPayloadToClient(UserConnection connection, String channel, byte[] message) {
+        // To be overridden if needed
+    }
+
+    /**
      * Get the API for this platform
      *
      * @return The API for the platform
@@ -176,6 +187,7 @@ public interface ViaPlatform<T> {
      * is loaded as a plugin which can be reloaded.
      */
     default void onReload() {
+        // To be overridden if needed
     }
 
     /**

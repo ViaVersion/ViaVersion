@@ -99,6 +99,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean cancelSwingInInventory;
     private int maxErrorLength;
     private boolean use1_8HitboxMargin;
+    private boolean sendServerDetails;
 
     protected AbstractViaConfig(final File configFile, final Logger logger) {
         super(configFile, logger);
@@ -164,6 +165,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         fix1_21PlacementRotation = getBoolean("fix-1_21-placement-rotation", true);
         cancelSwingInInventory = getBoolean("cancel-swing-in-inventory", true);
         use1_8HitboxMargin = getBoolean("use-1_8-hitbox-margin", true);
+        sendServerDetails = getBoolean("send-server-details", true);
         packetTrackerConfig = loadRateLimitConfig(getSection("packet-limiter"), "%pps", 1);
         packetSizeTrackerConfig = loadRateLimitConfig(getSection("packet-size-limiter"), "%bps", 1024);
 
@@ -630,5 +632,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean use1_8HitboxMargin() {
         return use1_8HitboxMargin;
+    }
+
+    @Override
+    public boolean sendServerDetails() {
+        return sendServerDetails;
     }
 }

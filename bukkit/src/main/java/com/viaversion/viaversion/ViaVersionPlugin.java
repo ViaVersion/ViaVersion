@@ -33,12 +33,15 @@ import com.viaversion.viaversion.bukkit.platform.BukkitViaTask;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaTaskTask;
 import com.viaversion.viaversion.bukkit.platform.FoliaViaTask;
 import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
+import com.viaversion.viaversion.connection.ConnectionDetails;
 import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.util.GsonUtil;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
@@ -117,6 +120,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         } else {
             manager.onServerLoaded();
         }
+
+        getServer().getMessenger().registerOutgoingPluginChannel(this, ConnectionDetails.SERVER_CHANNEL);
 
         getCommand("viaversion").setExecutor(commandHandler);
         getCommand("viaversion").setTabCompleter(commandHandler);
@@ -221,6 +226,27 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void sendCustomPayloadToClient(final UserConnection connection, final String channel, final byte[] message) {
+        UUID uuid = connection.getProtocolInfo().getUuid();
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) {
+            return;
+        }
+
+        // Because the messaging sucks
+        try {
+            final String className = Bukkit.getServer().getClass().getName();
+            final String craftBukkitPackage = className.substring(0, className.lastIndexOf('.'));
+            Class.forName(craftBukkitPackage + ".entity.CraftPlayer").getMethod("addChannel", String.class).invoke(player, channel);
+        } catch (final IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+            getLogger().log(Level.SEVERE, "Failed to register custom payload channel " + channel + " for player " + player.getName(), e);
+            return;
+        }
+
+        player.sendPluginMessage(this, channel, message);
     }
 
     @Override
