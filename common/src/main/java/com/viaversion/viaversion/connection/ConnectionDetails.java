@@ -35,10 +35,12 @@ import java.nio.charset.StandardCharsets;
  */
 public final class ConnectionDetails {
 
+    // To be used for the player details protocol
     public static final String PROXY_CHANNEL = "vv:proxy_details";
     public static final String MOD_CHANNEL = "vv:mod_details";
     public static final String APP_CHANNEL = "vv:app_details";
 
+    // To be used for the server details protocol
     public static final String SERVER_CHANNEL = "vv:server_details";
 
     /**
