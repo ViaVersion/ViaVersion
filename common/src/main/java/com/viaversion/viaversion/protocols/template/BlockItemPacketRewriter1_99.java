@@ -30,6 +30,7 @@ import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPac
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
+import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 
 // To replace if needed:
 //   ChunkType1_21_5
@@ -46,7 +47,7 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         // Register block and block state id changes
         // Other places using block state id mappings: Spawn particle, entity data, entity spawn (falling blocks)
         // Tags and statistics use block (!) ids
-        final BlockRewriter<ClientboundPacket1_21_6> blockRewriter = BlockRewriter.for1_20_2(protocol);
+        final BlockRewriter<ClientboundPacket1_21_6> blockRewriter = new BlockRewriter1_21_5<>(protocol);
         blockRewriter.registerBlockEvent(ClientboundPackets1_21_6.BLOCK_EVENT);
         blockRewriter.registerBlockUpdate(ClientboundPackets1_21_6.BLOCK_UPDATE);
         blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_21_6.SECTION_BLOCKS_UPDATE);

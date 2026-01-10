@@ -17,12 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.v1_19_4to1_20.rewriter;
 
-import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.ListTag;
-import com.viaversion.nbt.tag.StringTag;
-import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
-import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
@@ -33,7 +29,6 @@ import com.viaversion.viaversion.protocols.v1_19_4to1_20.Protocol1_19_4To1_20;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
-import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
 
 public final class ItemPacketRewriter1_20 extends ItemRewriter<ClientboundPackets1_19_4, ServerboundPackets1_19_4, Protocol1_19_4To1_20> {
@@ -44,11 +39,11 @@ public final class ItemPacketRewriter1_20 extends ItemRewriter<ClientboundPacket
 
     @Override
     public void registerPackets() {
-        final BlockRewriter<ClientboundPackets1_19_4> blockRewriter = BlockRewriter.for1_14(protocol);
+        final BlockRewriter<ClientboundPackets1_19_4> blockRewriter = new BlockPacketRewriter1_20(protocol);
         blockRewriter.registerBlockEvent(ClientboundPackets1_19_4.BLOCK_EVENT);
         blockRewriter.registerBlockUpdate(ClientboundPackets1_19_4.BLOCK_UPDATE);
         blockRewriter.registerLevelEvent(ClientboundPackets1_19_4.LEVEL_EVENT, 1010, 2001);
-        blockRewriter.registerBlockEntityData(ClientboundPackets1_19_4.BLOCK_ENTITY_DATA, this::handleBlockEntity);
+        blockRewriter.registerBlockEntityData(ClientboundPackets1_19_4.BLOCK_ENTITY_DATA);
 
         registerOpenScreen(ClientboundPackets1_19_4.OPEN_SCREEN);
         registerCooldown(ClientboundPackets1_19_4.COOLDOWN);
@@ -107,7 +102,10 @@ public final class ItemPacketRewriter1_20 extends ItemRewriter<ClientboundPacket
         protocol.registerClientbound(ClientboundPackets1_19_4.LEVEL_CHUNK_WITH_LIGHT, new PacketHandlers() {
             @Override
             protected void register() {
-                handler(blockRewriter.chunkHandler1_19(ChunkType1_18::new, (user, blockEntity) -> handleBlockEntity(blockEntity)));
+                handler(wrapper -> {
+                    final Chunk chunk = blockRewriter.handleChunk1_19(wrapper, ChunkType1_18::new);
+                    blockRewriter.handleBlockEntities(chunk, wrapper.user());
+                });
                 read(Types.BOOLEAN); // Trust edges
             }
         });
@@ -154,42 +152,5 @@ public final class ItemPacketRewriter1_20 extends ItemRewriter<ClientboundPacket
 
             wrapper.set(Types.VAR_INT, 0, newSize);
         });
-    }
-
-    private void handleBlockEntity(final BlockEntity blockEntity) {
-        // Check for signs
-        if (blockEntity.typeId() != 7 && blockEntity.typeId() != 8) {
-            return;
-        }
-
-        final CompoundTag tag = blockEntity.tag();
-        final CompoundTag frontText = new CompoundTag();
-        tag.put("front_text", frontText);
-
-        final ListTag<StringTag> messages = new ListTag<>(StringTag.class);
-        for (int i = 1; i < 5; i++) {
-            final Tag text = tag.remove("Text" + i);
-            messages.add(text instanceof StringTag ? (StringTag) text : new StringTag(ComponentUtil.emptyJsonComponentString()));
-        }
-        frontText.put("messages", messages);
-
-        final ListTag<StringTag> filteredMessages = new ListTag<>(StringTag.class);
-        for (int i = 1; i < 5; i++) {
-            final Tag text = tag.remove("FilteredText" + i);
-            filteredMessages.add(text instanceof StringTag ? (StringTag) text : messages.get(i - 1));
-        }
-        if (!filteredMessages.equals(messages)) {
-            frontText.put("filtered_messages", filteredMessages);
-        }
-
-        final Tag color = tag.remove("Color");
-        if (color != null) {
-            frontText.put("color", color);
-        }
-
-        final Tag glowing = tag.remove("GlowingText");
-        if (glowing != null) {
-            frontText.put("has_glowing_text", glowing);
-        }
     }
 }
