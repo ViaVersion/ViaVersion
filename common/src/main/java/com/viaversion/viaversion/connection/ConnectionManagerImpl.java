@@ -58,7 +58,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
             clientConnections.put(id, connection);
         }
 
-        // Make sure its gets sent into the correct connection for all platforms
+        // Make sure it gets sent into the correct connection for all platforms
         if (connection.isClientSide() || !Via.getPlatform().isProxy()) {
             ConnectionDetails.sendServerDetails(connection);
         }
