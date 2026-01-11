@@ -29,9 +29,7 @@ import java.nio.charset.StandardCharsets;
  * Network protocol to provide information to backend and frontend servers about the
  * connected players. See the documentation for more information:
  * <p>
- * <a href="https://github.com/ViaVersion/ViaVersion/wiki/Player-Details-Protocol">Player Details Protocol</a>
- * and
- * <a href="https://github.com/ViaVersion/ViaVersion/wiki/Server-Details-Protocol">Server Details Protocol</a>
+ * <a href="https://github.com/ViaVersion/ViaVersion/wiki/Server-Player-Details-Protocol">Server/Player Details Protocol</a>
  */
 public final class ConnectionDetails {
 
@@ -91,6 +89,7 @@ public final class ConnectionDetails {
         payload.addProperty("versionName", serverVersion.getName());
 
         Via.getPlatform().sendCustomPayloadToClient(connection, SERVER_CHANNEL, payload.toString().getBytes(StandardCharsets.UTF_8));
+        System.out.println("Sent server details to client: " + payload);
     }
 
 }
