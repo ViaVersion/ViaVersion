@@ -158,7 +158,7 @@ public interface ViaPlatform<T> {
      * @param message    The data to send
      */
     default void sendCustomPayloadToClient(UserConnection connection, String channel, byte[] message) {
-        // To be overridden if needed
+        throw new UnsupportedOperationException("ViaPlatform#sendCustomPayloadToClient is not implemented on this platform.");
     }
 
     /**
