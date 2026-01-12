@@ -437,10 +437,10 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         }
 
         // Unpack into new item components
-        final int bucketVariant = bucketVariantTag.asInt();
-        dataContainer.set(StructuredDataKey.TROPICAL_FISH_BASE_COLOR, bucketVariant >> 16 & 0xFF);
-        dataContainer.set(StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR, bucketVariant >> 24 & 0xFF);
-        dataContainer.set(StructuredDataKey.TROPICAL_FISH_PATTERN, new TropicalFishPattern(bucketVariant & 65535));
+        final int packedVariant = bucketVariantTag.asInt();
+        dataContainer.set(StructuredDataKey.TROPICAL_FISH_BASE_COLOR, packedVariant >> 16 & 0xFF);
+        dataContainer.set(StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR, packedVariant >> 24 & 0xFF);
+        dataContainer.set(StructuredDataKey.TROPICAL_FISH_PATTERN, new TropicalFishPattern(packedVariant & 65535));
     }
 
     public static void downgradeItemData(final Item item) {
