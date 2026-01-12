@@ -58,11 +58,6 @@ public class ConnectionManagerImpl implements ConnectionManager {
             clientConnections.put(id, connection);
         }
 
-        // Make sure it gets sent into the correct connection for all platforms
-        if (connection.isClientSide() || !Via.getPlatform().isProxy()) {
-            ConnectionDetails.sendServerDetails(connection);
-        }
-
         if (channel != null) {
             // We managed to add a user that had already disconnected!
             // Let's clean up the mess here and now
