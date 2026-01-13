@@ -21,6 +21,7 @@ import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Types;
@@ -125,32 +126,17 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
     }
 
     private void restoreInvalidEnchantments(CompoundTag tag, String tagName) {
-        ListTag<CompoundTag> enchantments = tag.getListTag(tagName, CompoundTag.class);
-        if (enchantments != null) {
-            int oobEnchantments = 0;
-            for (final CompoundTag enchantment : enchantments) {
-                if (enchantment.contains(nbtTagName("id"))) {
-                    enchantment.put("id", enchantment.remove(nbtTagName("id")));
-                    enchantment.put("lvl", enchantment.remove(nbtTagName("lvl")));
-                    oobEnchantments += 1;
-                }
-            }
+        Tag enchantments = tag.remove(nbtTagName(tagName));
+        if (enchantments == null) {
+            return;
+        }
+        tag.put(tagName, enchantments);
 
-            CompoundTag display = tag.getCompoundTag("display");
-            if (display != null) {
-                if (tag.remove(nbtTagName("display")) != null) {
-                    tag.remove("display");
-                }
-
-                ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
-                if (lore != null) {
-                    if (display.remove(nbtTagName("Lore")) != null) {
-                        display.remove("Lore");
-                    }
-
-                    lore.getValue().subList(0, oobEnchantments).clear();
-                }
-            }
+        Tag display = tag.remove(nbtTagName("display"));
+        if (display == null) {
+            tag.remove("display");
+        } else {
+            tag.put("display", display);
         }
     }
 
@@ -160,6 +146,9 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
             return;
         }
 
+        tag.put(nbtTagName(tagName), enchantments);
+
+        boolean displayRestoreTagAdded = false;
         for (final CompoundTag enchantment : enchantments.getValue()) {
             short lvl = enchantment.getShort("lvl");
             if (lvl >= 0 && lvl <= 255) {
@@ -174,20 +163,18 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
             CompoundTag display = tag.getCompoundTag("display");
             if (display == null) {
                 tag.put("display", display = new CompoundTag());
-                tag.putBoolean(nbtTagName("display"), true);
+            } else if (!displayRestoreTagAdded) {
+                displayRestoreTagAdded = true;
+                tag.put(nbtTagName("display"), display);
             }
 
             ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
             if (lore == null) {
                 display.put("Lore", lore = new ListTag<>(StringTag.class));
-                display.putBoolean(nbtTagName("Lore"), true);
             }
 
             Key key = Key.of(id);
             lore.getValue().add(0, new StringTag("{\"italic\":false,\"color\":\"gray\",\"translate\":\"enchantment." + key.namespace() + "." + key.path() + "\",\"extra\":[\" \",{\"translate\":\"enchantment.level." + lvl + "\"}]}"));
-
-            enchantment.put(nbtTagName("id"), enchantment.remove("id"));
-            enchantment.put(nbtTagName("lvl"), enchantment.remove("lvl"));
         }
     }
 }
