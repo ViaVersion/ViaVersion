@@ -29,6 +29,7 @@ import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.Protocol1_17To1_17_1;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Limit;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -182,10 +183,8 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
                 display.putBoolean(nbtTagName("Lore"), true);
             }
 
-            int separator = id.indexOf(':');
-            String namespace = separator >= 1 ? id.substring(0, separator) : "minecraft";
-            String path = separator >= 0 ? id.substring(separator + 1) : id;
-            lore.getValue().add(0, new StringTag("{\"italic\":false,\"color\":\"gray\",\"translate\":\"enchantment." + namespace + "." + path + "\",\"extra\":[\" \",{\"translate\":\"enchantment.level." + lvl + "\"}]}"));
+            Key key = Key.of(id);
+            lore.getValue().add(0, new StringTag("{\"italic\":false,\"color\":\"gray\",\"translate\":\"enchantment." + key.namespace() + "." + key.path() + "\",\"extra\":[\" \",{\"translate\":\"enchantment.level." + lvl + "\"}]}"));
 
             enchantment.put(nbtTagName("id"), enchantment.remove("id"));
             enchantment.put(nbtTagName("lvl"), enchantment.remove("lvl"));
