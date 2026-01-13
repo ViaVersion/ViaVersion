@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_17to1_17_1.rewriter;
 
+import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
@@ -58,11 +59,13 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
         protocol.registerClientbound(ClientboundPackets1_17.CONTAINER_SET_CONTENT, wrapper -> {
             wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
             wrapper.write(Types.VAR_INT, 0); // Add arbitrary state id
+            // Length encoded as var int now
             Item[] items = wrapper.passthroughAndMap(Types.ITEM1_13_2_SHORT_ARRAY, Types.ITEM1_13_2_ARRAY);
             for (int i = 0; i < items.length; i++) {
                 items[i] = handleItemToClient(wrapper.user(), items[i]);
             }
 
+            // Carried item - should work like this
             wrapper.write(Types.ITEM1_13_2, null);
         });
 
@@ -111,38 +114,46 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
 
         int hideFlags = tag.getInt("HideFlags");
         if ((hideFlags & 1) == 0) {
-            substituteInvalidEnchantments(tag, "Enchantments");
+            replaceInvalidEnchantments(tag, "Enchantments");
         }
         if ((hideFlags & 1 << 5) == 0) {
-            substituteInvalidEnchantments(tag, "StoredEnchantments");
+            replaceInvalidEnchantments(tag, "StoredEnchantments");
         }
 
         return item;
     }
 
-    private static void restoreInvalidEnchantments(CompoundTag tag, String tagName) {
+    private void restoreInvalidEnchantments(CompoundTag tag, String tagName) {
         ListTag<CompoundTag> enchantments = tag.getListTag(tagName, CompoundTag.class);
         if (enchantments != null) {
             int oobEnchantments = 0;
             for (final CompoundTag enchantment : enchantments) {
-                if (enchantment.contains("oob_id")) {
-                    enchantment.put("id", enchantment.remove("oob_id"));
-                    enchantment.put("lvl", enchantment.remove("oob_lvl"));
+                if (enchantment.contains(nbtTagName("id"))) {
+                    enchantment.put("id", enchantment.remove(nbtTagName("id")));
+                    enchantment.put("lvl", enchantment.remove(nbtTagName("lvl")));
                     oobEnchantments += 1;
                 }
             }
 
             CompoundTag display = tag.getCompoundTag("display");
             if (display != null) {
+                if (tag.remove(nbtTagName("display")) != null) {
+                    tag.remove("display");
+                }
+
                 ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
                 if (lore != null) {
+                    if (display.remove(nbtTagName("Lore")) != null) {
+                        display.remove("Lore");
+                    }
+
                     lore.getValue().subList(0, oobEnchantments).clear();
                 }
             }
         }
     }
 
-    private static void substituteInvalidEnchantments(CompoundTag tag, String tagName) {
+    private void replaceInvalidEnchantments(CompoundTag tag, String tagName) {
         ListTag<CompoundTag> enchantments = tag.getListTag(tagName, CompoundTag.class);
         if (enchantments == null) {
             return;
@@ -162,11 +173,13 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
             CompoundTag display = tag.getCompoundTag("display");
             if (display == null) {
                 tag.put("display", display = new CompoundTag());
+                tag.putBoolean(nbtTagName("display"), true);
             }
 
             ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
             if (lore == null) {
                 display.put("Lore", lore = new ListTag<>(StringTag.class));
+                display.putBoolean(nbtTagName("Lore"), true);
             }
 
             int separator = id.indexOf(':');
@@ -174,8 +187,8 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
             String path = separator >= 0 ? id.substring(separator + 1) : id;
             lore.getValue().add(0, new StringTag("{\"italic\":false,\"color\":\"gray\",\"translate\":\"enchantment." + namespace + "." + path + "\",\"extra\":[\" \",{\"translate\":\"enchantment.level." + lvl + "\"}]}"));
 
-            enchantment.put("oob_id", enchantment.remove("id"));
-            enchantment.put("oob_lvl", enchantment.remove("lvl"));
+            enchantment.put(nbtTagName("id"), enchantment.remove("id"));
+            enchantment.put(nbtTagName("lvl"), enchantment.remove("lvl"));
         }
     }
 }
