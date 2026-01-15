@@ -63,6 +63,11 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
                     final CompoundTag damageTypeRegistry = protocol.getMappingData().damageTypesRegistry();
                     registry.put("minecraft:damage_type", damageTypeRegistry);
 
+                    final CompoundTag trimMaterialRegistry = new CompoundTag();
+                    trimMaterialRegistry.putString("type", "minecraft:trim_material");
+                    trimMaterialRegistry.put("value", new ListTag<>(CompoundTag.class));
+                    registry.put("minecraft:trim_material", trimMaterialRegistry);
+
                     final ListTag<CompoundTag> biomes = TagUtil.getRegistryEntries(registry, "worldgen/biome");
                     for (final CompoundTag biomeTag : biomes) {
                         final CompoundTag biomeData = biomeTag.getCompoundTag("element");

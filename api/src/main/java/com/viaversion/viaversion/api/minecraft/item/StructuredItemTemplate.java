@@ -22,67 +22,38 @@
  */
 package com.viaversion.viaversion.api.minecraft.item;
 
-import com.viaversion.nbt.tag.CompoundTag;
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface Item extends ItemBase {
+public class StructuredItemTemplate extends StructuredItem {
 
-    /**
-     * Returns the item data. Always 0 for 1.13+ items.
-     *
-     * @return item data
-     */
-    default short data() {
-        return 0;
+    public StructuredItemTemplate(final int identifier, final int amount) {
+        super(identifier, amount, new StructuredDataContainer());
     }
 
-    /**
-     * Sets the item data used in versions before 1.13.
-     *
-     * @param data item data
-     * @throws UnsupportedOperationException if the item implementation does not store data
-     */
-    default void setData(short data) {
-        throw new UnsupportedOperationException();
+    public StructuredItemTemplate(final int identifier, final int amount, final StructuredDataContainer data) {
+        super(identifier, amount, data);
     }
 
-    /**
-     * Returns the item compound tag if present.
-     *
-     * @return item tag
-     */
-    @Nullable
-    CompoundTag tag();
-
-    /**
-     * Sets the item compound tag.
-     *
-     * @param tag item tag
-     */
-    void setTag(@Nullable CompoundTag tag);
-
-    /**
-     * Returns the data container for item data components.
-     *
-     * @return the data container
-     */
-    StructuredDataContainer dataContainer();
-
-    /**
-     * Returns a copy of the item.
-     *
-     * @return copy of the item
-     */
     @Override
-    Item copy();
+    public void setIdentifier(final int identifier) {
+        Preconditions.checkArgument(identifier > 0, "Template item cannot be empty");
+        super.setIdentifier(identifier);
+    }
 
-    /**
-     * Returns whether the item is a template item.
-     *
-     * @return whether the item is a template item
-     */
-    default boolean isTemplate() {
-        return false;
+    @Override
+    public void setAmount(final int amount) {
+        Preconditions.checkArgument(amount > 0, "Template item cannot be empty");
+        super.setAmount(amount);
+    }
+
+    @Override
+    public boolean isTemplate() {
+        return true;
+    }
+
+    @Override
+    public StructuredItemTemplate copy() {
+        return new StructuredItemTemplate(identifier(), amount(), dataContainer().copy());
     }
 }

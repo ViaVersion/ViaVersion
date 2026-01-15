@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
+import com.viaversion.viaversion.api.minecraft.item.StructuredItemTemplate;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -45,7 +45,7 @@ public class ItemTemplateType26_1 extends ItemType1_20_5 {
         final int id = Types.VAR_INT.readPrimitive(buffer);
         final int amount = Types.VAR_INT.readPrimitive(buffer);
         final Map<StructuredDataKey<?>, StructuredData<?>> data = readData(buffer);
-        return new StructuredItem(id, amount, new StructuredDataContainer(data));
+        return new StructuredItemTemplate(id, amount, new StructuredDataContainer(data));
     }
 
     @Override

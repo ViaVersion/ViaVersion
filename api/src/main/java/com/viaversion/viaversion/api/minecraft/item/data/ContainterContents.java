@@ -44,7 +44,7 @@ public final class ContainterContents {
             ops.writeList(list -> {
                 for (int i = 0; i < value.length; i++) {
                     final Item item = value[i];
-                    if (item.isEmpty()) {
+                    if (item == null || item.isEmpty()) {
                         continue;
                     }
 

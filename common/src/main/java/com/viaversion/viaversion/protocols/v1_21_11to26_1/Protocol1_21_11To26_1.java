@@ -87,6 +87,7 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             clocksPacket.send(Protocol1_21_11To26_1.class);
         });
 
+        addRequiredRegistryEntries();
         registryDataRewriter.addHandler("timeline", (key, tag) -> tag.putString("clock", "overworld"));
         registryDataRewriter.addHandler("wolf_sound_variant", (key, tag) -> {
             final CompoundTag sounds = new CompoundTag();
@@ -152,6 +153,61 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             wrapper.write(Types.BOOLEAN, !tickDayTime); // Paused
         });
         cancelServerbound(ServerboundPackets26_1.SET_GAME_RULE);
+    }
+
+    private void addRequiredRegistryEntries() {
+        // Add a few possibly missing registry entries required by delayed default item creation.
+        // These are some of the things that brought us the glorious EitherHolderType before
+        final CompoundTag spearDamageType = new CompoundTag();
+        spearDamageType.putFloat("exhaustion", 0.1F);
+        spearDamageType.putString("message_id", "spear");
+        spearDamageType.putString("scaling", "when_caused_by_living_non_player");
+        registryDataRewriter.addEntries("damage_type", new RegistryEntry("spear", spearDamageType));
+
+        final CompoundTag coldChicken = new CompoundTag();
+        coldChicken.putString("asset_id", "entity/chicken/chicken_cold");
+        coldChicken.putString("baby_asset_id", "entity/chicken/chicken_cold_baby");
+        coldChicken.putString("model", "cold");
+        final CompoundTag warmChicken = new CompoundTag();
+        warmChicken.putString("asset_id", "entity/chicken/chicken_warm");
+        warmChicken.putString("baby_asset_id", "entity/chicken/chicken_warm_baby");
+        registryDataRewriter.addEntries("chicken_variant", new RegistryEntry("cold", coldChicken), new RegistryEntry("warm", warmChicken));
+
+        final CompoundTag ponderGoatHornInstrument = new CompoundTag();
+        final CompoundTag ponderGoatHornDescription = new CompoundTag();
+        ponderGoatHornDescription.putString("translate", "instrument.minecraft.ponder_goat_horn");
+        ponderGoatHornInstrument.put("description", ponderGoatHornDescription);
+        ponderGoatHornInstrument.putString("sound_event", "item.goat_horn.sound.0");
+        ponderGoatHornInstrument.putFloat("use_duration", 7F);
+        ponderGoatHornInstrument.putFloat("range", 256F);
+        registryDataRewriter.addEntries("instrument", new RegistryEntry("spear", ponderGoatHornInstrument));
+
+        addJukeboxPlayables("11", "13", "5", "blocks", "cat", "chirp", "far", "mall", "mellohi", "otherside", "pigstep", "relic", "stal", "strad", "wait", "ward", "creator", "creator_music_box", "lava_chicken", "tears", "precipice");
+        addTrimMaterials("quartz", "iron", "netherite", "redstone", "copper", "gold", "emerald", "diamond", "lapis", "amethyst", "resin");
+    }
+
+    private void addTrimMaterials(final String... trimMaterials) {
+        for (final String trimMaterial : trimMaterials) {
+            final CompoundTag materialTag = new CompoundTag();
+            final CompoundTag materialDescription = new CompoundTag();
+            materialDescription.putString("translate", "trim_material.minecraft." + trimMaterial);
+            materialTag.put("description", materialDescription);
+            materialTag.putString("asset_name", trimMaterial);
+            registryDataRewriter.addEntries("trim_material", new RegistryEntry(trimMaterial, materialTag));
+        }
+    }
+
+    private void addJukeboxPlayables(final String... songs) {
+        for (final String song : songs) {
+            final CompoundTag songTag = new CompoundTag();
+            final CompoundTag songDescription = new CompoundTag();
+            songDescription.putString("translate", "jukebox_song.minecraft." + song);
+            songTag.put("description", songDescription);
+            songTag.putString("sound_event", "music_disc." + song);
+            songTag.putFloat("length_in_seconds", 175F);
+            songTag.putInt("comparator_output", 10);
+            registryDataRewriter.addEntries("jukebox_song", new RegistryEntry(song, songTag));
+        }
     }
 
     private void swapAffixAndAddAssetId(final String registryKey, final String affix) {

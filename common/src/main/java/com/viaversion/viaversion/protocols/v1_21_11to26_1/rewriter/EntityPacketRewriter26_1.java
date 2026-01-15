@@ -86,7 +86,7 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
             entityDataTypes.optionalComponentType
         );
 
-        filter().type(EntityTypes1_21_11.ABSTRACT_VILLAGER).addIndex(18); // Is villager data finalized
+        filter().type(EntityTypes1_21_11.ABSTRACT_VILLAGER).addIndex(19); // Is villager data finalized
         filter().type(EntityTypes1_21_11.ZOMBIE_VILLAGER).addIndex(21); // Is villager data finalized
     }
 

@@ -18,9 +18,12 @@
 package com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
@@ -67,6 +70,16 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
 
     @Override
     protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
+        // Uses null instead of empty items now
+        final Item[] containerData = container.get(protocol.types().structuredDataKeys().container);
+        if (containerData != null) {
+            for (int i = 0; i < containerData.length; i++) {
+                if (containerData[i].isEmpty()) {
+                    containerData[i] = null;
+                }
+            }
+        }
+
         upgradeData(item, container);
         super.handleItemDataComponentsToClient(connection, item, container);
     }
@@ -76,6 +89,15 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
 
     @Override
     protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
+        final Item[] containerData = container.get(protocol.mappedTypes().structuredDataKeys().container);
+        if (containerData != null) {
+            for (int i = 0; i < containerData.length; i++) {
+                if (containerData[i] == null) {
+                    containerData[i] = StructuredItem.empty();
+                }
+            }
+        }
+
         downgradeData(item, container);
         super.handleItemDataComponentsToServer(connection, item, container);
     }
