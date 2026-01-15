@@ -93,7 +93,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     public static final ProtocolVersion v1_21_7 = register(772, "1.21.7-1.21.8", new SubVersionRange("1.21", 7, 8));
     public static final ProtocolVersion v1_21_9 = register(773, "1.21.9-1.21.10", new SubVersionRange("1.21", 9, 10));
     public static final ProtocolVersion v1_21_11 = register(774, "1.21.11");
-    public static final ProtocolVersion v26_1 = register(775, 288, "26.1");
+    public static final ProtocolVersion v26_1 = register(775, 289, "26.1");
     public static final ProtocolVersion unknown = new ProtocolVersion(VersionType.SPECIAL, -1, -1, "UNKNOWN", null);
 
     static {

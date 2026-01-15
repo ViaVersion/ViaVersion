@@ -22,20 +22,37 @@
  */
 package com.viaversion.viaversion.api.type.types.version;
 
-import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_20_5;
-import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21;
+import com.viaversion.viaversion.api.minecraft.data.version.VersionedStructuredDataKeys;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.AbstractEntityDataTypes;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.item.ItemType1_20_5;
+import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.api.type.types.item.ItemTemplateType26_1;
 import java.util.function.Function;
 
-// 1.21 only (!)
-public final class Types1_21 extends Types1_20_5<StructuredDataKeys1_20_5, EntityDataTypes1_21> {
+public class Types26_1<K extends VersionedStructuredDataKeys, E extends AbstractEntityDataTypes> extends Types1_20_5<K, E> {
 
-    public final Type<Item> optionalItem; // Optional as in boolean prefixed, not via the amount
+    public final Type<Item> itemTemplate = new ItemTemplateType26_1(structuredData);
+    public final Type<Item> optionalItemTemplate = new ItemTemplateType26_1.OptionalItemTemplateType(itemTemplate);
+    public final Type<Item[]> itemTemplateArray = new ArrayType<>(itemTemplate);
 
-    public Types1_21(final Function<VersionedTypesHolder, StructuredDataKeys1_20_5> keysSupplier, final Function<VersionedTypesHolder, EntityDataTypes1_21> entityDataTypesSupplier) {
-        super(keysSupplier, entityDataTypesSupplier);
-        this.optionalItem = ((ItemType1_20_5) item).new OptionalItemType();
+    public Types26_1(final Function<VersionedTypesHolder, K> keysSupplier, final Function<VersionedTypesHolder, E> entityDataTypesSupplier) {
+        super(null, entityDataTypesSupplier);
+        initKeys(keysSupplier);
+    }
+
+    @Override
+    public Type<Item> itemTemplate() {
+        return itemTemplate;
+    }
+
+    @Override
+    public Type<Item> optionalItemTemplate() {
+        return optionalItemTemplate;
+    }
+
+    @Override
+    public Type<Item[]> itemTemplateArray() {
+        return itemTemplateArray;
     }
 }

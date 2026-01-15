@@ -50,7 +50,7 @@ public class Types1_20_5<K extends VersionedStructuredDataKeys, E extends Abstra
     public final Type<Item[]> itemArray = new ArrayType<>(item);
     public final Type<Item> itemCost = new ItemCostType1_20_5(structuredDataArray);
     public final Type<Item> optionalItemCost = new ItemCostType1_20_5.OptionalItemCostType(itemCost);
-    public final K structuredDataKeys;
+    private K structuredDataKeys;
 
     public final ParticleType particle = new ParticleType();
     public final ArrayType<Particle> particles = new ArrayType<>(particle);
@@ -58,11 +58,17 @@ public class Types1_20_5<K extends VersionedStructuredDataKeys, E extends Abstra
     public final Type<EntityData> entityData;
     public final Type<List<EntityData>> entityDataList;
 
-    public Types1_20_5(final Function<Types1_20_5<?, ?>, K> keysSupplier, final Function<Types1_20_5<?, ?>, E> entityDataTypesSupplier) {
-        this.structuredDataKeys = keysSupplier.apply(this);
+    public Types1_20_5(final Function<VersionedTypesHolder, K> keysSupplier, final Function<VersionedTypesHolder, E> entityDataTypesSupplier) {
         this.entityDataTypes = entityDataTypesSupplier.apply(this);
         this.entityData = new EntityDataType(entityDataTypes);
         this.entityDataList = new EntityDataListType(entityData);
+        if (keysSupplier != null) {
+            initKeys(keysSupplier);
+        }
+    }
+
+    protected void initKeys(final Function<VersionedTypesHolder, K> keysSupplier) {
+        this.structuredDataKeys = keysSupplier.apply(this);
     }
 
     @Override
@@ -72,6 +78,21 @@ public class Types1_20_5<K extends VersionedStructuredDataKeys, E extends Abstra
 
     @Override
     public Type<Item[]> itemArray() {
+        return itemArray;
+    }
+
+    @Override
+    public Type<Item> itemTemplate() {
+        return item;
+    }
+
+    @Override
+    public Type<Item> optionalItemTemplate() {
+        return item;
+    }
+
+    @Override
+    public Type<Item[]> itemTemplateArray() {
         return itemArray;
     }
 

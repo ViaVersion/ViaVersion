@@ -321,7 +321,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
-            wrapper.passthrough(Types.MOVEMENT_VECTOR); // Movement
+            wrapper.passthrough(Types.LOW_PRECISION_VECTOR); // Movement
             wrapper.passthrough(Types.BYTE); // Pitch
             wrapper.passthrough(Types.BYTE); // Yaw
             wrapper.passthrough(Types.BYTE); // Head yaw

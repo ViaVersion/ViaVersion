@@ -58,7 +58,7 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
 
-            wrapper.write(Types.MOVEMENT_VECTOR, Vector3d.ZERO); // Set at the end
+            wrapper.write(Types.LOW_PRECISION_VECTOR, Vector3d.ZERO); // Set at the end
 
             wrapper.passthrough(Types.BYTE); // Pitch
             wrapper.passthrough(Types.BYTE); // Yaw
@@ -70,12 +70,12 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
                 wrapper.set(Types.VAR_INT, 2, mappedBlockStateId);
             }
 
-            wrapper.set(Types.MOVEMENT_VECTOR, 0, readRelativeMovement(wrapper));
+            wrapper.set(Types.LOW_PRECISION_VECTOR, 0, readRelativeMovement(wrapper));
         });
 
         protocol.registerClientbound(ClientboundPackets1_21_6.SET_ENTITY_MOTION, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Entity ID
-            wrapper.write(Types.MOVEMENT_VECTOR, readRelativeMovement(wrapper));
+            wrapper.write(Types.LOW_PRECISION_VECTOR, readRelativeMovement(wrapper));
         });
 
         protocol.registerClientbound(ClientboundPackets1_21_6.PLAYER_ROTATION, wrapper -> {

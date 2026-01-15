@@ -39,10 +39,31 @@ import java.util.List;
  */
 public interface VersionedTypesHolder {
 
+    /**
+     * Returns the unmapped item stack type
+     *
+     * @return unmapped item stack type
+     */
     Type<Item> item();
 
     Type<Item[]> itemArray();
 
+    /**
+     * Returns the unmapped item stack template type, used for certain recipes/templates in 26.1+.
+     *
+     * @return unmapped item stack template type
+     */
+    Type<Item> itemTemplate();
+
+    Type<Item> optionalItemTemplate();
+
+    Type<Item[]> itemTemplateArray();
+
+    /**
+     * Returns the unmapped item cost type, used in merchant offers.
+     *
+     * @return unmapped item cost type
+     */
     Type<Item> itemCost();
 
     Type<Item> optionalItemCost();

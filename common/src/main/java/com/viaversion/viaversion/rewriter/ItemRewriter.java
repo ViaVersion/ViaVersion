@@ -50,6 +50,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     private final Type<Item[]> itemArrayType;
     private final Type<Item[]> mappedItemArrayType;
     private final Type<Item> itemCostType;
+    private final Type<Item> itemTemplateType;
+    private final Type<Item> mappedItemTemplateType;
     private final Type<Item> mappedItemCostType;
     private final Type<Item> optionalItemCostType;
     private final Type<Item> mappedOptionalItemCostType;
@@ -62,6 +64,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         this.itemArrayType = types.itemArray();
         this.mappedItemType = mappedTypes.item();
         this.mappedItemArrayType = mappedTypes.itemArray();
+        this.itemTemplateType = types.itemTemplate();
+        this.mappedItemTemplateType = mappedTypes.itemTemplate();
         this.itemCostType = types.itemCost();
         this.mappedItemCostType = mappedTypes.itemCost();
         this.optionalItemCostType = types.optionalItemCost();
@@ -74,6 +78,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         this.itemArrayType = itemArrayType;
         this.mappedItemType = mappedItemType;
         this.mappedItemArrayType = mappedItemArrayType;
+        this.itemTemplateType = null;
+        this.mappedItemTemplateType = null;
         this.itemCostType = null;
         this.mappedItemCostType = null;
         this.optionalItemCostType = null;
@@ -480,7 +486,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                         componentRewriter.processTag(wrapper.user(), description);
                     }
 
-                    passthroughClientboundItem(wrapper); // Icon
+                    passthroughClientboundItemTemplate(wrapper); // Icon
                     wrapper.passthrough(Types.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Types.INT); // Flags
                     if ((flags & 1) != 0) {
@@ -556,6 +562,12 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         wrapper.write(mappedItemType, item);
     }
 
+    protected void passthroughClientboundItemTemplate(final PacketWrapper wrapper) {
+        // Uses the regular item type pre 26.1
+        final Item item = handleItemToClient(wrapper.user(), wrapper.read(itemTemplateType()));
+        wrapper.write(mappedItemTemplateType(), item);
+    }
+
     protected void passthroughHashedItem(final PacketWrapper wrapper) {
         final HashedItem item = handleHashedItem(wrapper.user(), wrapper.read(Types.HASHED_ITEM));
         wrapper.write(Types.HASHED_ITEM, item);
@@ -615,5 +627,15 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     @Override
     public Type<Item[]> mappedItemArrayType() {
         return mappedItemArrayType;
+    }
+
+    @Override
+    public Type<Item> itemTemplateType() {
+        return itemTemplateType;
+    }
+
+    @Override
+    public Type<Item> mappedItemTemplateType() {
+        return mappedItemTemplateType;
     }
 }

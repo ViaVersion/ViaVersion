@@ -173,9 +173,9 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
 
     protected void handleItem(final PacketWrapper wrapper) {
         final ItemRewriter<?> itemRewriter = protocol.getItemRewriter();
-        final Item item = wrapper.read(itemRewriter.itemType());
+        final Item item = wrapper.read(itemRewriter.itemTemplateType());
         itemRewriter.handleItemToClient(wrapper.user(), item);
-        wrapper.write(itemRewriter.mappedItemType(), item);
+        wrapper.write(itemRewriter.mappedItemTemplateType(), item);
     }
 
     protected int rewriteItemId(final int id) {

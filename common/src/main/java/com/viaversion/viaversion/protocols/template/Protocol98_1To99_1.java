@@ -144,7 +144,7 @@ final class Protocol98_1To99_1 extends AbstractProtocol<ClientboundPacket26_1, C
             .reader("effect", ParticleType.Readers.SPELL)
             .reader("instant_effect", ParticleType.Readers.SPELL)
             .reader("flash", ParticleType.Readers.COLOR)
-            .reader("item", ParticleType.Readers.item(itemRewriter.mappedItemType()));*/
+            .reader("item", ParticleType.Readers.item(itemRewriter.mappedItemTemplateType()));*/
 
         super.onMappingDataLoaded(); // Calls load methods on rewriters. Last in case the rewriters access the above filled data
     }

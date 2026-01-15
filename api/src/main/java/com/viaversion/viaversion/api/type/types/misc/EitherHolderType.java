@@ -29,6 +29,11 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * Mess for certain pre 26.1 things.
+ *
+ * @param <T> held type
+ */
 public final class EitherHolderType<T> extends Type<EitherHolder<T>> {
     private final HolderType<T> holderType;
 

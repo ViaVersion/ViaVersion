@@ -107,13 +107,13 @@ public class ItemHashTest extends PlatformTestBase {
 
     @Test
     void testMapInList2() {
-        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys.container.type(), new Item[]{new StructuredItem(1, 1)});
+        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys().container.type(), new Item[]{new StructuredItem(1, 1)});
         Assertions.assertEquals(231516551, hasher.hash(), "container hash mismatch");
     }
 
     @Test
     void testContainerWithEmptyItem() {
-        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys.container.type(), new Item[]{StructuredItem.empty(), new StructuredItem(1, 1)});
+        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys().container.type(), new Item[]{StructuredItem.empty(), new StructuredItem(1, 1)});
         Assertions.assertEquals(1506540737, hasher.hash(), "container hash mismatch");
     }
 

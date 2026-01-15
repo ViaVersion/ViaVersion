@@ -35,9 +35,9 @@ public class StructuredDataKeys1_21_2 extends VersionedStructuredDataKeys {
     public final StructuredDataKey<Item> useRemainder;
 
     public StructuredDataKeys1_21_2(final VersionedTypesHolder types) {
-        this.container = add("container", new ContainerContentsType(types.item()));
-        this.chargedProjectiles = add("charged_projectiles", types.itemArray());
-        this.bundleContents = add("bundle_contents", types.itemArray());
-        this.useRemainder = add("use_remainder", types.item());
+        this.container = add("container", new ContainerContentsType(types.optionalItemTemplate()));
+        this.chargedProjectiles = add("charged_projectiles", types.itemTemplateArray());
+        this.bundleContents = add("bundle_contents", types.itemTemplateArray());
+        this.useRemainder = add("use_remainder", types.itemTemplate());
     }
 }
