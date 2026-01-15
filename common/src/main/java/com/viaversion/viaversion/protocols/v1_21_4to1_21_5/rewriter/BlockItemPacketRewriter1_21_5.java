@@ -17,6 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter;
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.LongArrayTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -48,6 +50,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.JukeboxPlayable;
 import com.viaversion.viaversion.api.minecraft.item.data.TooltipDisplay;
+import com.viaversion.viaversion.api.minecraft.item.data.TropicalFishPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
@@ -399,6 +402,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             dataContainer.set(StructuredDataKey.TOOLTIP_DISPLAY, new TooltipDisplay(hideTooltip, hiddenComponents));
         }
 
+        updateBucketVariant(dataContainer);
         dataContainer.replace(StructuredDataKey.UNBREAKABLE1_20_5, StructuredDataKey.UNBREAKABLE1_21_5, unbreakable -> Unit.INSTANCE);
         dataContainer.replace(StructuredDataKey.CAN_PLACE_ON1_20_5, StructuredDataKey.V1_21_5.canPlaceOn, BlockItemPacketRewriter1_21_5::updateAdventureModePredicate);
         dataContainer.replace(StructuredDataKey.CAN_BREAK1_20_5, StructuredDataKey.V1_21_5.canBreak, BlockItemPacketRewriter1_21_5::updateAdventureModePredicate);
@@ -421,6 +425,24 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         return new AdventureModePredicate(blockPredicates);
     }
 
+    private static void updateBucketVariant(final StructuredDataContainer dataContainer) {
+        final CompoundTag bucketEntityData = dataContainer.get(StructuredDataKey.BUCKET_ENTITY_DATA);
+        if (bucketEntityData == null) {
+            return;
+        }
+
+        final IntTag bucketVariantTag = bucketEntityData.removeUnchecked("BucketVariantTag");
+        if (bucketVariantTag == null) {
+            return;
+        }
+
+        // Unpack into new item components
+        final int packedVariant = bucketVariantTag.asInt();
+        dataContainer.set(StructuredDataKey.TROPICAL_FISH_BASE_COLOR, packedVariant >> 16 & 0xFF);
+        dataContainer.set(StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR, packedVariant >> 24 & 0xFF);
+        dataContainer.set(StructuredDataKey.TROPICAL_FISH_PATTERN, new TropicalFishPattern(packedVariant & 65535));
+    }
+
     public static void downgradeItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
         dataContainer.replaceKey(StructuredDataKey.TOOL1_21_5, StructuredDataKey.TOOL1_20_5);
@@ -439,6 +461,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             }
         }
 
+        downgradeBucketVariant(dataContainer);
         dataContainer.replace(StructuredDataKey.UNBREAKABLE1_21_5, StructuredDataKey.UNBREAKABLE1_20_5, unbreakable -> new Unbreakable(shouldShowToServer(tooltipDisplay, StructuredDataKey.UNBREAKABLE1_20_5)));
         updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.DYED_COLOR1_21_5, StructuredDataKey.DYED_COLOR1_20_5, dyedColor -> new DyedColor(dyedColor.rgb(), false));
         updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, attributeModifiers -> new AttributeModifiers1_21(attributeModifiers.modifiers(), false));
@@ -450,6 +473,27 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.JUKEBOX_PLAYABLE1_21, playable -> new JukeboxPlayable(playable.song(), false));
 
         dataContainer.remove(NEW_DATA_TO_REMOVE);
+    }
+
+    private static void downgradeBucketVariant(final StructuredDataContainer dataContainer) {
+        final TropicalFishPattern tropicalFishPattern = dataContainer.get(StructuredDataKey.TROPICAL_FISH_PATTERN);
+        if (tropicalFishPattern == null) {
+            return;
+        }
+
+        final Integer base = dataContainer.get(StructuredDataKey.TROPICAL_FISH_BASE_COLOR);
+        final Integer pattern = dataContainer.get(StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR);
+
+        // Pack into legacy tag again
+        final int baseColor = base != null ? base : 16777215;
+        final int patternColor = pattern != null ? pattern : 16777215;
+        final int packedVariant = (patternColor & 0xFF) << 24 | (baseColor & 0xFF) << 16 | (tropicalFishPattern.packedId() & 0xFFFF);
+
+        CompoundTag bucketEntityData = dataContainer.get(StructuredDataKey.BUCKET_ENTITY_DATA);
+        if (bucketEntityData == null) {
+            dataContainer.set(StructuredDataKey.BUCKET_ENTITY_DATA, bucketEntityData = new CompoundTag());
+        }
+        bucketEntityData.put("BucketVariantTag", new IntTag(packedVariant));
     }
 
     private StructuredItem convertHashedItemToStructuredItem(final UserConnection connection, final HashedItem hashedItem) {
