@@ -125,7 +125,7 @@ public interface ViaPlatform<T> {
      * @param message    The message to send
      */
     default void sendMessage(UserConnection connection, String message) {
-        throw new UnsupportedOperationException("ViaPlatform#sendMessage is not implemented on this platform.");
+        // To be overridden if needed
     }
 
     /**
@@ -136,7 +136,8 @@ public interface ViaPlatform<T> {
      * @return True if it was successful
      */
     default boolean kickPlayer(UserConnection connection, String message) {
-        throw new UnsupportedOperationException("ViaPlatform#kickPlayer is not implemented on this platform.");
+        // To be overridden if needed
+        return false;
     }
 
     /**
@@ -147,7 +148,7 @@ public interface ViaPlatform<T> {
      * @param message    The data to send
      */
     default void sendCustomPayload(UserConnection connection, String channel, byte[] message) {
-        throw new UnsupportedOperationException("ViaPlatform#sendCustomPayload is not implemented on this platform.");
+        // To be overridden if needed
     }
 
     /**
@@ -158,6 +159,7 @@ public interface ViaPlatform<T> {
      * @param message    The data to send
      */
     default void sendCustomPayloadToClient(UserConnection connection, String channel, byte[] message) {
+        // To be overridden if needed
     }
 
     /**
