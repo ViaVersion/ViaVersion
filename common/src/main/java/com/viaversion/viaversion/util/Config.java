@@ -165,7 +165,9 @@ public abstract class Config extends ConfigSection {
         }
     }
 
-    protected abstract void handleConfig(Map<String, Object> config);
+    protected void handleConfig(Map<String, Object> config) {
+        // Can be overridden
+    }
 
     public synchronized void save(File location, Map<String, Object> config) {
         try {
@@ -181,7 +183,9 @@ public abstract class Config extends ConfigSection {
      *
      * @return list of options to remove from the config
      */
-    public abstract List<String> getUnsupportedOptions();
+    public List<String> getUnsupportedOptions() {
+        return List.of();
+    }
 
     /**
      * Returns a set of section keys that will have custom entry keys.

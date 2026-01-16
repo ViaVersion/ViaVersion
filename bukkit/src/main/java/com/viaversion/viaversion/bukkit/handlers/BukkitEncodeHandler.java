@@ -22,6 +22,7 @@ import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
 import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.platform.ViaEncodeHandler;
 import com.viaversion.viaversion.util.ByteBufUtil;
 import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
@@ -30,16 +31,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.MessageToMessageEncoder;
 import java.util.List;
 
 @ChannelHandler.Sharable
-public final class BukkitEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
-    private final UserConnection connection;
+public final class BukkitEncodeHandler extends ViaEncodeHandler {
     private boolean handledCompression = BukkitChannelInitializer.COMPRESSION_ENABLED_EVENT != null;
 
     public BukkitEncodeHandler(final UserConnection connection) {
-        this.connection = connection;
+        super(connection);
     }
 
     @Override
@@ -104,7 +103,7 @@ public final class BukkitEncodeHandler extends MessageToMessageEncoder<ByteBuf> 
 
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        if (PipelineUtil.containsCause(cause, CancelCodecException.class)) {
+        if (PipelineUtil.containsCause(cause, CancelCodecException.class)) { // ProtocolLib previously wrapped all exceptions, check causes
             return;
         }
 
@@ -119,9 +118,5 @@ public final class BukkitEncodeHandler extends MessageToMessageEncoder<ByteBuf> 
             cause.printStackTrace();
             exception.setShouldBePrinted(false);
         }
-    }
-
-    public UserConnection connection() {
-        return connection;
     }
 }

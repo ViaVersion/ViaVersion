@@ -53,10 +53,6 @@ public class BukkitViaConfig extends AbstractViaConfig {
     }
 
     @Override
-    protected void handleConfig(Map<String, Object> config) {
-    }
-
-    @Override
     public boolean shouldRegisterUserConnectionOnJoin() {
         return registerUserConnectionOnJoin;
     }

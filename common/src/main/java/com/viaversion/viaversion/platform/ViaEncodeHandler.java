@@ -15,9 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.velocity.handlers;
+package com.viaversion.viaversion.platform;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.platform.ViaChannelHandler;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
 import com.viaversion.viaversion.util.ByteBufUtil;
@@ -28,24 +29,26 @@ import io.netty.handler.codec.MessageToMessageEncoder;
 import java.util.List;
 
 @ChannelHandler.Sharable
-public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
-    private final UserConnection info;
+public class ViaEncodeHandler extends MessageToMessageEncoder<ByteBuf> implements ViaChannelHandler {
+    protected final UserConnection connection;
 
-    public VelocityEncodeHandler(UserConnection info) {
-        this.info = info;
+    public ViaEncodeHandler(final UserConnection connection) {
+        this.connection = connection;
     }
 
     @Override
-    protected void encode(final ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
-        if (!info.checkOutgoingPacket()) throw CancelEncoderException.generate(null);
-        if (!info.shouldTransformPacket()) {
-            out.add(bytebuf.retain());
+    protected void encode(final ChannelHandlerContext ctx, final ByteBuf buf, final List<Object> out) throws Exception {
+        if (!connection.checkOutgoingPacket()) {
+            throw CancelEncoderException.generate(null);
+        }
+        if (!connection.shouldTransformPacket()) {
+            out.add(buf.retain());
             return;
         }
 
-        ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), bytebuf);
+        final ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), buf);
         try {
-            info.transformOutgoing(transformedBuf, CancelEncoderException::generate);
+            connection.transformOutgoing(transformedBuf, CancelEncoderException::generate);
             out.add(transformedBuf.retain());
         } finally {
             transformedBuf.release();
@@ -53,8 +56,19 @@ public class VelocityEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (cause instanceof CancelCodecException) return;
-        super.exceptionCaught(ctx, cause);
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        if (!(cause instanceof CancelCodecException)) {
+            super.exceptionCaught(ctx, cause);
+        }
+    }
+
+    @Override
+    public boolean isSharable() {
+        return true;
+    }
+
+    @Override
+    public UserConnection connection() {
+        return connection;
     }
 }
