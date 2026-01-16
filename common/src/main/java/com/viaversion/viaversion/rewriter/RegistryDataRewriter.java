@@ -104,10 +104,10 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             int index = 0;
             for (final RegistryEntry entry : entries) {
                 updatedEntries[index++] = entry;
-                existingKeys.add(entry.key());
+                existingKeys.add(Key.stripMinecraftNamespace(entry.key()));
             }
             for (final RegistryEntry entry : toAdd) {
-                if (existingKeys.contains(entry.key())) {
+                if (existingKeys.contains(Key.stripMinecraftNamespace(entry.key()))) {
                     continue;
                 }
 
