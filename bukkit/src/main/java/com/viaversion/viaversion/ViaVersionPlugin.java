@@ -229,6 +229,15 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     }
 
     @Override
+    public void sendCustomPayload(final UserConnection connection, final String channel, final byte[] message) {
+        UUID uuid = connection.getProtocolInfo().getUuid();
+        Player player = Bukkit.getPlayer(uuid);
+        if (player != null) {
+            Bukkit.getMessenger().dispatchIncomingMessage(player, channel, message);
+        }
+    }
+
+    @Override
     public void sendCustomPayloadToClient(final UserConnection connection, final String channel, final byte[] message) {
         UUID uuid = connection.getProtocolInfo().getUuid();
         Player player = Bukkit.getPlayer(uuid);
