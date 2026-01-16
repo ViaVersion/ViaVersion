@@ -17,27 +17,14 @@
  */
 package com.viaversion.viaversion.common.dummy;
 
-import com.viaversion.viaversion.UserConnectionViaAPI;
-import com.viaversion.viaversion.api.ViaAPI;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
-import java.io.File;
+import com.viaversion.viaversion.platform.UserConnectionViaVersionPlatform;
 import java.util.logging.Logger;
 
-public final class TestPlatform implements ViaPlatform<UserConnection> {
+public final class TestPlatform extends UserConnectionViaVersionPlatform {
 
-    private static final Logger log = Logger.getGlobal();
-    private final AbstractViaConfig testConfig = new AbstractViaConfig(null, log) {
-        @Override
-        public void reload() {
-        }
-    };
-    private final UserConnectionViaAPI testAPI = new UserConnectionViaAPI();
-
-    @Override
-    public Logger getLogger() {
-        return log;
+    public TestPlatform() {
+        super(null);
     }
 
     @Override
@@ -51,32 +38,16 @@ public final class TestPlatform implements ViaPlatform<UserConnection> {
     }
 
     @Override
-    public String getPluginVersion() {
-        return "test";
+    public Logger createLogger(final String name) {
+        return Logger.getGlobal();
     }
 
     @Override
-    public ViaAPI<UserConnection> getApi() {
-        return testAPI;
-    }
-
-    @Override
-    public AbstractViaConfig getConf() {
-        return testConfig;
-    }
-
-    @Override
-    public File getDataFolder() {
-        return null;
-    }
-
-    @Override
-    public boolean hasPlugin(final String name) {
-        return false;
-    }
-
-    @Override
-    public boolean couldBeReloading() {
-        return false;
+    protected AbstractViaConfig createConfig() {
+        return new AbstractViaConfig(null, null) {
+            @Override
+            public void reload() {
+            }
+        };
     }
 }

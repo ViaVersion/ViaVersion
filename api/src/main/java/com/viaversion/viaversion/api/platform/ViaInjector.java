@@ -30,14 +30,16 @@ import java.util.SortedSet;
 public interface ViaInjector {
 
     /**
-     * Inject into the current Platform
+     * Inject into the current Platform. May be empty on platforms not having to inject their pipeline
+     * or using alternative ways such as Mixin.
      *
      * @throws Exception if there is an error with injecting
      */
     void inject() throws Exception;
 
     /**
-     * Uninject into the current Platform
+     * Uninject into the current Platform. May be empty on platforms not having to inject their pipeline
+     * or using alternative ways such as Mixin.
      *
      * @throws Exception if there is an error with uninjecting
      */

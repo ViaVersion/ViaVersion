@@ -83,6 +83,37 @@ public class ProtocolVersionRange {
     }
 
     /**
+     * Returns a range that contains only the given version.
+     *
+     * @param version the version
+     * @return the range
+     *
+     */
+    public static ProtocolVersionRange singleton(final ProtocolVersion version) {
+        return new ProtocolVersionRange(Collections.singletonList(Range.singleton(version)));
+    }
+
+    /**
+     * Returns a range that contains all versions equal to or newer than the given version.
+     *
+     * @param version the version
+     * @return the range
+     */
+    public static ProtocolVersionRange andNewer(final ProtocolVersion version) {
+        return new ProtocolVersionRange(Collections.singletonList(Range.atLeast(version)));
+    }
+
+    /**
+     * Returns a range that contains all versions equal to or older than the given version.
+     *
+     * @param version the version
+     * @return the range
+     */
+    public static ProtocolVersionRange andOlder(final ProtocolVersion version) {
+        return new ProtocolVersionRange(Collections.singletonList(Range.atMost(version)));
+    }
+
+    /**
      * Adds a new range to this range. This method is only available if the range is not already containing all versions.
      *
      * @param range the range to add

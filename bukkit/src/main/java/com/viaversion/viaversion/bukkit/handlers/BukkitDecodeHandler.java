@@ -17,7 +17,9 @@
  */
 package com.viaversion.viaversion.bukkit.handlers;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.InformativeException;
@@ -57,9 +59,10 @@ public final class BukkitDecodeHandler extends ViaDecodeHandler {
     public void userEventTriggered(final ChannelHandlerContext ctx, final Object event) throws Exception {
         if (BukkitChannelInitializer.COMPRESSION_ENABLED_EVENT != null && event == BukkitChannelInitializer.COMPRESSION_ENABLED_EVENT) {
             // When compression handlers are added, the order becomes Minecraft Encoder -> Compressor -> Via Encoder; fix the order again
+            final ViaInjector injector = Via.getManager().getInjector();
             final ChannelPipeline pipeline = ctx.pipeline();
-            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_COMPRESSOR, BukkitChannelInitializer.VIA_ENCODER, pipeline.remove(BukkitChannelInitializer.VIA_ENCODER));
-            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_DECOMPRESSOR, BukkitChannelInitializer.VIA_DECODER, pipeline.remove(BukkitChannelInitializer.VIA_DECODER));
+            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_COMPRESSOR, injector.getEncoderName(), pipeline.remove(injector.getEncoderName()));
+            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_DECOMPRESSOR, injector.getDecoderName(), pipeline.remove(injector.getDecoderName()));
         }
         super.userEventTriggered(ctx, event);
     }

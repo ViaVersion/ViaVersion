@@ -17,7 +17,9 @@
  */
 package com.viaversion.viaversion.bukkit.handlers;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.platform.ViaChannelInitializer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -52,9 +54,10 @@ public final class BukkitChannelInitializer extends ViaChannelInitializer {
     }
 
     private static void injectMinecraftPipeline(final ChannelPipeline pipeline, final UserConnection connection) {
+        final ViaInjector injector = Via.getManager().getInjector();
         final String encoderName = pipeline.get(MINECRAFT_OUTBOUND_CONFIG) != null ? MINECRAFT_OUTBOUND_CONFIG : MINECRAFT_ENCODER;
-        pipeline.addBefore(encoderName, VIA_ENCODER, new BukkitEncodeHandler(connection));
-        pipeline.addBefore(MINECRAFT_DECODER, VIA_DECODER, new BukkitDecodeHandler(connection));
+        pipeline.addBefore(encoderName, injector.getEncoderName(), new BukkitEncodeHandler(connection));
+        pipeline.addBefore(MINECRAFT_DECODER, injector.getDecoderName(), new BukkitDecodeHandler(connection));
     }
 
     public static void afterChannelInitialize(Channel channel) {

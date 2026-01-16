@@ -131,11 +131,6 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     }
 
     @Override
-    public String getPluginVersion() {
-        return VersionInfo.VERSION;
-    }
-
-    @Override
     public PlatformTask runAsync(Runnable runnable) {
         return runSync(runnable);
     }

@@ -27,9 +27,6 @@ import java.lang.reflect.Method;
 
 public abstract class ViaChannelInitializer extends ChannelInitializer<Channel> implements WrappedChannelInitializer {
 
-    public static final String VIA_ENCODER = "via-encoder";
-    public static final String VIA_DECODER = "via-decoder";
-
     private static final Method INIT_CHANNEL_METHOD;
     private final ChannelInitializer<Channel> original;
     private final boolean clientSide;

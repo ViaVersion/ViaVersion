@@ -20,14 +20,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.platform;
+package com.viaversion.viaversion.api.command;
 
-public interface ViaServerProxyPlatform<T> extends ViaPlatform<T> {
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import java.util.UUID;
 
-    /**
-     * Returns a service to get protocol versions for proxied servers.
-     *
-     * @return protocol detector service
-     */
-    ProtocolDetectorService protocolDetectorService();
+public class UserConnectionViaCommandSender implements ViaCommandSender {
+
+    private final UserConnection connection;
+
+    public UserConnectionViaCommandSender(final UserConnection connection) {
+        this.connection = connection;
+    }
+
+    @Override
+    public boolean hasPermission(String permission) {
+        return true;
+    }
+
+    @Override
+    public void sendMessage(String msg) {
+        Via.getPlatform().sendMessage(connection, msg);
+    }
+
+    @Override
+    public UUID getUUID() {
+        return connection.getProtocolInfo().getUuid();
+    }
+
+    @Override
+    public String getName() {
+        return connection.getProtocolInfo().getUsername();
+    }
 }

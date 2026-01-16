@@ -49,6 +49,16 @@ public interface ViaPlatform<T> {
     Logger getLogger();
 
     /**
+     * Creates a logger for the given name. Returns the main platform logger by default
+     *
+     * @param name The name of the logger
+     * @return The logger
+     */
+    default Logger createLogger(String name) {
+        return getLogger();
+    }
+
+    /**
      * Get the platform name
      *
      * @return Platform Name (simply its name)
@@ -72,7 +82,7 @@ public interface ViaPlatform<T> {
     }
 
     /**
-     * Get the plugin version
+     * Get the plugin version.
      *
      * @return Plugin version as a semver string
      */
@@ -219,7 +229,9 @@ public interface ViaPlatform<T> {
      * @param name plugin or identifier
      * @return whether the platform has a plugin/mod with the given name
      */
-    boolean hasPlugin(String name);
+    default boolean hasPlugin(String name) {
+        return false;
+    }
 
     /**
      * Returns whether the platform might be reloading.
@@ -227,6 +239,6 @@ public interface ViaPlatform<T> {
      * @return whether the platform might be reloading
      */
     default boolean couldBeReloading() {
-        return true;
+        return false;
     }
 }

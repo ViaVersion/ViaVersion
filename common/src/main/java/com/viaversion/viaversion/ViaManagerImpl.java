@@ -370,10 +370,10 @@ public class ViaManagerImpl implements ViaManager {
     }
 
     public static final class ViaManagerBuilder {
+        private ViaPlatformLoader loader = ViaPlatformLoader.NOOP;
         private ViaPlatform<?> platform;
         private ViaInjector injector;
         private ViaCommandHandler commandHandler;
-        private ViaPlatformLoader loader;
 
         public ViaManagerBuilder platform(ViaPlatform<?> platform) {
             this.platform = platform;

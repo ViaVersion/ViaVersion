@@ -17,7 +17,9 @@
  */
 package com.viaversion.viaversion.bukkit.handlers;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
@@ -75,7 +77,8 @@ public final class BukkitEncodeHandler extends ViaEncodeHandler {
         }
 
         handledCompression = true;
-        if (compressorIndex > names.indexOf(BukkitChannelInitializer.VIA_ENCODER)) {
+        final ViaInjector injector = Via.getManager().getInjector();
+        if (compressorIndex > names.indexOf(injector.getEncoderName())) {
             // Need to decompress this packet due to bad order
             final ByteBuf decompressed = (ByteBuf) PipelineUtil.callDecode((ByteToMessageDecoder) pipeline.get(BukkitChannelInitializer.MINECRAFT_DECOMPRESSOR), ctx, buf).get(0);
             try {
@@ -84,8 +87,8 @@ public final class BukkitEncodeHandler extends ViaEncodeHandler {
                 decompressed.release();
             }
 
-            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_COMPRESSOR, BukkitChannelInitializer.VIA_ENCODER, pipeline.remove(BukkitChannelInitializer.VIA_ENCODER));
-            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_DECOMPRESSOR, BukkitChannelInitializer.VIA_DECODER, pipeline.remove(BukkitChannelInitializer.VIA_DECODER));
+            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_COMPRESSOR, injector.getEncoderName(), pipeline.remove(injector.getEncoderName()));
+            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_DECOMPRESSOR, injector.getDecoderName(), pipeline.remove(injector.getDecoderName()));
             return true;
         }
         return false;

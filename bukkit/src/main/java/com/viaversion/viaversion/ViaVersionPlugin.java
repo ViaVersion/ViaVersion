@@ -138,11 +138,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     }
 
     @Override
-    public String getPluginVersion() {
-        return getDescription().getVersion();
-    }
-
-    @Override
     public PlatformTask runAsync(Runnable runnable) {
         if (FOLIA) {
             return new BukkitViaTaskTask(Via.getManager().getScheduler().execute(runnable));

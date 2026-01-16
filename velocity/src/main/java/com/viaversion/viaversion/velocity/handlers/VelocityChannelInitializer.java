@@ -17,7 +17,9 @@
  */
 package com.viaversion.viaversion.velocity.handlers;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.platform.ViaChannelInitializer;
 import com.viaversion.viaversion.platform.ViaEncodeHandler;
 import io.netty.channel.Channel;
@@ -45,7 +47,8 @@ public class VelocityChannelInitializer extends ViaChannelInitializer {
     @Override
     protected void injectPipeline(final ChannelPipeline pipeline, final UserConnection connection) {
         // We need to add a separated handler because Velocity uses pipeline().get(MINECRAFT_DECODER)
-        pipeline.addBefore(MINECRAFT_ENCODER, VIA_ENCODER, new ViaEncodeHandler(connection));
-        pipeline.addBefore(MINECRAFT_DECODER, VIA_DECODER, new VelocityDecodeHandler(connection));
+        final ViaInjector injector = Via.getManager().getInjector();
+        pipeline.addBefore(MINECRAFT_ENCODER, injector.getEncoderName(), new ViaEncodeHandler(connection));
+        pipeline.addBefore(MINECRAFT_DECODER, injector.getDecoderName(), new VelocityDecodeHandler(connection));
     }
 }

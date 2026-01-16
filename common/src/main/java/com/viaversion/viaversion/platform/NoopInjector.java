@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.common.dummy;
+package com.viaversion.viaversion.platform;
 
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import java.util.SortedSet;
 
-public class TestInjector implements ViaInjector {
+/**
+ * Default implementation for {@link ViaInjector} on standalone proxies/platforms supporting all {@link ProtocolVersion}s and not requiring additional injection.
+ */
+public class NoopInjector implements ViaInjector {
 
     @Override
     public void inject() {
@@ -32,12 +37,20 @@ public class TestInjector implements ViaInjector {
     }
 
     @Override
-    public ProtocolVersion getServerProtocolVersion() {
-        return ProtocolVersion.v1_21_7;
+    public ProtocolVersion getServerProtocolVersion() throws Exception {
+        return getServerProtocolVersions().first();
+    }
+
+    @Override
+    public SortedSet<ProtocolVersion> getServerProtocolVersions() {
+        // Collect all registered protocol versions
+        final SortedSet<ProtocolVersion> versions = new ObjectLinkedOpenHashSet<>();
+        versions.addAll(ProtocolVersion.getProtocols());
+        return versions;
     }
 
     @Override
     public JsonObject getDump() {
-        return null;
+        return new JsonObject();
     }
 }
