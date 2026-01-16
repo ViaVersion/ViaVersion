@@ -232,7 +232,10 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
         final StringTag assetIdTag = tag.getStringTag("asset_id");
         final String assetId = assetIdTag.getValue();
         if (assetId.endsWith("_" + key)) {
-            assetIdTag.setValue(key + "_" + assetId.substring(key.length() + 1));
+            // e.g. entity/frog/warm_frog -> entity/frog/frog_warm
+            final String mappedAsset = assetId.substring(0, assetId.length() - key.length() - 1)
+                .replace(key + "/", key + "/" + key + "_");
+            assetIdTag.setValue(mappedAsset);
         }
     }
 

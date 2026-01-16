@@ -67,7 +67,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
      */
     @Override
     public Item handleItemToClient(UserConnection connection, Item item) {
-        if (item.isEmpty()) {
+        if (Item.isEmpty(item)) {
             return item;
         }
 
@@ -128,7 +128,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
 
     @Override
     public Item handleItemToServer(UserConnection connection, Item item) {
-        if (item.isEmpty()) {
+        if (Item.isEmpty(item)) {
             return item;
         }
 
