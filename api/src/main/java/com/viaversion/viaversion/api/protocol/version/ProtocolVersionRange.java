@@ -97,6 +97,24 @@ public class ProtocolVersionRange {
     }
 
     /**
+     * Adds all ranges from the given range to this range. This method is only available if the range is not already containing all versions.
+     *
+     * @param range the range to add
+     * @return this range
+     */
+    public ProtocolVersionRange add(final ProtocolVersionRange range) {
+        if (ranges == null) {
+            throw new UnsupportedOperationException("Range already contains all versions. Cannot add a new range.");
+        }
+        if (range.ranges != null) {
+            ranges.addAll(range.ranges);
+        } else {
+            ranges = null;
+        }
+        return this;
+    }
+
+    /**
      * Checks if the given version is included in this range.
      *
      * @param version the version

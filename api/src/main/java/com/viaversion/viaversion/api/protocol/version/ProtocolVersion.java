@@ -195,6 +195,17 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     }
 
     /**
+     * Returns an immutable list of registered protocol versions from newest to oldest.
+     *
+     * @return immutable list of registered protocol versions from newest to oldest
+     */
+    public static List<ProtocolVersion> getReversedProtocols() {
+        final List<ProtocolVersion> protocolVersions = new ArrayList<>(getProtocols());
+        Collections.reverse(protocolVersions);
+        return Collections.unmodifiableList(protocolVersions);
+    }
+
+    /**
      * Returns the registered protocol version if present, else null.
      * This accepts the actual registered names (like "1.16.4/1.16.5") as well as
      * included versions for version ranges and wildcards.
