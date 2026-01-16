@@ -23,12 +23,15 @@
 package com.viaversion.viaversion.api.platform;
 
 import com.google.gson.JsonObject;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.util.VersionInfo;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 /**
@@ -73,7 +76,9 @@ public interface ViaPlatform<T> {
      *
      * @return Plugin version as a semver string
      */
-    String getPluginVersion();
+    default String getPluginVersion() {
+        return VersionInfo.getVersion();
+    }
 
     /**
      * Run a task Async
@@ -81,7 +86,9 @@ public interface ViaPlatform<T> {
      * @param runnable The task to run
      * @return The Task ID
      */
-    PlatformTask runAsync(Runnable runnable);
+    default PlatformTask runAsync(Runnable runnable) {
+        return new ViaPlatformTask(Via.getManager().getScheduler().execute(runnable));
+    }
 
     /**
      * Run a task async at a repeating interval.
@@ -90,7 +97,9 @@ public interface ViaPlatform<T> {
      * @param ticks    The interval to run it at
      * @return The Task ID
      */
-    PlatformTask runRepeatingAsync(Runnable runnable, long ticks);
+    default PlatformTask runRepeatingAsync(Runnable runnable, long ticks) {
+        return new ViaPlatformTask(Via.getManager().getScheduler().scheduleRepeating(runnable, ticks * 50, ticks * 50, TimeUnit.MILLISECONDS));
+    }
 
     /**
      * Run a task Sync
@@ -98,7 +107,9 @@ public interface ViaPlatform<T> {
      * @param runnable The task to run
      * @return The Task ID
      */
-    PlatformTask runSync(Runnable runnable);
+    default PlatformTask runSync(Runnable runnable) {
+        return runAsync(runnable);
+    }
 
     /**
      * Runs a synchronous task after a delay in ticks.
@@ -107,7 +118,9 @@ public interface ViaPlatform<T> {
      * @param delay    delay in ticks to run it after
      * @return created task
      */
-    PlatformTask runSync(Runnable runnable, long delay);
+    default PlatformTask runSync(Runnable runnable, long delay) {
+        return new ViaPlatformTask(Via.getManager().getScheduler().schedule(runnable, delay * 50, TimeUnit.MILLISECONDS));
+    }
 
     /**
      * Runs a synchronous task at a repeating interval.
@@ -116,7 +129,9 @@ public interface ViaPlatform<T> {
      * @param period   period in ticks to run at
      * @return created task
      */
-    PlatformTask runRepeatingSync(Runnable runnable, long period);
+    default PlatformTask runRepeatingSync(Runnable runnable, long period) {
+        return runRepeatingAsync(runnable, period);
+    }
 
     /**
      * Send a message to a player

@@ -29,7 +29,6 @@ public class TestInjector implements ViaInjector {
 
     @Override
     public void uninject() {
-
     }
 
     @Override

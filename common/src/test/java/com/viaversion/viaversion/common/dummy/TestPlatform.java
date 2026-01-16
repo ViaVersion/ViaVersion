@@ -17,22 +17,23 @@
  */
 package com.viaversion.viaversion.common.dummy;
 
-import com.viaversion.viaversion.ViaAPIBase;
-import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.UserConnectionViaAPI;
 import com.viaversion.viaversion.api.ViaAPI;
-import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
-import com.viaversion.viaversion.api.platform.PlatformTask;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import io.netty.buffer.ByteBuf;
+import com.viaversion.viaversion.configuration.AbstractViaConfig;
 import java.io.File;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public final class TestPlatform implements ViaPlatform {
+public final class TestPlatform implements ViaPlatform<UserConnection> {
 
     private static final Logger log = Logger.getGlobal();
-    private final TestConfig testConfig = new TestConfig(null, log);
+    private final AbstractViaConfig testConfig = new AbstractViaConfig(null, log) {
+        @Override
+        public void reload() {
+        }
+    };
+    private final UserConnectionViaAPI testAPI = new UserConnectionViaAPI();
 
     @Override
     public Logger getLogger() {
@@ -55,46 +56,12 @@ public final class TestPlatform implements ViaPlatform {
     }
 
     @Override
-    public PlatformTask runAsync(Runnable runnable) {
-        return new TestTask(Via.getManager().getScheduler().execute(runnable));
+    public ViaAPI<UserConnection> getApi() {
+        return testAPI;
     }
 
     @Override
-    public PlatformTask runRepeatingAsync(final Runnable runnable, final long ticks) {
-        return new TestTask(Via.getManager().getScheduler().scheduleRepeating(runnable, ticks * 50, ticks * 50, TimeUnit.MILLISECONDS));
-    }
-
-    @Override
-    public PlatformTask runSync(Runnable runnable) {
-        return runAsync(runnable);
-    }
-
-    @Override
-    public PlatformTask runSync(Runnable runnable, long delay) {
-        return new TestTask(Via.getManager().getScheduler().schedule(runnable, delay * 50, TimeUnit.MILLISECONDS));
-    }
-
-    @Override
-    public PlatformTask runRepeatingSync(Runnable runnable, long period) {
-        return runRepeatingAsync(runnable, period);
-    }
-
-    @Override
-    public ViaAPI getApi() {
-        return new ViaAPIBase() {
-            @Override
-            public ProtocolVersion getPlayerProtocolVersion(Object player) {
-                return ProtocolVersion.unknown;
-            }
-
-            @Override
-            public void sendRawPacket(Object player, ByteBuf packet) {
-            }
-        };
-    }
-
-    @Override
-    public ViaVersionConfig getConf() {
+    public AbstractViaConfig getConf() {
         return testConfig;
     }
 

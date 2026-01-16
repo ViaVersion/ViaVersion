@@ -22,22 +22,15 @@
  */
 package com.viaversion.viaversion.api.platform;
 
-public interface ViaPlatformLoader {
+import com.viaversion.viaversion.api.scheduler.Task;
 
-    ViaPlatformLoader NOOP = new ViaPlatformLoader() {
-        @Override
-        public void load() {
-        }
+/**
+ * Implements {@link PlatformTask} for Via's own scheduler. If present and possible, platform schedulers should be used over this.
+ */
+public record ViaPlatformTask(Task task) implements PlatformTask<Task> {
 
-        @Override
-        public void unload() {
-        }
-    };
-
-    /**
-     * Initialise the loading for a platform, e.g. registering listeners / providers / events etc.
-     */
-    void load();
-
-    void unload();
+    @Override
+    public void cancel() {
+        task.cancel();
+    }
 }

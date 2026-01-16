@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.common.dummy;
+package com.viaversion.viaversion;
 
-import com.viaversion.viaversion.ViaManagerImpl;
-import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import io.netty.buffer.ByteBuf;
 
-public final class DummyInitializer {
+/**
+ * Implements {@link ViaAPIBase} on Via's own {@link UserConnection}.
+ */
+public class UserConnectionViaAPI extends ViaAPIBase<UserConnection> {
 
-    private static boolean initialized;
+    @Override
+    public ProtocolVersion getPlayerProtocolVersion(final UserConnection connection) {
+        return connection.getProtocolInfo().protocolVersion();
+    }
 
-    public static void init() {
-        if (initialized) {
-            return;
-        }
-
-        initialized = true;
-        Via.init(new ViaManagerImpl(new TestPlatform(), new TestInjector(), new TestCommandHandler(), new TestLoader()));
-
-        final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
-        manager.init();
-        manager.onServerLoaded();
+    @Override
+    public void sendRawPacket(final UserConnection connection, final ByteBuf packet) {
+        connection.sendRawPacket(packet);
     }
 }

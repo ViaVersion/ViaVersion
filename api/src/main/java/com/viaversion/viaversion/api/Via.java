@@ -84,4 +84,8 @@ public final class Via {
         Preconditions.checkArgument(manager != null, "ViaVersion has not loaded the platform yet");
         return manager;
     }
+
+    public static boolean isLoaded() {
+        return manager != null;
+    }
 }

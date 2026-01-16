@@ -78,6 +78,26 @@ public class ViaManagerImpl implements ViaManager {
         this.loader = loader;
     }
 
+    /**
+     * Initialized and completes the full loading process of ViaVersion.
+     *
+     * @param platform       platform
+     * @param injector       platform injector
+     * @param commandHandler command handler
+     * @return the initialized and loaded manager
+     */
+    public static ViaManager initAndLoad(ViaPlatform<?> platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader, Runnable... enableListeners) {
+        final ViaManagerImpl manager = new ViaManagerImpl(platform, injector, commandHandler, loader);
+        Via.init(manager);
+        platform.getConf().reload();
+        for (final Runnable listener : enableListeners) {
+            manager.addEnableListener(listener);
+        }
+        manager.init();
+        manager.onServerLoaded();
+        return manager;
+    }
+
     public static ViaManagerBuilder builder() {
         return new ViaManagerBuilder();
     }

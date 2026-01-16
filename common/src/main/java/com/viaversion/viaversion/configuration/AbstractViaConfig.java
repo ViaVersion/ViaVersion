@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public abstract class AbstractViaConfig extends Config implements ViaVersionConfig {
+public class AbstractViaConfig extends Config implements ViaVersionConfig {
     public static final List<String> BUKKIT_ONLY_OPTIONS = Arrays.asList("register-userconnections-on-join", "quick-move-action-fix",
         "change-1_9-hitbox", "change-1_14-hitbox", "blockconnection-method", "armor-toggle-fix", "use-new-deathmessages",
         "item-cache", "nms-player-ticking");
@@ -100,7 +100,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private int maxErrorLength;
     private boolean use1_8HitboxMargin;
 
-    protected AbstractViaConfig(final File configFile, final Logger logger) {
+    public AbstractViaConfig(final File configFile, final Logger logger) {
         super(configFile, logger);
     }
 

@@ -43,10 +43,10 @@ import java.util.Set;
 
 import static com.viaversion.viaversion.api.command.ViaSubCommand.color;
 
-public abstract class ViaCommandHandler implements ViaVersionCommand {
+public class ViaCommandHandler implements ViaVersionCommand {
     private final Map<String, ViaSubCommand> commandMap = new HashMap<>();
 
-    protected ViaCommandHandler() {
+    public ViaCommandHandler() {
         registerDefaults();
     }
 
