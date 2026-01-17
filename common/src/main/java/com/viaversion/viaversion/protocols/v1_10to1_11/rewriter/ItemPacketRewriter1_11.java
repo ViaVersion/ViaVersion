@@ -67,10 +67,7 @@ public class ItemPacketRewriter1_11 extends ItemRewriter<ClientboundPackets1_9_3
         if (enchTag != null && enchTag.isEmpty()) {
             tag.putBoolean(nbtTagName("clearEnch"), true);
 
-            CompoundTag dummyTag = new CompoundTag();
-            dummyTag.putShort("id", Short.MAX_VALUE);
-
-            enchTag.add(dummyTag);
+            enchTag.add(new CompoundTag());
         }
         return item;
     }
