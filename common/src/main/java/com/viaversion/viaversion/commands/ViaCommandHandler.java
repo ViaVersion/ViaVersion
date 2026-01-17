@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.command.ViaVersionCommand;
 import com.viaversion.viaversion.commands.defaultsubs.AutoTeamSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.DebugSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.DisplayLeaksSubCmd;
-import com.viaversion.viaversion.commands.defaultsubs.DontBugMeSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.DumpSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.ListSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.PPSSubCmd;
@@ -197,7 +196,6 @@ public class ViaCommandHandler implements ViaVersionCommand {
         registerSubCommand(new DebugSubCmd());
         registerSubCommand(new DumpSubCmd());
         registerSubCommand(new DisplayLeaksSubCmd());
-        registerSubCommand(new DontBugMeSubCmd());
         registerSubCommand(new AutoTeamSubCmd());
         registerSubCommand(new ReloadSubCmd());
         registerSubCommand(new PlayerSubCmd());

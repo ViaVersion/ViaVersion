@@ -19,11 +19,13 @@ package com.viaversion.viaversion.velocity.command;
 
 import com.velocitypowered.api.command.SimpleCommand;
 import com.viaversion.viaversion.commands.ViaCommandHandler;
+import com.viaversion.viaversion.commands.defaultsubs.DontBugMeSubCmd;
 import com.viaversion.viaversion.velocity.command.subs.ProbeSubCmd;
 import java.util.List;
 
 public class VelocityCommandHandler extends ViaCommandHandler implements SimpleCommand {
     public VelocityCommandHandler() {
+        registerSubCommand(new DontBugMeSubCmd());
         registerSubCommand(new ProbeSubCmd());
     }
 
