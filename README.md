@@ -78,7 +78,7 @@ If you need access to the existing protocol or platform implementations, use the
 Please note the [differences in licensing](#license).
 
 Note: If you want to make your own platform implementation of ViaVersion (and additional addons),
-you can use the [ViaLoader](https://github.com/ViaVersion/ViaLoader) project.
+take a look at the [documentation](https://github.com/ViaVersion/ViaVersion/wiki/Creating-a-new-ViaVersion-platform).
 
 Building
 --------
