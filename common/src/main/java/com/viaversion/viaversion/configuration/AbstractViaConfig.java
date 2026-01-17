@@ -118,6 +118,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     public List<String> getUnsupportedOptions() {
         final List<String> unsupportedOptions = new ArrayList<>(BUKKIT_ONLY_OPTIONS);
         unsupportedOptions.addAll(VELOCITY_ONLY_OPTIONS);
+        unsupportedOptions.add("check-for-updates");
         return unsupportedOptions;
     }
 

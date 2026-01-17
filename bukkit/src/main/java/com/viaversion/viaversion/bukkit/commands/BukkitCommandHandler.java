@@ -25,6 +25,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
 public class BukkitCommandHandler extends ViaCommandHandler implements CommandExecutor, TabExecutor {
+
+    public BukkitCommandHandler() {
+        super(true);
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         return onCommand(new BukkitCommandSender(sender), args);

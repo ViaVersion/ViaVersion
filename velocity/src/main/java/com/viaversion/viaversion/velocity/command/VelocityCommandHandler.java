@@ -24,6 +24,7 @@ import java.util.List;
 
 public class VelocityCommandHandler extends ViaCommandHandler implements SimpleCommand {
     public VelocityCommandHandler() {
+        super(true);
         registerSubCommand(new ProbeSubCmd());
     }
 
