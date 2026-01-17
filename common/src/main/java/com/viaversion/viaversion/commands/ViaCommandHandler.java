@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.command.ViaVersionCommand;
 import com.viaversion.viaversion.commands.defaultsubs.AutoTeamSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.DebugSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.DisplayLeaksSubCmd;
+import com.viaversion.viaversion.commands.defaultsubs.DontBugMeSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.DumpSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.ListSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.PPSSubCmd;
@@ -46,7 +47,21 @@ public class ViaCommandHandler implements ViaVersionCommand {
     private final Map<String, ViaSubCommand> commandMap = new HashMap<>();
 
     public ViaCommandHandler() {
-        registerDefaults();
+        this(false);
+    }
+
+    public ViaCommandHandler(final boolean checkForUpdates) {
+        registerSubCommand(new ListSubCmd());
+        registerSubCommand(new PPSSubCmd());
+        registerSubCommand(new DebugSubCmd());
+        registerSubCommand(new DumpSubCmd());
+        registerSubCommand(new DisplayLeaksSubCmd());
+        registerSubCommand(new AutoTeamSubCmd());
+        registerSubCommand(new ReloadSubCmd());
+        registerSubCommand(new PlayerSubCmd());
+        if (checkForUpdates) {
+            registerSubCommand(new DontBugMeSubCmd());
+        }
     }
 
     @Override
@@ -188,16 +203,5 @@ public class ViaCommandHandler implements ViaVersionCommand {
 
     private boolean hasPermission(ViaCommandSender sender, String permission) {
         return permission == null || sender.hasPermission("viaversion.admin") || sender.hasPermission(permission);
-    }
-
-    private void registerDefaults() {
-        registerSubCommand(new ListSubCmd());
-        registerSubCommand(new PPSSubCmd());
-        registerSubCommand(new DebugSubCmd());
-        registerSubCommand(new DumpSubCmd());
-        registerSubCommand(new DisplayLeaksSubCmd());
-        registerSubCommand(new AutoTeamSubCmd());
-        registerSubCommand(new ReloadSubCmd());
-        registerSubCommand(new PlayerSubCmd());
     }
 }

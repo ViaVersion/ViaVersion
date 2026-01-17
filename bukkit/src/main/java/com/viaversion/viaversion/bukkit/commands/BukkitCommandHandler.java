@@ -19,7 +19,6 @@ package com.viaversion.viaversion.bukkit.commands;
 
 import com.viaversion.viaversion.commands.ViaCommandHandler;
 import java.util.List;
-import com.viaversion.viaversion.commands.defaultsubs.DontBugMeSubCmd;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,7 +27,7 @@ import org.bukkit.command.TabExecutor;
 public class BukkitCommandHandler extends ViaCommandHandler implements CommandExecutor, TabExecutor {
 
     public BukkitCommandHandler() {
-        registerSubCommand(new DontBugMeSubCmd());
+        super(true);
     }
 
     @Override
