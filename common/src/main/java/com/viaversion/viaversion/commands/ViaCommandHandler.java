@@ -46,8 +46,9 @@ import static com.viaversion.viaversion.api.command.ViaSubCommand.color;
 public class ViaCommandHandler implements ViaVersionCommand {
     private final Map<String, ViaSubCommand> commandMap = new HashMap<>();
 
+    @Deprecated
     public ViaCommandHandler() {
-        this(false);
+        this(true);
     }
 
     public ViaCommandHandler(final boolean checkForUpdates) {
