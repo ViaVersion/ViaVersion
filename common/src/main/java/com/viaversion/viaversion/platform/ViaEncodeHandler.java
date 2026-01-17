@@ -25,7 +25,6 @@ import com.viaversion.viaversion.util.ByteBufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import java.util.List;
 
@@ -60,15 +59,9 @@ public class ViaEncodeHandler extends MessageToMessageEncoder<ByteBuf> implement
     }
 
     @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        try {
-            super.write(ctx, msg, promise);
-        } catch (Throwable e) {
-            if (!(e instanceof CancelCodecException)) {
-                throw e;
-            } else {
-                promise.setSuccess();
-            }
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        if (!(cause instanceof CancelCodecException)) {
+            super.exceptionCaught(ctx, cause);
         }
     }
 
