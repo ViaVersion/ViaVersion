@@ -70,9 +70,26 @@ public class ViaCodecHandler extends ByteToMessageCodec<ByteBuf> implements ViaC
     }
 
     @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        if (!(cause instanceof CancelCodecException)) {
-            super.exceptionCaught(ctx, cause);
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        try {
+            super.write(ctx, msg, promise);
+        } catch (Throwable e) {
+            if (!(e instanceof CancelCodecException)) {
+                throw e;
+            } else {
+                promise.setSuccess();
+            }
+        }
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        try {
+            super.channelRead(ctx, msg);
+        } catch (Throwable e) {
+            if (!(e instanceof CancelCodecException)) {
+                throw e;
+            }
         }
     }
 
