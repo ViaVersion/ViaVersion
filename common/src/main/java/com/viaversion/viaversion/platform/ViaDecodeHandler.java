@@ -30,6 +30,9 @@ import java.util.List;
 
 @ChannelHandler.Sharable
 public class ViaDecodeHandler extends MessageToMessageDecoder<ByteBuf> implements ViaChannelHandler {
+
+    public static final String NAME = "via-decoder";
+
     protected final UserConnection connection;
 
     public ViaDecodeHandler(final UserConnection connection) {
@@ -56,9 +59,13 @@ public class ViaDecodeHandler extends MessageToMessageDecoder<ByteBuf> implement
     }
 
     @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        if (!(cause instanceof CancelCodecException)) {
-            super.exceptionCaught(ctx, cause);
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        try {
+            super.channelRead(ctx, msg);
+        } catch (Throwable e) {
+            if (!(e instanceof CancelCodecException)) {
+                throw e;
+            }
         }
     }
 

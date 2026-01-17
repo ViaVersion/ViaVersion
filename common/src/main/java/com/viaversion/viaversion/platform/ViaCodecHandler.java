@@ -20,39 +20,49 @@ package com.viaversion.viaversion.platform;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.ViaChannelHandler;
 import com.viaversion.viaversion.exception.CancelCodecException;
+import com.viaversion.viaversion.exception.CancelDecoderException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
-import com.viaversion.viaversion.util.ByteBufUtil;
+import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
-import io.netty.handler.codec.MessageToMessageEncoder;
+import io.netty.handler.codec.ByteToMessageCodec;
+
 import java.util.List;
 
-@ChannelHandler.Sharable
-public class ViaEncodeHandler extends MessageToMessageEncoder<ByteBuf> implements ViaChannelHandler {
+public class ViaCodecHandler extends ByteToMessageCodec<ByteBuf> implements ViaChannelHandler {
 
-    public static final String NAME = "via-encoder";
+    public static final String NAME = "via-codec";
 
     protected final UserConnection connection;
 
-    public ViaEncodeHandler(final UserConnection connection) {
+    public ViaCodecHandler(final UserConnection connection) {
         this.connection = connection;
     }
 
     @Override
-    protected void encode(final ChannelHandlerContext ctx, final ByteBuf buf, final List<Object> out) throws Exception {
-        if (!connection.checkOutgoingPacket()) {
+    protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) {
+        if (!this.connection.checkOutgoingPacket()) {
             throw CancelEncoderException.generate(null);
         }
-        if (!connection.shouldTransformPacket()) {
-            out.add(buf.retain());
-            return;
+
+        out.writeBytes(in);
+        if (this.connection.shouldTransformPacket()) {
+            this.connection.transformOutgoing(out, CancelEncoderException::generate);
+        }
+    }
+
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        if (!this.connection.checkIncomingPacket(in.readableBytes())) {
+            throw CancelDecoderException.generate(null);
         }
 
-        final ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), buf);
+        final ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(in);
         try {
-            connection.transformOutgoing(transformedBuf, CancelEncoderException::generate);
+            if (this.connection.shouldTransformPacket()) {
+                this.connection.transformIncoming(transformedBuf, CancelDecoderException::generate);
+            }
             out.add(transformedBuf.retain());
         } finally {
             transformedBuf.release();
@@ -60,25 +70,14 @@ public class ViaEncodeHandler extends MessageToMessageEncoder<ByteBuf> implement
     }
 
     @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        try {
-            super.write(ctx, msg, promise);
-        } catch (Throwable e) {
-            if (!(e instanceof CancelCodecException)) {
-                throw e;
-            } else {
-                promise.setSuccess();
-            }
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        if (!(cause instanceof CancelCodecException)) {
+            super.exceptionCaught(ctx, cause);
         }
     }
 
     @Override
-    public boolean isSharable() {
-        return true;
-    }
-
-    @Override
     public UserConnection connection() {
-        return connection;
+        return this.connection;
     }
 }
