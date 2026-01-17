@@ -176,6 +176,12 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     }
 
     @Override
+    public void sendCustomPayloadToClient(final UserConnection connection, final String channel, final byte[] message) {
+        final UUID uuid = connection.getProtocolInfo().getUuid();
+        PROXY.getPlayer(uuid).ifPresent(player -> player.sendPluginMessage(MinecraftChannelIdentifier.from(channel), message));
+    }
+
+    @Override
     public boolean kickPlayer(UserConnection connection, String message) {
         final UUID uuid = connection.getProtocolInfo().getUuid();
         if (uuid == null) {
