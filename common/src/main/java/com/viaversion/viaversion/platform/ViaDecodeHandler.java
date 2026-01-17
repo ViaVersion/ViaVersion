@@ -30,6 +30,9 @@ import java.util.List;
 
 @ChannelHandler.Sharable
 public class ViaDecodeHandler extends MessageToMessageDecoder<ByteBuf> implements ViaChannelHandler {
+
+    public static final String NAME = "via-decoder";
+
     protected final UserConnection connection;
 
     public ViaDecodeHandler(final UserConnection connection) {
