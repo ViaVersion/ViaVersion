@@ -568,7 +568,6 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             }
             return new FoodProperties1_21_2(food.nutrition(), food.saturationModifier(), food.canAlwaysEat());
         }, () -> {
-            dataContainer.setEmpty(StructuredDataKey.FOOD1_21_2);
             dataContainer.setEmpty(StructuredDataKey.CONSUMABLE1_21_2);
             dataContainer.setEmpty(StructuredDataKey.V1_21_2.useRemainder);
         });

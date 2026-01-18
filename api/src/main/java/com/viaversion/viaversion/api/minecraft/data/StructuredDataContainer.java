@@ -177,11 +177,10 @@ public final class StructuredDataContainer implements Copyable {
                 set(toKey, replacement);
             }
         } else {
+            // Also replace the key for empty data
+            setEmpty(toKey);
             if (emptyValueHandler != null) {
                 emptyValueHandler.run();
-            } else {
-                // Also replace the key for empty data
-                setEmpty(toKey);
             }
         }
     }
