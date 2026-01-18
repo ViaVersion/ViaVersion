@@ -160,6 +160,10 @@ public final class StructuredDataContainer implements Copyable {
     }
 
     public <T, V> void replace(final StructuredDataKey<T> key, final StructuredDataKey<V> toKey, final Function<T, @Nullable V> valueMapper) {
+        replace(key, toKey, valueMapper, null);
+    }
+
+    public <T, V> void replace(final StructuredDataKey<T> key, final StructuredDataKey<V> toKey, final Function<T, @Nullable V> valueMapper, final Runnable emptyValueHandler) {
         final StructuredData<?> data = this.data.remove(key);
         if (data == null) {
             return;
@@ -173,8 +177,12 @@ public final class StructuredDataContainer implements Copyable {
                 set(toKey, replacement);
             }
         } else {
-            // Also replace the key for empty data
-            setEmpty(toKey);
+            if (emptyValueHandler != null) {
+                emptyValueHandler.run();
+            } else {
+                // Also replace the key for empty data
+                setEmpty(toKey);
+            }
         }
     }
 
