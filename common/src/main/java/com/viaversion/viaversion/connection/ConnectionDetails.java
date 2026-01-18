@@ -60,6 +60,10 @@ public final class ConnectionDetails {
      * @param channel    the channel to send the details to
      */
     public static void sendPlayerDetails(final UserConnection connection, final String channel) {
+        if (!Via.getConfig().sendPlayerDetails()) {
+            return;
+        }
+
         final ProtocolInfo protocolInfo = connection.getProtocolInfo();
         final ProtocolVersion nativeVersion = protocolInfo.protocolVersion();
         final ProtocolVersion serverVersion = protocolInfo.serverProtocolVersion();
