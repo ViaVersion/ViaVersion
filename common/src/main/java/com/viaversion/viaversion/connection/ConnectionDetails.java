@@ -64,24 +64,20 @@ public final class ConnectionDetails {
             return;
         }
 
-        final ProtocolInfo protocolInfo = connection.getProtocolInfo();
-        final ProtocolVersion nativeVersion = protocolInfo.protocolVersion();
-        final ProtocolVersion serverVersion = protocolInfo.serverProtocolVersion();
-        if (serverVersion.equals(nativeVersion)) {
-            // No need to send details if the native version is the same as the server version
-            return;
-        }
+        final JsonObject payload = new JsonObject();
+        payload.addProperty("specVersion", VERSION);
 
         final String platformName = Via.getPlatform().getPlatformName();
         final String platformVersion = Via.getPlatform().getPlatformVersion();
 
-        final JsonObject payload = new JsonObject();
-        payload.addProperty("specVersion", VERSION);
+        final ProtocolInfo protocolInfo = connection.getProtocolInfo();
+        final ProtocolVersion clientVersion = protocolInfo.protocolVersion();
 
         payload.addProperty("platformName", platformName);
         payload.addProperty("platformVersion", platformVersion);
-        payload.addProperty("version", nativeVersion.getOriginalVersion());
-        payload.addProperty("versionName", nativeVersion.getName());
+        payload.addProperty("version", clientVersion.getOriginalVersion());
+        payload.addProperty("versionName", clientVersion.getName());
+        payload.addProperty("versionType", clientVersion.getVersionType().name());
 
         Via.getPlatform().sendCustomPayload(connection, channel, payload.toString().getBytes(StandardCharsets.UTF_8));
     }
@@ -98,13 +94,14 @@ public final class ConnectionDetails {
             return;
         }
 
-        final ProtocolInfo protocolInfo = connection.getProtocolInfo();
-        final ProtocolVersion serverVersion = protocolInfo.serverProtocolVersion();
         final JsonObject payload = new JsonObject();
         payload.addProperty("specVersion", VERSION);
 
+        final ProtocolInfo protocolInfo = connection.getProtocolInfo();
+        final ProtocolVersion serverVersion = protocolInfo.serverProtocolVersion();
         payload.addProperty("version", serverVersion.getOriginalVersion());
         payload.addProperty("versionName", serverVersion.getName());
+        payload.addProperty("versionType", serverVersion.getVersionType().name());
 
         Via.getPlatform().sendCustomPayloadToClient(connection, channel, payload.toString().getBytes(StandardCharsets.UTF_8));
     }
