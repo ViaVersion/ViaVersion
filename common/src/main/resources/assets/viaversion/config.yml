@@ -44,6 +44,9 @@ config-version: 1
 init-config-version: 1
 # Whether to update config values that were left on their default to newly changed defaults. Recommended to keep enabled.
 migrate-default-config-changes: true
+# If enabled, ViaVersion will send the native server version to a player on connect via a plugin message.
+# See the wiki for more info: https://github.com/ViaVersion/ViaVersion/wiki/Server-&-Player-Details-Protocol
+send-server-details: true
 #----------------------------------------------------------#
 #                    VELOCITY OPTIONS                      #
 #----------------------------------------------------------#

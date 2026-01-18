@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
+import com.viaversion.viaversion.connection.ConnectionDetails;
 import io.netty.channel.Channel;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -128,6 +129,8 @@ public class JoinListener implements Listener {
         info.setUuid(player.getUniqueId());
         info.setUsername(player.getName());
         Via.getManager().getConnectionManager().onLoginSuccess(user);
+
+        ConnectionDetails.sendConnectionDetails(user, ConnectionDetails.SERVER_CHANNEL);
     }
 
     private @Nullable UserConnection getUserConnection(Channel channel) {

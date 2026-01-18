@@ -26,18 +26,40 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Optional utility to provide the target server of a player's connection with the player's native version and the
- * current platform name/version for version-specific handling.
+ * Network protocol to provide information to backend and frontend servers about the
+ * connected players and the server. See the documentation for more information:
  * <p>
- * Requires {@link ViaPlatform#sendCustomPayload(UserConnection, String, byte[])} to be implemented
+ * <a href="https://github.com/ViaVersion/ViaVersion/wiki/Server-&-Player-Details-Protocol">Server/Player Details Protocol</a>
  */
 public final class ConnectionDetails {
 
-    public static final String PROXY_CHANNEL = "vv:proxy_details";
-    public static final String MOD_CHANNEL = "vv:mod_details";
-    public static final String APP_CHANNEL = "vv:app_details";
+    public static final String PROXY_CHANNEL = "vv:proxy_details"; // Used for multi server proxies like Velocity
+    public static final String SERVER_CHANNEL = "vv:server_details"; // Used for backend servers like Paper
+    public static final String MOD_CHANNEL = "vv:mod_details"; // Used for clientside mods like ViaFabric
+    public static final String APP_CHANNEL = "vv:app_details"; // Used for standalone applications
 
+    private static final int VERSION = 1;
+
+    /**
+     * Sends both player and server details to the proxy fronting the server.
+     *
+     * @param connection the user connection
+     * @param channel    the channel to send the details to
+     */
     public static void sendConnectionDetails(final UserConnection connection, final String channel) {
+        sendPlayerDetails(connection, channel);
+        sendServerDetails(connection, channel);
+    }
+
+    /**
+     * Sends the running ViaVersion version and native version of a player to the proxy fronting the server.
+     * <p>
+     * Requires {@link ViaPlatform#sendCustomPayload(UserConnection, String, byte[])} to be implemented
+     *
+     * @param connection the user connection
+     * @param channel    the channel to send the details to
+     */
+    public static void sendPlayerDetails(final UserConnection connection, final String channel) {
         final ProtocolInfo protocolInfo = connection.getProtocolInfo();
         final ProtocolVersion nativeVersion = protocolInfo.protocolVersion();
         final ProtocolVersion serverVersion = protocolInfo.serverProtocolVersion();
@@ -50,12 +72,37 @@ public final class ConnectionDetails {
         final String platformVersion = Via.getPlatform().getPlatformVersion();
 
         final JsonObject payload = new JsonObject();
+        payload.addProperty("specVersion", VERSION);
+
         payload.addProperty("platformName", platformName);
         payload.addProperty("platformVersion", platformVersion);
         payload.addProperty("version", nativeVersion.getOriginalVersion());
         payload.addProperty("versionName", nativeVersion.getName());
 
         Via.getPlatform().sendCustomPayload(connection, channel, payload.toString().getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Sends the server's version details to the connected client.
+     * <p>
+     * Requires {@link ViaPlatform#sendCustomPayloadToClient(UserConnection, String, byte[])} to be implemented
+     *
+     * @param connection the user connection
+     */
+    public static void sendServerDetails(final UserConnection connection, final String channel) {
+        if (!Via.getConfig().sendServerDetails()) {
+            return;
+        }
+
+        final ProtocolInfo protocolInfo = connection.getProtocolInfo();
+        final ProtocolVersion serverVersion = protocolInfo.serverProtocolVersion();
+        final JsonObject payload = new JsonObject();
+        payload.addProperty("specVersion", VERSION);
+
+        payload.addProperty("version", serverVersion.getOriginalVersion());
+        payload.addProperty("versionName", serverVersion.getName());
+
+        Via.getPlatform().sendCustomPayloadToClient(connection, channel, payload.toString().getBytes(StandardCharsets.UTF_8));
     }
 
 }
