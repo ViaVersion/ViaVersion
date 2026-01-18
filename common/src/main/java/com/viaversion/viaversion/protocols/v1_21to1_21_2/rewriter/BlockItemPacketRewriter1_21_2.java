@@ -567,6 +567,9 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 dataContainer.set(StructuredDataKey.V1_21_2.useRemainder, food.usingConvertsTo());
             }
             return new FoodProperties1_21_2(food.nutrition(), food.saturationModifier(), food.canAlwaysEat());
+        }, () -> {
+            dataContainer.setEmpty(StructuredDataKey.CONSUMABLE1_21_2);
+            dataContainer.setEmpty(StructuredDataKey.V1_21_2.useRemainder);
         });
         dataContainer.replaceKey(StructuredDataKey.POTION_CONTENTS1_20_5, StructuredDataKey.POTION_CONTENTS1_21_2);
         dataContainer.replace(StructuredDataKey.FIRE_RESISTANT, StructuredDataKey.DAMAGE_RESISTANT, fireResistant -> new DamageResistant(Key.of("minecraft:is_fire")));
