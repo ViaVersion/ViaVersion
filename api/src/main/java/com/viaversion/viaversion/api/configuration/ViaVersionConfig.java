@@ -543,6 +543,13 @@ public interface ViaVersionConfig extends Config {
     boolean use1_8HitboxMargin();
 
     /**
+     * If enabled, ViaVersion will send the native client version to the server on connect via a plugin message.
+     *
+     * @return true if enabled
+     */
+    boolean sendPlayerDetails();
+
+    /**
      * If enabled, ViaVersion will send the native server version to a player on connect via a plugin message.
      *
      * @return true if enabled
