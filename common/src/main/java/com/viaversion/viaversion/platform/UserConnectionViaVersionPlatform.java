@@ -50,6 +50,11 @@ public abstract class UserConnectionViaVersionPlatform implements ViaPlatform<Us
     public abstract Logger createLogger(String name);
 
     @Override
+    public boolean isProxy() {
+        return true;
+    }
+
+    @Override
     public Logger getLogger() {
         return logger;
     }
