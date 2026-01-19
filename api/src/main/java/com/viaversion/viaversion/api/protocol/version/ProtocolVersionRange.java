@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Wrapper class file for {@link com.google.common.collect.Range} to support multiple ranges. This class is used to
@@ -159,7 +160,7 @@ public class ProtocolVersionRange {
         return false;
     }
 
-    public ProtocolVersion getMin() {
+    public @Nullable ProtocolVersion getMin() {
         ProtocolVersion min = null;
         if (this.ranges != null) {
             for (Range<ProtocolVersion> range : this.ranges) {
@@ -174,7 +175,7 @@ public class ProtocolVersionRange {
         return min;
     }
 
-    public ProtocolVersion getMax() {
+    public @Nullable ProtocolVersion getMax() {
         ProtocolVersion max = null;
         if (this.ranges != null) {
             for (Range<ProtocolVersion> range : this.ranges) {
