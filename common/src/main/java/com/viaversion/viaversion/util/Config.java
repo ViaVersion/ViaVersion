@@ -22,10 +22,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
@@ -212,7 +212,7 @@ public abstract class Config extends ConfigSection {
         if (this.configFile.getParentFile() != null) {
             this.configFile.getParentFile().mkdirs();
         }
-        this.values = new ConcurrentSkipListMap<>(loadConfig(this.configFile));
+        this.values = Collections.synchronizedMap(loadConfig(this.configFile));
     }
 
     @Override
