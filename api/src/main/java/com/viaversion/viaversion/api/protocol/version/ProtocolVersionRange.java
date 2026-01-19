@@ -159,6 +159,36 @@ public class ProtocolVersionRange {
         return false;
     }
 
+    public ProtocolVersion getMin() {
+        ProtocolVersion min = null;
+        if (this.ranges != null) {
+            for (Range<ProtocolVersion> range : this.ranges) {
+                if (range.hasLowerBound()) {
+                    ProtocolVersion rangeMin = range.lowerEndpoint();
+                    if (min == null || rangeMin.compareTo(min) < 0) {
+                        min = rangeMin;
+                    }
+                }
+            }
+        }
+        return min;
+    }
+
+    public ProtocolVersion getMax() {
+        ProtocolVersion max = null;
+        if (this.ranges != null) {
+            for (Range<ProtocolVersion> range : this.ranges) {
+                if (range.hasUpperBound()) {
+                    ProtocolVersion rangeMax = range.upperEndpoint();
+                    if (max == null || rangeMax.compareTo(max) > 0) {
+                        max = rangeMax;
+                    }
+                }
+            }
+        }
+        return max;
+    }
+
     @Override
     public String toString() {
         if (this.ranges != null) {
