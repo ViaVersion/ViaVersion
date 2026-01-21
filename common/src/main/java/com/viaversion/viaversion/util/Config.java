@@ -139,9 +139,9 @@ public abstract class Config extends ConfigSection {
 
         handleConfig(mergedConfig);
 
-        if (!mergedConfig.equals(existingConfig)) {
-            originalRoot = existingConfig != null ? new ConfigSection(this, "", existingConfig) : null;
+        originalRoot = existingConfig != null ? new ConfigSection(this, "", existingConfig) : null;
 
+        if (!mergedConfig.equals(existingConfig)) {
             // Also updates comments once values need to be saved
             save(location, mergedConfig);
         }
@@ -228,7 +228,7 @@ public abstract class Config extends ConfigSection {
     /**
      * Returns the pre-modification root section of the config if present.
      *
-     * @return pre-modification root section, or null if no config existed or it did not require changes on load
+     * @return pre-modification root section, or null if no config existed
      */
     public @Nullable ConfigSection originalRootSection() {
         return originalRoot;
