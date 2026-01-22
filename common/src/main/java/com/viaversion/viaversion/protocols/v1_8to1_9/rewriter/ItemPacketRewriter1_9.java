@@ -61,7 +61,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     final short property = wrapper.get(Types.SHORT, 0);
                     short value = wrapper.get(Types.SHORT, 1);
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                    if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equalsIgnoreCase("minecraft:enchanting_table")) {
+                    if (inventoryTracker != null && inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equalsIgnoreCase("minecraft:enchanting_table")) {
                         if (property > 3 && property < 7) {
                             // Send 2 properties, splitting it into enchantID & level
                             final short level = (short) (value >> 8);
@@ -92,7 +92,9 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                 handler(wrapper -> {
                     String inventory = wrapper.get(Types.STRING, 0);
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                    inventoryTracker.setInventory(inventory);
+                    if (inventoryTracker != null) {
+                        inventoryTracker.setInventory(inventory);
+                    }
                 });
                 // Brewing patch
                 handler(wrapper -> {
