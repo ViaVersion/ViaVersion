@@ -40,6 +40,7 @@ import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.storage.DimensionScal
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
+import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 
 public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<ClientboundPacket1_21_6, ServerboundPacket1_21_9, Protocol1_21_7To1_21_9> {
 
@@ -49,7 +50,7 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
 
     @Override
     public void registerPackets() {
-        final BlockRewriter<ClientboundPacket1_21_6> blockRewriter = BlockRewriter.for1_20_2(protocol);
+        final BlockRewriter<ClientboundPacket1_21_6> blockRewriter = new BlockRewriter1_21_5<>(protocol);
         blockRewriter.registerBlockEvent(ClientboundPackets1_21_6.BLOCK_EVENT);
         blockRewriter.registerBlockUpdate(ClientboundPackets1_21_6.BLOCK_UPDATE);
         blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_21_6.SECTION_BLOCKS_UPDATE);
