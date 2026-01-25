@@ -23,17 +23,18 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.StringType;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
+import com.viaversion.viaversion.protocols.v1_17to1_17_1.rewriter.ItemPacketRewriter1_17_1;
 
 public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPackets1_17, ClientboundPackets1_17_1, ServerboundPackets1_17, ServerboundPackets1_17> {
 
     private static final StringType PAGE_STRING_TYPE = new StringType(8192);
     private static final StringType TITLE_STRING_TYPE = new StringType(128);
+    private final ItemPacketRewriter1_17_1 itemRewriter = new ItemPacketRewriter1_17_1(this);
 
     public Protocol1_17To1_17_1() {
         super(ClientboundPackets1_17.class, ClientboundPackets1_17_1.class, ServerboundPackets1_17.class, ServerboundPackets1_17.class);
@@ -41,41 +42,12 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
+        super.registerPackets();
+
         registerClientbound(ClientboundPackets1_17.REMOVE_ENTITY, ClientboundPackets1_17_1.REMOVE_ENTITIES, wrapper -> {
             // Aaaaand back to an array again!
             int entityId = wrapper.read(Types.VAR_INT);
             wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
-        });
-
-        registerClientbound(ClientboundPackets1_17.CONTAINER_SET_SLOT, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.BYTE); // Container id
-                create(Types.VAR_INT, 0); // Add arbitrary state id
-            }
-        });
-
-        registerClientbound(ClientboundPackets1_17.CONTAINER_SET_CONTENT, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.UNSIGNED_BYTE); // Container id
-                create(Types.VAR_INT, 0); // Add arbitrary state id
-                handler(wrapper -> {
-                    // Length encoded as var int now
-                    wrapper.write(Types.ITEM1_13_2_ARRAY, wrapper.read(Types.ITEM1_13_2_SHORT_ARRAY));
-
-                    // Carried item - should work like this
-                    wrapper.write(Types.ITEM1_13_2, null);
-                });
-            }
-        });
-
-        registerServerbound(ServerboundPackets1_17.CONTAINER_CLICK, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.BYTE); // Container id
-                read(Types.VAR_INT); // Remove state id
-            }
         });
 
         registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> {
@@ -121,5 +93,10 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
             // Write the slot
             wrapper.write(Types.VAR_INT, slot);
         });
+    }
+
+    @Override
+    public ItemPacketRewriter1_17_1 getItemRewriter() {
+        return itemRewriter;
     }
 }
