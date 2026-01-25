@@ -125,7 +125,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         });
 
         registerClientbound(ClientboundPackets1_20_3.SERVER_DATA, wrapper -> {
-            wrapper.passthrough(Types.TAG); // MOTD
+            wrapper.passthrough(Types.TRUSTED_TAG); // MOTD
             wrapper.passthrough(Types.OPTIONAL_BYTE_ARRAY_PRIMITIVE); // Icon
 
             // Moved to join game

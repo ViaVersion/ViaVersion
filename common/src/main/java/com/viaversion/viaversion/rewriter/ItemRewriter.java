@@ -472,8 +472,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
                 // Display data
                 if (wrapper.passthrough(Types.BOOLEAN)) {
-                    final Tag title = wrapper.passthrough(Types.TAG);
-                    final Tag description = wrapper.passthrough(Types.TAG);
+                    final Tag title = wrapper.passthrough(Types.TRUSTED_TAG);
+                    final Tag description = wrapper.passthrough(Types.TRUSTED_TAG);
                     final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
                     if (componentRewriter != null) {
                         componentRewriter.processTag(wrapper.user(), title);

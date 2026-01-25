@@ -46,7 +46,7 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
     @Override
     public CompoundTag read(final ByteBuf buffer) {
         try {
-            return read(buffer, true);
+            return read(buffer, MAX_NBT_BYTES, true);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -61,7 +61,7 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
         }
     }
 
-    public static CompoundTag read(final ByteBuf buffer, final boolean readName) throws IOException {
+    public static CompoundTag read(final ByteBuf buffer, final int maxBytes, final boolean readName) throws IOException {
         final byte id = buffer.readByte();
         if (id == 0) {
             return null;
@@ -74,7 +74,7 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
             buffer.skipBytes(buffer.readUnsignedShort());
         }
 
-        final TagLimiter tagLimiter = TagLimiter.create(MAX_NBT_BYTES, MAX_NESTING_LEVEL);
+        final TagLimiter tagLimiter = TagLimiter.create(maxBytes, MAX_NESTING_LEVEL);
         return CompoundTag.read(new ByteBufInputStream(buffer), tagLimiter, 0);
     }
 

@@ -41,14 +41,21 @@ import java.util.Map;
  */
 public class CompoundTagType extends Type<CompoundTag> {
 
+    private final int maxBytes;
+
     public CompoundTagType() {
+        this(true);
+    }
+
+    public CompoundTagType(final boolean limitMaxBytes) {
         super(CompoundTag.class);
+        this.maxBytes = limitMaxBytes ? NamedCompoundTagType.MAX_NBT_BYTES : Integer.MAX_VALUE;
     }
 
     @Override
     public CompoundTag read(final ByteBuf buffer) {
         try {
-            return NamedCompoundTagType.read(buffer, false);
+            return NamedCompoundTagType.read(buffer, this.maxBytes, false);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -74,8 +81,16 @@ public class CompoundTagType extends Type<CompoundTag> {
 
     public static final class OptionalCompoundTagType extends OptionalType<CompoundTag> {
 
-        public OptionalCompoundTagType() {
-            super(Types.COMPOUND_TAG);
+        private OptionalCompoundTagType(final Type<CompoundTag> tagType) {
+            super(tagType);
+        }
+
+        public static OptionalCompoundTagType type() {
+            return new OptionalCompoundTagType(Types.COMPOUND_TAG);
+        }
+
+        public static OptionalCompoundTagType trustedType() {
+            return new OptionalCompoundTagType(Types.TRUSTED_COMPOUND_TAG);
         }
     }
 }

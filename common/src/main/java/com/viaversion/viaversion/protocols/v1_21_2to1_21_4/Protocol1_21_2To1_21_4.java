@@ -144,7 +144,7 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
                 if (actions.get(4)) {
                     wrapper.passthrough(Types.VAR_INT); // Latency
                 }
-                componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
+                componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG));
                 if (actions.get(6)) {
                     wrapper.passthrough(Types.VAR_INT); // List order
                 }

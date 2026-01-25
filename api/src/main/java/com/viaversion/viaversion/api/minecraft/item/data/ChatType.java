@@ -59,7 +59,7 @@ public record ChatType(ChatTypeDecoration chatDecoration, ChatTypeDecoration nar
             public ChatTypeDecoration read(final ByteBuf buffer) {
                 final String translationKey = Types.STRING.read(buffer);
                 final int[] parameters = Types.INT_ARRAY_PRIMITIVE.read(buffer);
-                final Tag style = Types.TAG.read(buffer);
+                final Tag style = Types.TRUSTED_TAG.read(buffer);
                 return new ChatTypeDecoration(translationKey, parameters, style);
             }
 
@@ -67,7 +67,7 @@ public record ChatType(ChatTypeDecoration chatDecoration, ChatTypeDecoration nar
             public void write(final ByteBuf buffer, final ChatTypeDecoration value) {
                 Types.STRING.write(buffer, value.translationKey());
                 Types.INT_ARRAY_PRIMITIVE.write(buffer, value.parameters());
-                Types.TAG.write(buffer, value.style());
+                Types.TRUSTED_TAG.write(buffer, value.style());
             }
         };
 

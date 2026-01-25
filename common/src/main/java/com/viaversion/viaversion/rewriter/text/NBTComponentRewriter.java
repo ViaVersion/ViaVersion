@@ -98,7 +98,7 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
                 }
             }
 
-            processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
+            processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Unsigned content
 
             final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
             if (filterMaskType == 2) { // Partially filtered
@@ -106,8 +106,8 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
             }
 
             wrapper.passthrough(ChatType.TYPE); // Chat Type
-            processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Name
-            processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Target Name
+            processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_TAG)); // Name
+            processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Target Name
         });
     }
 }

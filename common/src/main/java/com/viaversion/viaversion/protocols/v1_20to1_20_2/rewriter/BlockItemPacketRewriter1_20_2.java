@@ -90,7 +90,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         protocol.registerClientbound(ClientboundPackets1_19_4.BLOCK_ENTITY_DATA, wrapper -> {
             wrapper.passthrough(Types.BLOCK_POSITION1_14); // Position
             wrapper.passthrough(Types.VAR_INT); // Type
-            wrapper.write(Types.COMPOUND_TAG, handleBlockEntity(wrapper.read(Types.NAMED_COMPOUND_TAG)));
+            wrapper.write(Types.TRUSTED_COMPOUND_TAG, handleBlockEntity(wrapper.read(Types.NAMED_COMPOUND_TAG)));
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {

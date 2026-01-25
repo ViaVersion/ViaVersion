@@ -112,7 +112,7 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
                 if (actions.get(4)) {
                     wrapper.passthrough(Types.VAR_INT); // Latency
                 }
-                processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
+                processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG));
             }
         });
     }
@@ -134,7 +134,7 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
                 }
             }
 
-            processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
+            processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Unsigned content
 
             final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
             if (filterMaskType == 2) { // Partially filtered
@@ -142,8 +142,8 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
             }
 
             wrapper.passthrough(chatType); // Chat Type
-            processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Name
-            processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Target Name
+            processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_TAG)); // Name
+            processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Target Name
         });
     }
 

@@ -179,7 +179,7 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
                     wrapper.passthrough(Types.VAR_INT); // Latency
                 }
 
-                processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
+                processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG));
 
                 if (actions.get(6)) {
                     wrapper.passthrough(Types.VAR_INT); // List order
@@ -210,14 +210,14 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
     public void passthroughAndProcess(final PacketWrapper wrapper) {
         switch (type) {
             case JSON -> processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
-            case NBT -> processTag(wrapper.user(), wrapper.passthrough(Types.TAG));
+            case NBT -> processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_TAG));
         }
     }
 
     public void passthroughAndProcessOptional(final PacketWrapper wrapper) {
         switch (type) {
             case JSON -> processText(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_COMPONENT));
-            case NBT -> processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
+            case NBT -> processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG));
         }
     }
 

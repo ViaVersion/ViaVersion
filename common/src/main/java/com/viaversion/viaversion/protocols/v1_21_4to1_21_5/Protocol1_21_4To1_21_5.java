@@ -140,7 +140,7 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
                 }
             }
 
-            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
+            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Unsigned content
 
             final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
             if (filterMaskType == 2) { // Partially filtered
@@ -148,8 +148,8 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
             }
 
             wrapper.passthrough(ChatType.TYPE); // Chat Type
-            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Name
-            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Target Name
+            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_TAG)); // Name
+            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Target Name
         });
         registerServerbound(ServerboundPackets1_21_5.CHAT_COMMAND_SIGNED, wrapper -> {
             wrapper.passthrough(Types.STRING); // Command

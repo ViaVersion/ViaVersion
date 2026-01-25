@@ -166,7 +166,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
                 if (actions.get(4)) {
                     wrapper.passthrough(Types.VAR_INT); // Latency
                 }
-                componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
+                componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG));
             }
         });
 

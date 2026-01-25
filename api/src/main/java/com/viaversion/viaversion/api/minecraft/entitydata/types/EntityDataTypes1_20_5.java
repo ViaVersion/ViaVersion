@@ -33,8 +33,8 @@ public final class EntityDataTypes1_20_5 extends AbstractEntityDataTypes {
     public final EntityDataType longType = add(2, Types.VAR_LONG);
     public final EntityDataType floatType = add(3, Types.FLOAT);
     public final EntityDataType stringType = add(4, Types.STRING);
-    public final EntityDataType componentType = add(5, Types.TAG);
-    public final EntityDataType optionalComponentType = add(6, Types.OPTIONAL_TAG);
+    public final EntityDataType componentType = add(5, Types.TRUSTED_TAG);
+    public final EntityDataType optionalComponentType = add(6, Types.TRUSTED_OPTIONAL_TAG);
     public final EntityDataType itemType;
     public final EntityDataType booleanType = add(8, Types.BOOLEAN);
     public final EntityDataType rotationsType = add(9, Types.ROTATIONS);

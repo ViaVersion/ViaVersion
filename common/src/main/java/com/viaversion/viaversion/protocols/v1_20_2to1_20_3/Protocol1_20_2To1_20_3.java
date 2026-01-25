@@ -102,7 +102,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
             wrapper.passthrough(Types.VAR_INT); // Score
 
             // Null display and number format
-            wrapper.write(Types.OPTIONAL_TAG, null);
+            wrapper.write(Types.TRUSTED_OPTIONAL_TAG, null);
             wrapper.write(Types.BOOLEAN, false);
         });
         registerClientbound(ClientboundPackets1_20_2.SET_OBJECTIVE, wrapper -> {
@@ -338,11 +338,11 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
     }
 
     private void convertComponent(final PacketWrapper wrapper) {
-        wrapper.write(Types.TAG, ComponentUtil.jsonToTag(wrapper.read(Types.COMPONENT)));
+        wrapper.write(Types.TRUSTED_TAG, ComponentUtil.jsonToTag(wrapper.read(Types.COMPONENT)));
     }
 
     private void convertOptionalComponent(final PacketWrapper wrapper) {
-        wrapper.write(Types.OPTIONAL_TAG, ComponentUtil.jsonToTag(wrapper.read(Types.OPTIONAL_COMPONENT)));
+        wrapper.write(Types.TRUSTED_OPTIONAL_TAG, ComponentUtil.jsonToTag(wrapper.read(Types.OPTIONAL_COMPONENT)));
     }
 
     @Override

@@ -117,8 +117,8 @@ import com.viaversion.viaversion.api.type.types.misc.NamedCompoundTagType;
 import com.viaversion.viaversion.api.type.types.misc.PlayerMessageSignatureType;
 import com.viaversion.viaversion.api.type.types.misc.ProfileKeyType;
 import com.viaversion.viaversion.api.type.types.misc.ProfilePropertyType;
-import com.viaversion.viaversion.api.type.types.misc.SoundEventType;
 import com.viaversion.viaversion.api.type.types.misc.ResolvableProfileType;
+import com.viaversion.viaversion.api.type.types.misc.SoundEventType;
 import com.viaversion.viaversion.api.type.types.misc.TagKeyType;
 import com.viaversion.viaversion.api.type.types.misc.TagType;
 import com.viaversion.viaversion.api.type.types.misc.TextComponentTagType;
@@ -204,12 +204,18 @@ public final class Types {
     public static final Type<CompoundTag> OPTIONAL_NAMED_COMPOUND_TAG = new NamedCompoundTagType.OptionalNamedCompoundTagType();
     public static final Type<CompoundTag[]> NAMED_COMPOUND_TAG_ARRAY = new ArrayType<>(Types.NAMED_COMPOUND_TAG);
     public static final Type<CompoundTag> COMPOUND_TAG = new CompoundTagType();
-    public static final Type<CompoundTag> OPTIONAL_COMPOUND_TAG = new CompoundTagType.OptionalCompoundTagType();
+    public static final Type<CompoundTag> OPTIONAL_COMPOUND_TAG = CompoundTagType.OptionalCompoundTagType.type();
+
     public static final Type<Tag> TAG = new TagType();
     public static final Type<Tag[]> TAG_ARRAY = new ArrayType<>(TAG);
-    public static final Type<Tag> OPTIONAL_TAG = new TagType.OptionalTagType();
+    public static final Type<Tag> OPTIONAL_TAG = TagType.OptionalTagType.type();
     public static final Type<Tag> TEXT_COMPONENT_TAG = new TextComponentTagType(); // only strictly needed for hashing
     public static final Type<Tag> CUSTOM_CLICK_ACTION_TAG = new LengthPrefixedTagType(65536);
+
+    public static final Type<Tag> TRUSTED_TAG = new TagType(false);
+    public static final Type<Tag> TRUSTED_OPTIONAL_TAG = TagType.OptionalTagType.trustedType();
+    public static final Type<CompoundTag> TRUSTED_COMPOUND_TAG = new CompoundTagType(false);
+    public static final Type<CompoundTag> TRUSTED_OPTIONAL_COMPOUND_TAG = CompoundTagType.OptionalCompoundTagType.trustedType();
 
     public static final Type<GlobalBlockPosition> GLOBAL_POSITION = new GlobalBlockPositionType();
     public static final Type<GlobalBlockPosition> OPTIONAL_GLOBAL_POSITION = new GlobalBlockPositionType.OptionalGlobalPositionType();

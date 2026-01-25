@@ -50,8 +50,15 @@ import java.util.Map;
 
 public class TagType extends Type<Tag> {
 
+    private final int maxBytes;
+
     public TagType() {
+        this(true);
+    }
+
+    public TagType(final boolean limitBytes) {
         super(Tag.class);
+        this.maxBytes = limitBytes ? NamedCompoundTagType.MAX_NBT_BYTES : Integer.MAX_VALUE;
     }
 
     @Override
@@ -61,7 +68,7 @@ public class TagType extends Type<Tag> {
             return null;
         }
 
-        final TagLimiter tagLimiter = TagLimiter.create(NamedCompoundTagType.MAX_NBT_BYTES, NamedCompoundTagType.MAX_NESTING_LEVEL);
+        final TagLimiter tagLimiter = TagLimiter.create(this.maxBytes, NamedCompoundTagType.MAX_NESTING_LEVEL);
         try {
             return TagRegistry.read(id, new ByteBufInputStream(buffer), tagLimiter, 0);
         } catch (final IOException e) {
@@ -127,8 +134,16 @@ public class TagType extends Type<Tag> {
 
     public static final class OptionalTagType extends OptionalType<Tag> {
 
-        public OptionalTagType() {
-            super(Types.TAG);
+        private OptionalTagType(final Type<Tag> tagType) {
+            super(tagType);
+        }
+
+        public static OptionalTagType type() {
+            return new OptionalTagType(Types.TAG);
+        }
+
+        public static OptionalTagType trustedType() {
+            return new OptionalTagType(Types.TRUSTED_TAG);
         }
     }
 }

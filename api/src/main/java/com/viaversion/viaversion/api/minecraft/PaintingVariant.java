@@ -58,8 +58,8 @@ public record PaintingVariant(int width, int height, String assetId, @Nullable T
             final int width = Types.VAR_INT.readPrimitive(buffer);
             final int height = Types.VAR_INT.readPrimitive(buffer);
             final String assetId = Types.STRING.read(buffer);
-            final Tag title = Types.OPTIONAL_TAG.read(buffer);
-            final Tag author = Types.OPTIONAL_TAG.read(buffer);
+            final Tag title = Types.TRUSTED_OPTIONAL_TAG.read(buffer);
+            final Tag author = Types.TRUSTED_OPTIONAL_TAG.read(buffer);
             return new PaintingVariant(width, height, assetId, title, author);
         }
 
@@ -68,8 +68,8 @@ public record PaintingVariant(int width, int height, String assetId, @Nullable T
             Types.VAR_INT.writePrimitive(buffer, variant.width());
             Types.VAR_INT.writePrimitive(buffer, variant.height());
             Types.STRING.write(buffer, variant.assetId());
-            Types.OPTIONAL_TAG.write(buffer, variant.title());
-            Types.OPTIONAL_TAG.write(buffer, variant.author());
+            Types.TRUSTED_OPTIONAL_TAG.write(buffer, variant.title());
+            Types.TRUSTED_OPTIONAL_TAG.write(buffer, variant.author());
         }
 
         @Override
@@ -79,8 +79,8 @@ public record PaintingVariant(int width, int height, String assetId, @Nullable T
                 .write("width", Types.INT, value.width())
                 .write("height", Types.INT, value.height())
                 .write("asset_id", Types.IDENTIFIER, Key.of(value.assetId()))
-                .writeOptional("title", Types.TAG, value.title())
-                .writeOptional("author", Types.TAG, value.author()));
+                .writeOptional("title", Types.TRUSTED_TAG, value.title())
+                .writeOptional("author", Types.TRUSTED_TAG, value.author()));
         }
 
         @Override

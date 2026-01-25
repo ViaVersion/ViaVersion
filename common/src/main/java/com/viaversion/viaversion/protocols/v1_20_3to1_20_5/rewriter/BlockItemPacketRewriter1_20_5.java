@@ -163,14 +163,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 return;
             }
 
-            CompoundTag tag = wrapper.read(Types.COMPOUND_TAG);
+            CompoundTag tag = wrapper.read(Types.TRUSTED_COMPOUND_TAG);
             if (tag != null) {
                 updateBlockEntityTag(wrapper.user(), null, tag);
             } else {
                 // No longer nullable
                 tag = new CompoundTag();
             }
-            wrapper.write(Types.COMPOUND_TAG, tag);
+            wrapper.write(Types.TRUSTED_COMPOUND_TAG, tag);
         });
 
         registerCooldown(ClientboundPackets1_20_3.COOLDOWN);
@@ -196,8 +196,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
                 // Display data
                 if (wrapper.passthrough(Types.BOOLEAN)) {
-                    wrapper.passthrough(Types.TAG); // Title
-                    wrapper.passthrough(Types.TAG); // Description
+                    wrapper.passthrough(Types.TRUSTED_TAG); // Title
+                    wrapper.passthrough(Types.TRUSTED_TAG); // Description
 
                     Item item = handleNonEmptyItemToClient(wrapper.user(), wrapper.read(itemType()));
                     wrapper.write(mappedItemType(), item);
