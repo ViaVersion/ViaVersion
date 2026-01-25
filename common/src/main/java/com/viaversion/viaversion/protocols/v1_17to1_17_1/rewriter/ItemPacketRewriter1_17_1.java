@@ -91,25 +91,10 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
     }
 
     @Override
-    public @Nullable Item handleItemToServer(final UserConnection connection, @Nullable final Item item) {
-        if (item == null) return null;
-
-        CompoundTag tag = item.tag();
-        if (tag == null) {
-            return item;
-        }
-
-        restoreInvalidEnchantments(tag, "Enchantments");
-        restoreInvalidEnchantments(tag, "StoredEnchantments");
-
-        return item;
-    }
-
-    @Override
     public Item handleItemToClient(UserConnection connection, Item item) {
         if (item == null) return null;
 
-        CompoundTag tag = item.tag();
+        final CompoundTag tag = item.tag();
         if (tag == null) {
             return item;
         }
@@ -125,23 +110,23 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
         return item;
     }
 
-    private void restoreInvalidEnchantments(CompoundTag tag, String tagName) {
-        Tag enchantments = tag.remove(nbtTagName(tagName));
-        if (enchantments == null) {
-            return;
-        }
-        tag.put(tagName, enchantments);
+    @Override
+    public @Nullable Item handleItemToServer(final UserConnection connection, @Nullable final Item item) {
+        if (item == null) return null;
 
-        Tag display = tag.remove(nbtTagName("display"));
-        if (display == null) {
-            tag.remove("display");
-        } else {
-            tag.put("display", display);
+        final CompoundTag tag = item.tag();
+        if (tag == null) {
+            return item;
         }
+
+        restoreInvalidEnchantments(tag, "Enchantments");
+        restoreInvalidEnchantments(tag, "StoredEnchantments");
+
+        return item;
     }
 
     private void replaceInvalidEnchantments(CompoundTag tag, String tagName) {
-        ListTag<CompoundTag> enchantments = tag.getListTag(tagName, CompoundTag.class);
+        final ListTag<CompoundTag> enchantments = tag.getListTag(tagName, CompoundTag.class);
         if (enchantments == null) {
             return;
         }
@@ -150,12 +135,12 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
 
         boolean displayRestoreTagAdded = false;
         for (final CompoundTag enchantment : enchantments.getValue()) {
-            short lvl = enchantment.getShort("lvl");
+            final short lvl = enchantment.getShort("lvl");
             if (lvl >= 0 && lvl <= 255) {
                 continue;
             }
 
-            String id = enchantment.getString("id");
+            final String id = enchantment.getString("id");
             if (id == null) {
                 continue;
             }
@@ -173,8 +158,24 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
                 display.put("Lore", lore = new ListTag<>(StringTag.class));
             }
 
-            Key key = Key.of(id);
+            final Key key = Key.of(id);
             lore.getValue().add(0, new StringTag("{\"italic\":false,\"color\":\"gray\",\"translate\":\"enchantment." + key.namespace() + "." + key.path() + "\",\"extra\":[\" \",{\"translate\":\"enchantment.level." + lvl + "\"}]}"));
+        }
+    }
+
+    private void restoreInvalidEnchantments(final CompoundTag tag, final String tagName) {
+        final Tag enchantments = tag.remove(nbtTagName(tagName));
+        if (enchantments == null) {
+            return;
+        }
+
+        tag.put(tagName, enchantments);
+
+        final Tag display = tag.remove(nbtTagName("display"));
+        if (display == null) {
+            tag.remove("display");
+        } else {
+            tag.put("display", display);
         }
     }
 }
