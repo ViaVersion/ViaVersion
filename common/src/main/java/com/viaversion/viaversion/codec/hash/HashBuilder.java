@@ -22,9 +22,11 @@ import java.util.Arrays;
 public final class HashBuilder {
 
     private static final byte[] EMPTY_BYTES = new byte[0];
+    private static final int MAX_RETAINED_CAPACITY = 4096;
     private final HashFunction hashFunction;
     private byte[] bytes = EMPTY_BYTES;
     private int index;
+    private boolean direct;
 
     public HashBuilder(final HashFunction hashFunction) {
         this.hashFunction = hashFunction;
@@ -43,11 +45,17 @@ public final class HashBuilder {
         return this;
     }
 
+    /**
+     * Writes the given bytes directly, avoiding a copy if currently empty.
+     *
+     * @param bytes the bytes to write directly
+     */
     public void writeBytesDirect(final byte[] bytes) {
         if (this.bytes.length == 0) {
             // Set bytes directly if still empty
             this.bytes = bytes;
             this.index = bytes.length;
+            this.direct = true;
         } else {
             writeBytes(bytes);
         }
@@ -75,9 +83,11 @@ public final class HashBuilder {
 
     public HashBuilder writeString(final CharSequence sequence) {
         final int length = sequence.length();
-        this.ensureSize(length);
+        this.ensureSize(length * 2);
         for (int i = 0; i < length; i++) {
-            this.writeChar(sequence.charAt(i));
+            final char c = sequence.charAt(i);
+            this.bytes[this.index++] = (byte) c;
+            this.bytes[this.index++] = (byte) (c >> 8);
         }
         return this;
     }
@@ -130,9 +140,11 @@ public final class HashBuilder {
 
     private void ensureSize(final int bytes) {
         final int length = this.bytes.length;
-        if (this.index + bytes > length) {
-            final int newLength = Math.max(length * 2, this.index + bytes);
+        final int required = this.index + bytes;
+        if (required > length) {
+            final int newLength = Math.max(length * 2, required);
             this.bytes = Arrays.copyOf(this.bytes, newLength);
+            this.direct = false;
         }
     }
 
@@ -142,7 +154,11 @@ public final class HashBuilder {
 
     public void reset() {
         this.index = 0;
-        this.bytes = EMPTY_BYTES;
+        // Discard the buffer if it was direct (externally owned) or exceeds max retained capacity
+        if (this.direct || this.bytes.length > MAX_RETAINED_CAPACITY) {
+            this.bytes = EMPTY_BYTES;
+            this.direct = false;
+        }
     }
 
     public HashFunction function() {
