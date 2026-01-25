@@ -131,51 +131,74 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
             return;
         }
 
-        tag.put(nbtTagName(tagName), enchantments);
-
-        boolean displayRestoreTagAdded = false;
+        // Check if any enchantment has an invalid level
+        boolean hasInvalidLevel = false;
         for (final CompoundTag enchantment : enchantments.getValue()) {
             final short lvl = enchantment.getShort("lvl");
-            if (lvl >= 0 && lvl <= 255) {
-                continue;
+            if (lvl < 0 || lvl > 255) {
+                hasInvalidLevel = true;
+                break;
             }
+        }
 
+        if (!hasInvalidLevel) {
+            return;
+        }
+
+        tag.put(nbtTagName(tagName), new ByteTag(true));
+
+        final int originalHideFlags = tag.getInt("HideFlags");
+        tag.put(nbtTagName("HideFlags"), new ByteTag((byte) originalHideFlags));
+
+        final int hideBit = tagName.equals("Enchantments") ? 1 : (1 << 5);
+        tag.put("HideFlags", new ByteTag((byte) (originalHideFlags | hideBit)));
+
+        CompoundTag display = tag.getCompoundTag("display");
+        if (display != null) {
+            tag.put(nbtTagName("display"), display.copy());
+        } else {
+            tag.put("display", display = new CompoundTag());
+        }
+
+        ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
+        if (lore == null) {
+            display.put("Lore", lore = new ListTag<>(StringTag.class));
+        }
+
+        // Add all enchantments to lore in reverse order (so first enchantment ends up at top)
+        for (int i = enchantments.size() - 1; i >= 0; i--) {
+            final CompoundTag enchantment = enchantments.get(i);
             final String id = enchantment.getString("id");
             if (id == null) {
                 continue;
             }
 
-            CompoundTag display = tag.getCompoundTag("display");
-            if (display == null) {
-                tag.put("display", display = new CompoundTag());
-            } else if (!displayRestoreTagAdded) {
-                displayRestoreTagAdded = true;
-                tag.put(nbtTagName("display"), display);
-            }
-
-            ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
-            if (lore == null) {
-                display.put("Lore", lore = new ListTag<>(StringTag.class));
-            }
-
+            final short lvl = enchantment.getShort("lvl");
             final Key key = Key.of(id);
             lore.getValue().add(0, new StringTag("{\"italic\":false,\"color\":\"gray\",\"translate\":\"enchantment." + key.namespace() + "." + key.path() + "\",\"extra\":[\" \",{\"translate\":\"enchantment.level." + lvl + "\"}]}"));
         }
     }
 
     private void restoreInvalidEnchantments(final CompoundTag tag, final String tagName) {
-        final Tag enchantments = tag.remove(nbtTagName(tagName));
-        if (enchantments == null) {
+        final Tag marker = tag.remove(nbtTagName(tagName));
+        if (marker == null) {
             return;
         }
 
-        tag.put(tagName, enchantments);
+        final Tag hideFlags = tag.remove(nbtTagName("HideFlags"));
+        if (hideFlags != null) {
+            if (((ByteTag) hideFlags).asByte() == 0) {
+                tag.remove("HideFlags");
+            } else {
+                tag.put("HideFlags", hideFlags);
+            }
+        }
 
         final Tag display = tag.remove(nbtTagName("display"));
-        if (display == null) {
-            tag.remove("display");
-        } else {
+        if (display != null) {
             tag.put("display", display);
+        } else {
+            tag.remove("display");
         }
     }
 }
