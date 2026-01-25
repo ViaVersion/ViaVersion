@@ -42,7 +42,7 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        itemRewriter.register();
+        super.registerPackets();
 
         registerClientbound(ClientboundPackets1_17.REMOVE_ENTITY, ClientboundPackets1_17_1.REMOVE_ENTITIES, wrapper -> {
             // Aaaaand back to an array again!
