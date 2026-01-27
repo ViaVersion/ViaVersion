@@ -165,6 +165,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> ADDITIONAL_TRADE_COST = new StructuredDataKey<>("additional_trade_cost", Types.VAR_INT);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS1_20_5 = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE1_20_5);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS1_21_5 = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE1_21_5);
+    public static final StructuredDataKey<Integer> DYE = new StructuredDataKey<>("dye", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<DyedColor> DYED_COLOR1_20_5 = new StructuredDataKey<>("dyed_color", DyedColor.TYPE1_20_5);
     public static final StructuredDataKey<DyedColor> DYED_COLOR1_21_5 = new StructuredDataKey<>("dyed_color", DyedColor.TYPE1_21_5);
     public static final StructuredDataKey<Integer> MAP_COLOR = new StructuredDataKey<>("map_color", Types.INT);

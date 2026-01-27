@@ -45,6 +45,7 @@ public class MappingDataBase implements MappingData {
     protected FullMappings entityMappings;
     protected FullMappings recipeSerializerMappings;
     protected FullMappings itemDataSerializerMappings;
+    protected FullMappings slotDisplayMappings;
     protected FullMappings attributeMappings;
     protected FullMappings blockEntityMappings;
     protected ParticleMappings particleMappings;
@@ -89,6 +90,7 @@ public class MappingDataBase implements MappingData {
 
             entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
             argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
+            slotDisplayMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "slot_displays");
             recipeSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "recipe_serializers");
             itemDataSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "data_component_type");
             attributeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "attributes");
@@ -333,6 +335,11 @@ public class MappingDataBase implements MappingData {
     @Override
     public @Nullable FullMappings getRecipeSerializerMappings() {
         return recipeSerializerMappings;
+    }
+
+    @Override
+    public @Nullable FullMappings getSlotDisplayMappings() {
+        return slotDisplayMappings;
     }
 
     @Override

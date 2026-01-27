@@ -585,6 +585,16 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
+    public void consumeReadsOnly(final Runnable runnable) {
+        this.allActionsRead = true;
+        try {
+            runnable.run();
+        } finally {
+            this.allActionsRead = false;
+        }
+    }
+
+    @Override
     public String toString() {
         return "PacketWrapper{" +
             "type=" + packetType +

@@ -170,6 +170,8 @@ public interface MappingData {
 
     @Nullable FullMappings getRecipeSerializerMappings();
 
+    @Nullable FullMappings getSlotDisplayMappings();
+
     @Nullable FullMappings getDataComponentSerializerMappings();
 
     default @Nullable FullMappings getFullMappings(final MappingType mappingType) {

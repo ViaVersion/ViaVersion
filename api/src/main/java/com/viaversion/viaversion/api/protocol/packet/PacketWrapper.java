@@ -383,11 +383,20 @@ public interface PacketWrapper {
     void scheduleSendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws InformativeException;
 
     /**
+     * Allows running through code that may both read and write data to/from this packet wrapper,
+     * but will no-op any write call.
+     *
+     * @param runnable runnable to do further method calls on this packet wrapper
+     */
+    void consumeReadsOnly(Runnable runnable);
+
+    /**
      * Returns the packet type, or null if not transformed or manually unset.
      *
      * @return packet type if set
      */
-    @Nullable PacketType getPacketType();
+    @Nullable
+    PacketType getPacketType();
 
     /**
      * Sets the packet type. If set to null, it will not be written to the buffer with {@link #writeToBuffer(ByteBuf)}.
