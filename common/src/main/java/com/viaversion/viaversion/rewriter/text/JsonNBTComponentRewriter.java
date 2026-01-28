@@ -203,9 +203,8 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
     }
 
     @Override
-    protected void handleNestedComponent(final UserConnection connection, final CompoundTag parent, final String key) {
-        final StringTag tag = parent.getStringTag(key);
-        if (tag == null) {
+    protected void handleNestedComponent(final UserConnection connection, @Nullable final Tag tag) {
+        if (!(tag instanceof StringTag stringTag)) {
             return;
         }
 
@@ -213,10 +212,10 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
         final var input = inputSerializerVersion();
         final var output = outputSerializerVersion();
 
-        final Tag asTag = input.toTag(input.toComponent(tag.getValue()));
+        final Tag asTag = input.toTag(input.toComponent(stringTag.getValue()));
         processTag(connection, asTag);
 
-        tag.setValue(output.toString(output.toComponent(asTag)));
+        stringTag.setValue(output.toString(output.toComponent(asTag)));
     }
 
     @Override

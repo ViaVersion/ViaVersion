@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.type.Types;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Rewrites nbt serialized components from 1.21.5 upwards. Can also handle json components outside of hover events.
@@ -68,11 +69,8 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
     }
 
     @Override
-    protected void handleNestedComponent(final UserConnection connection, final CompoundTag parent, final String key) {
-        final Tag tag = parent.get(key);
-        if (tag != null) {
-            processTag(connection, tag);
-        }
+    protected void handleNestedComponent(final UserConnection connection, @Nullable final Tag tag) {
+        processTag(connection, tag);
     }
 
     @Override

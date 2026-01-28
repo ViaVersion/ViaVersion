@@ -352,11 +352,8 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
             return;
         }
 
-        final Tag itemName = TagUtil.getNamespacedTag(componentsTag, "item_name");
-        processTag(connection, itemName);
-        final Tag customName = TagUtil.getNamespacedTag(componentsTag, "custom_name");
-        processTag(connection, customName);
-        handleLore(connection, componentsTag);
+        handleNestedComponent(connection, TagUtil.getNamespacedTag(componentsTag, "item_name"));
+        handleNestedComponent(connection, TagUtil.getNamespacedTag(componentsTag, "custom_name"));
         handleWrittenBookContents(connection, componentsTag);
 
         handleAttributeModifiers(componentsTag);
@@ -430,8 +427,8 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
         }
 
         for (final CompoundTag compoundTag : pagesTag) {
-            handleNestedComponent(connection, compoundTag, "raw");
-            handleNestedComponent(connection, compoundTag, "filtered");
+            handleNestedComponent(connection, compoundTag.get("raw"));
+            handleNestedComponent(connection, compoundTag.get("filtered"));
         }
     }
 
@@ -472,7 +469,13 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
             || tag.remove("!" + Key.stripMinecraftNamespace(key)) != null;
     }
 
-    protected abstract void handleNestedComponent(UserConnection connection, CompoundTag parent, String key);
+    /**
+     * Rewrites a nested text component. Stored as a regular tag in 1.21.5+, but is nested via snbt in string components before that.
+     *
+     * @param connection user connection
+     * @param tag        nested tag to handle
+     */
+    protected abstract void handleNestedComponent(UserConnection connection, @Nullable Tag tag);
 
     public enum ReadType {
 
