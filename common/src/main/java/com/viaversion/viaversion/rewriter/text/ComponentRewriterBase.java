@@ -352,8 +352,14 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
             return;
         }
 
-        handleAttributeModifiers(componentsTag);
+        final Tag itemName = TagUtil.getNamespacedTag(componentsTag, "item_name");
+        processTag(connection, itemName);
+        final Tag customName = TagUtil.getNamespacedTag(componentsTag, "custom_name");
+        processTag(connection, customName);
+        handleLore(connection, componentsTag);
         handleWrittenBookContents(connection, componentsTag);
+
+        handleAttributeModifiers(componentsTag);
         handleContainerContents(connection, componentsTag);
         handleItemArrayContents(connection, componentsTag, "bundle_contents");
         handleItemArrayContents(connection, componentsTag, "charged_projectiles");
@@ -361,12 +367,6 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
         if (useRemainder != null) {
             handleShowItem(connection, useRemainder);
         }
-
-        final Tag itemName = TagUtil.getNamespacedTag(componentsTag, "item_name");
-        processTag(connection, itemName);
-        final Tag customName = TagUtil.getNamespacedTag(componentsTag, "custom_name");
-        processTag(connection, customName);
-        handleLore(connection, componentsTag);
 
         removeDataComponents(componentsTag, "lock", "debug_stick_state");
     }
