@@ -17,10 +17,13 @@
  */
 package com.viaversion.viaversion.platform;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import java.lang.reflect.Method;
@@ -57,6 +60,23 @@ public abstract class ViaChannelInitializer extends ChannelInitializer<Channel> 
         final UserConnection connection = new UserConnectionImpl(channel, clientSide);
         new ProtocolPipelineImpl(connection);
         return connection;
+    }
+
+    /**
+     * Reorders the ViaVersion handlers in the pipeline to be before the specified handlers. This is needed in platforms
+     * where enabling the compression breaks the order of Via handlers to be: encoder -> compressor -> via encoder.
+     *
+     * @param pipeline The channel pipeline
+     * @param encoder  The name of the encoder handler where Via's encoder was initially placed before
+     * @param decoder  The name of the decoder handler where Via's decoder was initially placed before
+     */
+    public static void reorderPipeline(final ChannelPipeline pipeline, final String encoder, final String decoder) {
+        final ViaInjector injector = Via.getManager().getInjector();
+        final ChannelHandler encoderHandler = pipeline.remove(injector.getEncoderName());
+        final ChannelHandler decoderHandler = pipeline.remove(injector.getDecoderName());
+
+        pipeline.addBefore(encoder, injector.getEncoderName(), encoderHandler);
+        pipeline.addBefore(decoder, injector.getDecoderName(), decoderHandler);
     }
 
     protected abstract void injectPipeline(ChannelPipeline pipeline, UserConnection connection);

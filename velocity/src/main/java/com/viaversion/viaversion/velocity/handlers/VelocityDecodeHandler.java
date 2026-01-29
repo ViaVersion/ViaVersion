@@ -17,13 +17,12 @@
  */
 package com.viaversion.viaversion.velocity.handlers;
 
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.platform.ViaDecodeHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
+
+import static com.viaversion.viaversion.platform.ViaChannelInitializer.reorderPipeline;
 
 @ChannelHandler.Sharable
 public class VelocityDecodeHandler extends ViaDecodeHandler {
@@ -38,14 +37,7 @@ public class VelocityDecodeHandler extends ViaDecodeHandler {
         if (event == VelocityChannelInitializer.COMPRESSION_ENABLED_EVENT) {
             // When Velocity adds the compression handlers, the order becomes Minecraft Encoder -> Compressor -> Via Encoder
             // Move Via codec handlers back to right position
-            final ViaInjector injector = Via.getManager().getInjector();
-            final ChannelPipeline pipeline = ctx.pipeline();
-
-            final ChannelHandler encoder = pipeline.remove(injector.getEncoderName());
-            pipeline.addBefore(VelocityChannelInitializer.MINECRAFT_ENCODER, injector.getEncoderName(), encoder);
-
-            final ChannelHandler decoder = pipeline.remove(injector.getDecoderName());
-            pipeline.addBefore(VelocityChannelInitializer.MINECRAFT_DECODER, injector.getDecoderName(), decoder);
+            reorderPipeline(ctx.pipeline(), VelocityChannelInitializer.MINECRAFT_ENCODER, VelocityChannelInitializer.MINECRAFT_DECODER);
         }
         super.userEventTriggered(ctx, event);
     }
