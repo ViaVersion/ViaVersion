@@ -20,6 +20,11 @@ package com.viaversion.viaversion.connection;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import io.netty.util.concurrent.EventExecutor;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Instance of {@link Runnable} that will run {@link #run(UserConnection, StorableObject)} for all active user connections.
@@ -36,15 +41,31 @@ public abstract class StorableObjectTask<T extends StorableObject> implements Ru
 
     @Override
     public void run() {
+        // Group connections by event loop to batch executions and reduce wakeup() calls
+        final Map<EventExecutor, List<UserConnection>> connectionsByEventLoop = new IdentityHashMap<>();
+        
         for (final UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
             if (!connection.isActive() || !connection.has(storableObject)) {
                 continue;
             }
-
-            connection.getChannel().eventLoop().execute(() -> {
-                final T object = connection.get(storableObject);
-                if (object != null) {
-                    this.run(connection, object);
+            
+            final EventExecutor eventLoop = connection.getChannel().eventLoop();
+            connectionsByEventLoop.computeIfAbsent(eventLoop, k -> new ArrayList<>()).add(connection);
+        }
+        
+        // Execute batched tasks - one execute() call per event loop instead of per connection
+        for (final Map.Entry<EventExecutor, List<UserConnection>> entry : connectionsByEventLoop.entrySet()) {
+            final List<UserConnection> connections = entry.getValue();
+            entry.getKey().execute(() -> {
+                for (final UserConnection connection : connections) {
+                    try {
+                        final T object = connection.get(storableObject);
+                        if (object != null) {
+                            this.run(connection, object);
+                        }
+                    } catch (final Exception e) {
+                        Via.getPlatform().getLogger().warning("Error running task for connection: " + e.getMessage());
+                    }
                 }
             });
         }
