@@ -38,12 +38,12 @@ public class CompressionProvider implements Provider {
 
         ChannelPipeline pipe = user.getChannel().pipeline();
 
-        if (threshold < 0) {
-            if (pipe.get("compress") != null) {
-                pipe.remove("compress");
-                pipe.remove("decompress");
-            }
-        } else {
+        if (pipe.get("compress") != null) {
+            pipe.remove("compress");
+            pipe.remove("decompress");
+        }
+
+        if (threshold >= 0) {
             if (pipe.get("compress") == null) {
                 pipe.addBefore(Via.getManager().getInjector().getEncoderName(), "compress", getEncoder(threshold));
                 pipe.addBefore(Via.getManager().getInjector().getDecoderName(), "decompress", getDecoder(threshold));
