@@ -63,20 +63,27 @@ public abstract class ViaChannelInitializer extends ChannelInitializer<Channel> 
     }
 
     /**
-     * Reorders the ViaVersion handlers in the pipeline to be before the specified handlers. This is needed in platforms
+     * Reorders the ViaVersion handlers in the pipeline to be after the specified handlers. This is needed in platforms
      * where enabling the compression breaks the order of Via handlers to be: encoder -> compressor -> via encoder.
      *
-     * @param pipeline The channel pipeline
-     * @param encoder  The name of the encoder handler where Via's encoder was initially placed before
-     * @param decoder  The name of the decoder handler where Via's decoder was initially placed before
+     * @param pipeline   The channel pipeline
+     * @param compress   The name of the compress handler where Via's encoder was initially placed after
+     * @param decompress The name of the decompress handler where Via's decoder was initially placed after
      */
-    public static void reorderPipeline(final ChannelPipeline pipeline, final String encoder, final String decoder) {
+    public static void reorderPipeline(final ChannelPipeline pipeline, final String compress, final String decompress) {
         final ViaInjector injector = Via.getManager().getInjector();
-        final ChannelHandler encoderHandler = pipeline.remove(injector.getEncoderName());
-        final ChannelHandler decoderHandler = pipeline.remove(injector.getDecoderName());
+        final int decompressIndex = pipeline.names().indexOf(decompress);
+        if (decompressIndex == -1) {
+            return;
+        }
 
-        pipeline.addBefore(encoder, injector.getEncoderName(), encoderHandler);
-        pipeline.addBefore(decoder, injector.getDecoderName(), decoderHandler);
+        if (decompressIndex > pipeline.names().indexOf(injector.getDecoderName())) {
+            final ChannelHandler encoderHandler = pipeline.remove(injector.getEncoderName());
+            final ChannelHandler decoderHandler = pipeline.remove(injector.getDecoderName());
+
+            pipeline.addAfter(compress, injector.getEncoderName(), encoderHandler);
+            pipeline.addAfter(decompress, injector.getDecoderName(), decoderHandler);
+        }
     }
 
     protected abstract void injectPipeline(ChannelPipeline pipeline, UserConnection connection);
