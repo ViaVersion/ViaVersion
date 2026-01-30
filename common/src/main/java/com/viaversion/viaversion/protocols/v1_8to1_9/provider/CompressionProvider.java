@@ -44,13 +44,8 @@ public class CompressionProvider implements Provider {
         }
 
         if (threshold >= 0) {
-            if (pipe.get("compress") == null) {
-                pipe.addBefore(Via.getManager().getInjector().getEncoderName(), "compress", getEncoder(threshold));
-                pipe.addBefore(Via.getManager().getInjector().getDecoderName(), "decompress", getDecoder(threshold));
-            } else {
-                ((CompressionHandler) pipe.get("compress")).setCompressionThreshold(threshold);
-                ((CompressionHandler) pipe.get("decompress")).setCompressionThreshold(threshold);
-            }
+            pipe.addBefore(Via.getManager().getInjector().getEncoderName(), "compress", getEncoder(threshold));
+            pipe.addBefore(Via.getManager().getInjector().getDecoderName(), "decompress", getDecoder(threshold));
         }
     }
 
