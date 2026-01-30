@@ -34,18 +34,31 @@ import java.util.zip.Inflater;
 
 public class CompressionProvider implements Provider {
     public void handlePlayCompression(UserConnection user, int threshold) {
-        if (!user.isClientSide()) throw new IllegalStateException("PLAY state Compression packet is unsupported");
-
-        ChannelPipeline pipe = user.getChannel().pipeline();
-
-        if (pipe.get("compress") != null) {
-            pipe.remove("compress");
-            pipe.remove("decompress");
+        if (!user.isClientSide()) {
+            throw new IllegalStateException("PLAY state Compression packet is unsupported");
         }
 
-        if (threshold >= 0) {
-            pipe.addBefore(Via.getManager().getInjector().getEncoderName(), "compress", getEncoder(threshold));
-            pipe.addBefore(Via.getManager().getInjector().getDecoderName(), "decompress", getDecoder(threshold));
+        ChannelPipeline pipe = user.getChannel().pipeline();
+        if (threshold < 0) {
+            removeHandlers(pipe);
+            return;
+        }
+
+        if (pipe.get("compress") instanceof CompressionHandler compressionHandler) {
+            compressionHandler.setCompressionThreshold(threshold);
+            ((CompressionHandler) pipe.get("decompress")).setCompressionThreshold(threshold);
+            return;
+        }
+
+        removeHandlers(pipe);
+        pipe.addBefore(Via.getManager().getInjector().getEncoderName(), "compress", getEncoder(threshold));
+        pipe.addBefore(Via.getManager().getInjector().getDecoderName(), "decompress", getDecoder(threshold));
+    }
+
+    private void removeHandlers(ChannelPipeline pipeline) {
+        if (pipeline.get("compress") != null) {
+            pipeline.remove("compress");
+            pipeline.remove("decompress");
         }
     }
 
