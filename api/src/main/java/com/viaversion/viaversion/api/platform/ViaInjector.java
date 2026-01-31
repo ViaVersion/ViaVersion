@@ -79,7 +79,7 @@ public interface ViaInjector {
     }
 
     /**
-     * Get the name of the encoder for then netty pipeline for this platform.
+     * Get the name of the encoder for the netty pipeline for this platform.
      *
      * @return The name
      */
@@ -88,7 +88,7 @@ public interface ViaInjector {
     }
 
     /**
-     * Get the name of the decoder for then netty pipeline for this platform.
+     * Get the name of the decoder for the netty pipeline for this platform.
      *
      * @return The name
      */
