@@ -19,6 +19,7 @@ package com.viaversion.viaversion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -80,21 +81,10 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
 
     @Subscribe
     public void onProxyInit(ProxyInitializeEvent e) {
-        if (!hasConnectionEvent()) {
-            // No way to disable the plugin :(
-            Logger logger = this.loggerslf4j;
-            logger.error("      / \\");
-            logger.error("     /   \\");
-            logger.error("    /  |  \\");
-            logger.error("   /   |   \\        VELOCITY 3.0.0 IS REQUIRED");
-            logger.error("  /         \\   VIAVERSION WILL NOT WORK AS INTENDED");
-            logger.error(" /     o     \\");
-            logger.error("/_____________\\");
-        }
-
         PROXY = proxy;
         VelocityCommandHandler commandHandler = new VelocityCommandHandler();
-        PROXY.getCommandManager().register("viaver", commandHandler, "vvvelocity", "viaversion");
+        CommandManager commandManager = PROXY.getCommandManager();
+        commandManager.register(commandManager.metaBuilder("viaver").aliases("vvvelocity", "viaversion").plugin(this).build(), commandHandler);
         api = new VelocityViaAPI();
         logger = new LoggerWrapper(loggerslf4j);
         conf = new VelocityViaConfig(configDir.toFile(), logger);
@@ -106,6 +96,7 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
         conf.reload();
     }
 
+    @SuppressWarnings("deprecation")
     @Subscribe(order = PostOrder.LAST)
     public void onProxyLateInit(ProxyInitializeEvent e) {
         final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
@@ -239,14 +230,5 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     @Override
     public ProtocolDetectorService protocolDetectorService() {
         return protocolDetectorService;
-    }
-
-    private boolean hasConnectionEvent() {
-        try {
-            Class.forName("com.velocitypowered.proxy.protocol.VelocityConnectionEvent");
-            return true;
-        } catch (ClassNotFoundException ignored) {
-            return false;
-        }
     }
 }
