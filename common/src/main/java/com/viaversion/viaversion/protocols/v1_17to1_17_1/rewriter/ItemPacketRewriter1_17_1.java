@@ -42,7 +42,6 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
 
     @Override
     public void registerPackets() {
-        registerCooldown(ClientboundPackets1_17.COOLDOWN);
         registerMerchantOffers(ClientboundPackets1_17.MERCHANT_OFFERS);
         registerSetEquipment(ClientboundPackets1_17.SET_EQUIPMENT);
         registerAdvancements(ClientboundPackets1_17.UPDATE_ADVANCEMENTS);
