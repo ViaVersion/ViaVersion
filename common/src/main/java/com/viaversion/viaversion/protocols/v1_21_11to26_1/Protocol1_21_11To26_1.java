@@ -58,6 +58,7 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
+import com.viaversion.viaversion.util.Key;
 import java.util.Map;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
@@ -111,6 +112,9 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
         registryDataRewriter.addHandler("cat_variant", (key, tag) -> {
             addEntityNamePrefix("cat", tag);
             addBabyAssetId("cat", tag);
+        });
+        registryDataRewriter.addHandler("dimension_type", (key, tag) -> {
+           tag.putBoolean("has_ender_dragon_fight", Key.equals(key, "the_end"));
         });
         registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
 
