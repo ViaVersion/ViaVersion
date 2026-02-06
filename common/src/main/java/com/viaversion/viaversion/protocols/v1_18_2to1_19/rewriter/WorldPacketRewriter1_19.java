@@ -17,11 +17,16 @@
  */
 package com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter;
 
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.Protocol1_18_2To1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.packet.ServerboundPackets1_19;
+import com.viaversion.viaversion.protocols.v1_18_2to1_19.provider.AckSequenceProvider;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 
 public final class WorldPacketRewriter1_19 {
@@ -29,10 +34,34 @@ public final class WorldPacketRewriter1_19 {
     public static void register(final Protocol1_18_2To1_19 protocol) {
         final BlockRewriter<ClientboundPackets1_18> blockRewriter = BlockRewriter.for1_14(protocol);
         blockRewriter.registerBlockEvent(ClientboundPackets1_18.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_18.BLOCK_UPDATE);
-        blockRewriter.registerSectionBlocksUpdate(ClientboundPackets1_18.SECTION_BLOCKS_UPDATE);
         blockRewriter.registerLevelEvent(ClientboundPackets1_18.LEVEL_EVENT, 1010, 2001);
         blockRewriter.registerLevelChunk1_19(ClientboundPackets1_18.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_18::new);
+
+        protocol.registerClientbound(ClientboundPackets1_18.BLOCK_UPDATE, wrapper -> {
+            final BlockPosition position = wrapper.passthrough(Types.BLOCK_POSITION1_14);
+            wrapper.write(Types.VAR_INT, protocol.getMappingData().getNewBlockStateId(wrapper.read(Types.VAR_INT)));
+            Via.getManager().getProviders().get(AckSequenceProvider.class).handleBlockChange(wrapper.user(), position);
+        });
+        protocol.registerClientbound(ClientboundPackets1_18.SECTION_BLOCKS_UPDATE, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.LONG); // Chunk position
+                map(Types.BOOLEAN); // Suppress light updates
+                handler(wrapper -> {
+                    final AckSequenceProvider ackSequenceProvider = Via.getManager().getProviders().get(AckSequenceProvider.class);
+                    final long chunkPosition = wrapper.get(Types.LONG, 0);
+                    final int x = (int) ((chunkPosition >> 42) & 0x3FFFFFL) << 4;
+                    final int z = (int) ((chunkPosition >> 20) & 0x3FFFFFL) << 4;
+                    final int y = (int) (chunkPosition & 0xFFFL) << 4;
+
+                    for (BlockChangeRecord record : wrapper.passthrough(Types.VAR_LONG_BLOCK_CHANGE_ARRAY)) {
+                        record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
+                        final BlockPosition position = new BlockPosition(x + record.getSectionX(), y + record.getSectionY(), z + record.getSectionZ());
+                        ackSequenceProvider.handleBlockChange(wrapper.user(), position);
+                    }
+                });
+            }
+        });
 
         protocol.cancelClientbound(ClientboundPackets1_18.BLOCK_BREAK_ACK);
 
