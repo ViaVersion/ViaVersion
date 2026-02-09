@@ -37,7 +37,7 @@ import java.util.List;
 
 @ChannelHandler.Sharable
 public final class BukkitEncodeHandler extends ViaEncodeHandler {
-    private boolean handledCompression = BukkitChannelInitializer.COMPRESSION_ENABLED_EVENT != null;
+    private boolean handledCompression = BukkitChannelInitializer.COMPRESSION_ENABLED_EVENT != null || Boolean.getBoolean("com.viaversion.disableLegacyCompressionReorder");
 
     public BukkitEncodeHandler(final UserConnection connection) {
         super(connection);
