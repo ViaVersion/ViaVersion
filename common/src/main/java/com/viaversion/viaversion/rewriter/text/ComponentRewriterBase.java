@@ -354,6 +354,7 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
 
         handleNestedComponent(connection, TagUtil.getNamespacedTag(componentsTag, "item_name"));
         handleNestedComponent(connection, TagUtil.getNamespacedTag(componentsTag, "custom_name"));
+        handleLore(connection, componentsTag);
         handleWrittenBookContents(connection, componentsTag);
 
         handleAttributeModifiers(componentsTag);
@@ -411,7 +412,7 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
         }
 
         for (final Tag lore : loreTag) {
-            processTag(connection, lore);
+            handleNestedComponent(connection, lore);
         }
     }
 
