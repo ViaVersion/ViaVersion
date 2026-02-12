@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_11;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
@@ -75,8 +76,23 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
 
     @Override
     protected void registerRewrites() {
-        final EntityDataTypes1_21_11 entityDataTypes = protocol.mappedTypes().entityDataTypes();
-        filter().mapDataType(entityDataTypes::byId);
+        final EntityDataTypes26_1 entityDataTypes = protocol.mappedTypes().entityDataTypes();
+        filter().mapDataType(id -> {
+            int mappedId = id;
+            if (mappedId >= entityDataTypes.catSoundVariant.typeId()) {
+                mappedId++;
+            }
+            if (mappedId >= entityDataTypes.cowSoundVariant.typeId()) {
+                mappedId++;
+            }
+            if (mappedId >= entityDataTypes.pigSoundVariant.typeId()) {
+                mappedId++;
+            }
+            if (mappedId >= entityDataTypes.chickenSoundVariant.typeId()) {
+                mappedId++;
+            }
+            return entityDataTypes.byId(mappedId);
+        });
         registerEntityDataTypeHandler(
             entityDataTypes.itemType,
             entityDataTypes.blockStateType,

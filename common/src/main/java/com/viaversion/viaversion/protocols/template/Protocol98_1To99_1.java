@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
-import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_11;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
@@ -49,7 +49,7 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 // Placeholders to replace (in the entire package):
 //   ClientboundPacket26_1
 //   ServerboundPacket1_21_9
-//   EntityTypes1_21_11 (MAPPED type)
+//   EntityDataTypes26_1 (MAPPED type)
 //   VersionedTypes.V26_1
 //   98.1, 99.1
 final class Protocol98_1To99_1 extends AbstractProtocol<ClientboundPacket26_1, ClientboundPacket26_1, ServerboundPacket1_21_9, ServerboundPacket1_21_9> {
@@ -194,12 +194,12 @@ final class Protocol98_1To99_1 extends AbstractProtocol<ClientboundPacket26_1, C
     }
 
     @Override
-    public Types1_20_5<StructuredDataKeys1_21_11, EntityDataTypes1_21_11> types() {
+    public Types1_20_5<StructuredDataKeys1_21_11, EntityDataTypes26_1> types() {
         return VersionedTypes.V26_1;
     }
 
     @Override
-    public Types1_20_5<StructuredDataKeys1_21_11, EntityDataTypes1_21_11> mappedTypes() {
+    public Types1_20_5<StructuredDataKeys1_21_11, EntityDataTypes26_1> mappedTypes() {
         return VersionedTypes.V26_1;
     }
 

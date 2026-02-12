@@ -353,6 +353,15 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         }
     }
 
+    public RegistryEntry[] entriesFromTag(final CompoundTag tag) {
+        final RegistryEntry[] entries = new RegistryEntry[tag.size()];
+        int index = 0;
+        for (final Map.Entry<String, Tag> entry : tag.entrySet()) {
+            entries[index++] = new RegistryEntry(entry.getKey(), entry.getValue());
+        }
+        return entries;
+    }
+
     @Override
     public @Nullable KeyMappings getMappings(final String registryKey) {
         return this.registryKeyMappings.get(Key.stripMinecraftNamespace(registryKey));

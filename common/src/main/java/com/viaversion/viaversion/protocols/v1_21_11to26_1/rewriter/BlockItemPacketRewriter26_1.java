@@ -104,5 +104,9 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
     public static void downgradeData(final Item item, final StructuredDataContainer container) {
         container.remove(StructuredDataKey.ADDITIONAL_TRADE_COST);
         container.remove(StructuredDataKey.DYE);
+        container.remove(StructuredDataKey.CAT_SOUND_VARIANT);
+        container.remove(StructuredDataKey.CHICKEN_SOUND_VARIANT);
+        container.remove(StructuredDataKey.COW_SOUND_VARIANT);
+        container.remove(StructuredDataKey.PIG_SOUND_VARIANT);
     }
 }

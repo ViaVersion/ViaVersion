@@ -22,12 +22,12 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
-import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_11;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
@@ -38,6 +38,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.data.MappingData26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
@@ -65,7 +66,7 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
 public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPacket1_21_11, ClientboundPacket26_1, ServerboundPacket1_21_9, ServerboundPacket26_1> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.21.11", "26.1");
+    public static final MappingData26_1 MAPPINGS = new MappingData26_1();
     private final EntityPacketRewriter26_1 entityRewriter = new EntityPacketRewriter26_1(this);
     private final BlockItemPacketRewriter26_1 itemRewriter = new BlockItemPacketRewriter26_1(this);
     private final ParticleRewriter<ClientboundPacket1_21_11> particleRewriter = new ParticleRewriter<>(this);
@@ -86,6 +87,11 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             clocksPacket.write(Types.STRING, "world_clock");
             clocksPacket.write(Types.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{new RegistryEntry("minecraft:overworld", new CompoundTag())});
             clocksPacket.send(Protocol1_21_11To26_1.class);
+
+            sendSoundVariants(wrapper, "cat_sound_variant", MAPPINGS.catSoundVariants());
+            sendSoundVariants(wrapper, "cow_sound_variant", MAPPINGS.cowSoundVariants());
+            sendSoundVariants(wrapper, "pig_sound_variant", MAPPINGS.pigSoundVariants());
+            sendSoundVariants(wrapper, "chicken_sound_variant", MAPPINGS.chickenSoundVariants());
         });
 
         addRequiredRegistryEntries();
@@ -114,7 +120,7 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             addBabyAssetId("cat", tag);
         });
         registryDataRewriter.addHandler("dimension_type", (key, tag) -> {
-           tag.putBoolean("has_ender_dragon_fight", Key.equals(key, "the_end"));
+            tag.putBoolean("has_ender_dragon_fight", Key.equals(key, "the_end"));
         });
         registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
 
@@ -157,6 +163,13 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             wrapper.write(Types.BOOLEAN, !tickDayTime); // Paused
         });
         cancelServerbound(ServerboundPackets26_1.SET_GAME_RULE);
+    }
+
+    private void sendSoundVariants(final PacketWrapper wrapper, final String key, final CompoundTag tag) {
+        final PacketWrapper clocksPacket = wrapper.create(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA);
+        clocksPacket.write(Types.STRING, key);
+        clocksPacket.write(Types.REGISTRY_ENTRY_ARRAY, registryDataRewriter.entriesFromTag(tag));
+        clocksPacket.send(Protocol1_21_11To26_1.class);
     }
 
     private void addRequiredRegistryEntries() {
@@ -297,7 +310,7 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             StructuredDataKey.BREAK_SOUND, StructuredDataKey.COW_VARIANT, StructuredDataKey.CHICKEN_VARIANT26_1, StructuredDataKey.WOLF_SOUND_VARIANT,
             StructuredDataKey.USE_EFFECTS, StructuredDataKey.MINIMUM_ATTACK_CHARGE, StructuredDataKey.DAMAGE_TYPE26_1, StructuredDataKey.PIERCING_WEAPON,
             StructuredDataKey.KINETIC_WEAPON, StructuredDataKey.SWING_ANIMATION, StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT26_1, StructuredDataKey.ADDITIONAL_TRADE_COST,
-            StructuredDataKey.DYE);
+            StructuredDataKey.DYE, StructuredDataKey.PIG_SOUND_VARIANT, StructuredDataKey.COW_SOUND_VARIANT, StructuredDataKey.CHICKEN_SOUND_VARIANT, StructuredDataKey.CAT_SOUND_VARIANT);
         super.onMappingDataLoaded();
     }
 
@@ -342,7 +355,7 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
     }
 
     @Override
-    public Types1_20_5<StructuredDataKeys1_21_11, EntityDataTypes1_21_11> mappedTypes() {
+    public Types1_20_5<StructuredDataKeys1_21_11, EntityDataTypes26_1> mappedTypes() {
         return VersionedTypes.V26_1;
     }
 

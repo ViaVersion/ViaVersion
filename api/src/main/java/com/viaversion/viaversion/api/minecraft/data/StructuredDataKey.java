@@ -244,6 +244,10 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> CAT_COLLAR = new StructuredDataKey<>("cat/collar", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<Integer> SHEEP_COLOR = new StructuredDataKey<>("sheep/color", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<Integer> SHULKER_COLOR = new StructuredDataKey<>("shulker/color", EnumTypes.DYE_COLOR);
+    public static final StructuredDataKey<Integer> PIG_SOUND_VARIANT = new StructuredDataKey<>("pig/sound_variant", new SynchronizedRegistryValueType(RegistryKey.of("pig_sound_variant")));
+    public static final StructuredDataKey<Integer> COW_SOUND_VARIANT = new StructuredDataKey<>("cow/sound_variant", new SynchronizedRegistryValueType(RegistryKey.of("cow_sound_variant")));
+    public static final StructuredDataKey<Integer> CHICKEN_SOUND_VARIANT = new StructuredDataKey<>("chicken/sound_variant", new SynchronizedRegistryValueType(RegistryKey.of("chicken_sound_variant")));
+    public static final StructuredDataKey<Integer> CAT_SOUND_VARIANT = new StructuredDataKey<>("cat/sound_variant", new SynchronizedRegistryValueType(RegistryKey.of("cat_sound_variant")));
 
     // These are only safe to use after protocol loading
     public static final StructuredDataKeys1_20_5 V1_20_5 = VersionedTypes.V1_20_5.structuredDataKeys();

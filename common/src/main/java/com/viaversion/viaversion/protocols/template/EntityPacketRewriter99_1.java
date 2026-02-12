@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.template;
 
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
-import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_11;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
@@ -47,7 +47,7 @@ final class EntityPacketRewriter99_1 extends EntityRewriter<ClientboundPacket26_
 
     @Override
     protected void registerRewrites() {
-        final EntityDataTypes1_21_11 entityDataTypes = protocol.mappedTypes().entityDataTypes();
+        final EntityDataTypes26_1 entityDataTypes = protocol.mappedTypes().entityDataTypes();
         filter().mapDataType(entityDataTypes::byId);
         /* ... or something this if entity data classes changed
         filter().mapDataType(typeId -> {
