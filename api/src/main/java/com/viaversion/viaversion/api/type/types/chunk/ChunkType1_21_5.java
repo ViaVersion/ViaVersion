@@ -34,14 +34,18 @@ import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ChunkType1_21_5 extends Type<Chunk> {
+public class ChunkType1_21_5 extends Type<Chunk> {
     private final ChunkSectionType1_18 sectionType;
     private final int ySectionCount;
 
     public ChunkType1_21_5(final int ySectionCount, final int globalPaletteBlockBits, final int globalPaletteBiomeBits) {
+        this(new ChunkSectionType1_21_5(globalPaletteBlockBits, globalPaletteBiomeBits), ySectionCount);
+    }
+
+    protected ChunkType1_21_5(final ChunkSectionType1_18 sectionType, final int ySectionCount) {
         super(Chunk.class);
         Preconditions.checkArgument(ySectionCount > 0);
-        this.sectionType = new ChunkSectionType1_21_5(globalPaletteBlockBits, globalPaletteBiomeBits);
+        this.sectionType = sectionType;
         this.ySectionCount = ySectionCount;
     }
 

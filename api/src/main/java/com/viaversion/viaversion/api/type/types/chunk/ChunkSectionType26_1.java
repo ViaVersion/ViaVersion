@@ -26,30 +26,22 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-public class ChunkSectionType1_18 extends Type<ChunkSection> {
+public class ChunkSectionType26_1 extends ChunkSectionType1_18 {
 
-    protected final PaletteTypeBase blockPaletteType;
-    protected final PaletteTypeBase biomePaletteType;
-
-    public ChunkSectionType1_18(final int globalPaletteBlockBits, final int globalPaletteBiomeBits) {
-        super(ChunkSection.class);
-        this.blockPaletteType = new PaletteType1_18(PaletteType.BLOCKS, globalPaletteBlockBits);
-        this.biomePaletteType = new PaletteType1_18(PaletteType.BIOMES, globalPaletteBiomeBits);
-    }
-
-    protected ChunkSectionType1_18(final PaletteTypeBase blockPaletteType, PaletteTypeBase biomePaletteType) {
-        super(ChunkSection.class);
-        this.blockPaletteType = blockPaletteType;
-        this.biomePaletteType = biomePaletteType;
+    public ChunkSectionType26_1(final int globalPaletteBlockBits, final int globalPaletteBiomeBits) {
+        super(
+            new PaletteType1_21_5(PaletteType.BLOCKS, globalPaletteBlockBits),
+            new PaletteType1_21_5(PaletteType.BIOMES, globalPaletteBiomeBits)
+        );
     }
 
     @Override
     public ChunkSection read(final ByteBuf buffer) {
         final ChunkSection chunkSection = new ChunkSectionImpl();
         chunkSection.setNonAirBlocksCount(buffer.readShort());
+        chunkSection.setFluidCount(buffer.readShort());
         chunkSection.addPalette(PaletteType.BLOCKS, blockPaletteType.read(buffer));
         chunkSection.addPalette(PaletteType.BIOMES, biomePaletteType.read(buffer));
         return chunkSection;
@@ -58,14 +50,16 @@ public class ChunkSectionType1_18 extends Type<ChunkSection> {
     @Override
     public void write(final ByteBuf buffer, final ChunkSection section) {
         buffer.writeShort(section.getNonAirBlocksCount());
+        buffer.writeShort(section.getFluidCount());
         blockPaletteType.write(buffer, section.palette(PaletteType.BLOCKS));
         biomePaletteType.write(buffer, section.palette(PaletteType.BIOMES));
     }
 
+    @Override
     public int serializedSize(final Chunk chunk) {
         int length = 0;
         for (final ChunkSection section : chunk.getSections()) {
-            length += Short.BYTES
+            length += Short.BYTES + Short.BYTES // non-air and fluid count
                 + blockPaletteType.serializedSize(section.palette(PaletteType.BLOCKS))
                 + biomePaletteType.serializedSize(section.palette(PaletteType.BIOMES));
         }

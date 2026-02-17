@@ -231,13 +231,20 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public Chunk handleChunk1_19(PacketWrapper wrapper, ChunkTypeSupplier chunkTypeSupplier) {
+        return handleChunk1_19(wrapper, chunkTypeSupplier, null);
+    }
+
+    public Chunk handleChunk1_19(PacketWrapper wrapper, ChunkTypeSupplier chunkTypeSupplier, @Nullable ChunkTypeSupplier mappedChunkTypeSupplier) {
         final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
         Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
         Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
         final Type<Chunk> chunkType = chunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
             MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
             MathUtil.ceilLog2(tracker.biomesSent()));
-        final Chunk chunk = wrapper.passthrough(chunkType);
+        final Type<Chunk> mappedChunkType = mappedChunkTypeSupplier != null ? mappedChunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
+            MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+            MathUtil.ceilLog2(tracker.biomesSent())) : chunkType;
+        final Chunk chunk = wrapper.passthroughAndMap(chunkType, mappedChunkType);
         for (final ChunkSection section : chunk.getSections()) {
             final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
             for (int i = 0; i < blockPalette.size(); i++) {

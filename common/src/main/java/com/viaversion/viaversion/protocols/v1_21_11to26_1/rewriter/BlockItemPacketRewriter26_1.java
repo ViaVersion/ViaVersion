@@ -18,11 +18,16 @@
 package com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
@@ -47,8 +52,21 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
         blockRewriter.registerBlockUpdate(ClientboundPackets1_21_11.BLOCK_UPDATE);
         blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_21_11.SECTION_BLOCKS_UPDATE);
         blockRewriter.registerLevelEvent1_21(ClientboundPackets1_21_11.LEVEL_EVENT, 2001);
-        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_21_11.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_21_5::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_21_11.BLOCK_ENTITY_DATA);
+        protocol.registerClientbound(ClientboundPackets1_21_11.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
+            final Chunk chunk = blockRewriter.handleChunk1_19(wrapper, ChunkType1_21_5::new, ChunkType26_1::new);
+            for (final ChunkSection section : chunk.getSections()) {
+                final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
+                for (int i = 0; i < blockPalette.size(); i++) {
+                    final int id = blockPalette.idByIndex(i);
+                    if (Protocol1_21_11To26_1.MAPPINGS.fluidBlockStates().contains(id)) {
+                        // Needed for certain client-side fluid interactions
+                        section.setFluidCount(section.getFluidCount() + 1);
+                    }
+                }
+            }
+            blockRewriter.handleBlockEntities(chunk, wrapper.user());
+        });
 
         registerSetCursorItem(ClientboundPackets1_21_11.SET_CURSOR_ITEM);
         registerSetPlayerInventory(ClientboundPackets1_21_11.SET_PLAYER_INVENTORY);

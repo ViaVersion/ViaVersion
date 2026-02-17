@@ -21,7 +21,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
@@ -33,7 +33,7 @@ import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 
 // To replace if needed:
-//   ChunkType1_21_5
+//   ChunkType26_1
 //   RecipeDisplayRewriter
 final class BlockItemPacketRewriter99_1 extends StructuredItemRewriter<ClientboundPacket26_1, ServerboundPacket1_21_9, Protocol98_1To99_1> {
 
@@ -51,7 +51,7 @@ final class BlockItemPacketRewriter99_1 extends StructuredItemRewriter<Clientbou
         blockRewriter.registerBlockUpdate(ClientboundPackets26_1.BLOCK_UPDATE);
         blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets26_1.SECTION_BLOCKS_UPDATE);
         blockRewriter.registerLevelEvent1_21(ClientboundPackets26_1.LEVEL_EVENT, 2001);
-        blockRewriter.registerLevelChunk1_19(ClientboundPackets26_1.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_21_5::new);
+        blockRewriter.registerLevelChunk1_19(ClientboundPackets26_1.LEVEL_CHUNK_WITH_LIGHT, ChunkType26_1::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets26_1.BLOCK_ENTITY_DATA);
 
         // Registers item id changes
