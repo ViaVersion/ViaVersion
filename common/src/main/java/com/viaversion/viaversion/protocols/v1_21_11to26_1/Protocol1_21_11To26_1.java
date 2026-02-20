@@ -240,9 +240,10 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
     }
 
     private void addEntityNamePrefix(final String key, final CompoundTag tag) {
+        // e.g. entity/cat/jellie -> entity/cat/cat_jellie
         final StringTag assetIdTag = tag.getStringTag("asset_id");
         final String assetId = assetIdTag.getValue();
-        assetIdTag.setValue(key + "_" + assetId);
+        assetIdTag.setValue(assetId.replace(key + "/", key + "/" + key + "_"));
     }
 
     private void swapEntityNameAffix(final String key, final CompoundTag tag) {
