@@ -131,7 +131,7 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
                 tag.putString("skybox", "end");
                 attributes.putString("visual/fog_color", "#181318");
                 attributes.putString("visual/sky_color", "#000000");
-                attributes.putString("visual/sky_light_color", "#e580ff");
+                attributes.putString("visual/sky_light_color", "#ac60cd");
                 addAmbientCaveSound(attributes);
 
                 final CompoundTag backgroundMusic = new CompoundTag();

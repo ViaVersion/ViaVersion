@@ -121,6 +121,17 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
         });
         registryDataRewriter.addHandler("dimension_type", (key, tag) -> {
             tag.putBoolean("has_ender_dragon_fight", Key.equals(key, "the_end"));
+
+            final CompoundTag attributes = tag.getCompoundTag("attributes");
+            if (attributes != null) {
+                final int ambientLightColor = switch (Key.stripMinecraftNamespace(key)) {
+                    case "the_end" -> -12630209;
+                    case "the_nether" -> -13621215;
+                    case "overworld" -> -16119286;
+                    default -> -16777216;
+                };
+                attributes.putInt("visual/ambient_light_color", ambientLightColor);
+            }
         });
         registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
 
