@@ -135,6 +135,15 @@ public interface ProtocolInfo {
     void setUuid(UUID uuid);
 
     /**
+     * Returns whether compression is enabled for this connection.
+     *
+     * @return whether compression is enabled
+     */
+    boolean compressionEnabled();
+
+    void setCompressionEnabled(boolean compressionEnabled);
+
+    /**
      * Returns the user's pipeline.
      *
      * @return protocol pipeline

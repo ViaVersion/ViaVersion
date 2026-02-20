@@ -128,6 +128,11 @@ public class ClientboundBaseProtocol1_7 extends AbstractProtocol<BaseClientbound
             }
         });
 
+        registerClientbound(ClientboundLoginPackets.LOGIN_COMPRESSION, wrapper -> {
+            final int threshold = wrapper.passthrough(Types.VAR_INT);
+            wrapper.user().getProtocolInfo().setCompressionEnabled(threshold >= 0);
+        });
+
         // Track player name/uuid and setup connection + track state
         registerClientbound(ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
             final ProtocolInfo info = wrapper.user().getProtocolInfo();

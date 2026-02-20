@@ -56,7 +56,7 @@ public final class BukkitEncodeHandler extends ViaEncodeHandler {
 
         final ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), bytebuf);
         try {
-            final boolean needsCompression = !handledCompression && handleCompressionOrder(ctx, transformedBuf);
+            final boolean needsCompression = !handledCompression && connection.getProtocolInfo().compressionEnabled() && handleCompressionOrder(ctx, transformedBuf);
             connection.transformClientbound(transformedBuf, CancelEncoderException::generate);
             if (needsCompression) {
                 recompress(ctx, transformedBuf);

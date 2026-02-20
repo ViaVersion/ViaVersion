@@ -331,9 +331,12 @@ public class PlayerPacketRewriter1_9 {
         /* Removed packets */
         protocol.registerClientbound(ClientboundPackets1_8.SET_COMPRESSION, null, wrapper -> {
             wrapper.cancel();
-            CompressionProvider provider = Via.getManager().getProviders().get(CompressionProvider.class);
 
-            provider.handlePlayCompression(wrapper.user(), wrapper.read(Types.VAR_INT));
+            int threshold = wrapper.read(Types.VAR_INT);
+            wrapper.user().getProtocolInfo().setCompressionEnabled(threshold >= 0);
+
+            CompressionProvider provider = Via.getManager().getProviders().get(CompressionProvider.class);
+            provider.handlePlayCompression(wrapper.user(), threshold);
         });
 
 

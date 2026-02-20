@@ -32,6 +32,7 @@ public class ProtocolInfoImpl implements ProtocolInfo {
     private String username;
     private UUID uuid;
     private ProtocolPipeline pipeline;
+    private boolean compressionEnabled;
 
     @Override
     public State getClientState() {
@@ -97,6 +98,16 @@ public class ProtocolInfoImpl implements ProtocolInfo {
     @Override
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
+    }
+
+    @Override
+    public boolean compressionEnabled() {
+        return compressionEnabled;
+    }
+
+    @Override
+    public void setCompressionEnabled(final boolean compressionEnabled) {
+        this.compressionEnabled = compressionEnabled;
     }
 
     @Override
