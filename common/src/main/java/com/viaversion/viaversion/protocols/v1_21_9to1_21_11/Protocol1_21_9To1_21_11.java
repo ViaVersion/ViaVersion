@@ -116,7 +116,8 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
             tag.put("attributes", attributes);
 
             if (Key.equals(key, "the_nether")) {
-                tag.put("timelines", new ListTag<>(List.of(new StringTag("villager_schedule"))));
+                // Fill in the new defaults
+                tag.put("timelines", new ListTag<>(List.of(new StringTag("villager_schedule")))); // inline the actual tag values
                 tag.putString("skybox", "none");
                 tag.putString("cardinal_light", "nether");
                 attributes.putString("visual/sky_light_color", "#7a7aff");
@@ -134,6 +135,10 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
                 tag.put("timelines", timelines);
             }
 
+            final Tag fixedTime = tag.remove("fixed_time");
+            if (fixedTime != null) {
+                tag.putBoolean("has_fixed_time", true);
+            }
             if (!tag.getBoolean("natural")) {
                 attributes.putFloat("visual/sky_light_factor", 0F);
             }
@@ -160,10 +165,66 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
             final CompoundTag effects = tag.getCompoundTag("effects");
             final CompoundTag attributes = new CompoundTag();
             tag.put("attributes", attributes);
+
+            // Move color attributes
             moveAttribute(effects, attributes, "sky_color", "visual/sky_color", Function.identity(), new IntTag(0));
             if (!Key.equals(key, "the_end")) {
                 moveAttribute(effects, attributes, "water_fog_color", "visual/water_fog_color", Function.identity(), new IntTag(-16448205));
                 moveAttribute(effects, attributes, "fog_color", "visual/fog_color", Function.identity(), new IntTag(0));
+            }
+
+            // Move music and sound attributes
+            final ListTag<CompoundTag> musicTag = effects.getListTag("music", CompoundTag.class);
+            if (musicTag != null && !musicTag.isEmpty()) {
+                final CompoundTag data = musicTag.get(0).getCompoundTag("data");
+                if (data != null) {
+                    final CompoundTag defaultMusic = new CompoundTag();
+                    final Tag maxDelay = data.get("max_delay");
+                    final Tag minDelay = data.get("min_delay");
+                    final Tag sound = data.get("sound");
+                    if (maxDelay != null) {
+                        defaultMusic.put("max_delay", maxDelay);
+                    }
+                    if (minDelay != null) {
+                        defaultMusic.put("min_delay", minDelay);
+                    }
+                    if (sound != null) {
+                        defaultMusic.put("sound", sound);
+                    }
+
+                    final CompoundTag backgroundMusic = new CompoundTag();
+                    backgroundMusic.put("default", defaultMusic);
+                    attributes.put("audio/background_music", backgroundMusic);
+                }
+            }
+
+            final CompoundTag ambientSounds = new CompoundTag();
+            final Tag moodSound = effects.get("mood_sound");
+            if (moodSound != null) {
+                ambientSounds.put("mood", moodSound);
+            }
+            final Tag additionsSound = effects.get("additions_sound");
+            if (additionsSound != null) {
+                ambientSounds.put("additions", additionsSound);
+            }
+            final Tag loopSound = effects.get("ambient_sound");
+            if (loopSound != null) {
+                ambientSounds.put("loop", loopSound);
+            }
+            if (!ambientSounds.isEmpty()) {
+                attributes.put("audio/ambient_sounds", ambientSounds);
+            }
+
+            // Move particles
+            final CompoundTag particleTag = effects.getCompoundTag("particle");
+            if (particleTag != null) {
+                final CompoundTag entry = new CompoundTag();
+                entry.put("probability", particleTag.get("probability"));
+                entry.put("particle", particleTag.get("options"));
+
+                final ListTag<CompoundTag> ambientParticles = new ListTag<>(CompoundTag.class);
+                ambientParticles.add(entry);
+                attributes.put("visual/ambient_particles", ambientParticles);
             }
         });
         registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
