@@ -116,6 +116,14 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
             wrapper.passthrough(Types.STRING); // Objective name
             wrapper.passthrough(Types.VAR_INT); // Score
             passthroughAndProcessOptional(wrapper);
+            if (wrapper.passthrough(Types.BOOLEAN)) {
+                final int numberFormatType = wrapper.passthrough(Types.VAR_INT);
+                if (numberFormatType == 1) { // styled
+                    passthroughAndProcess(wrapper); // Only contains the style
+                } else if (numberFormatType == 2) { // fixed
+                    passthroughAndProcess(wrapper);
+                }
+            }
         });
     }
 
