@@ -19,6 +19,7 @@ package com.viaversion.viaversion.bukkit.providers;
 
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.tasks.v1_18_2to1_19.AckSequenceTask;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.provider.AckSequenceProvider;
@@ -33,7 +34,9 @@ public final class BukkitAckSequenceProvider extends AckSequenceProvider {
     }
 
     @Override
-    public void handleSequence(final UserConnection connection, final int sequence) {
+    public void handleSequence(final UserConnection connection, final BlockPosition position, final int sequence) {
+        if (sequence <= 0) return; // Does not need to be acked
+
         final SequenceStorage sequenceStorage = connection.get(SequenceStorage.class);
         final int previousSequence = sequenceStorage.setSequenceId(sequence);
         if (previousSequence == -1) {
@@ -45,4 +48,10 @@ public final class BukkitAckSequenceProvider extends AckSequenceProvider {
             }
         }
     }
+
+    @Override
+    public void handleBlockChange(final UserConnection connection, final BlockPosition position) {
+        // no op on bukkit
+    }
+
 }

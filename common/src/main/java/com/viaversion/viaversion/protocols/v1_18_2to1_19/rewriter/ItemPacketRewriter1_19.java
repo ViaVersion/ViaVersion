@@ -19,7 +19,8 @@ package com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.minecraft.BlockFace;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
@@ -113,7 +114,14 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
                 map(Types.VAR_INT); // Action
                 map(Types.BLOCK_POSITION1_14); // Block position
                 map(Types.UNSIGNED_BYTE); // Direction
-                handler(sequenceHandler());
+                handler(wrapper -> {
+                    final AckSequenceProvider ackSequenceProvider = Via.getManager().getProviders().get(AckSequenceProvider.class);
+                    final BlockPosition position = wrapper.get(Types.BLOCK_POSITION1_14, 0);
+                    final BlockPosition relativePosition = position.getRelative(getBlockFace(wrapper.get(Types.UNSIGNED_BYTE, 0)));
+                    final int sequence = wrapper.read(Types.VAR_INT);
+                    ackSequenceProvider.handleSequence(wrapper.user(), position, sequence);
+                    ackSequenceProvider.handleSequence(wrapper.user(), relativePosition, sequence);
+                });
             }
         });
         protocol.registerServerbound(ServerboundPackets1_19.USE_ITEM_ON, new PacketHandlers() {
@@ -126,25 +134,42 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
                 map(Types.FLOAT); // Y
                 map(Types.FLOAT); // Z
                 map(Types.BOOLEAN); // Inside
-                handler(sequenceHandler());
+                handler(wrapper -> {
+                    final AckSequenceProvider ackSequenceProvider = Via.getManager().getProviders().get(AckSequenceProvider.class);
+                    final BlockPosition position = wrapper.get(Types.BLOCK_POSITION1_14, 0);
+                    final BlockPosition relativePosition = position.getRelative(getBlockFace(wrapper.get(Types.VAR_INT, 1)));
+                    final int sequence = wrapper.read(Types.VAR_INT);
+                    ackSequenceProvider.handleSequence(wrapper.user(), position, sequence);
+                    ackSequenceProvider.handleSequence(wrapper.user(), relativePosition, sequence);
+                });
             }
         });
         protocol.registerServerbound(ServerboundPackets1_19.USE_ITEM, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // Hand
-                handler(sequenceHandler());
+                handler(wrapper -> {
+                    final AckSequenceProvider ackSequenceProvider = Via.getManager().getProviders().get(AckSequenceProvider.class);
+                    final int sequence = wrapper.read(Types.VAR_INT);
+                    ackSequenceProvider.handleSequence(wrapper.user(), null, sequence);
+                });
             }
         });
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_18.UPDATE_RECIPES);
     }
 
-    private PacketHandler sequenceHandler() {
-        return wrapper -> {
-            final int sequence = wrapper.read(Types.VAR_INT);
-            final AckSequenceProvider provider = Via.getManager().getProviders().get(AckSequenceProvider.class);
-            provider.handleSequence(wrapper.user(), sequence);
+    private BlockFace getBlockFace(int direction) {
+        direction = Math.abs(direction % 6);
+        return switch (direction) {
+            case 0 -> BlockFace.BOTTOM;
+            case 1 -> BlockFace.TOP;
+            case 2 -> BlockFace.NORTH;
+            case 3 -> BlockFace.SOUTH;
+            case 4 -> BlockFace.WEST;
+            case 5 -> BlockFace.EAST;
+            default -> throw new IllegalStateException("Unexpected value: " + direction);
         };
     }
+
 }
