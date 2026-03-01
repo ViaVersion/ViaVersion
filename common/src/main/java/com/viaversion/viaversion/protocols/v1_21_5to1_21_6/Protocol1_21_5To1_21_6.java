@@ -46,7 +46,6 @@ import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundCon
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPacket1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.rewriter.BlockItemPacketRewriter1_21_6;
-import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.rewriter.ComponentRewriter1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.rewriter.EntityPacketRewriter1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.storage.SneakStorage;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
@@ -68,7 +67,7 @@ public final class Protocol1_21_5To1_21_6 extends AbstractProtocol<ClientboundPa
     private final BlockItemPacketRewriter1_21_6 itemRewriter = new BlockItemPacketRewriter1_21_6(this);
     private final ParticleRewriter<ClientboundPacket1_21_5> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket1_21_5> tagRewriter = new TagRewriter<>(this);
-    private final NBTComponentRewriter<ClientboundPacket1_21_5> componentRewriter = new ComponentRewriter1_21_6(this);
+    private final NBTComponentRewriter<ClientboundPacket1_21_5> componentRewriter = new NBTComponentRewriter<>(this);
     private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
 
     public Protocol1_21_5To1_21_6() {
