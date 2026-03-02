@@ -135,8 +135,7 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
                 addAmbientCaveSound(attributes);
 
                 final CompoundTag backgroundMusic = new CompoundTag();
-                backgroundMusic.put("default", backgroundMusicEntry("music.game", false, 12000));
-                backgroundMusic.put("creative", backgroundMusicEntry("music.creative", false, 12000));
+                backgroundMusic.put("default", backgroundMusicEntry("music.end", true, 6000));
                 attributes.put("audio/background_music", backgroundMusic);
             } else {
                 final ListTag<StringTag> timelines = new ListTag<>(List.of(new StringTag("day"), new StringTag("moon"), new StringTag("early_game")));
@@ -146,7 +145,8 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
                 addAmbientCaveSound(attributes);
 
                 final CompoundTag backgroundMusic = new CompoundTag();
-                backgroundMusic.put("default", backgroundMusicEntry("music.end", true, 6000));
+                backgroundMusic.put("default", backgroundMusicEntry("music.game", false, 12000));
+                backgroundMusic.put("creative", backgroundMusicEntry("music.creative", false, 12000));
                 attributes.put("audio/background_music", backgroundMusic);
             }
 
