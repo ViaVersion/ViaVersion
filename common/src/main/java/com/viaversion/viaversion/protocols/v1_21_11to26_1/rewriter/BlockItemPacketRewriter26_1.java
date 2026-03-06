@@ -18,6 +18,8 @@
 package com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.EitherHolder;
+import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
@@ -26,6 +28,10 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
+import com.viaversion.viaversion.api.minecraft.item.data.DamageType;
+import com.viaversion.viaversion.api.minecraft.item.data.JukeboxPlayable;
+import com.viaversion.viaversion.api.minecraft.item.data.ProvidesTrimMaterial;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
@@ -38,6 +44,8 @@ import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
+import com.viaversion.viaversion.util.Either;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<ClientboundPacket1_21_11, ServerboundPacket26_1, Protocol1_21_11To26_1> {
 
@@ -97,11 +105,34 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
             }
         }
 
-        upgradeData(item, container);
+        upgradeData(protocol, container);
         super.handleItemDataComponentsToClient(connection, item, container);
     }
 
-    public static void upgradeData(final Item item, final StructuredDataContainer container) {
+    public static void upgradeData(final Protocol<?, ?, ?, ?> protocol, final StructuredDataContainer container) {
+        container.replace(StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.JUKEBOX_PLAYABLE26_1, jukeboxPlayable -> upgradeHolder(protocol, jukeboxPlayable.song(), "jukebox_playable"));
+        container.replace(StructuredDataKey.INSTRUMENT1_21_5, StructuredDataKey.INSTRUMENT26_1, instrument -> upgradeHolder(protocol, instrument, "instrument"));
+        container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL1_21_5, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, providesTrimMaterial -> upgradeHolder(protocol, providesTrimMaterial.material(), "trim_material"));
+        container.replace(StructuredDataKey.CHICKEN_VARIANT1_21_5, StructuredDataKey.CHICKEN_VARIANT26_1, chickenVariant -> upgradeEitherVariant(protocol, chickenVariant, "chicken_variant"));
+        container.replace(StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT1_21_11, StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT26_1, nautilusVariant -> upgradeEitherVariant(protocol, nautilusVariant, "zombie_nautilus_variant"));
+        container.replace(StructuredDataKey.DAMAGE_TYPE1_21_11, StructuredDataKey.DAMAGE_TYPE26_1, damageType -> upgradeEitherVariant(protocol, damageType.id(), "damage_type"));
+    }
+
+    private static @Nullable Integer upgradeEitherVariant(final Protocol<?, ?, ?, ?> protocol, final Either<Integer, String> eitherHolder, final String registry) {
+        return eitherHolder.isLeft() ? eitherHolder.left() : registryIdOrNull(protocol, registry, eitherHolder.right());
+    }
+
+    private static <T> @Nullable Holder<T> upgradeHolder(final Protocol<?, ?, ?, ?> protocol, final EitherHolder<T> eitherHolder, final String registry) {
+        if (eitherHolder.hasHolder()) {
+            return eitherHolder.holder();
+        }
+        final Integer id = registryIdOrNull(protocol, registry, eitherHolder.key());
+        return id != null ? Holder.of((int) id) : null;
+    }
+
+    private static @Nullable Integer registryIdOrNull(final Protocol<?, ?, ?, ?> protocol, final String registry, final String key) {
+        final int id = protocol.getRegistryDataRewriter().getMappings(registry).keyToId(key);
+        return id != -1 ? id : null;
     }
 
     @Override
@@ -115,11 +146,18 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
             }
         }
 
-        downgradeData(item, container);
+        downgradeData(container);
         super.handleItemDataComponentsToServer(connection, item, container);
     }
 
-    public static void downgradeData(final Item item, final StructuredDataContainer container) {
+    public static void downgradeData(final StructuredDataContainer container) {
+        container.replace(StructuredDataKey.JUKEBOX_PLAYABLE26_1, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, jukeboxPlayable -> new JukeboxPlayable(jukeboxPlayable, true));
+        container.replace(StructuredDataKey.INSTRUMENT26_1, StructuredDataKey.INSTRUMENT1_21_5, EitherHolder::of);
+        container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, StructuredDataKey.PROVIDES_TRIM_MATERIAL1_21_5, providesTrimMaterial -> new ProvidesTrimMaterial(EitherHolder.of(providesTrimMaterial)));
+        container.replace(StructuredDataKey.CHICKEN_VARIANT26_1, StructuredDataKey.CHICKEN_VARIANT1_21_5, Either::left);
+        container.replace(StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT26_1, StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT1_21_11, Either::left);
+        container.replace(StructuredDataKey.DAMAGE_TYPE26_1, StructuredDataKey.DAMAGE_TYPE1_21_11, damageType -> new DamageType(Either.left(damageType)));
+
         container.remove(StructuredDataKey.ADDITIONAL_TRADE_COST);
         container.remove(StructuredDataKey.DYE);
         container.remove(StructuredDataKey.CAT_SOUND_VARIANT);
