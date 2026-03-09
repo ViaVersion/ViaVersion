@@ -29,6 +29,7 @@ import com.viaversion.viaversion.bukkit.platform.BukkitViaAPI;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaConfig;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaLoader;
+import com.viaversion.viaversion.bukkit.platform.LegacyClientSupportBootstrap;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaTask;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaTaskTask;
 import com.viaversion.viaversion.bukkit.platform.FoliaViaTask;
@@ -73,6 +74,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
             .loader(new BukkitViaLoader(this))
             .build());
 
+        LegacyClientSupportBootstrap.install(this);
         conf.reload();
     }
 
@@ -311,3 +313,4 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         return instance;
     }
 }
+
