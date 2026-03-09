@@ -165,8 +165,8 @@ public class ViaManagerImpl implements ViaManager {
 
             if (!protocolManager.isWorkingPipe()) {
                 platform.getLogger().warning("ViaVersion does not have any compatible versions for this server version!");
-                platform.getLogger().warning("ViaVersion only supports newer client versions. Use ViaBackwards to allow older versions (ViaRewind for 1.7/1.8) to join.");
-                platform.getLogger().warning("Get setup help at https://viaversion.com/setup or download ViaBackwards/ViaRewind directly at https://ci.viaversion.com/");
+                platform.getLogger().warning("ViaVersion only supports newer client versions by default. Older-client support requires backwards translators.");
+                platform.getLogger().warning("Use a build that bundles ViaBackwards/ViaRewind support, or install those addons separately. Help: https://viaversion.com/setup");
                 platform.getLogger().warning("Need more help? Join our Discord at https://viaversion.com/discord");
             } else if (protocolVersion.highestSupportedProtocolVersion().olderThan(ProtocolVersion.v1_16)) {
                 platform.getLogger().warning("This version of Minecraft is extremely outdated and support for it has reached its end of life. "
@@ -400,3 +400,4 @@ public class ViaManagerImpl implements ViaManager {
         }
     }
 }
+

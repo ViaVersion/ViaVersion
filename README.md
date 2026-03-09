@@ -7,6 +7,8 @@
 **Allows the connection of higher client versions to lower server versions -
 it works on any platform you can think of.**
 
+This fork also carries embedded ViaBackwards/ViaRewind support in the Bukkit build, so 1.7+ legacy clients can be bridged without installing separate addons on Spigot/Paper.
+
 The base ViaVersion jar runs on Paper and Velocity. We also have projects integrating ViaVersion to run
 on Fabric, Forge, Sponge, or as a standalone proxy to join from basically any client version on
 any server version from the past decade. **See [HERE](https://viaversion.com) for an overview of the different Via\* projects.**
@@ -108,3 +110,4 @@ Everything else, unless explicitly stated otherwise, is licensed under the GNU G
 end-product as a whole; see [licenses/GPL.md](licenses/GPL.md) for details.
 
 Special thanks to all our [Contributors](https://github.com/ViaVersion/ViaVersion/graphs/contributors).
+
