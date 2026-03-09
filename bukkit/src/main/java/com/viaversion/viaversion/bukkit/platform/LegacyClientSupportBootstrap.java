@@ -17,14 +17,28 @@
  */
 package com.viaversion.viaversion.bukkit.platform;
 
+import com.viaversion.viabackwards.protocol.v1_20_2to1_20.provider.AdvancementCriteriaProvider;
+import com.viaversion.viarewind.protocol.v1_9to1_8.provider.InventoryProvider;
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.bukkit.compat.viabackwards.listener.DurabilitySync1_11;
+import com.viaversion.viaversion.bukkit.compat.viabackwards.listener.FireExtinguish1_16;
+import com.viaversion.viaversion.bukkit.compat.viabackwards.listener.ItemDropSync1_17;
+import com.viaversion.viaversion.bukkit.compat.viabackwards.listener.LecternInteract1_14;
+import com.viaversion.viaversion.bukkit.compat.viabackwards.listener.PlayerHurtSound1_12;
+import com.viaversion.viaversion.bukkit.compat.viabackwards.listener.SpearAttack1_21_11;
+import com.viaversion.viaversion.bukkit.compat.viabackwards.provider.BukkitAdvancementCriteriaProvider;
+import com.viaversion.viaversion.bukkit.compat.viarewind.provider.BukkitInventoryProvider;
 
 public final class LegacyClientSupportBootstrap {
+    private final ViaVersionPlugin plugin;
     private final IntegratedViaBackwardsPlatform viaBackwardsPlatform;
     private final IntegratedViaRewindPlatform viaRewindPlatform;
 
     private LegacyClientSupportBootstrap(final ViaVersionPlugin plugin) {
+        this.plugin = plugin;
         this.viaBackwardsPlatform = new IntegratedViaBackwardsPlatform(plugin);
         this.viaRewindPlatform = new IntegratedViaRewindPlatform(plugin);
     }
@@ -32,7 +46,7 @@ public final class LegacyClientSupportBootstrap {
     public static void install(final ViaVersionPlugin plugin) {
         final LegacyClientSupportBootstrap bootstrap = new LegacyClientSupportBootstrap(plugin);
         Via.getManager().addEnableListener(bootstrap::registerProtocols);
-        Via.getManager().addPostEnableListener(bootstrap::enableBackwardsTasks);
+        Via.getManager().addPostEnableListener(bootstrap::enableBukkitSupport);
     }
 
     private void registerProtocols() {
@@ -40,7 +54,36 @@ public final class LegacyClientSupportBootstrap {
         viaRewindPlatform.initSupport();
     }
 
-    private void enableBackwardsTasks() {
+    private void enableBukkitSupport() {
         viaBackwardsPlatform.enableSupport();
+
+        final ViaProviders providers = Via.getManager().getProviders();
+        final ProtocolVersion protocolVersion = Via.getAPI().getServerVersion().highestSupportedProtocolVersion();
+        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_9)) {
+            providers.use(InventoryProvider.class, new BukkitInventoryProvider());
+        }
+
+        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_21_11)) {
+            new SpearAttack1_21_11(plugin).register();
+        }
+        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_17)) {
+            new ItemDropSync1_17(plugin).register();
+        }
+        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_16)) {
+            new FireExtinguish1_16(plugin).register();
+        }
+        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_14)) {
+            new LecternInteract1_14(plugin).register();
+        }
+        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_12)) {
+            new PlayerHurtSound1_12(plugin).register();
+        }
+        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_11)) {
+            new DurabilitySync1_11(plugin).register();
+        }
+        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_20_2)) {
+            providers.use(AdvancementCriteriaProvider.class, new BukkitAdvancementCriteriaProvider());
+        }
     }
 }
+
