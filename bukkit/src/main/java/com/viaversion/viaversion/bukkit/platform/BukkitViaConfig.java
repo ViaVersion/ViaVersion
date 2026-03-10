@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class BukkitViaConfig extends AbstractViaConfig {
+    private boolean autoEnableViaRewind;
+    private boolean autoEnableViaBackwards;
     private boolean quickMoveActionFix;
     private boolean hitboxFix1_9;
     private boolean hitboxFix1_14;
@@ -41,6 +43,8 @@ public class BukkitViaConfig extends AbstractViaConfig {
     @Override
     protected void loadFields() {
         super.loadFields();
+        autoEnableViaRewind = getBoolean("auto-enable-viarewind", true);
+        autoEnableViaBackwards = getBoolean("auto-enable-viabackwards", true);
         registerUserConnectionOnJoin = getBoolean("register-userconnections-on-join", true);
         quickMoveActionFix = getBoolean("quick-move-action-fix", false);
         hitboxFix1_9 = getBoolean("change-1_9-hitbox", false);
@@ -55,6 +59,14 @@ public class BukkitViaConfig extends AbstractViaConfig {
     @Override
     public boolean shouldRegisterUserConnectionOnJoin() {
         return registerUserConnectionOnJoin;
+    }
+
+    public boolean isAutoEnableViaRewind() {
+        return autoEnableViaRewind;
+    }
+
+    public boolean isAutoEnableViaBackwards() {
+        return autoEnableViaBackwards;
     }
 
     @Override
