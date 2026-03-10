@@ -1,10 +1,12 @@
 # Gradle
 
 .gradle/
+.gradle-cache/
 build/
 out/
 classes/
 .kotlin/
+_upstream/
 
 # Eclipse
 
