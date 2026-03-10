@@ -104,9 +104,9 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         StructuredDataKey.PIG_VARIANT, StructuredDataKey.CHICKEN_VARIANT1_21_5, StructuredDataKey.FROG_VARIANT,
         StructuredDataKey.HORSE_VARIANT, StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.LLAMA_VARIANT,
         StructuredDataKey.AXOLOTL_VARIANT, StructuredDataKey.CAT_VARIANT, StructuredDataKey.CAT_COLLAR,
-        StructuredDataKey.SHEEP_COLOR, StructuredDataKey.SHULKER_COLOR, StructuredDataKey.BLOCKS_ATTACKS,
+        StructuredDataKey.SHEEP_COLOR, StructuredDataKey.SHULKER_COLOR, StructuredDataKey.BLOCKS_ATTACKS1_21_5,
         StructuredDataKey.PROVIDES_TRIM_MATERIAL1_21_5, StructuredDataKey.BREAK_SOUND, StructuredDataKey.WOLF_SOUND_VARIANT,
-        StructuredDataKey.PROVIDES_BANNER_PATTERNS
+        StructuredDataKey.PROVIDES_BANNER_PATTERNS1_21_5
     );
     private static final DataComponentMatchers EMPTY_DATA_MATCHERS = new DataComponentMatchers(new StructuredData[0], new DataComponentPredicate[0]);
     private static final Heightmap[] EMPTY_HEIGHTMAPS = new Heightmap[0];
@@ -518,7 +518,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             if (item.identifier() == 858 || item.identifier() == 863 || item.identifier() == 873 || item.identifier() == 868 || item.identifier() == 878) { // swords
                 item.dataContainer().remove(StructuredDataKey.CONSUMABLE1_21_2);
-                item.dataContainer().set(StructuredDataKey.BLOCKS_ATTACKS,
+                item.dataContainer().set(StructuredDataKey.BLOCKS_ATTACKS1_21_5,
                     new BlocksAttacks(
                         0F,
                         0F,

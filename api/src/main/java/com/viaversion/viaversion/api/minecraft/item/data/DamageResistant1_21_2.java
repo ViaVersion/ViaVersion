@@ -28,12 +28,12 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Key;
 
-public record DamageResistant(Key typesTagKey) {
+public record DamageResistant1_21_2(Key typesTagKey) {
 
-    public static final Type<DamageResistant> TYPE = new TransformingType<>(Types.IDENTIFIER, DamageResistant.class, DamageResistant::new, DamageResistant::typesTagKey) {
+    public static final Type<DamageResistant1_21_2> TYPE = new TransformingType<>(Types.IDENTIFIER, DamageResistant1_21_2.class, DamageResistant1_21_2::new, DamageResistant1_21_2::typesTagKey) {
 
         @Override
-        public void write(final Ops ops, final DamageResistant value) {
+        public void write(final Ops ops, final DamageResistant1_21_2 value) {
             ops.writeMap(map -> map.write("types", Types.TAG_KEY, value.typesTagKey));
         }
     };

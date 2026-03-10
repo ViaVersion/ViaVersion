@@ -39,7 +39,7 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
-import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant;
+import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_21_2;
@@ -572,7 +572,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             dataContainer.setEmpty(StructuredDataKey.V1_21_2.useRemainder);
         });
         dataContainer.replaceKey(StructuredDataKey.POTION_CONTENTS1_20_5, StructuredDataKey.POTION_CONTENTS1_21_2);
-        dataContainer.replace(StructuredDataKey.FIRE_RESISTANT, StructuredDataKey.DAMAGE_RESISTANT, fireResistant -> new DamageResistant(Key.of("minecraft:is_fire")));
+        dataContainer.replace(StructuredDataKey.FIRE_RESISTANT, StructuredDataKey.DAMAGE_RESISTANT1_21_2, fireResistant -> new DamageResistant1_21_2(Key.of("minecraft:is_fire")));
         dataContainer.replace(StructuredDataKey.LOCK1_20_5, StructuredDataKey.LOCK1_21_2, tag -> {
             final String lock = ((StringTag) tag).getValue();
             final CompoundTag predicateTag = new CompoundTag();
@@ -639,7 +639,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             return trim;
         });
         dataContainer.replaceKey(StructuredDataKey.POTION_CONTENTS1_21_2, StructuredDataKey.POTION_CONTENTS1_20_5);
-        dataContainer.replace(StructuredDataKey.DAMAGE_RESISTANT, StructuredDataKey.FIRE_RESISTANT, damageResistant -> {
+        dataContainer.replace(StructuredDataKey.DAMAGE_RESISTANT1_21_2, StructuredDataKey.FIRE_RESISTANT, damageResistant -> {
             if (damageResistant.typesTagKey().equals("is_fire")) {
                 return Unit.INSTANCE;
             }
