@@ -50,38 +50,46 @@ public final class LegacyClientSupportBootstrap {
     }
 
     private void registerProtocols() {
-        viaBackwardsPlatform.initSupport();
-        viaRewindPlatform.initSupport();
+        if (plugin.getConf().isAutoEnableViaBackwards()) {
+            viaBackwardsPlatform.initSupport();
+        }
+
+        if (plugin.getConf().isAutoEnableViaRewind()) {
+            viaRewindPlatform.initSupport();
+        }
     }
 
     private void enableBukkitSupport() {
-        viaBackwardsPlatform.enableSupport();
+        if (plugin.getConf().isAutoEnableViaBackwards()) {
+            viaBackwardsPlatform.enableSupport();
+        }
 
         final ViaProviders providers = Via.getManager().getProviders();
         final ProtocolVersion protocolVersion = Via.getAPI().getServerVersion().highestSupportedProtocolVersion();
-        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_9)) {
+
+        if (plugin.getConf().isAutoEnableViaRewind() && protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_9)) {
             providers.use(InventoryProvider.class, new BukkitInventoryProvider());
         }
 
-        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_21_11)) {
+        if (plugin.getConf().isAutoEnableViaBackwards() && protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_21_11)) {
             new SpearAttack1_21_11(plugin).register();
         }
-        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_17)) {
+        if (plugin.getConf().isAutoEnableViaBackwards() && protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_17)) {
             new ItemDropSync1_17(plugin).register();
         }
-        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_16)) {
+        if (plugin.getConf().isAutoEnableViaBackwards() && protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_16)) {
             new FireExtinguish1_16(plugin).register();
         }
-        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_14)) {
+        if (plugin.getConf().isAutoEnableViaBackwards() && protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_14)) {
             new LecternInteract1_14(plugin).register();
         }
-        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_12)) {
+        if (plugin.getConf().isAutoEnableViaBackwards() && protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_12)) {
             new PlayerHurtSound1_12(plugin).register();
         }
-        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_11)) {
+        if (plugin.getConf().isAutoEnableViaBackwards() && protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_11)) {
             new DurabilitySync1_11(plugin).register();
         }
-        if (protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_20_2)) {
+        if (plugin.getConf().isAutoEnableViaBackwards() && protocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_20_2)) {
             providers.use(AdvancementCriteriaProvider.class, new BukkitAdvancementCriteriaProvider());
         }
     }
