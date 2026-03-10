@@ -12,6 +12,10 @@
 check-for-updates: true
 # Send the supported versions with the Status (Ping) response packet
 send-supported-versions: false
+# Whether ViaVersion should automatically load ViaRewind for 1.7 clients on newer servers.
+auto-enable-viarewind: true
+# Whether ViaVersion should automatically load ViaBackwards for newer clients on older servers.
+auto-enable-viabackwards: true
 # Easier to configure alternative to 'block-protocols'. Uses readable version strings with possible '<' and '>' prefixes.
 # An example to block 1.16.4, everything below 1.16, as well as everything above 1.17.1 would be: ["<1.16", "1.16.4", ">1.17.1"]
 # You can use both this and the block-protocols option at the same time as well.
