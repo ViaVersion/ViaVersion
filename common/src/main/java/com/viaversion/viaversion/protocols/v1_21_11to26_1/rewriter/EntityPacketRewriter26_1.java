@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
@@ -47,19 +48,21 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
 
         protocol.registerServerbound(ServerboundPackets26_1.INTERACT, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT);
-            final int hand = wrapper.read(Types.VAR_INT);
-            final Vector3d location = wrapper.read(Types.LOW_PRECISION_VECTOR);
-            if (tracker(wrapper.user()).entityType(entityId) == EntityTypes1_21_11.ARMOR_STAND) {
-                wrapper.write(Types.VAR_INT, 2); // Interact at
-                wrapper.write(Types.FLOAT, (float) location.x());
-                wrapper.write(Types.FLOAT, (float) location.y());
-                wrapper.write(Types.FLOAT, (float) location.z());
-                wrapper.write(Types.VAR_INT, hand);
-                return;
-            }
-
             wrapper.write(Types.VAR_INT, 0); // Interact
-            wrapper.write(Types.VAR_INT, hand);
+            final int hand = wrapper.passthrough(Types.VAR_INT);
+            final Vector3d location = wrapper.read(Types.LOW_PRECISION_VECTOR);
+            final boolean secondaryAction = wrapper.passthrough(Types.BOOLEAN);
+
+            // Send interact at as well
+            final PacketWrapper interactAtPacket = wrapper.create(ServerboundPackets1_21_6.INTERACT);
+            interactAtPacket.write(Types.VAR_INT, entityId);
+            interactAtPacket.write(Types.VAR_INT, 2); // Interact at
+            interactAtPacket.write(Types.FLOAT, (float) location.x());
+            interactAtPacket.write(Types.FLOAT, (float) location.y());
+            interactAtPacket.write(Types.FLOAT, (float) location.z());
+            interactAtPacket.write(Types.VAR_INT, hand);
+            interactAtPacket.write(Types.BOOLEAN, secondaryAction);
+            interactAtPacket.sendToServer(Protocol1_21_11To26_1.class);
         });
         protocol.registerServerbound(ServerboundPackets26_1.ATTACK, ServerboundPackets1_21_6.INTERACT, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Entity ID
