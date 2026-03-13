@@ -25,8 +25,6 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
-import com.viaversion.viaversion.api.minecraft.RegistryType;
-import com.viaversion.viaversion.api.minecraft.TagData;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
@@ -35,8 +33,6 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.api.rewriter.EntityRewriter;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.exception.CancelException;
@@ -50,17 +46,16 @@ import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.rewriter.BlockItemPacketRewriter1_20_2;
+import com.viaversion.viaversion.protocols.v1_20to1_20_2.rewriter.BlockRewriter1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.rewriter.EntityPacketRewriter1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ConfigurationState;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ConfigurationState.BridgePhase;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.LastResourcePack;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.LastTags;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.Key;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -71,6 +66,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
     private final BlockItemPacketRewriter1_20_2 itemPacketRewriter = new BlockItemPacketRewriter1_20_2(this);
     private final ParticleRewriter<ClientboundPackets1_19_4> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_19_4> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPackets1_19_4> blockRewriter = new BlockRewriter1_20_2(this);
 
     public Protocol1_20To1_20_2() {
         super(ClientboundPackets1_19_4.class, ClientboundPackets1_20_2.class, ServerboundPackets1_19_4.class, ServerboundPackets1_20_2.class);
@@ -80,12 +76,6 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
     protected void registerPackets() {
         // Close your eyes and turn around while you still can
         super.registerPackets();
-
-        final SoundRewriter<ClientboundPackets1_19_4> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND_ENTITY);
-
-        particleRewriter.registerLevelParticles1_19(ClientboundPackets1_19_4.LEVEL_PARTICLES);
 
         registerClientbound(ClientboundPackets1_19_4.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
@@ -123,7 +113,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             wrapper.user().put(new LastResourcePack(url, hash, required, prompt));
         });
 
-        registerClientbound(ClientboundPackets1_19_4.UPDATE_TAGS, wrapper -> {
+        replaceClientbound(ClientboundPackets1_19_4.UPDATE_TAGS, wrapper -> {
             tagRewriter.handleGeneric(wrapper);
             wrapper.resetReader();
             wrapper.user().put(new LastTags(wrapper));
@@ -407,13 +397,18 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    public EntityRewriter<Protocol1_20To1_20_2> getEntityRewriter() {
+    public EntityPacketRewriter1_20_2 getEntityRewriter() {
         return entityPacketRewriter;
     }
 
     @Override
-    public ItemRewriter<Protocol1_20To1_20_2> getItemRewriter() {
+    public BlockItemPacketRewriter1_20_2 getItemRewriter() {
         return itemPacketRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPackets1_19_4> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

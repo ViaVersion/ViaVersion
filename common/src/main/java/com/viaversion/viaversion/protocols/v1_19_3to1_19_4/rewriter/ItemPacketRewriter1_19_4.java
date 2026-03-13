@@ -20,12 +20,10 @@ package com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.packet.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.RecipeRewriter1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.Protocol1_19_3To1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ServerboundPackets1_19_4;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
 public final class ItemPacketRewriter1_19_4 extends ItemRewriter<ClientboundPackets1_19_3, ServerboundPackets1_19_4, Protocol1_19_3To1_19_4> {
@@ -36,14 +34,7 @@ public final class ItemPacketRewriter1_19_4 extends ItemRewriter<ClientboundPack
 
     @Override
     public void registerPackets() {
-        final BlockRewriter<ClientboundPackets1_19_3> blockRewriter = BlockRewriter.for1_14(protocol);
-        blockRewriter.registerBlockEvent(ClientboundPackets1_19_3.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_19_3.BLOCK_UPDATE);
-        blockRewriter.registerSectionBlocksUpdate(ClientboundPackets1_19_3.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_19_3.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_18::new);
-        blockRewriter.registerBlockEntityData(ClientboundPackets1_19_3.BLOCK_ENTITY_DATA);
-
-        protocol.registerClientbound(ClientboundPackets1_19_3.LEVEL_EVENT, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_19_3.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.INT); // Effect Id
@@ -82,16 +73,6 @@ public final class ItemPacketRewriter1_19_4 extends ItemRewriter<ClientboundPack
                 });
             }
         });
-
-        registerCooldown(ClientboundPackets1_19_3.COOLDOWN);
-        registerSetContent1_17_1(ClientboundPackets1_19_3.CONTAINER_SET_CONTENT);
-        registerSetSlot1_17_1(ClientboundPackets1_19_3.CONTAINER_SET_SLOT);
-        registerAdvancements(ClientboundPackets1_19_3.UPDATE_ADVANCEMENTS);
-        registerSetEquipment(ClientboundPackets1_19_3.SET_EQUIPMENT);
-        registerMerchantOffers1_19(ClientboundPackets1_19_3.MERCHANT_OFFERS);
-        registerContainerSetData(ClientboundPackets1_19_3.CONTAINER_SET_DATA);
-        registerSetCreativeModeSlot(ServerboundPackets1_19_4.SET_CREATIVE_MODE_SLOT);
-        registerContainerClick1_17_1(ServerboundPackets1_19_4.CONTAINER_CLICK);
 
         new RecipeRewriter1_19_3<>(protocol) {
             @Override

@@ -18,6 +18,8 @@
 package com.viaversion.viaversion.rewriter;
 
 import com.viaversion.viaversion.api.data.FullMappings;
+import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -215,8 +217,9 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
     }
 
     protected int rewriteItemId(final int id) {
-        if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
-            return protocol.getMappingData().getItemMappings().getNewIdOrDefault(id, id);
+        final MappingData mappingData = protocol.getMappingData();
+        if (mappingData != null && mappingData.getItemMappings() != null) {
+            return mappingData.getItemMappings().getNewIdOrDefault(id, id);
         }
         return id;
     }

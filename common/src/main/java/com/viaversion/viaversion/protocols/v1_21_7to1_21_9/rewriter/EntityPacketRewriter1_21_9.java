@@ -27,7 +27,6 @@ import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundConfigurationPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPacket1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.Protocol1_21_7To1_21_9;
@@ -43,14 +42,7 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerSetEntityData(ClientboundPackets1_21_6.SET_ENTITY_DATA);
-        registerRemoveEntities(ClientboundPackets1_21_6.REMOVE_ENTITIES);
-        registerPlayerAbilities(ClientboundPackets1_21_6.PLAYER_ABILITIES);
-        registerGameEvent(ClientboundPackets1_21_6.GAME_EVENT);
-        registerLogin1_20_5(ClientboundPackets1_21_6.LOGIN);
-        registerRespawn1_20_5(ClientboundPackets1_21_6.RESPAWN);
-
-        protocol.registerClientbound(ClientboundPackets1_21_6.ADD_ENTITY, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_21_6.ADD_ENTITY, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT);
             wrapper.passthrough(Types.UUID); // Entity UUID
             final int entityTypeId = wrapper.passthrough(Types.VAR_INT);
@@ -98,7 +90,6 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
                 dimension.putFloat("ambient_light", 0.25F); // End now has actual skylight
             }
         });
-        protocol.registerClientbound(ClientboundConfigurationPackets1_21_6.REGISTRY_DATA, protocol.getRegistryDataRewriter()::handle);
     }
 
     private Vector3d readRelativeMovement(final PacketWrapper wrapper) {

@@ -34,16 +34,18 @@ import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_11;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_9;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPacket1_21_9;
@@ -53,16 +55,16 @@ import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.data.MappingData1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPacket1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPackets1_21_11;
-import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.rewriter.BlockItemPacketRewriter1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.rewriter.ComponentRewriter1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.rewriter.EntityPacketRewriter1_21_11;
+import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.rewriter.BlockItemPacketRewriter1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.storage.GameTimeStorage;
-import com.viaversion.viaversion.rewriter.AttributeRewriter;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
+import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 import com.viaversion.viaversion.util.Key;
 import java.util.List;
@@ -79,10 +81,12 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
     private static final Set<String> REMOVE_SKY_COLOR_FROM_BIOMES = Set.of("warped_forest", "basalt_deltas", "nether_wastes", "soul_sand_valley", "crimson_forest"); // rendered via the already defined fog instead
     private final EntityPacketRewriter1_21_11 entityRewriter = new EntityPacketRewriter1_21_11(this);
     private final BlockItemPacketRewriter1_21_11 itemRewriter = new BlockItemPacketRewriter1_21_11(this);
+    private final BlockRewriter<ClientboundPacket1_21_9> blockRewriter = new BlockRewriter1_21_5<>(this, ChunkType1_21_5::new);
     private final ParticleRewriter<ClientboundPacket1_21_9> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket1_21_9> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket1_21_9> componentRewriter = new ComponentRewriter1_21_11(this);
     private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
+    private final RecipeDisplayRewriter<ClientboundPacket1_21_9> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(this);
 
     public Protocol1_21_9To1_21_11() {
         super(ClientboundPacket1_21_9.class, ClientboundPacket1_21_11.class, ServerboundPacket1_21_9.class, ServerboundPacket1_21_9.class);
@@ -245,37 +249,6 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
                 attributes.put("visual/ambient_particles", ambientParticles);
             }
         });
-        registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
-
-        tagRewriter.registerGeneric(ClientboundPackets1_21_9.UPDATE_TAGS);
-        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21_9.UPDATE_TAGS);
-
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_21_9.OPEN_SCREEN);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_9.SET_ACTION_BAR_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_9.SET_TITLE_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_9.SET_SUBTITLE_TEXT);
-        componentRewriter.registerBossEvent(ClientboundPackets1_21_9.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_9.DISCONNECT);
-        componentRewriter.registerComponentPacket(ClientboundConfigurationPackets1_21_9.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets1_21_9.TAB_LIST);
-        componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21_9.PLAYER_COMBAT_KILL);
-        componentRewriter.registerPlayerInfoUpdate1_21_4(ClientboundPackets1_21_9.PLAYER_INFO_UPDATE);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_9.SYSTEM_CHAT);
-        componentRewriter.registerDisguisedChat(ClientboundPackets1_21_9.DISGUISED_CHAT);
-        componentRewriter.registerPlayerChat1_21_5(ClientboundPackets1_21_9.PLAYER_CHAT);
-        componentRewriter.registerSetObjective(ClientboundPackets1_21_9.SET_OBJECTIVE);
-        componentRewriter.registerSetScore1_20_3(ClientboundPackets1_21_9.SET_SCORE);
-        componentRewriter.registerPing();
-
-        particleRewriter.registerLevelParticles1_21_4(ClientboundPackets1_21_9.LEVEL_PARTICLES);
-        particleRewriter.registerExplode1_21_9(ClientboundPackets1_21_9.EXPLODE); // Rewrites the included sound and particles
-
-        final SoundRewriter<ClientboundPacket1_21_9> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_21_9.SOUND);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_21_9.SOUND_ENTITY);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_21_9.AWARD_STATS);
-        new AttributeRewriter<>(this).register1_21(ClientboundPackets1_21_9.UPDATE_ATTRIBUTES);
     }
 
     private void addAmbientCaveSound(final CompoundTag attributes) {
@@ -385,6 +358,16 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
     @Override
     public BlockItemPacketRewriter1_21_11 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPacket1_21_9> getBlockRewriter() {
+        return blockRewriter;
+    }
+
+    @Override
+    public RecipeDisplayRewriter<ClientboundPacket1_21_9> getRecipeRewriter() {
+        return recipeRewriter;
     }
 
     @Override

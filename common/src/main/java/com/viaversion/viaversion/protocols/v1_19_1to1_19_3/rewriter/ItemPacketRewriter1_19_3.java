@@ -20,11 +20,9 @@ package com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.Protocol1_19_1To1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.packet.ServerboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ClientboundPackets1_19_1;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import com.viaversion.viaversion.util.Key;
@@ -39,24 +37,6 @@ public final class ItemPacketRewriter1_19_3 extends ItemRewriter<ClientboundPack
 
     @Override
     public void registerPackets() {
-        final BlockRewriter<ClientboundPackets1_19_1> blockRewriter = BlockRewriter.for1_14(protocol);
-        blockRewriter.registerBlockEvent(ClientboundPackets1_19_1.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_19_1.BLOCK_UPDATE);
-        blockRewriter.registerSectionBlocksUpdate(ClientboundPackets1_19_1.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerLevelEvent(ClientboundPackets1_19_1.LEVEL_EVENT, 1010, 2001);
-        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_19_1.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_18::new);
-        blockRewriter.registerBlockEntityData(ClientboundPackets1_19_1.BLOCK_ENTITY_DATA);
-
-        registerCooldown(ClientboundPackets1_19_1.COOLDOWN);
-        registerSetContent1_17_1(ClientboundPackets1_19_1.CONTAINER_SET_CONTENT);
-        registerSetSlot1_17_1(ClientboundPackets1_19_1.CONTAINER_SET_SLOT);
-        registerAdvancements(ClientboundPackets1_19_1.UPDATE_ADVANCEMENTS);
-        registerSetEquipment(ClientboundPackets1_19_1.SET_EQUIPMENT);
-        registerContainerClick1_17_1(ServerboundPackets1_19_3.CONTAINER_CLICK);
-        registerMerchantOffers1_19(ClientboundPackets1_19_1.MERCHANT_OFFERS);
-        registerSetCreativeModeSlot(ServerboundPackets1_19_3.SET_CREATIVE_MODE_SLOT);
-        registerContainerSetData(ClientboundPackets1_19_1.CONTAINER_SET_DATA);
-
         final RecipeRewriter<ClientboundPackets1_19_1> recipeRewriter = new RecipeRewriter<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_19_1.UPDATE_RECIPES, wrapper -> {
             final int size = wrapper.passthrough(Types.VAR_INT);
@@ -99,9 +79,12 @@ public final class ItemPacketRewriter1_19_3 extends ItemRewriter<ClientboundPack
                         wrapper.passthrough(Types.FLOAT); // EXP
                         wrapper.passthrough(Types.VAR_INT); // Cooking time
                     }
-                    case "crafting_special_armordye", "crafting_special_bookcloning", "crafting_special_mapcloning", "crafting_special_mapextending",
-                         "crafting_special_firework_rocket", "crafting_special_firework_star", "crafting_special_firework_star_fade", "crafting_special_tippedarrow",
-                         "crafting_special_bannerduplicate", "crafting_special_shielddecoration", "crafting_special_shulkerboxcoloring", "crafting_special_suspiciousstew",
+                    case "crafting_special_armordye", "crafting_special_bookcloning", "crafting_special_mapcloning",
+                         "crafting_special_mapextending",
+                         "crafting_special_firework_rocket", "crafting_special_firework_star",
+                         "crafting_special_firework_star_fade", "crafting_special_tippedarrow",
+                         "crafting_special_bannerduplicate", "crafting_special_shielddecoration",
+                         "crafting_special_shulkerboxcoloring", "crafting_special_suspiciousstew",
                          "crafting_special_repairitem" -> wrapper.write(Types.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
                     default -> recipeRewriter.handleRecipeType(wrapper, type);
                 }

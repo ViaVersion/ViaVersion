@@ -32,16 +32,6 @@ public class ItemPacketRewriter1_15 extends ItemRewriter<ClientboundPackets1_14_
 
     @Override
     public void registerPackets() {
-        registerCooldown(ClientboundPackets1_14_4.COOLDOWN);
-        registerSetContent(ClientboundPackets1_14_4.CONTAINER_SET_CONTENT);
-        registerMerchantOffers(ClientboundPackets1_14_4.MERCHANT_OFFERS);
-        registerSetSlot(ClientboundPackets1_14_4.CONTAINER_SET_SLOT);
-        registerSetEquippedItem(ClientboundPackets1_14_4.SET_EQUIPPED_ITEM);
-        registerAdvancements(ClientboundPackets1_14_4.UPDATE_ADVANCEMENTS);
-
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_14_4.UPDATE_RECIPES);
-
-        registerContainerClick(ServerboundPackets1_14.CONTAINER_CLICK);
-        registerSetCreativeModeSlot(ServerboundPackets1_14.SET_CREATIVE_MODE_SLOT);
     }
 }

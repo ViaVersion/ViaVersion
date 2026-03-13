@@ -37,7 +37,6 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.Protocol1_13_2To1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.storage.EntityTracker1_14;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import java.util.Arrays;
 
@@ -53,8 +52,6 @@ public class WorldPacketRewriter1_14 {
     }
 
     public static void register(Protocol1_13_2To1_14 protocol) {
-        BlockRewriter<ClientboundPackets1_13> blockRewriter = BlockRewriter.for1_14(protocol);
-
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_DESTRUCTION, new PacketHandlers() {
             @Override
             public void register() {
@@ -69,7 +66,7 @@ public class WorldPacketRewriter1_14 {
                 map(Types.BLOCK_POSITION1_8, Types.BLOCK_POSITION1_14);
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_EVENT, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_13.BLOCK_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.BLOCK_POSITION1_8, Types.BLOCK_POSITION1_14); // Location
@@ -79,7 +76,7 @@ public class WorldPacketRewriter1_14 {
                 handler(wrapper -> wrapper.set(Types.VAR_INT, 0, protocol.getMappingData().getNewBlockId(wrapper.get(Types.VAR_INT, 0))));
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_UPDATE, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_13.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.BLOCK_POSITION1_8, Types.BLOCK_POSITION1_14);
@@ -101,8 +98,6 @@ public class WorldPacketRewriter1_14 {
                 });
             }
         });
-
-        blockRewriter.registerChunkBlocksUpdate(ClientboundPackets1_13.CHUNK_BLOCKS_UPDATE);
 
         protocol.registerClientbound(ClientboundPackets1_13.EXPLODE, new PacketHandlers() {
             @Override
@@ -247,7 +242,7 @@ public class WorldPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.LEVEL_EVENT, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_13.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.INT); // Effect Id

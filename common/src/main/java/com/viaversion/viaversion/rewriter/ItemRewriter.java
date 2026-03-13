@@ -93,7 +93,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     @Override
     public @Nullable Item handleItemToClient(final UserConnection connection, @Nullable Item item) {
         if (item == null) return null;
-        if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
+        if (protocol.getMappingData() != null && !Mappings.isIntIdIdentity(protocol.getMappingData().getItemMappings())) {
             item.setIdentifier(protocol.getMappingData().getNewItemId(item.identifier()));
         }
         return item;
@@ -102,7 +102,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     @Override
     public @Nullable Item handleItemToServer(final UserConnection connection, @Nullable Item item) {
         if (item == null) return null;
-        if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
+        if (protocol.getMappingData() != null && !Mappings.isIntIdIdentity(protocol.getMappingData().getItemMappings())) {
             item.setIdentifier(protocol.getMappingData().getOldItemId(item.identifier()));
         }
         return item;
@@ -117,7 +117,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
         final FullMappings dataComponentMappings = mappingData.getDataComponentSerializerMappings();
         if (dataComponentMappings != null) {
-            updateHashedItemDataComponentIds(item, dataComponentMappings.inverse());
+            if (!dataComponentMappings.isIdentity()) {
+                updateHashedItemDataComponentIds(item, dataComponentMappings.inverse());
+            }
 
             final int customDataId = dataComponentMappings.id("custom_data");
             if (item.dataHashesById().containsKey(customDataId)) {
@@ -169,21 +171,27 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     public void registerOpenScreen(C packetType) {
-        protocol.registerClientbound(packetType, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Container id
-            handleMenuType(wrapper);
-        });
-    }
-
-    public void handleMenuType(final PacketWrapper wrapper) {
-        final int windowType = wrapper.read(Types.VAR_INT);
-        final int mappedId = protocol.getMappingData().getMenuMappings().getNewId(windowType);
-        if (mappedId == -1) {
-            wrapper.cancel();
+        if ((protocol.getMappingData() == null || Mappings.isIntIdIdentity(protocol.getMappingData().getMenuMappings()))
+            && protocol.getComponentRewriter() == null) {
             return;
         }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Container id
 
-        wrapper.write(Types.VAR_INT, mappedId);
+            int windowType = wrapper.read(Types.VAR_INT);
+            if (protocol.getMappingData() != null && protocol.getMappingData().getMenuMappings() != null) {
+                windowType = protocol.getMappingData().getMenuMappings().getNewId(windowType);
+                if (windowType == -1) {
+                    wrapper.cancel();
+                    return;
+                }
+            }
+            wrapper.write(Types.VAR_INT, windowType);
+
+            if (protocol.getComponentRewriter() != null) {
+                protocol.getComponentRewriter().passthroughAndProcess(wrapper);
+            }
+        });
     }
 
     public void registerSetSlot(C packetType) {
@@ -304,6 +312,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     public void registerCooldown(C packetType) {
+        if (protocol.getMappingData() == null || Mappings.isIntIdIdentity(protocol.getMappingData().getItemMappings())) {
+            return;
+        }
         protocol.registerClientbound(packetType, wrapper -> {
             int itemId = wrapper.read(Types.VAR_INT);
             wrapper.write(Types.VAR_INT, protocol.getMappingData().getNewItemId(itemId));
@@ -311,6 +322,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     public void registerCooldown1_21_2(C packetType) {
+        if (protocol.getMappingData() == null || Mappings.isFullIdentity(protocol.getMappingData().getFullItemMappings())) {
+            return;
+        }
         protocol.registerClientbound(packetType, wrapper -> {
             String itemIdentifier = wrapper.read(Types.STRING);
             if (itemIdentifier != null) {
@@ -354,8 +368,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
 
-    // 1.14.4+
-    public void registerMerchantOffers(C packetType) {
+    public void registerMerchantOffers1_14_4(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.VAR_INT);
             int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
@@ -512,17 +525,15 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     // Pre 1.21 for enchantments
     public void registerContainerSetData(C packetType) {
+        if (protocol.getMappingData() == null || Mappings.isIntIdIdentity(protocol.getMappingData().getEnchantmentMappings())) {
+            return;
+        }
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
 
-            Mappings mappings = protocol.getMappingData().getEnchantmentMappings();
-            if (mappings == null) {
-                return;
-            }
-
             short property = wrapper.passthrough(Types.SHORT);
             if (property >= 4 && property <= 6) { // Enchantment id
-                short enchantmentId = (short) mappings.getNewId(wrapper.read(Types.SHORT));
+                short enchantmentId = (short) protocol.getMappingData().getEnchantmentMappings().getNewId(wrapper.read(Types.SHORT));
                 wrapper.write(Types.SHORT, enchantmentId);
             }
         });

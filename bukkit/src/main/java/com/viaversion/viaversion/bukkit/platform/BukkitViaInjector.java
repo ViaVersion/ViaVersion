@@ -105,7 +105,8 @@ public class BukkitViaInjector extends LegacyViaInjector {
         // Grab the ping class and find the field to access it
         Class<?> pingClazz = NMSUtil.nms(
             "ServerPing",
-            "net.minecraft.network.protocol.status.ServerPing"
+            "net.minecraft.network.protocol.status.ServerPing",
+            "net.minecraft.network.protocol.status.ServerStatus"
         );
         Object ping = null;
         for (Field field : serverClazz.getDeclaredFields()) {
@@ -120,7 +121,8 @@ public class BukkitViaInjector extends LegacyViaInjector {
         // Now get the ServerData inside ServerPing
         Class<?> serverDataClass = NMSUtil.nms(
             "ServerPing$ServerData",
-            "net.minecraft.network.protocol.status.ServerPing$ServerData"
+            "net.minecraft.network.protocol.status.ServerPing$ServerData",
+            "net.minecraft.network.protocol.status.ServerStatus$Version"
         );
         Object serverData = null;
         for (Field field : pingClazz.getDeclaredFields()) {
@@ -155,7 +157,8 @@ public class BukkitViaInjector extends LegacyViaInjector {
         );
         Class<?> connectionClass = NMSUtil.nms(
             "ServerConnection",
-            "net.minecraft.server.network.ServerConnection"
+            "net.minecraft.server.network.ServerConnection",
+            "net.minecraft.server.network.ServerConnectionListener"
         );
 
         Object server = ReflectionUtil.invokeStatic(serverClass, "getServer");

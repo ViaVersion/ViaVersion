@@ -40,9 +40,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
 
     @Override
     protected void registerPackets() {
-        registerTrackerWithData(ClientboundPackets1_14_4.ADD_ENTITY, EntityTypes1_15.FALLING_BLOCK);
-
-        protocol.registerClientbound(ClientboundPackets1_14_4.ADD_MOB, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_14_4.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // 0 - Entity ID
@@ -123,7 +121,6 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
         });
 
         registerSetEntityData(ClientboundPackets1_14_4.SET_ENTITY_DATA, Types1_14.ENTITY_DATA_LIST);
-        registerRemoveEntities(ClientboundPackets1_14_4.REMOVE_ENTITIES);
     }
 
     @Override

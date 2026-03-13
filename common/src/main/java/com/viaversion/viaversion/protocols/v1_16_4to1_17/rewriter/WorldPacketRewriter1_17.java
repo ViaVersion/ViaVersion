@@ -32,7 +32,6 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_17;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.Protocol1_16_4To1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -40,13 +39,6 @@ import java.util.List;
 public final class WorldPacketRewriter1_17 {
 
     public static void register(Protocol1_16_4To1_17 protocol) {
-        BlockRewriter<ClientboundPackets1_16_2> blockRewriter = BlockRewriter.for1_14(protocol);
-
-        blockRewriter.registerBlockEvent(ClientboundPackets1_16_2.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_16_2.BLOCK_UPDATE);
-        blockRewriter.registerSectionBlocksUpdate(ClientboundPackets1_16_2.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerBlockBreakAck(ClientboundPackets1_16_2.BLOCK_BREAK_ACK);
-
         protocol.registerClientbound(ClientboundPackets1_16_2.SET_BORDER, null, wrapper -> {
             // Border packet actions have been split into individual packets (the content hasn't changed)
             int type = wrapper.read(Types.VAR_INT);
@@ -126,10 +118,8 @@ public final class WorldPacketRewriter1_17 {
             chunk.setChunkMask(BitSet.valueOf(new long[]{chunk.getBitmask()}));
 
             // Rewrite block state ids
-            blockRewriter.handleChunk(chunk);
+            protocol.getBlockRewriter().handleChunk(chunk);
         });
-
-        blockRewriter.registerLevelEvent(ClientboundPackets1_16_2.LEVEL_EVENT, 1010, 2001);
     }
 
     private static void writeMultiBlockChangePacket(PacketWrapper wrapper, Chunk chunk) {

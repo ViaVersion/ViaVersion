@@ -261,6 +261,22 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
     void appendServerbound(SU type, PacketHandler handler);
 
     /**
+     * Replaces a clientbound packet type handler with another.
+     *
+     * @param type    clientbound packet type
+     * @param handler packet handler
+     */
+    void replaceClientbound(CU type, @Nullable PacketHandler handler);
+
+    /**
+     * Replaces a serverbound packet type handler with another.
+     *
+     * @param type    serverbound packet type
+     * @param handler packet handler
+     */
+    void replaceServerbound(SU type, @Nullable PacketHandler handler);
+
+    /**
      * Transform a packet using this protocol
      *
      * @param direction     The direction the packet is going in
@@ -440,5 +456,14 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      */
     default boolean isBaseProtocol() {
         return false;
+    }
+
+    /**
+     * Marks this protocol as dependent on another. Before being initialized, it will wait for the dependency's completion.
+     *
+     * @return protocol class to depend on
+     */
+    default @Nullable Class<? extends Protocol<?, ?, ?, ?>> dependsOn() {
+        return null;
     }
 }

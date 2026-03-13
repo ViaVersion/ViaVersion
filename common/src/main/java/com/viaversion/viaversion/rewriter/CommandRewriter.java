@@ -19,6 +19,7 @@ package com.viaversion.viaversion.rewriter;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.data.FullMappings;
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -108,62 +109,65 @@ public class CommandRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerDeclareCommands1_19(C packetType) {
-        protocol.registerClientbound(packetType, wrapper -> {
-            int size = wrapper.passthrough(Types.VAR_INT);
-            for (int i = 0; i < size; i++) {
-                byte flags = wrapper.passthrough(Types.BYTE);
-                wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE); // Children indices
-                if ((flags & 0x08) != 0) {
-                    wrapper.passthrough(Types.VAR_INT); // Redirect node index
-                }
+        // Don't check for identity mappings here, since overrides may be needed outside of id remapping
+        protocol.registerClientbound(packetType, this::handle1_19);
+    }
 
-                byte nodeType = (byte) (flags & 0x03);
-                if (nodeType == 1 || nodeType == 2) { // Literal/argument node
-                    wrapper.passthrough(Types.STRING); // Name
-                }
-
-                if (nodeType == 2) { // Argument node
-                    int argumentTypeId = wrapper.read(Types.VAR_INT);
-                    String argumentType = argumentType(argumentTypeId);
-                    if (argumentType == null) {
-                        // Modded servers may send unknown argument types that are ignored by the client
-                        // Adjust the id to the hopefully still assumed out-of-bounds pos...
-                        wrapper.write(Types.VAR_INT, mapInvalidArgumentType(argumentTypeId));
-                        continue;
-                    }
-
-                    String newArgumentType = handleArgumentType(argumentType);
-                    Preconditions.checkNotNull(newArgumentType, "No mapping for argument type %s", argumentType);
-
-                    boolean removedRegistryArgument = false;
-                    if (protocol.getRegistryDataRewriter() != null && REGISTRY_ARGUMENT_TYPES.contains(Key.stripMinecraftNamespace(newArgumentType))) {
-                        final String registry = wrapper.read(Types.STRING);
-                        if (protocol.getRegistryDataRewriter().shouldRemoveRegistry(registry)) {
-                            // Map removed registry arguments to a plain quotable string
-                            removedRegistryArgument = true;
-                            wrapper.write(Types.VAR_INT, mappedArgumentTypeId("brigadier:string"));
-                            wrapper.write(Types.VAR_INT, 1);
-                        } else {
-                            // Keep reading
-                            wrapper.write(Types.STRING, registry);
-                            wrapper.rewindReader(1);
-                        }
-                    }
-
-                    if (!removedRegistryArgument) {
-                        wrapper.write(Types.VAR_INT, mappedArgumentTypeId(newArgumentType));
-                        // Call the handler using the previous name
-                        handleArgument(wrapper, argumentType);
-                    }
-
-                    if ((flags & 0x10) != 0) {
-                        wrapper.passthrough(Types.STRING); // Suggestion type
-                    }
-                }
+    public void handle1_19(PacketWrapper wrapper) {
+        int size = wrapper.passthrough(Types.VAR_INT);
+        for (int i = 0; i < size; i++) {
+            byte flags = wrapper.passthrough(Types.BYTE);
+            wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE); // Children indices
+            if ((flags & 0x08) != 0) {
+                wrapper.passthrough(Types.VAR_INT); // Redirect node index
             }
 
-            wrapper.passthrough(Types.VAR_INT); // Root node index
-        });
+            byte nodeType = (byte) (flags & 0x03);
+            if (nodeType == 1 || nodeType == 2) { // Literal/argument node
+                wrapper.passthrough(Types.STRING); // Name
+            }
+
+            if (nodeType == 2) { // Argument node
+                int argumentTypeId = wrapper.read(Types.VAR_INT);
+                String argumentType = argumentType(argumentTypeId);
+                if (argumentType == null) {
+                    // Modded servers may send unknown argument types that are ignored by the client
+                    // Adjust the id to the hopefully still assumed out-of-bounds pos...
+                    wrapper.write(Types.VAR_INT, mapInvalidArgumentType(argumentTypeId));
+                    continue;
+                }
+
+                String newArgumentType = handleArgumentType(argumentType);
+                Preconditions.checkNotNull(newArgumentType, "No mapping for argument type %s", argumentType);
+
+                boolean removedRegistryArgument = false;
+                if (protocol.getRegistryDataRewriter() != null && REGISTRY_ARGUMENT_TYPES.contains(Key.stripMinecraftNamespace(newArgumentType))) {
+                    final String registry = wrapper.read(Types.STRING);
+                    if (protocol.getRegistryDataRewriter().shouldRemoveRegistry(registry)) {
+                        // Map removed registry arguments to a plain quotable string
+                        removedRegistryArgument = true;
+                        wrapper.write(Types.VAR_INT, mappedArgumentTypeId("brigadier:string"));
+                        wrapper.write(Types.VAR_INT, 1);
+                    } else {
+                        // Keep reading
+                        wrapper.write(Types.STRING, registry);
+                        wrapper.rewindReader(1);
+                    }
+                }
+
+                if (!removedRegistryArgument) {
+                    wrapper.write(Types.VAR_INT, mappedArgumentTypeId(newArgumentType));
+                    // Call the handler using the previous name
+                    handleArgument(wrapper, argumentType);
+                }
+
+                if ((flags & 0x10) != 0) {
+                    wrapper.passthrough(Types.STRING); // Suggestion type
+                }
+            }
+        }
+
+        wrapper.passthrough(Types.VAR_INT); // Root node index
     }
 
     public void handleArgument(PacketWrapper wrapper, String argumentType) {

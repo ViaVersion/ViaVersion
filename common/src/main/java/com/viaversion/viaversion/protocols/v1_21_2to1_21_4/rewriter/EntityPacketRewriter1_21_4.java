@@ -27,7 +27,6 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfi
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.Protocol1_21_2To1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 
@@ -39,12 +38,7 @@ public final class EntityPacketRewriter1_21_4 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_21_2.ADD_ENTITY, EntityTypes1_21_4.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA);
-        registerRemoveEntities(ClientboundPackets1_21_2.REMOVE_ENTITIES);
-
-        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
-        registryDataRewriter.addHandler("worldgen/biome", (key, biome) -> {
+        protocol.getRegistryDataRewriter().addHandler("worldgen/biome", (key, biome) -> {
             final CompoundTag effectsTag = biome.getCompoundTag("effects");
             final CompoundTag musicTag = effectsTag.getCompoundTag("music");
             if (musicTag == null) {
@@ -59,10 +53,6 @@ public final class EntityPacketRewriter1_21_4 extends EntityRewriter<Clientbound
             weightedMusicTags.add(weightedMusicTag);
             effectsTag.put("music", weightedMusicTags);
         });
-        protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
-
-        registerLogin1_20_5(ClientboundPackets1_21_2.LOGIN);
-        registerRespawn1_20_5(ClientboundPackets1_21_2.RESPAWN);
 
         protocol.registerServerbound(ServerboundPackets1_21_4.MOVE_VEHICLE, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // X

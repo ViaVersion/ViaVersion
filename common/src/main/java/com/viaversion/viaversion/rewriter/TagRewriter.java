@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.rewriter;
 
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
@@ -293,10 +294,10 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
     public @Nullable IdRewriteFunction getRewriter(RegistryType tagType) {
         MappingData mappingData = protocol.getMappingData();
         return switch (tagType) {
-            case BLOCK -> mappingData != null && mappingData.getBlockMappings() != null ? mappingData::getNewBlockId : null;
-            case ITEM -> mappingData != null && mappingData.getItemMappings() != null ? mappingData::getNewItemId : null;
-            case ENTITY -> protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
-            case ENCHANTMENT -> mappingData != null && mappingData.getEnchantmentMappings() != null ? id -> mappingData.getEnchantmentMappings().getNewId(id) : null;
+            case BLOCK -> mappingData != null && !Mappings.isIntIdIdentity(mappingData.getBlockMappings()) ? mappingData::getNewBlockId : null;
+            case ITEM -> mappingData != null && !Mappings.isIntIdIdentity(mappingData.getItemMappings())? mappingData::getNewItemId : null;
+            case ENCHANTMENT -> mappingData != null && !Mappings.isIntIdIdentity(mappingData.getEnchantmentMappings()) ? mappingData.getEnchantmentMappings()::getNewId : null;
+            case ENTITY -> protocol.getEntityRewriter() != null ? protocol.getEntityRewriter()::newEntityId : null;
             case FLUID, GAME_EVENT, DAMAGE_TYPE, BANNER_PATTERN -> null;
         };
     }

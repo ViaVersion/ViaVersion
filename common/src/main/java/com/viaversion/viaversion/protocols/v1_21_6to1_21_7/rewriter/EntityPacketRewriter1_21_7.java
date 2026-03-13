@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_6;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPacket1_21_6;
-import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_6to1_21_7.Protocol1_21_6To1_21_7;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
@@ -29,17 +28,6 @@ public final class EntityPacketRewriter1_21_7 extends EntityRewriter<Clientbound
 
     public EntityPacketRewriter1_21_7(final Protocol1_21_6To1_21_7 protocol) {
         super(protocol);
-    }
-
-    @Override
-    public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_21_6.ADD_ENTITY, EntityTypes1_21_6.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_21_6.SET_ENTITY_DATA);
-        registerRemoveEntities(ClientboundPackets1_21_6.REMOVE_ENTITIES);
-        registerPlayerAbilities(ClientboundPackets1_21_6.PLAYER_ABILITIES);
-        registerGameEvent(ClientboundPackets1_21_6.GAME_EVENT);
-        registerLogin1_20_5(ClientboundPackets1_21_6.LOGIN);
-        registerRespawn1_20_5(ClientboundPackets1_21_6.RESPAWN);
     }
 
     @Override

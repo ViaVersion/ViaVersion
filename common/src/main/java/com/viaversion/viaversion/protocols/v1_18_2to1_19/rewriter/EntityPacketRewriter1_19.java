@@ -60,9 +60,8 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
     public void registerPackets() {
         registerTracker(ClientboundPackets1_18.ADD_PLAYER, EntityTypes1_19.PLAYER);
         registerSetEntityData(ClientboundPackets1_18.SET_ENTITY_DATA, Types1_18.ENTITY_DATA_LIST, Types1_19.ENTITY_DATA_LIST);
-        registerRemoveEntities(ClientboundPackets1_18.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_18.ADD_ENTITY, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_18.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // Entity id

@@ -17,6 +17,8 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
@@ -32,6 +34,14 @@ public class StatisticsRewriter<C extends ClientboundPacketType> {
     }
 
     public void register(C packetType) {
+        final MappingData mappingData = protocol.getMappingData();
+        if (mappingData == null || Mappings.isIntIdIdentity(mappingData.getBlockMappings())
+            && Mappings.isIntIdIdentity(mappingData.getItemMappings())
+            && Mappings.isIntIdIdentity(mappingData.getEntityMappings())
+            && Mappings.isIntIdIdentity(mappingData.getStatisticsMappings())) {
+            return;
+        }
+
         protocol.registerClientbound(packetType, wrapper -> {
             int size = wrapper.passthrough(Types.VAR_INT);
             int newSize = size;
@@ -39,9 +49,9 @@ public class StatisticsRewriter<C extends ClientboundPacketType> {
                 int categoryId = wrapper.read(Types.VAR_INT);
                 int statisticId = wrapper.read(Types.VAR_INT);
                 int value = wrapper.read(Types.VAR_INT);
-                if (categoryId == CUSTOM_STATS_CATEGORY && protocol.getMappingData().getStatisticsMappings() != null) {
+                if (categoryId == CUSTOM_STATS_CATEGORY && mappingData.getStatisticsMappings() != null) {
                     // Rewrite custom statistics id
-                    statisticId = protocol.getMappingData().getStatisticsMappings().getNewId(statisticId);
+                    statisticId = mappingData.getStatisticsMappings().getNewId(statisticId);
                     if (statisticId == -1) {
                         // Remove entry
                         newSize--;

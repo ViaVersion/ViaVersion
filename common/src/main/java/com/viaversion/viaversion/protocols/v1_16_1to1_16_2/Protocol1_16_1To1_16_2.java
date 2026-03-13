@@ -31,9 +31,8 @@ import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter.EntityPacketRewriter1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter.ItemPacketRewriter1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter.WorldPacketRewriter1_16_2;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1_16, ClientboundPackets1_16_2, ServerboundPackets1_16, ServerboundPackets1_16_2> {
@@ -43,6 +42,7 @@ public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1
     private final ItemPacketRewriter1_16_2 itemRewriter = new ItemPacketRewriter1_16_2(this);
     private final ParticleRewriter<ClientboundPackets1_16> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_16> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPackets1_16> blockRewriter = BlockRewriter.for1_14(this);
 
     public Protocol1_16_1To1_16_2() {
         super(ClientboundPackets1_16.class, ClientboundPackets1_16_2.class, ServerboundPackets1_16.class, ServerboundPackets1_16_2.class);
@@ -55,13 +55,6 @@ public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1
         WorldPacketRewriter1_16_2.register(this);
 
         tagRewriter.register(ClientboundPackets1_16.UPDATE_TAGS, RegistryType.ENTITY);
-        particleRewriter.registerLevelParticles1_13(ClientboundPackets1_16.LEVEL_PARTICLES, Types.DOUBLE);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_16.AWARD_STATS);
-
-        SoundRewriter<ClientboundPackets1_16> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound(ClientboundPackets1_16.SOUND);
-        soundRewriter.registerSound(ClientboundPackets1_16.SOUND_ENTITY);
 
         // Recipe book data has been split into 2 separate packets
         registerServerbound(ServerboundPackets1_16_2.RECIPE_BOOK_CHANGE_SETTINGS, ServerboundPackets1_16.RECIPE_BOOK_UPDATE, wrapper -> {
@@ -112,6 +105,11 @@ public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1
     @Override
     public ItemPacketRewriter1_16_2 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPackets1_16> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

@@ -51,12 +51,6 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_21_2.ADD_ENTITY, EntityTypes1_21_5.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA);
-        registerRemoveEntities(ClientboundPackets1_21_2.REMOVE_ENTITIES);
-        registerPlayerAbilities(ClientboundPackets1_21_2.PLAYER_ABILITIES);
-        registerGameEvent(ClientboundPackets1_21_2.GAME_EVENT);
-
         // No more special experience orb add packet
         protocol.registerClientbound(ClientboundPackets1_21_2.ADD_EXPERIENCE_ORB, ClientboundPackets1_21_5.ADD_ENTITY, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Entity ID
@@ -90,13 +84,11 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             wolfSoundVariantsPacket.send(Protocol1_21_4To1_21_5.class);
         });
 
-        registerRespawn1_20_5(ClientboundPackets1_21_2.RESPAWN);
-        registerLogin1_20_5(ClientboundPackets1_21_2.LOGIN);
         protocol.appendClientbound(ClientboundPackets1_21_2.LOGIN, wrapper -> {
             wrapper.user().get(MessageIndexStorage.class).setIndex(0);
         });
 
-        protocol.registerClientbound(ClientboundPackets1_21_2.SET_PLAYER_TEAM, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_21_2.SET_PLAYER_TEAM, wrapper -> {
             wrapper.passthrough(Types.STRING); // Team Name
             final byte action = wrapper.passthrough(Types.BYTE); // Mode
             if (action == 0 || action == 2) {

@@ -40,6 +40,13 @@ public interface PacketMapping {
     void applyType(PacketWrapper wrapper);
 
     /**
+     * Replaces the current packet handler.
+     *
+     * @param handler packet transformer
+     */
+    void setHandler(@Nullable PacketHandler handler);
+
+    /**
      * Returns a packet transformer to transform a packet from one protocol version to another.
      *
      * @return packet transformer, or null if no action has to be taken

@@ -49,7 +49,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.LockCode;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
@@ -60,7 +59,6 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.LastExplosionPowerStorage;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
@@ -96,26 +94,14 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
     @Override
     public void registerPackets() {
-        final BlockRewriter<ClientboundPacket1_21> blockRewriter = BlockRewriter.for1_20_2(protocol);
-        blockRewriter.registerBlockEvent(ClientboundPackets1_21.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_21.BLOCK_UPDATE);
-        blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_21.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerLevelEvent1_21(ClientboundPackets1_21.LEVEL_EVENT, 2001);
-        blockRewriter.registerBlockEntityData(ClientboundPackets1_21.BLOCK_ENTITY_DATA);
-
-        registerAdvancements1_20_3(ClientboundPackets1_21.UPDATE_ADVANCEMENTS);
-        registerSetEquipment(ClientboundPackets1_21.SET_EQUIPMENT);
-        registerMerchantOffers1_20_5(ClientboundPackets1_21.MERCHANT_OFFERS);
-        registerSetCreativeModeSlot(ServerboundPackets1_21_2.SET_CREATIVE_MODE_SLOT);
-
-        protocol.registerClientbound(ClientboundPackets1_21.COOLDOWN, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_21.COOLDOWN, wrapper -> {
             final MappingData mappingData = protocol.getMappingData();
             final int itemId = wrapper.read(Types.VAR_INT);
             final int mappedItemId = mappingData.getNewItemId(itemId);
             wrapper.write(Types.STRING, mappingData.getFullItemMappings().mappedIdentifier(mappedItemId));
         });
 
-        protocol.registerClientbound(ClientboundPackets1_21.CONTAINER_SET_CONTENT, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_21.CONTAINER_SET_CONTENT, wrapper -> {
             unsignedByteToVarInt(wrapper);
             wrapper.passthrough(Types.VAR_INT); // State id
             final Item[] items = wrapper.read(itemArrayType());
@@ -125,7 +111,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             }
             passthroughClientboundItem(wrapper);
         });
-        protocol.registerClientbound(ClientboundPackets1_21.CONTAINER_SET_SLOT, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_21.CONTAINER_SET_SLOT, wrapper -> {
             byteToVarInt(wrapper);
             final int containerId = wrapper.get(Types.VAR_INT, 0);
             if (containerId == -1) { // cursor item
@@ -151,7 +137,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         protocol.registerClientbound(ClientboundPackets1_21.HORSE_SCREEN_OPEN, this::unsignedByteToVarInt);
         protocol.registerClientbound(ClientboundPackets1_21.SET_CARRIED_ITEM, ClientboundPackets1_21_2.SET_HELD_SLOT);
         protocol.registerServerbound(ServerboundPackets1_21_2.CONTAINER_CLOSE, this::varIntToByte);
-        protocol.registerServerbound(ServerboundPackets1_21_2.CONTAINER_CLICK, wrapper -> {
+        protocol.replaceServerbound(ServerboundPackets1_21_2.CONTAINER_CLICK, wrapper -> {
             varIntToByte(wrapper);
             wrapper.passthrough(Types.VAR_INT); // State id
             wrapper.passthrough(Types.SHORT); // Slot
@@ -194,7 +180,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             wrapper.read(Types.BOOLEAN); // World border hit
         });
 
-        protocol.registerClientbound(ClientboundPackets1_21.EXPLODE, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_21.EXPLODE, wrapper -> {
             final int centerX = (int) Math.floor(wrapper.passthrough(Types.DOUBLE)); // Center X
             final int centerY = (int) Math.floor(wrapper.passthrough(Types.DOUBLE)); // Center Y
             final int centerZ = (int) Math.floor(wrapper.passthrough(Types.DOUBLE)); // Center Z
@@ -368,8 +354,8 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             wrapper.write(Types.BOOLEAN, state == RECIPE_INIT); // Replace
         });
 
-        protocol.registerClientbound(ClientboundPackets1_21.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
-            final Chunk chunk = blockRewriter.handleChunk1_19(wrapper, ChunkType1_20_2::new);
+        protocol.replaceClientbound(ClientboundPackets1_21.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
+            final Chunk chunk = protocol.getBlockRewriter().handleChunk1_18(wrapper);
             final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
             if (blockEntityMappings != null) {
                 final List<BlockEntity> blockEntities = chunk.blockEntities();
