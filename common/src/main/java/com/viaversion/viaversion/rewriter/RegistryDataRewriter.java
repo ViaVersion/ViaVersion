@@ -370,4 +370,9 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     public Map<String, KeyMappings> registryKeyMappings() {
         return registryKeyMappings;
     }
+
+    @Override
+    public boolean shouldRemoveRegistry(final String registryKey) {
+        return this.toRemove.contains(Key.stripMinecraftNamespace(registryKey));
+    }
 }

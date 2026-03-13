@@ -23,14 +23,18 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Abstract rewriter for the declare commands packet to handle argument type name and content changes.
  */
 public class CommandRewriter<C extends ClientboundPacketType> {
+
+    private static final Set<String> REGISTRY_ARGUMENT_TYPES = Set.of("resource", "resource_key", "resource_or_tag", "resource_or_tag_key", "resource_selector");
     protected final Protocol<C, ?, ?, ?> protocol;
     protected final Map<String, CommandArgumentConsumer> parserHandlers = new HashMap<>();
 
@@ -130,10 +134,27 @@ public class CommandRewriter<C extends ClientboundPacketType> {
 
                     String newArgumentType = handleArgumentType(argumentType);
                     Preconditions.checkNotNull(newArgumentType, "No mapping for argument type %s", argumentType);
-                    wrapper.write(Types.VAR_INT, mappedArgumentTypeId(newArgumentType));
 
-                    // Always call the handler using the previous name
-                    handleArgument(wrapper, argumentType);
+                    boolean removedRegistryArgument = false;
+                    if (protocol.getRegistryDataRewriter() != null && REGISTRY_ARGUMENT_TYPES.contains(Key.stripMinecraftNamespace(newArgumentType))) {
+                        final String registry = wrapper.read(Types.STRING);
+                        if (protocol.getRegistryDataRewriter().shouldRemoveRegistry(registry)) {
+                            // Map removed registry arguments to a plain quotable string
+                            removedRegistryArgument = true;
+                            wrapper.write(Types.VAR_INT, mappedArgumentTypeId("brigadier:string"));
+                            wrapper.write(Types.VAR_INT, 1);
+                        } else {
+                            // Keep reading
+                            wrapper.write(Types.STRING, registry);
+                            wrapper.rewindReader(1);
+                        }
+                    }
+
+                    if (!removedRegistryArgument) {
+                        wrapper.write(Types.VAR_INT, mappedArgumentTypeId(newArgumentType));
+                        // Call the handler using the previous name
+                        handleArgument(wrapper, argumentType);
+                    }
 
                     if ((flags & 0x10) != 0) {
                         wrapper.passthrough(Types.STRING); // Suggestion type

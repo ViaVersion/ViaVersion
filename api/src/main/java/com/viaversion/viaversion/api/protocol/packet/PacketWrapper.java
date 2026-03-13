@@ -329,6 +329,13 @@ public interface PacketWrapper {
     void resetReader();
 
     /**
+     * Rewind the reader by the given number of arguments, so they can be read again.
+     *
+     * @param values number of values to add to the reader dequeue again
+     */
+    void rewindReader(int values);
+
+    /**
      * Sends this packet to the server.
      * <b>Unlike {@link #sendToServer(Class)}, this method does not handle the pipeline with packet id and data changes.</b>
      *

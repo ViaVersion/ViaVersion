@@ -130,17 +130,6 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
                     default -> super.handleArgument(wrapper, argumentType);
                 }
             }
-
-            @Override
-            public String handleArgumentType(final String argumentType) {
-                return switch (argumentType) {
-                    case "minecraft:resource" -> "minecraft:resource_key";
-                    case "minecraft:resource_or_tag" -> "minecraft:resource_or_tag_key";
-                    case "minecraft:entity_summon", "minecraft:item_enchantment", "minecraft:mob_effect" ->
-                        "minecraft:resource";
-                    default -> argumentType;
-                };
-            }
         };
         commandRewriter.registerDeclareCommands1_19(ClientboundPackets1_19_1.COMMANDS);
 

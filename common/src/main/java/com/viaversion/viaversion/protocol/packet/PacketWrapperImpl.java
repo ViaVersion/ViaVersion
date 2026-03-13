@@ -479,6 +479,19 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
+    public void rewindReader(final int values) {
+        if (allActionsRead) {
+            return;
+        }
+
+        final int size = packetValues.size();
+        Preconditions.checkArgument(values <= size, "Tried resetting more values than there are readable values");
+        for (int i = size - 1; i >= size - values; i--) {
+            this.readableObjects.addFirst(this.packetValues.remove(i));
+        }
+    }
+
+    @Override
     public void sendToServerRaw() throws InformativeException {
         sendToServerRaw(true);
     }

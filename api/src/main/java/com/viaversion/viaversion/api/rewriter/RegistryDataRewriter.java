@@ -27,5 +27,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface RegistryDataRewriter {
 
-    @Nullable KeyMappings getMappings(String registryKey);
+    @Nullable
+    KeyMappings getMappings(String registryKey);
+
+    boolean shouldRemoveRegistry(String registryKey);
 }
