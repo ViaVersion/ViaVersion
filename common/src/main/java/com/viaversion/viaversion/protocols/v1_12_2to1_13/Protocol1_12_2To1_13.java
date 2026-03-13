@@ -40,7 +40,6 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.ConnectionData;
@@ -181,10 +180,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
         WorldPacketRewriter1_13.register(this);
 
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper -> {
-            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
-        });
-
         registerClientbound(State.STATUS, ClientboundStatusPackets.STATUS_RESPONSE, new PacketHandlers() {
             @Override
             public void register() {
@@ -252,9 +247,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-
-        componentRewriter.registerBossEvent(ClientboundPackets1_12_1.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.CHAT);
 
         registerClientbound(ClientboundPackets1_12_1.COMMAND_SUGGESTIONS, wrapper -> {
             wrapper.write(Types.VAR_INT, wrapper.user().get(TabCompleteTracker.class).getTransactionId());
@@ -329,8 +321,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.DISCONNECT);
-
         registerClientbound(ClientboundPackets1_12_1.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
@@ -358,8 +348,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                 handler(wrapper -> wrapper.write(Types.STRING, "viaversion:legacy/" + wrapper.read(Types.VAR_INT)));
             }
         });
-
-        componentRewriter.registerPlayerCombat(ClientboundPackets1_12_1.PLAYER_COMBAT);
 
         registerClientbound(ClientboundPackets1_12_1.MAP_ITEM_DATA, new PacketHandlers() {
             @Override
@@ -508,17 +496,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     }
                 }
             }
-        });
-
-        componentRewriter.registerTitle(ClientboundPackets1_12_1.SET_TITLES);
-
-        // New 0x4C - Stop Sound
-
-        new SoundRewriter<>(this).registerSound(ClientboundPackets1_12_1.SOUND);
-
-        registerClientbound(ClientboundPackets1_12_1.TAB_LIST, wrapper -> {
-            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
-            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
         });
 
         registerClientbound(ClientboundPackets1_12_1.UPDATE_ADVANCEMENTS, wrapper -> {

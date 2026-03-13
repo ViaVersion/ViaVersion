@@ -38,12 +38,7 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
 
     @Override
     public void registerPackets() {
-        registerCooldown(ClientboundPackets1_18.COOLDOWN);
-        registerSetContent1_17_1(ClientboundPackets1_18.CONTAINER_SET_CONTENT);
-        registerSetSlot1_17_1(ClientboundPackets1_18.CONTAINER_SET_SLOT);
-        registerAdvancements(ClientboundPackets1_18.UPDATE_ADVANCEMENTS);
-        registerSetEquipment(ClientboundPackets1_18.SET_EQUIPMENT);
-        protocol.registerClientbound(ClientboundPackets1_18.LEVEL_PARTICLES, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_18.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.INT, Types.VAR_INT); // 0 - Particle ID
@@ -73,12 +68,7 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
             }
         });
 
-        registerContainerClick1_17_1(ServerboundPackets1_19.CONTAINER_CLICK);
-        registerSetCreativeModeSlot(ServerboundPackets1_19.SET_CREATIVE_MODE_SLOT);
-
-        registerContainerSetData(ClientboundPackets1_18.CONTAINER_SET_DATA);
-
-        protocol.registerClientbound(ClientboundPackets1_18.MERCHANT_OFFERS, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_18.MERCHANT_OFFERS, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // Container id

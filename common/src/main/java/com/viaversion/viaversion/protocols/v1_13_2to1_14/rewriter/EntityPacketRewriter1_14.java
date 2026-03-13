@@ -252,7 +252,6 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
             }
         });
 
-        registerRemoveEntities(ClientboundPackets1_13.REMOVE_ENTITIES);
         registerSetEntityData(ClientboundPackets1_13.SET_ENTITY_DATA, Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST);
     }
 

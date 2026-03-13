@@ -36,11 +36,6 @@ public class ItemPacketRewriter1_13_1 extends ItemRewriter<ClientboundPackets1_1
 
     @Override
     public void registerPackets() {
-        registerSetSlot(ClientboundPackets1_13.CONTAINER_SET_SLOT);
-        registerSetContent(ClientboundPackets1_13.CONTAINER_SET_CONTENT);
-        registerAdvancements(ClientboundPackets1_13.UPDATE_ADVANCEMENTS);
-        registerCooldown(ClientboundPackets1_13.COOLDOWN);
-
         protocol.registerClientbound(ClientboundPackets1_13.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
@@ -72,8 +67,6 @@ public class ItemPacketRewriter1_13_1 extends ItemRewriter<ClientboundPackets1_1
             }
         });
 
-        registerSetEquippedItem(ClientboundPackets1_13.SET_EQUIPPED_ITEM);
-
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol) {
             @Override
             protected Type<Item> itemType() {
@@ -94,8 +87,5 @@ public class ItemPacketRewriter1_13_1 extends ItemRewriter<ClientboundPackets1_1
                 recipeRewriter.handleRecipeType(wrapper, type);
             }
         });
-
-        registerContainerClick(ServerboundPackets1_13.CONTAINER_CLICK);
-        registerSetCreativeModeSlot(ServerboundPackets1_13.SET_CREATIVE_MODE_SLOT);
     }
 }

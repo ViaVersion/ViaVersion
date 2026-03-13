@@ -30,7 +30,6 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_15;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.Protocol1_15_2To1_16;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
@@ -40,13 +39,7 @@ import java.util.UUID;
 public class WorldPacketRewriter1_16 {
 
     public static void register(Protocol1_15_2To1_16 protocol) {
-        BlockRewriter<ClientboundPackets1_15> blockRewriter = BlockRewriter.for1_14(protocol);
-
-        blockRewriter.registerBlockEvent(ClientboundPackets1_15.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_15.BLOCK_UPDATE);
-        blockRewriter.registerChunkBlocksUpdate(ClientboundPackets1_15.CHUNK_BLOCKS_UPDATE);
-        blockRewriter.registerBlockBreakAck(ClientboundPackets1_15.BLOCK_BREAK_ACK);
-        blockRewriter.registerLevelChunk(ClientboundPackets1_15.LEVEL_CHUNK, ChunkType1_15.TYPE, ChunkType1_16.TYPE, (connection, chunk) -> {
+        protocol.getBlockRewriter().registerLevelChunk(ClientboundPackets1_15.LEVEL_CHUNK, ChunkType1_15.TYPE, ChunkType1_16.TYPE, (connection, chunk) -> {
             chunk.setIgnoreOldLightData(chunk.isFullChunk());
 
             CompoundTag heightMaps = chunk.getHeightMap();
@@ -78,8 +71,6 @@ public class WorldPacketRewriter1_16 {
             CompoundTag tag = wrapper.passthrough(Types.NAMED_COMPOUND_TAG);
             handleBlockEntity(protocol, wrapper.user(), tag);
         });
-
-        blockRewriter.registerLevelEvent(ClientboundPackets1_15.LEVEL_EVENT, 1010, 2001);
     }
 
     private static void handleBlockEntity(Protocol1_15_2To1_16 protocol, UserConnection connection, CompoundTag compoundTag) {

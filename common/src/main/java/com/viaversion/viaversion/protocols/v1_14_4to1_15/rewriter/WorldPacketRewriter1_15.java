@@ -23,18 +23,11 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_14;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_15;
 import com.viaversion.viaversion.protocols.v1_14_3to1_14_4.packet.ClientboundPackets1_14_4;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.Protocol1_14_4To1_15;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
 
 public final class WorldPacketRewriter1_15 {
 
     public static void register(Protocol1_14_4To1_15 protocol) {
-        BlockRewriter<ClientboundPackets1_14_4> blockRewriter = BlockRewriter.for1_14(protocol);
-
-        blockRewriter.registerBlockEvent(ClientboundPackets1_14_4.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_14_4.BLOCK_UPDATE);
-        blockRewriter.registerChunkBlocksUpdate(ClientboundPackets1_14_4.CHUNK_BLOCKS_UPDATE);
-        blockRewriter.registerBlockBreakAck(ClientboundPackets1_14_4.BLOCK_BREAK_ACK);
-        blockRewriter.registerLevelChunk(ClientboundPackets1_14_4.LEVEL_CHUNK, ChunkType1_14.TYPE, ChunkType1_15.TYPE, (connection, chunk) -> {
+        protocol.getBlockRewriter().registerLevelChunk(ClientboundPackets1_14_4.LEVEL_CHUNK, ChunkType1_14.TYPE, ChunkType1_15.TYPE, (connection, chunk) -> {
             if (chunk.isFullChunk()) {
                 int[] biomeData = chunk.getBiomeData();
                 int[] newBiomeData = new int[1024];
@@ -58,8 +51,7 @@ public final class WorldPacketRewriter1_15 {
             }
         });
 
-        blockRewriter.registerLevelEvent(ClientboundPackets1_14_4.LEVEL_EVENT, 1010, 2001);
-        protocol.registerClientbound(ClientboundPackets1_14_4.LEVEL_PARTICLES, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_14_4.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.INT); // 0 - Particle ID

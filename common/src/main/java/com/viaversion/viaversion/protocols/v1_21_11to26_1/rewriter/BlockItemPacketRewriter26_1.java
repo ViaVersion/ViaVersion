@@ -37,19 +37,11 @@ import com.viaversion.viaversion.api.minecraft.item.data.JukeboxPlayable;
 import com.viaversion.viaversion.api.minecraft.item.data.ProvidesBannerPatterns;
 import com.viaversion.viaversion.api.minecraft.item.data.ProvidesTrimMaterial;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
-import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
-import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
-import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPacket1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPackets1_21_11;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
-import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
-import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -62,14 +54,8 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
 
     @Override
     public void registerPackets() {
-        final BlockRewriter<ClientboundPacket1_21_11> blockRewriter = new BlockRewriter1_21_5<>(protocol);
-        blockRewriter.registerBlockEvent(ClientboundPackets1_21_11.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_21_11.BLOCK_UPDATE);
-        blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_21_11.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerLevelEvent1_21(ClientboundPackets1_21_11.LEVEL_EVENT, 2001);
-        blockRewriter.registerBlockEntityData(ClientboundPackets1_21_11.BLOCK_ENTITY_DATA);
-        protocol.registerClientbound(ClientboundPackets1_21_11.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
-            final Chunk chunk = blockRewriter.handleChunk1_19(wrapper, ChunkType1_21_5::new, ChunkType26_1::new);
+        protocol.replaceClientbound(ClientboundPackets1_21_11.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
+            final Chunk chunk = protocol.getBlockRewriter().handleChunk1_18(wrapper);
             for (final ChunkSection section : chunk.getSections()) {
                 final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
                 for (int i = 0; i < blockPalette.size(); i++) {
@@ -80,26 +66,8 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
                     }
                 }
             }
-            blockRewriter.handleBlockEntities(chunk, wrapper.user());
+            protocol.getBlockRewriter().handleBlockEntities(chunk, wrapper.user());
         });
-
-        registerSetCursorItem(ClientboundPackets1_21_11.SET_CURSOR_ITEM);
-        registerSetPlayerInventory(ClientboundPackets1_21_11.SET_PLAYER_INVENTORY);
-        registerCooldown1_21_2(ClientboundPackets1_21_11.COOLDOWN);
-        registerSetContent1_21_2(ClientboundPackets1_21_11.CONTAINER_SET_CONTENT);
-        registerSetSlot1_21_2(ClientboundPackets1_21_11.CONTAINER_SET_SLOT);
-        registerAdvancements1_20_3(ClientboundPackets1_21_11.UPDATE_ADVANCEMENTS);
-        registerSetEquipment(ClientboundPackets1_21_11.SET_EQUIPMENT);
-        registerMerchantOffers1_20_5(ClientboundPackets1_21_11.MERCHANT_OFFERS);
-        registerContainerClick1_21_5(ServerboundPackets26_1.CONTAINER_CLICK);
-        registerSetCreativeModeSlot1_21_5(ServerboundPackets26_1.SET_CREATIVE_MODE_SLOT);
-        registerShowDialog(ClientboundPackets1_21_11.SHOW_DIALOG);
-        registerShowDialogDirect(ClientboundConfigurationPackets1_21_9.SHOW_DIALOG);
-
-        final RecipeDisplayRewriter<ClientboundPacket1_21_11> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(protocol);
-        recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_11.UPDATE_RECIPES);
-        recipeRewriter.registerRecipeBookAdd(ClientboundPackets1_21_11.RECIPE_BOOK_ADD);
-        recipeRewriter.registerPlaceGhostRecipe(ClientboundPackets1_21_11.PLACE_GHOST_RECIPE);
     }
 
     @Override

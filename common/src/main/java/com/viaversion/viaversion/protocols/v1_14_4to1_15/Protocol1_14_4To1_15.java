@@ -32,9 +32,8 @@ import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter.EntityPacketRewriter1_15;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter.ItemPacketRewriter1_15;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter.WorldPacketRewriter1_15;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_14_4, ClientboundPackets1_15, ServerboundPackets1_14, ServerboundPackets1_14> {
@@ -44,6 +43,7 @@ public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_1
     private final ItemPacketRewriter1_15 itemRewriter = new ItemPacketRewriter1_15(this);
     private final ParticleRewriter<ClientboundPackets1_14_4> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_14_4> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPackets1_14_4> blockRewriter = BlockRewriter.for1_14(this);
 
     public Protocol1_14_4To1_15() {
         super(ClientboundPackets1_14_4.class, ClientboundPackets1_15.class, ServerboundPackets1_14.class, ServerboundPackets1_14.class);
@@ -54,12 +54,6 @@ public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_1
         super.registerPackets();
 
         WorldPacketRewriter1_15.register(this);
-
-        SoundRewriter<ClientboundPackets1_14_4> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound(ClientboundPackets1_14_4.SOUND_ENTITY); // Entity Sound Effect (added somewhere in 1.14)
-        soundRewriter.registerSound(ClientboundPackets1_14_4.SOUND);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_14_4.AWARD_STATS);
 
         registerServerbound(ServerboundPackets1_14.EDIT_BOOK, wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)));
 
@@ -97,6 +91,11 @@ public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public ItemPacketRewriter1_15 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPackets1_14_4> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

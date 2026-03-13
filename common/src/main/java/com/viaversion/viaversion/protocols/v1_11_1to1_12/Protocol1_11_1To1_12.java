@@ -43,7 +43,6 @@ import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.EntityPacketRe
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.ItemPacketRewriter1_12;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPackets1_9_3;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
 
 public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
 
@@ -57,6 +56,16 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
     @Override
     protected void registerPackets() {
         super.registerPackets();
+
+        registerClientbound(ClientboundPackets1_9_3.SOUND, wrapper -> {
+            int soundId = wrapper.read(Types.VAR_INT);
+            int mappedId = getNewSoundId(soundId);
+            if (mappedId == -1) {
+                wrapper.cancel();
+            } else {
+                wrapper.write(Types.VAR_INT, mappedId);
+            }
+        });
 
         registerClientbound(ClientboundPackets1_9_3.CHAT, wrapper -> {
             final JsonElement element = wrapper.passthrough(Types.COMPONENT);
@@ -95,9 +104,6 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
                 }
             }
         });
-
-        new SoundRewriter<>(this, this::getNewSoundId).registerSound(ClientboundPackets1_9_3.SOUND);
-
 
         // New packet at 0x01
         cancelServerbound(ServerboundPackets1_12.CRAFTING_RECIPE_PLACEMENT);

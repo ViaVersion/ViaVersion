@@ -40,20 +40,11 @@ public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPacket
 
     @Override
     public void registerPackets() {
-        registerCooldown(ClientboundPackets1_16_2.COOLDOWN);
-        registerSetContent(ClientboundPackets1_16_2.CONTAINER_SET_CONTENT);
-        registerMerchantOffers(ClientboundPackets1_16_2.MERCHANT_OFFERS);
-        registerSetSlot(ClientboundPackets1_16_2.CONTAINER_SET_SLOT);
-        registerAdvancements(ClientboundPackets1_16_2.UPDATE_ADVANCEMENTS);
-        registerSetEquipment(ClientboundPackets1_16_2.SET_EQUIPMENT);
-
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_16_2.UPDATE_RECIPES);
-
-        registerSetCreativeModeSlot(ServerboundPackets1_17.SET_CREATIVE_MODE_SLOT);
 
         protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)));
 
-        protocol.registerServerbound(ServerboundPackets1_17.CONTAINER_CLICK, new PacketHandlers() {
+        protocol.replaceServerbound(ServerboundPackets1_17.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.BYTE); // Window Id

@@ -24,6 +24,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -58,6 +59,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         this.protocol = protocol;
     }
 
+    @Override
     public void handle(final PacketWrapper wrapper) {
         final String registryKey = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
         RegistryEntry[] entries = wrapper.read(Types.REGISTRY_ENTRY_ARRAY);
@@ -209,15 +211,13 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     }
 
     public void updateEnchantments(final UserConnection connection, final RegistryEntry[] entries) {
-        final List<String> identifiers = new ArrayList<>(entries.length);
         for (final RegistryEntry entry : entries) {
-            identifiers.add(entry.key());
             if (entry.tag() == null) {
                 continue;
             }
 
             final CompoundTag tag = (CompoundTag) entry.tag();
-            if (protocol.getMappingData().getFullItemMappings() != null) {
+            if (!Mappings.isFullIdentity(protocol.getMappingData().getFullItemMappings())) {
                 updateItemList(tag.getListTag("supported_items", StringTag.class));
                 updateItemList(tag.getListTag("primary_items", StringTag.class));
             }
@@ -250,7 +250,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     }
 
     public void updateTrimMaterials(final RegistryEntry[] entries) {
-        if (protocol.getMappingData().getFullItemMappings() == null) {
+        if (Mappings.isFullIdentity(protocol.getMappingData().getFullItemMappings())) {
             return;
         }
 
@@ -364,7 +364,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
 
     protected void updateType(final CompoundTag tag, final String key, final FullMappings mappings) {
         final Tag typeTag = tag.get(key);
-        if (typeTag == null || mappings == null) {
+        if (typeTag == null || Mappings.isFullIdentity(mappings)) {
             return;
         }
 
@@ -424,5 +424,10 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     @Override
     public boolean shouldRemoveRegistry(final String registryKey) {
         return this.toRemove.contains(Key.stripMinecraftNamespace(registryKey));
+    }
+
+    @Override
+    public boolean hasRegistriesToRemove() {
+        return !this.toRemove.isEmpty();
     }
 }

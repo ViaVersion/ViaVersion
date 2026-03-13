@@ -23,6 +23,7 @@ import com.google.common.collect.Range;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
@@ -38,6 +39,7 @@ import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionType;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocol.packet.VersionedPacketTransformerImpl;
+import com.viaversion.viaversion.protocol.shared_registration.def.DefaultRegistrations;
 import com.viaversion.viaversion.protocols.base.InitialBaseProtocol;
 import com.viaversion.viaversion.protocols.base.v1_16.ClientboundBaseProtocol1_16;
 import com.viaversion.viaversion.protocols.base.v1_7.ClientboundBaseProtocol1_7;
@@ -146,6 +148,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
             worker.setName("Via-Mappingloader-" + threadIndex.incrementAndGet());
             return worker;
         }, ForkJoinWorkerThread.getDefaultUncaughtExceptionHandler(), true);
+
+        DefaultRegistrations.apply();
     }
 
     public void registerProtocols() {
@@ -225,8 +229,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void registerProtocol(Protocol protocol, List<ProtocolVersion> supportedClientVersion, ProtocolVersion serverVersion) {
-        // Register the protocol's handlers
-        protocol.initialize();
+        // Set the server version on AbstractProtocol instances before initialization
+        if (protocol instanceof AbstractProtocol<?, ?, ?, ?> abstractProtocol) {
+            abstractProtocol.setServerVersion(serverVersion);
+            abstractProtocol.setClientVersion(supportedClientVersion.stream().max(ProtocolVersion::compareTo).orElseThrow());
+        }
 
         // Clear cache as this may make new routes.
         if (!pathCache.isEmpty()) {
@@ -248,14 +255,22 @@ public class ProtocolManagerImpl implements ProtocolManager {
             refreshVersions();
         }
 
-        if (protocol.hasMappingDataToLoad()) {
-            if (mappingLoaderExecutor != null) {
-                // Submit mapping data loading
-                addMappingLoaderFuture(protocol.getClass(), protocol::loadMappingData);
+        // Load mapping data and register the protocol's handlers
+        if (!protocol.hasMappingDataToLoad()) {
+            protocol.initialize();
+            return;
+        }
+
+        // Submit mapping data loading
+        if (mappingLoaderExecutor != null) {
+            if (protocol.dependsOn() != null) {
+                addMappingLoaderFuture(protocol.getClass(), protocol.dependsOn(), protocol::loadMappingData);
             } else {
-                // Late protocol adding - just do it on the current thread
-                protocol.loadMappingData();
+                addMappingLoaderFuture(protocol.getClass(), protocol::loadMappingData);
             }
+        } else {
+            // Late protocol adding - just do it on the current thread
+            protocol.loadMappingData();
         }
     }
 
@@ -573,7 +588,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     private Function<Throwable, Void> mappingLoaderThrowable(Class<? extends Protocol> protocolClass) {
         return throwable -> {
-            Via.getPlatform().getLogger().log(Level.SEVERE, "Error during mapping loading of " + protocolClass.getSimpleName(), throwable);
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Error during loading of " + protocolClass.getSimpleName(), throwable);
             return null;
         };
     }

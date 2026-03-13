@@ -34,6 +34,8 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType26_1;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
@@ -47,18 +49,19 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPack
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.BlockItemPacketRewriter26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.ComponentRewriter26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.EntityPacketRewriter26_1;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundPacket1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPacket1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPackets1_21_11;
-import com.viaversion.viaversion.rewriter.AttributeRewriter;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
+import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 import com.viaversion.viaversion.util.Key;
 import java.util.Map;
@@ -74,6 +77,8 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
     private final TagRewriter<ClientboundPacket1_21_11> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket1_21_11> componentRewriter = new ComponentRewriter26_1(this);
     private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
+    private final RecipeDisplayRewriter<ClientboundPacket1_21_11> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(this);
+    private final BlockRewriter<ClientboundPacket1_21_11> blockRewriter = new BlockRewriter1_21_5<>(this, ChunkType1_21_5::new, ChunkType26_1::new);
 
     public Protocol1_21_11To26_1() {
         super(ClientboundPacket1_21_11.class, ClientboundPacket26_1.class, ServerboundPacket1_21_9.class, ServerboundPacket26_1.class);
@@ -134,36 +139,6 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
                 attributes.putInt("visual/ambient_light_color", ambientLightColor);
             }
         });
-        registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
-
-        tagRewriter.registerGeneric(ClientboundPackets1_21_11.UPDATE_TAGS);
-        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21_9.UPDATE_TAGS);
-
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_21_11.OPEN_SCREEN);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_11.SET_ACTION_BAR_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_11.SET_TITLE_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_11.SET_SUBTITLE_TEXT);
-        componentRewriter.registerBossEvent(ClientboundPackets1_21_11.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_11.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets1_21_11.TAB_LIST);
-        componentRewriter.registerSetPlayerTeam1_21_5(ClientboundPackets1_21_11.SET_PLAYER_TEAM);
-        componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21_11.PLAYER_COMBAT_KILL);
-        componentRewriter.registerPlayerInfoUpdate1_21_4(ClientboundPackets1_21_11.PLAYER_INFO_UPDATE);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_11.SYSTEM_CHAT);
-        componentRewriter.registerDisguisedChat(ClientboundPackets1_21_11.DISGUISED_CHAT);
-        componentRewriter.registerPlayerChat1_21_5(ClientboundPackets1_21_11.PLAYER_CHAT);
-        componentRewriter.registerPing();
-
-        particleRewriter.registerLevelParticles1_21_4(ClientboundPackets1_21_11.LEVEL_PARTICLES);
-        particleRewriter.registerExplode1_21_9(ClientboundPackets1_21_11.EXPLODE);
-
-        final SoundRewriter<ClientboundPacket1_21_11> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_21_11.SOUND);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_21_11.SOUND_ENTITY);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_21_11.AWARD_STATS);
-        new AttributeRewriter<>(this).register1_21(ClientboundPackets1_21_11.UPDATE_ATTRIBUTES);
-
         registerClientbound(ClientboundPackets1_21_11.SET_TIME, wrapper -> {
             wrapper.passthrough(Types.LONG); // Game time
 
@@ -350,6 +325,16 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
     @Override
     public BlockItemPacketRewriter26_1 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPacket1_21_11> getBlockRewriter() {
+        return blockRewriter;
+    }
+
+    @Override
+    public RecipeDisplayRewriter<ClientboundPacket1_21_11> getRecipeRewriter() {
+        return recipeRewriter;
     }
 
     @Override

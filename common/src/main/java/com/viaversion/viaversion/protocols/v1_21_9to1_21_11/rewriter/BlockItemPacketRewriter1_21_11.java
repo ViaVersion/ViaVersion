@@ -25,19 +25,13 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.AttackRange;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
-import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
-import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPacket1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundPacket1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.Protocol1_21_9To1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.storage.GameTimeStorage;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
-import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
-import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 
 public final class BlockItemPacketRewriter1_21_11 extends StructuredItemRewriter<ClientboundPacket1_21_9, ServerboundPacket1_21_9, Protocol1_21_9To1_21_11> {
 
@@ -47,32 +41,6 @@ public final class BlockItemPacketRewriter1_21_11 extends StructuredItemRewriter
 
     @Override
     public void registerPackets() {
-        final BlockRewriter<ClientboundPacket1_21_9> blockRewriter = new BlockRewriter1_21_5<>(protocol);
-        blockRewriter.registerBlockEvent(ClientboundPackets1_21_9.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_21_9.BLOCK_UPDATE);
-        blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_21_9.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerLevelEvent1_21(ClientboundPackets1_21_9.LEVEL_EVENT, 2001);
-        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_21_9.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_21_5::new);
-        blockRewriter.registerBlockEntityData(ClientboundPackets1_21_9.BLOCK_ENTITY_DATA);
-
-        registerSetCursorItem(ClientboundPackets1_21_9.SET_CURSOR_ITEM);
-        registerSetPlayerInventory(ClientboundPackets1_21_9.SET_PLAYER_INVENTORY);
-        registerCooldown1_21_2(ClientboundPackets1_21_9.COOLDOWN);
-        registerSetContent1_21_2(ClientboundPackets1_21_9.CONTAINER_SET_CONTENT);
-        registerSetSlot1_21_2(ClientboundPackets1_21_9.CONTAINER_SET_SLOT);
-        registerAdvancements1_20_3(ClientboundPackets1_21_9.UPDATE_ADVANCEMENTS);
-        registerSetEquipment(ClientboundPackets1_21_9.SET_EQUIPMENT);
-        registerMerchantOffers1_20_5(ClientboundPackets1_21_9.MERCHANT_OFFERS);
-        registerContainerClick1_21_5(ServerboundPackets1_21_6.CONTAINER_CLICK);
-        registerSetCreativeModeSlot1_21_5(ServerboundPackets1_21_6.SET_CREATIVE_MODE_SLOT);
-        registerShowDialog(ClientboundPackets1_21_9.SHOW_DIALOG);
-        registerShowDialogDirect(ClientboundConfigurationPackets1_21_9.SHOW_DIALOG);
-
-        final RecipeDisplayRewriter<ClientboundPacket1_21_9> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(protocol);
-        recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_9.UPDATE_RECIPES);
-        recipeRewriter.registerRecipeBookAdd(ClientboundPackets1_21_9.RECIPE_BOOK_ADD);
-        recipeRewriter.registerPlaceGhostRecipe(ClientboundPackets1_21_9.PLACE_GHOST_RECIPE);
-
         protocol.registerClientbound(ClientboundPackets1_21_9.SET_BORDER_LERP_SIZE, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // oldSize
             wrapper.passthrough(Types.DOUBLE); // newSize

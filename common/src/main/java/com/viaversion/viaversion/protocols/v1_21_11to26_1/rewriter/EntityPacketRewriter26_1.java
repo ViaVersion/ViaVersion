@@ -38,14 +38,6 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_21_9(ClientboundPackets1_21_11.ADD_ENTITY, EntityTypes1_21_11.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_21_11.SET_ENTITY_DATA);
-        registerRemoveEntities(ClientboundPackets1_21_11.REMOVE_ENTITIES);
-        registerPlayerAbilities(ClientboundPackets1_21_11.PLAYER_ABILITIES);
-        registerGameEvent(ClientboundPackets1_21_11.GAME_EVENT);
-        registerLogin1_20_5(ClientboundPackets1_21_11.LOGIN);
-        registerRespawn1_20_5(ClientboundPackets1_21_11.RESPAWN);
-
         protocol.registerServerbound(ServerboundPackets26_1.INTERACT, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT);
             wrapper.write(Types.VAR_INT, 0); // Interact

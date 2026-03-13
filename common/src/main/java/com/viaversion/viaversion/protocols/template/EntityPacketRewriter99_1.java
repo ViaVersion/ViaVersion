@@ -35,14 +35,8 @@ final class EntityPacketRewriter99_1 extends EntityRewriter<ClientboundPacket26_
 
     @Override
     public void registerPackets() {
-        // Tracks entities, applies entity data rewrites registered below, untracks entities
-        registerTrackerWithData1_21_9(ClientboundPackets26_1.ADD_ENTITY, EntityTypes1_21_11.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets26_1.SET_ENTITY_DATA);
-        registerRemoveEntities(ClientboundPackets26_1.REMOVE_ENTITIES);
-        registerPlayerAbilities(ClientboundPackets26_1.PLAYER_ABILITIES);
-        registerGameEvent(ClientboundPackets26_1.GAME_EVENT);
-        registerLogin1_20_5(ClientboundPackets26_1.LOGIN);
-        registerRespawn1_20_5(ClientboundPackets26_1.RESPAWN);
+        // Common entity registrations (SET_ENTITY_DATA, REMOVE_ENTITIES, PLAYER_ABILITIES,
+        // GAME_EVENT, LOGIN, RESPAWN) are handled by SharedRegistrations.
     }
 
     @Override

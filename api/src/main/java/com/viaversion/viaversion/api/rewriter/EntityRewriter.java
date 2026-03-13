@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter<T> {
 
@@ -38,6 +39,11 @@ public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter
      * @return entity type
      */
     EntityType typeFromId(int type);
+
+    default @Nullable EntityType typeFromId(final String type) {
+        final int id = protocol().getMappingData().getEntityMappings().id(type);
+        return id == -1 ? null : typeFromId(id);
+    }
 
     /**
      * Returns the entity type from the given id.

@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.data;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.data.MappingDataLoader.IdentifiersPair;
 import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -37,13 +38,13 @@ public class FullMappingsBase implements FullMappings {
     private final String[] mappedIdToString;
     private final Mappings mappings;
 
-    public FullMappingsBase(final List<String> unmappedIdentifiers, final List<String> mappedIdentifiers, final Mappings mappings) {
+    public FullMappingsBase(final IdentifiersPair identifiersPair, final Mappings mappings) {
         Preconditions.checkNotNull(mappings, "Mappings cannot be null");
         this.mappings = mappings;
-        this.stringToId = toInverseMap(unmappedIdentifiers);
-        this.mappedStringToId = toInverseMap(mappedIdentifiers);
-        this.idToString = unmappedIdentifiers.toArray(EMPTY_ARRAY);
-        this.mappedIdToString = mappedIdentifiers.toArray(EMPTY_ARRAY);
+        this.stringToId = toInverseMap(identifiersPair.unmapped());
+        this.idToString = identifiersPair.unmapped().toArray(EMPTY_ARRAY);
+        this.mappedStringToId = toInverseMap(identifiersPair.mapped());
+        this.mappedIdToString = identifiersPair.mapped().toArray(EMPTY_ARRAY);
     }
 
     private FullMappingsBase(final Object2IntMap<String> stringToId, final Object2IntMap<String> mappedStringToId, final String[] idToString, final String[] mappedIdToString, final Mappings mappings) {
@@ -54,7 +55,11 @@ public class FullMappingsBase implements FullMappings {
         this.mappings = mappings;
     }
 
-    private static Object2IntMap<String> toInverseMap(final List<String> list) {
+    public static FullMappings of(final IdentifiersPair identifiersPair, final Mappings mappings) {
+        return mappings.isIdentity() && identifiersPair.identity() ? new FullIdentityMappings(identifiersPair, mappings) : new FullMappingsBase(identifiersPair, mappings);
+    }
+
+    static Object2IntMap<String> toInverseMap(final List<String> list) {
         final Object2IntMap<String> map = new Object2IntOpenHashMap<>(list.size());
         map.defaultReturnValue(-1);
         for (int i = 0; i < list.size(); i++) {
@@ -133,6 +138,11 @@ public class FullMappingsBase implements FullMappings {
     @Override
     public int mappedSize() {
         return mappings.mappedSize();
+    }
+
+    @Override
+    public boolean isIntIdIdentity() {
+        return mappings.isIdentity();
     }
 
     @Override

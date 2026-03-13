@@ -38,6 +38,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -52,9 +53,9 @@ import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.NonceStorage1
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.ReceivedMessagesStorage;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ServerboundPackets1_19_1;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Pair;
@@ -73,6 +74,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     private final ParticleRewriter<ClientboundPackets1_19_1> particleRewriter = new ParticleRewriter<>(this);
     private final ComponentRewriter1_19_3 componentRewriter = new ComponentRewriter1_19_3(this);
     private final TagRewriter<ClientboundPackets1_19_1> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPackets1_19_1> blockRewriter = BlockRewriter.for1_18(this, ChunkType1_18::new);
 
     public Protocol1_19_1To1_19_3() {
         super(ClientboundPackets1_19_1.class, ClientboundPackets1_19_3.class, ServerboundPackets1_19_1.class, ServerboundPackets1_19_3.class);
@@ -80,12 +82,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void registerPackets() {
-        tagRewriter.registerGeneric(ClientboundPackets1_19_1.UPDATE_TAGS);
-
-        particleRewriter.registerLevelParticles1_19(ClientboundPackets1_19_1.LEVEL_PARTICLES);
-
-        entityRewriter.register();
-        itemRewriter.register();
+        super.registerPackets();
 
         // Rewrite sounds as holders
         final PacketHandler soundHandler = wrapper -> {
@@ -98,27 +95,12 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
 
             wrapper.write(Types.SOUND_EVENT, Holder.of(soundId));
         };
-        registerClientbound(ClientboundPackets1_19_1.SOUND_ENTITY, soundHandler);
-        registerClientbound(ClientboundPackets1_19_1.SOUND, soundHandler);
+        replaceClientbound(ClientboundPackets1_19_1.SOUND_ENTITY, soundHandler);
+        replaceClientbound(ClientboundPackets1_19_1.SOUND, soundHandler);
         registerClientbound(ClientboundPackets1_19_1.CUSTOM_SOUND, ClientboundPackets1_19_3.SOUND, wrapper -> {
             final String soundIdentifier = wrapper.read(Types.STRING);
             wrapper.write(Types.SOUND_EVENT, Holder.of(new SoundEvent(soundIdentifier, null)));
         });
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_1.AWARD_STATS);
-
-        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.SYSTEM_CHAT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.SET_ACTION_BAR_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.SET_TITLE_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.SET_SUBTITLE_TEXT);
-        componentRewriter.registerBossEvent(ClientboundPackets1_19_1.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets1_19_1.TAB_LIST);
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_19_1.OPEN_SCREEN);
-        componentRewriter.registerPlayerCombatKill(ClientboundPackets1_19_1.PLAYER_COMBAT_KILL);
-        componentRewriter.registerSetPlayerTeam1_13(ClientboundPackets1_19_1.SET_PLAYER_TEAM);
-        componentRewriter.registerSetObjective(ClientboundPackets1_19_1.SET_OBJECTIVE);
-        componentRewriter.registerPing();
 
         final CommandRewriter<ClientboundPackets1_19_1> commandRewriter = new CommandRewriter<>(this) {
             @Override
@@ -131,9 +113,9 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
                 }
             }
         };
-        commandRewriter.registerDeclareCommands1_19(ClientboundPackets1_19_1.COMMANDS);
+        replaceClientbound(ClientboundPackets1_19_1.COMMANDS, commandRewriter::handle1_19);
 
-        registerClientbound(ClientboundPackets1_19_1.SERVER_DATA, new PacketHandlers() {
+        replaceClientbound(ClientboundPackets1_19_1.SERVER_DATA, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.OPTIONAL_COMPONENT); // Motd
@@ -386,6 +368,11 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     public ItemPacketRewriter1_19_3 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPackets1_19_1> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

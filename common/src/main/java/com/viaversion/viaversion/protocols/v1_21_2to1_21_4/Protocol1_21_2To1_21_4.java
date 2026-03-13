@@ -23,9 +23,7 @@ import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_4;
-import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.type.Types;
@@ -33,12 +31,14 @@ import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPacket1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.provider.PickItemProvider;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter.BlockItemPacketRewriter1_21_4;
+import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter.BlockPacketRewriter1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter.ComponentRewriter1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter.EntityPacketRewriter1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter.ParticleRewriter1_21_4;
@@ -46,10 +46,10 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
-import com.viaversion.viaversion.rewriter.AttributeRewriter;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
+import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
+import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import java.util.BitSet;
@@ -64,6 +64,9 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
     private final ParticleRewriter<ClientboundPacket1_21_2> particleRewriter = new ParticleRewriter1_21_4(this);
     private final TagRewriter<ClientboundPacket1_21_2> tagRewriter = new TagRewriter<>(this);
     private final JsonNBTComponentRewriter<ClientboundPacket1_21_2> componentRewriter = new ComponentRewriter1_21_4(this);
+    private final BlockRewriter<ClientboundPacket1_21_2> blockRewriter = new BlockPacketRewriter1_21_4(this);
+    private final RecipeDisplayRewriter<ClientboundPacket1_21_2> recipeRewriter = new RecipeDisplayRewriter<>(this);
+    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
 
     public Protocol1_21_2To1_21_4() {
         super(ClientboundPacket1_21_2.class, ClientboundPacket1_21_2.class, ServerboundPacket1_21_2.class, ServerboundPacket1_21_4.class);
@@ -73,28 +76,7 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
     protected void registerPackets() {
         super.registerPackets();
 
-        tagRewriter.registerGeneric(ClientboundPackets1_21_2.UPDATE_TAGS);
-        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21.UPDATE_TAGS);
-
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_21_2.OPEN_SCREEN);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SET_ACTION_BAR_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SET_TITLE_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SET_SUBTITLE_TEXT);
-        componentRewriter.registerBossEvent(ClientboundPackets1_21_2.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.DISCONNECT);
-        componentRewriter.registerComponentPacket(ClientboundConfigurationPackets1_21.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets1_21_2.TAB_LIST);
-        componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21_2.PLAYER_COMBAT_KILL);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SYSTEM_CHAT);
-        componentRewriter.registerDisguisedChat(ClientboundPackets1_21_2.DISGUISED_CHAT);
-        componentRewriter.registerPlayerChat(ClientboundPackets1_21_2.PLAYER_CHAT, ChatType.TYPE);
-        componentRewriter.registerSetPlayerTeam1_13(ClientboundPackets1_21_2.SET_PLAYER_TEAM);
-        componentRewriter.registerSetObjective(ClientboundPackets1_21_2.SET_OBJECTIVE);
-        componentRewriter.registerSetScore1_20_3(ClientboundPackets1_21_2.SET_SCORE);
-        componentRewriter.registerPing();
-
-        particleRewriter.registerExplode1_21_2(ClientboundPackets1_21_2.EXPLODE);
-        registerClientbound(ClientboundPackets1_21_2.LEVEL_PARTICLES, wrapper -> {
+        replaceClientbound(ClientboundPackets1_21_2.LEVEL_PARTICLES, wrapper -> {
             wrapper.passthrough(Types.BOOLEAN); // Override limiter
             wrapper.write(Types.BOOLEAN, false); // Always show
             wrapper.passthrough(Types.DOUBLE); // X
@@ -110,14 +92,7 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
             particleRewriter.rewriteParticle(wrapper.user(), particle);
         });
 
-        final SoundRewriter<ClientboundPacket1_21_2> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_21_2.SOUND);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_21_2.SOUND_ENTITY);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_21_2.AWARD_STATS);
-        new AttributeRewriter<>(this).register1_21(ClientboundPackets1_21_2.UPDATE_ATTRIBUTES);
-
-        registerClientbound(ClientboundPackets1_21_2.PLAYER_INFO_UPDATE, wrapper -> {
+        replaceClientbound(ClientboundPackets1_21_2.PLAYER_INFO_UPDATE, wrapper -> {
             // Added "show hat" - true by default, keep it like that
             final BitSet actions = wrapper.passthroughAndMap(Types.PROFILE_ACTIONS_ENUM1_21_2, Types.PROFILE_ACTIONS_ENUM1_21_4);
             if (!actions.get(5)) { // Update display name
@@ -213,6 +188,21 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
     @Override
     public BlockItemPacketRewriter1_21_4 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPacket1_21_2> getBlockRewriter() {
+        return blockRewriter;
+    }
+
+    @Override
+    public RecipeDisplayRewriter<ClientboundPacket1_21_2> getRecipeRewriter() {
+        return recipeRewriter;
+    }
+
+    @Override
+    public RegistryDataRewriter getRegistryDataRewriter() {
+        return registryDataRewriter;
     }
 
     @Override

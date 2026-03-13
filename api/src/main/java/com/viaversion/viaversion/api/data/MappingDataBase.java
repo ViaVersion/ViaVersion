@@ -26,6 +26,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.MappingDataLoader.IdentifiersPair;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -96,14 +97,13 @@ public class MappingDataBase implements MappingData {
             attributeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "attributes");
             blockEntityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "blockentities");
 
-            final List<String> unmappedParticles = identifiersFromGlobalIds(unmappedIdentifierData, "particles");
-            final List<String> mappedParticles = identifiersFromGlobalIds(mappedIdentifierData, "particles");
-            if (unmappedParticles != null && mappedParticles != null) {
+            final IdentifiersPair particleIdentifiers = identifiersFromGlobalIds(unmappedIdentifierData, mappedIdentifierData, "particles");
+            if (particleIdentifiers != null) {
                 Mappings particleMappings = loadMappings(data, "particles");
                 if (particleMappings == null) {
-                    particleMappings = new IdentityMappings(unmappedParticles.size(), mappedParticles.size());
+                    particleMappings = new IdentityMappings(particleIdentifiers.unmapped().size(), particleIdentifiers.mapped().size());
                 }
-                this.particleMappings = new ParticleMappings(unmappedParticles, mappedParticles, particleMappings);
+                this.particleMappings = new ParticleMappings(particleIdentifiers, particleMappings);
             }
         } else {
             // Might not have identifiers in older versions
@@ -132,6 +132,10 @@ public class MappingDataBase implements MappingData {
         return MappingDataLoader.INSTANCE.identifiersFromGlobalIds(mappingsTag, key);
     }
 
+    protected @Nullable IdentifiersPair identifiersFromGlobalIds(final CompoundTag unmappedTag, final CompoundTag mappedTag, final String key) {
+        return MappingDataLoader.INSTANCE.identifiersFromGlobalIds(unmappedTag, mappedTag, key);
+    }
+
     protected @Nullable CompoundTag readMappingsFile(final String name) {
         return MappingDataLoader.INSTANCE.loadNBT(name);
     }
@@ -158,14 +162,12 @@ public class MappingDataBase implements MappingData {
             return null;
         }
 
-        final List<String> unmappedIdentifiers = identifiersFromGlobalIds(unmappedIdentifiersTag, key);
-        final List<String> mappedIdentifiers = identifiersFromGlobalIds(mappedIdentifiersTag, key);
+        final IdentifiersPair identifiersPair = identifiersFromGlobalIds(unmappedIdentifiersTag, mappedIdentifiersTag, key);
         Mappings mappings = loadBiMappings(data, key); // Load as bi-mappings to keep the inverse cached
         if (mappings == null) {
-            mappings = new IdentityMappings(unmappedIdentifiers.size(), mappedIdentifiers.size());
+            mappings = new IdentityMappings(identifiersPair.unmapped().size(), identifiersPair.mapped().size());
         }
-
-        return new FullMappingsBase(unmappedIdentifiers, mappedIdentifiers, mappings);
+        return FullMappingsBase.of(identifiersPair, mappings);
     }
 
     protected @Nullable BiMappings loadBiMappings(final CompoundTag data, final String key) {

@@ -23,25 +23,25 @@ import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType26_1;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundPacket1_21_9;
-import com.viaversion.viaversion.rewriter.AttributeRewriter;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
@@ -51,12 +51,14 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 //   ServerboundPacket1_21_9
 //   EntityDataTypes26_1 (MAPPED type)
 //   VersionedTypes.V26_1
+//   ChunkType26_1::new
 //   98.1, 99.1
 final class Protocol98_1To99_1 extends AbstractProtocol<ClientboundPacket26_1, ClientboundPacket26_1, ServerboundPacket1_21_9, ServerboundPacket1_21_9> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("98.1", "99.1");
     private final EntityPacketRewriter99_1 entityRewriter = new EntityPacketRewriter99_1(this);
     private final BlockItemPacketRewriter99_1 itemRewriter = new BlockItemPacketRewriter99_1(this);
+    private final BlockRewriter<ClientboundPacket26_1> blockRewriter = new BlockRewriter1_21_5<>(this, ChunkType26_1::new);
     private final ParticleRewriter<ClientboundPacket26_1> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket26_1> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket26_1> componentRewriter = new ComponentRewriter99_1(this);
@@ -71,40 +73,9 @@ final class Protocol98_1To99_1 extends AbstractProtocol<ClientboundPacket26_1, C
     protected void registerPackets() {
         super.registerPackets();
 
-        registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
-
-        tagRewriter.registerGeneric(ClientboundPackets26_1.UPDATE_TAGS);
-        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21_9.UPDATE_TAGS);
-
-        // If needed for item or component changes
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets26_1.OPEN_SCREEN);
-        componentRewriter.registerComponentPacket(ClientboundPackets26_1.SET_ACTION_BAR_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets26_1.SET_TITLE_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets26_1.SET_SUBTITLE_TEXT);
-        componentRewriter.registerBossEvent(ClientboundPackets26_1.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets26_1.DISCONNECT);
-        componentRewriter.registerComponentPacket(ClientboundConfigurationPackets1_21_9.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets26_1.TAB_LIST);
-        componentRewriter.registerSetPlayerTeam1_21_5(ClientboundPackets26_1.SET_PLAYER_TEAM);
-        componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets26_1.PLAYER_COMBAT_KILL);
-        componentRewriter.registerPlayerInfoUpdate1_21_4(ClientboundPackets26_1.PLAYER_INFO_UPDATE);
-        componentRewriter.registerComponentPacket(ClientboundPackets26_1.SYSTEM_CHAT);
-        componentRewriter.registerDisguisedChat(ClientboundPackets26_1.DISGUISED_CHAT);
-        componentRewriter.registerPlayerChat1_21_5(ClientboundPackets26_1.PLAYER_CHAT);
-        componentRewriter.registerSetObjective(ClientboundPackets26_1.SET_OBJECTIVE);
-        componentRewriter.registerSetScore1_20_3(ClientboundPackets26_1.SET_SCORE);
-        componentRewriter.registerPing();
-
-        // If needed for any particle, item, or block changes. Extend ParticleRewriter for particle serializer changes
-        particleRewriter.registerLevelParticles1_21_4(ClientboundPackets26_1.LEVEL_PARTICLES);
-        particleRewriter.registerExplode1_21_9(ClientboundPackets26_1.EXPLODE); // Rewrites the included sound and particles
-
-        final SoundRewriter<ClientboundPacket26_1> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound1_19_3(ClientboundPackets26_1.SOUND);
-        soundRewriter.registerSound1_19_3(ClientboundPackets26_1.SOUND_ENTITY);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets26_1.AWARD_STATS);
-        new AttributeRewriter<>(this).register1_21(ClientboundPackets26_1.UPDATE_ATTRIBUTES);
+        // Common registrations (tags, components, particles, sounds, statistics, attributes)
+        // are automatically applied via SharedRegistrations based on the protocol's version range.
+        // Only protocol-specific registrations need to be added here.
 
         // Uncomment if an existing type changed serialization format. Mappings for argument type keys can also be defined in mapping files
         /*new CommandRewriter1_19_4<>(this) {
@@ -171,6 +142,11 @@ final class Protocol98_1To99_1 extends AbstractProtocol<ClientboundPacket26_1, C
     @Override
     public BlockItemPacketRewriter99_1 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPacket26_1> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

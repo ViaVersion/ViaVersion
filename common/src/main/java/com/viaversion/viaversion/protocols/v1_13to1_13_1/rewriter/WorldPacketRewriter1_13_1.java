@@ -24,25 +24,18 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.Protocol1_13To1_13_1;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
 
 public class WorldPacketRewriter1_13_1 {
 
     public static void register(Protocol1_13To1_13_1 protocol) {
-        BlockRewriter<ClientboundPackets1_13> blockRewriter = BlockRewriter.legacy(protocol);
-
         protocol.registerClientbound(ClientboundPackets1_13.LEVEL_CHUNK, wrapper -> {
             ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13To1_13_1.class);
             Chunk chunk = wrapper.passthrough(ChunkType1_13.forEnvironment(clientWorld.getEnvironment()));
 
-            blockRewriter.handleChunk(chunk);
+            protocol.getBlockRewriter().handleChunk(chunk);
         });
 
-        blockRewriter.registerBlockEvent(ClientboundPackets1_13.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_13.BLOCK_UPDATE);
-        blockRewriter.registerChunkBlocksUpdate(ClientboundPackets1_13.CHUNK_BLOCKS_UPDATE);
-
-        protocol.registerClientbound(ClientboundPackets1_13.LEVEL_EVENT, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_13.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.INT); // Effect Id

@@ -34,30 +34,7 @@ public final class ItemPacketRewriter1_18 extends ItemRewriter<ClientboundPacket
 
     @Override
     public void registerPackets() {
-        registerCooldown(ClientboundPackets1_17_1.COOLDOWN);
-        registerSetContent1_17_1(ClientboundPackets1_17_1.CONTAINER_SET_CONTENT);
-        registerMerchantOffers(ClientboundPackets1_17_1.MERCHANT_OFFERS);
-        registerSetSlot1_17_1(ClientboundPackets1_17_1.CONTAINER_SET_SLOT);
-        registerAdvancements(ClientboundPackets1_17_1.UPDATE_ADVANCEMENTS);
-        registerSetEquipment(ClientboundPackets1_17_1.SET_EQUIPMENT);
-
-        protocol.registerClientbound(ClientboundPackets1_17_1.LEVEL_EVENT, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.INT); // Effect id
-                map(Types.BLOCK_POSITION1_14); // Location
-                map(Types.INT); // Data
-                handler(wrapper -> {
-                    int id = wrapper.get(Types.INT, 0);
-                    int data = wrapper.get(Types.INT, 1);
-                    if (id == 1010) { // Play record
-                        wrapper.set(Types.INT, 1, protocol.getMappingData().getNewItemId(data));
-                    }
-                });
-            }
-        });
-
-        protocol.registerClientbound(ClientboundPackets1_17_1.LEVEL_PARTICLES, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_17_1.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.INT); // Particle id
@@ -98,8 +75,5 @@ public final class ItemPacketRewriter1_18 extends ItemRewriter<ClientboundPacket
         });
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_17_1.UPDATE_RECIPES);
-
-        registerContainerClick1_17_1(ServerboundPackets1_17.CONTAINER_CLICK);
-        registerSetCreativeModeSlot(ServerboundPackets1_17.SET_CREATIVE_MODE_SLOT);
     }
 }

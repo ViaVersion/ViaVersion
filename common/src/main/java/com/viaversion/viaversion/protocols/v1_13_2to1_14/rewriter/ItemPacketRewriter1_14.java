@@ -64,9 +64,6 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
 
     @Override
     public void registerPackets() {
-        registerCooldown(ClientboundPackets1_13.COOLDOWN);
-        registerAdvancements(ClientboundPackets1_13.UPDATE_ADVANCEMENTS);
-
         protocol.registerClientbound(ClientboundPackets1_13.OPEN_SCREEN, null, wrapper -> {
             Short windowId = wrapper.read(Types.UNSIGNED_BYTE);
             String type = wrapper.read(Types.STRING);
@@ -111,9 +108,6 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
                 wrapper.write(Types.COMPONENT, title);
             }
         });
-
-        registerSetContent(ClientboundPackets1_13.CONTAINER_SET_CONTENT);
-        registerSetSlot(ClientboundPackets1_13.CONTAINER_SET_SLOT);
 
         protocol.registerClientbound(ClientboundPackets1_13.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
@@ -166,8 +160,6 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
             }
         });
 
-        registerSetEquippedItem(ClientboundPackets1_13.SET_EQUIPPED_ITEM);
-
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_13.UPDATE_RECIPES, wrapper -> {
             int size = wrapper.passthrough(Types.VAR_INT);
@@ -188,8 +180,6 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
         });
 
 
-        registerContainerClick(ServerboundPackets1_14.CONTAINER_CLICK);
-
         protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, wrapper -> {
             // Selecting trade now moves the items, we need to resync the inventory
             PacketWrapper resyncPacket = wrapper.create(ServerboundPackets1_13.CONTAINER_CLICK);
@@ -204,8 +194,6 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
             resyncPacket.write(Types.ITEM1_13_2, new DataItem(1, (byte) 1, tag)); // 5 - Clicked Item
             resyncPacket.scheduleSendToServer(Protocol1_13_2To1_14.class);
         });
-
-        registerSetCreativeModeSlot(ServerboundPackets1_14.SET_CREATIVE_MODE_SLOT);
     }
 
     @Override
