@@ -16,7 +16,7 @@ pluginManagement {
     plugins {
         id("com.gradleup.shadow") version "9.3.1"
         id("net.kyori.blossom") version "2.2.0"
-        id("org.jetbrains.gradle.plugin.idea-ext") version "1.3"
+        id("org.jetbrains.gradle.plugin.idea-ext") version "1.4.1"
 
         // A nice no-conflict comment for patching in downgrading
     }
