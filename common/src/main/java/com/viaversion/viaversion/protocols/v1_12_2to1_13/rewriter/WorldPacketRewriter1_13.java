@@ -302,13 +302,15 @@ public class WorldPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.FORGET_LEVEL_CHUNK, new PacketHandlers() {
             @Override
             public void register() {
-                if (Via.getConfig().isServersideBlockConnections()) {
-                    handler(wrapper -> {
-                        int x = wrapper.passthrough(Types.INT);
-                        int z = wrapper.passthrough(Types.INT);
+                handler(wrapper -> {
+                    int x = wrapper.passthrough(Types.INT);
+                    int z = wrapper.passthrough(Types.INT);
+
+                    wrapper.user().get(BlockStorage.class).removeChunk(x, z);
+                    if (Via.getConfig().isServersideBlockConnections()) {
                         ConnectionData.blockConnectionProvider.unloadChunk(wrapper.user(), x, z);
-                    });
-                }
+                    }
+                });
             }
         });
 

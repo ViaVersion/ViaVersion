@@ -215,7 +215,7 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
 
     @Override
     public @Nullable DimensionData dimensionData(int dimensionId) {
-        return dimensions.values().stream().filter(data -> data.id() == dimensionId).findFirst().orElse(null); // TODO Store as array as well
+        return dimensions.values().stream().filter(data -> data.id() == dimensionId).findFirst().orElse(null);
     }
 
     @Override

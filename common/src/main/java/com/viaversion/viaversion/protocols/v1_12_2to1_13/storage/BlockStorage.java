@@ -24,7 +24,6 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO Fix memory leak lolz (only a smol one tho)
 public class BlockStorage implements StorableObject {
     private static final IntSet WHITELIST = new IntOpenHashSet(46);
     private final Map<BlockPosition, ReplacementData> blocks = new HashMap<>();
@@ -79,6 +78,10 @@ public class BlockStorage implements StorableObject {
 
     public ReplacementData remove(BlockPosition position) {
         return blocks.remove(position);
+    }
+
+    public void removeChunk(int chunkX, int chunkZ) {
+        blocks.keySet().removeIf(position -> (position.x() >> 4) == chunkX && (position.z() >> 4) == chunkZ);
     }
 
     public static final class ReplacementData {
