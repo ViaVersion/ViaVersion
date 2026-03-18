@@ -98,6 +98,10 @@ public class BlockStorage implements StorableObject {
         blocks.remove(ChunkPosition.chunkKey(chunkX, chunkZ));
     }
 
+    public void clear() {
+        blocks.clear();
+    }
+
     public static final class ReplacementData {
         private final int original;
         private int replacement;
