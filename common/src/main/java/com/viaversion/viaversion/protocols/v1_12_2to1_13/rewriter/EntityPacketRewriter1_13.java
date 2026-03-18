@@ -30,6 +30,7 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.ConnectionData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.EntityIdMappings1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ParticleIdMappings1_13;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -153,6 +154,7 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                             ConnectionData.clearBlockStorage(wrapper.user());
                         }
                         tracker(wrapper.user()).clearEntities();
+                        wrapper.user().get(BlockStorage.class).clear();
                     }
                 });
                 handler(Protocol1_12_2To1_13.SEND_DECLARE_COMMANDS_AND_TAGS);

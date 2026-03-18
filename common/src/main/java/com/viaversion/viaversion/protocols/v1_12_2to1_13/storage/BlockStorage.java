@@ -19,15 +19,15 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.ChunkPosition;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO Fix memory leak lolz (only a smol one tho)
 public class BlockStorage implements StorableObject {
     private static final IntSet WHITELIST = new IntOpenHashSet(46);
-    private final Map<BlockPosition, ReplacementData> blocks = new HashMap<>();
+    private final Map<Long, Map<BlockPosition, ReplacementData>> blocks = new HashMap<>();
 
     static {
         // Flower pots
@@ -62,7 +62,8 @@ public class BlockStorage implements StorableObject {
         if (!WHITELIST.contains(block))
             return;
 
-        blocks.put(position, new ReplacementData(block, replacementId));
+        final long chunkKey = ChunkPosition.chunkKeyForBlock(position.x(), position.z());
+        blocks.computeIfAbsent(chunkKey, key -> new HashMap<>()).put(position, new ReplacementData(block, replacementId));
     }
 
     public boolean isWelcome(int block) {
@@ -70,15 +71,35 @@ public class BlockStorage implements StorableObject {
     }
 
     public boolean contains(BlockPosition position) {
-        return blocks.containsKey(position);
+        final Map<BlockPosition, ReplacementData> chunkBlocks = blocks.get(ChunkPosition.chunkKeyForBlock(position.x(), position.z()));
+        return chunkBlocks != null && chunkBlocks.containsKey(position);
     }
 
     public ReplacementData get(BlockPosition position) {
-        return blocks.get(position);
+        final Map<BlockPosition, ReplacementData> chunkBlocks = blocks.get(ChunkPosition.chunkKeyForBlock(position.x(), position.z()));
+        return chunkBlocks != null ? chunkBlocks.get(position) : null;
     }
 
     public ReplacementData remove(BlockPosition position) {
-        return blocks.remove(position);
+        final long chunkKey = ChunkPosition.chunkKeyForBlock(position.x(), position.z());
+        final Map<BlockPosition, ReplacementData> chunkBlocks = blocks.get(chunkKey);
+        if (chunkBlocks == null) {
+            return null;
+        }
+
+        final ReplacementData removed = chunkBlocks.remove(position);
+        if (chunkBlocks.isEmpty()) {
+            blocks.remove(chunkKey);
+        }
+        return removed;
+    }
+
+    public void removeChunk(int chunkX, int chunkZ) {
+        blocks.remove(ChunkPosition.chunkKey(chunkX, chunkZ));
+    }
+
+    public void clear() {
+        blocks.clear();
     }
 
     public static final class ReplacementData {
