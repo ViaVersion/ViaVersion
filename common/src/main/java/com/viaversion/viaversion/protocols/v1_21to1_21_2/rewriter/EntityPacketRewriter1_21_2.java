@@ -102,7 +102,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             entity.setRotation(yaw, pitch);
         });
 
-        protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
+        protocol.registerClientbound(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
             final PacketWrapper instrumentsPacket = wrapper.create(ClientboundConfigurationPackets1_21.REGISTRY_DATA);
             instrumentsPacket.write(Types.STRING, "minecraft:instrument");
             final RegistryEntry[] entries = new RegistryEntry[GOAT_HORN_INSTRUMENTS.length];
