@@ -149,7 +149,7 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
         for (int i = 0; i < length; i++) {
             final String registryKey = wrapper.read(Types.STRING);
             final String strippedKey = Key.stripMinecraftNamespace(registryKey);
-            if (toRemoveRegistries.contains(strippedKey)) {
+            if (shouldRemoveRegistry(strippedKey)) {
                 finalLength--;
 
                 final int tagsSize = wrapper.read(Types.VAR_INT);
@@ -280,6 +280,14 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
     @Override
     public List<TagData> getOrComputeNewTags(RegistryType tagType) {
         return toAdd.computeIfAbsent(tagType, type -> new ArrayList<>());
+    }
+
+    public boolean shouldRemoveRegistry(final String registryKey) {
+        if (protocol.getRegistryDataRewriter() != null
+            && protocol.getRegistryDataRewriter().shouldRemoveRegistry(registryKey)) {
+            return true;
+        }
+        return toRemoveRegistries.contains(registryKey);
     }
 
     public @Nullable IdRewriteFunction getRewriter(RegistryType tagType) {
