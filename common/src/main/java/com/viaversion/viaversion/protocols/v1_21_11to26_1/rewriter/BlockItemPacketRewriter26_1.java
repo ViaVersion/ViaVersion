@@ -168,7 +168,7 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
         container.replace(StructuredDataKey.DAMAGE_TYPE26_1, StructuredDataKey.DAMAGE_TYPE1_21_11, damageType -> new DamageType(Either.left(damageType)));
         container.replace(StructuredDataKey.PROVIDES_BANNER_PATTERNS26_1, StructuredDataKey.PROVIDES_BANNER_PATTERNS1_21_5, patterns -> tagOrNull(patterns.patterns()));
         container.replace(StructuredDataKey.DAMAGE_RESISTANT26_1, StructuredDataKey.DAMAGE_RESISTANT1_21_2, damageResistant -> new DamageResistant1_21_2(tagOrNull(damageResistant.types())));
-        container.replace(StructuredDataKey.BLOCKS_ATTACKS1_21_5, StructuredDataKey.BLOCKS_ATTACKS26_1, blocksAttacks -> {
+        container.replace(StructuredDataKey.BLOCKS_ATTACKS26_1, StructuredDataKey.BLOCKS_ATTACKS1_21_5, blocksAttacks -> {
             if (blocksAttacks.bypassedBy() == null) {
                 return blocksAttacks;
             }

@@ -35,7 +35,7 @@ public record ProvidesBannerPatterns(HolderSet patterns) {
     public static final Type<ProvidesBannerPatterns> TYPE = new TransformingType<>(Types.HOLDER_SET, ProvidesBannerPatterns.class, ProvidesBannerPatterns::new, ProvidesBannerPatterns::patterns) {
         @Override
         public void write(final Ops ops, final ProvidesBannerPatterns value) {
-            ops.writeMap(map -> map.write("items", new HolderSetType(RegistryKey.of("banner_patterns")), value.patterns));
+            ops.writeMap(map -> map.write("items", new HolderSetType(RegistryKey.of("banner_pattern")), value.patterns));
         }
     };
 }
