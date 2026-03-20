@@ -167,13 +167,13 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             wrapper.passthrough(Types.LONG); // Game time
 
             final long dayTime = wrapper.read(Types.LONG);
-            wrapper.read(Types.BOOLEAN); // Tick day time
+            final boolean tickDayTime = wrapper.read(Types.BOOLEAN);
 
             wrapper.write(Types.VAR_INT, 1); // One!
             wrapper.write(Types.VAR_INT, 0); // Overworld clock
             wrapper.write(Types.VAR_LONG, dayTime); // Total ticks
             wrapper.write(Types.FLOAT, 0F); // Partial tick
-            wrapper.write(Types.FLOAT, 1F); // Tick rate
+            wrapper.write(Types.FLOAT, tickDayTime ? 1F : 0F); // Tick rate
         });
         cancelServerbound(ServerboundPackets26_1.SET_GAME_RULE);
     }
