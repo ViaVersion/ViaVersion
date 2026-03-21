@@ -107,8 +107,7 @@ Resources
 
 - **[Via Mappings Generator](https://github.com/ViaVersion/Mappings)**
 - **[Mojang mappings](https://minecraft.wiki/w/Obfuscation_map)** (Thank you, Mojang, very cool)
-- Previously: **[Burger](https://github.com/Pokechu22/Burger)** (see [PAaaS](https://github.com/Matsv/Paaas)) and *
-  *wiki.vg**
+- Previously: **[Burger](https://github.com/Pokechu22/Burger)** (see [PAaaS](https://github.com/Matsv/Paaas)) and **wiki.vg**
 
 License
 --------
