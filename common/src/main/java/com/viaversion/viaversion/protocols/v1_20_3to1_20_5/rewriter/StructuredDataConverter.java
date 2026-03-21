@@ -425,7 +425,9 @@ public final class StructuredDataConverter {
 
                 customPotionEffectsTag.add(effectTag);
             }
-            tag.put("custom_potion_effects", customPotionEffectsTag);
+            if (!customPotionEffectsTag.isEmpty()) {
+                tag.put("custom_potion_effects", customPotionEffectsTag);
+            }
         });
         register(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, (data, tag) -> {
             final ListTag<CompoundTag> effectsTag = new ListTag<>(CompoundTag.class);
