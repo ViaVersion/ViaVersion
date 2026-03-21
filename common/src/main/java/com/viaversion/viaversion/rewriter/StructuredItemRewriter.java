@@ -51,6 +51,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     T extends Protocol<C, ?, ?, S>> extends ItemRewriter<C, S, T> {
 
     public static final String MARKER_KEY = "VV|custom_data";
+    protected final int FIRST_HOTBAR_SLOT_ID = 36;
 
     public StructuredItemRewriter(T protocol) {
         super(protocol);
@@ -60,7 +61,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
      * Rewrites an item to the client, including item hash tracking if necessary.
      *
      * @param connection user connection
-     * @param item item
+     * @param item       item
      * @return the rewritten item, can be the same or a new object
      * @see #handleItemDataComponentsToClient(UserConnection, Item, StructuredDataContainer)
      * @see #handleItemToServer(UserConnection, Item)
@@ -169,8 +170,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
      * Always remember to call the super method.
      *
      * @param connection user connection
-     * @param item item to update
-     * @param container item data container
+     * @param item       item to update
+     * @param container  item data container
      */
     protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
         if (protocol.getComponentRewriter() != null) {
@@ -288,8 +289,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     /**
      * Stores inconvertible data in a backup tag. Called before data component modification to the item.
      *
-     * @param connection user connection
-     * @param item item to save data for
+     * @param connection    user connection
+     * @param item          item to save data for
      * @param dataContainer item data container
      */
     protected void backupInconvertibleData(final UserConnection connection, final Item item, final StructuredDataContainer dataContainer, final CompoundTag backupTag) {
@@ -298,8 +299,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     /**
      * Restored inconvertible backup data from the item. Called after rewritables and before the remaining data component modification.
      *
-     * @param item item
-     * @param container item data container
+     * @param item       item
+     * @param container  item data container
      * @param customData custom data tag
      */
     protected void restoreBackupData(final Item item, final StructuredDataContainer container, final CompoundTag customData) {
@@ -351,9 +352,10 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
     }
 
-    protected void passthroughLengthPrefixedItem(final PacketWrapper wrapper) {
+    protected Item passthroughLengthPrefixedItem(final PacketWrapper wrapper) {
         final Item item = handleItemToServer(wrapper.user(), wrapper.read(protocol.mappedTypes().lengthPrefixedItem()));
         wrapper.write(protocol.types().lengthPrefixedItem(), item);
+        return item;
     }
 
     private void replaceAnnoyingKeys(final StructuredDataContainer container, final VersionedTypesHolder types, final VersionedTypesHolder mappedTypes) {
@@ -383,6 +385,9 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     // -----------------------
 
     public void registerSetCreativeModeSlot1_21_5(S packetType) {
+    }
+
+    public void registerSetCreativeModeSlot(S packetType, C playerInventoryType) {
         protocol.registerServerbound(packetType, wrapper -> {
             if (!protocol.getEntityRewriter().tracker(wrapper.user()).canInstaBuild()) {
                 // Mimic server/client behavior
@@ -390,8 +395,16 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
                 return;
             }
 
-            wrapper.passthrough(Types.SHORT); // Slot
-            passthroughLengthPrefixedItem(wrapper);
+            final short slot = wrapper.passthrough(Types.SHORT);
+            final Item item = passthroughLengthPrefixedItem(wrapper);
+            if (item.isEmpty()) {
+                return;
+            }
+
+            final PacketWrapper setPlayerInventory = PacketWrapper.create(playerInventoryType, wrapper.user());
+            setPlayerInventory.write(Types.VAR_INT, slot - FIRST_HOTBAR_SLOT_ID);
+            setPlayerInventory.write(protocol.mappedTypes().lengthPrefixedItem(), item);
+            setPlayerInventory.send(protocol.getClass(), false);
         });
     }
 }

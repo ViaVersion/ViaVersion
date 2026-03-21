@@ -67,7 +67,7 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
         registerSetEquipment(ClientboundPackets1_21_6.SET_EQUIPMENT);
         registerMerchantOffers1_20_5(ClientboundPackets1_21_6.MERCHANT_OFFERS);
         registerContainerClick1_21_5(ServerboundPackets1_21_6.CONTAINER_CLICK);
-        registerSetCreativeModeSlot1_21_5(ServerboundPackets1_21_6.SET_CREATIVE_MODE_SLOT);
+        registerSetCreativeModeSlot(ServerboundPackets1_21_6.SET_CREATIVE_MODE_SLOT, ClientboundPackets1_21_6.SET_PLAYER_INVENTORY);
 
         final RecipeDisplayRewriter<ClientboundPacket1_21_6> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(protocol);
         recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_6.UPDATE_RECIPES);

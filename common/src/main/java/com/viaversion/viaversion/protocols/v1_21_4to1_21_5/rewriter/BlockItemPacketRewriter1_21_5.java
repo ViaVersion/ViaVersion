@@ -177,10 +177,15 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
                 return;
             }
 
-            wrapper.passthrough(Types.SHORT); // Slot
+            final short slot = wrapper.passthrough(Types.SHORT);
 
             final Item item = handleItemToServer(wrapper.user(), wrapper.read(VersionedTypes.V1_21_5.lengthPrefixedItem()));
             wrapper.write(itemType(), item);
+
+            final PacketWrapper setPlayerInventory = PacketWrapper.create(ClientboundPackets1_21_2.SET_PLAYER_INVENTORY, wrapper.user());
+            setPlayerInventory.write(Types.VAR_INT, slot - FIRST_HOTBAR_SLOT_ID);
+            setPlayerInventory.write(mappedItemType(), item);
+            setPlayerInventory.send(Protocol1_21_4To1_21_5.class, false);
         });
 
         protocol.registerServerbound(ServerboundPackets1_21_5.CONTAINER_CLICK, wrapper -> {

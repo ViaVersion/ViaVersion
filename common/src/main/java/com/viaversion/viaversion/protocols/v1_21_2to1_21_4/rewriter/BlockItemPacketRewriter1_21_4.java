@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
@@ -86,6 +87,20 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
         registerContainerClick1_21_2(ServerboundPackets1_21_4.CONTAINER_CLICK);
         registerMerchantOffers1_20_5(ClientboundPackets1_21_2.MERCHANT_OFFERS);
         registerSetCreativeModeSlot(ServerboundPackets1_21_4.SET_CREATIVE_MODE_SLOT);
+        protocol.appendServerbound(ServerboundPackets1_21_4.SET_CREATIVE_MODE_SLOT, wrapper -> {
+            // The server now no longer responds with a set player inventory on set creative mode slot
+            // causing items replaced by us to stone to not get updated on the client.
+            final Item item = wrapper.get(itemType(), 0);
+            if (item.isEmpty()) {
+                return;
+            }
+
+            final short slot = wrapper.get(Types.SHORT, 0);
+            final PacketWrapper setPlayerInventory = PacketWrapper.create(ClientboundPackets1_21_2.SET_PLAYER_INVENTORY, wrapper.user());
+            setPlayerInventory.write(Types.VAR_INT, slot - FIRST_HOTBAR_SLOT_ID);
+            setPlayerInventory.write(mappedItemType(), item);
+            setPlayerInventory.send(Protocol1_21_2To1_21_4.class, false);
+        });
 
         final RecipeDisplayRewriter<ClientboundPacket1_21_2> recipeRewriter = new RecipeDisplayRewriter<>(protocol);
         recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_2.UPDATE_RECIPES);
