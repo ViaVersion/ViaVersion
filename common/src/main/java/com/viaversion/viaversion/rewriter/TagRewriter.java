@@ -297,7 +297,7 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
             case ITEM -> mappingData != null && mappingData.getItemMappings() != null ? mappingData::getNewItemId : null;
             case ENTITY -> protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
             case ENCHANTMENT -> mappingData != null && mappingData.getEnchantmentMappings() != null ? id -> mappingData.getEnchantmentMappings().getNewId(id) : null;
-            case FLUID, GAME_EVENT -> null;
+            case FLUID, GAME_EVENT, DAMAGE_TYPE, BANNER_PATTERN -> null;
         };
     }
 }

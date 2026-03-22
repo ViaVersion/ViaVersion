@@ -34,7 +34,9 @@ public enum RegistryType implements RegistryKey {
     FLUID("fluid"),
     ENTITY("entity_type"),
     GAME_EVENT("game_event"),
-    ENCHANTMENT("enchantment");
+    ENCHANTMENT("enchantment"),
+    DAMAGE_TYPE("damage_type"),
+    BANNER_PATTERN("banner_pattern");
 
     private static final Map<String, RegistryType> MAP = new HashMap<>();
     private static final RegistryType[] VALUES = values();

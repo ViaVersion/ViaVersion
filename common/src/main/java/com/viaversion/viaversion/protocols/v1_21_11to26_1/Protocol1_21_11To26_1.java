@@ -23,6 +23,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
@@ -325,6 +326,14 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             StructuredDataKey.USE_EFFECTS, StructuredDataKey.MINIMUM_ATTACK_CHARGE, StructuredDataKey.DAMAGE_TYPE26_1, StructuredDataKey.PIERCING_WEAPON,
             StructuredDataKey.KINETIC_WEAPON, StructuredDataKey.SWING_ANIMATION, StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT26_1, StructuredDataKey.ADDITIONAL_TRADE_COST,
             StructuredDataKey.DYE, StructuredDataKey.PIG_SOUND_VARIANT, StructuredDataKey.COW_SOUND_VARIANT, StructuredDataKey.CHICKEN_SOUND_VARIANT, StructuredDataKey.CAT_SOUND_VARIANT);
+
+        tagRewriter.addEmptyTags(RegistryType.DAMAGE_TYPE, "damages_helmet", "bypasses_armor", "bypasses_shield", "bypasses_invulnerability", "bypasses_cooldown", "bypasses_effects",
+            "bypasses_resistance", "bypasses_enchantments", "is_fire", "is_projectile", "witch_resistant_to", "is_explosion", "is_fall", "is_drowning", "is_freezing", "is_lightning", "no_anger",
+            "no_impact", "always_most_significant_fall", "wither_immune_to", "ignites_armor_stands", "burns_armor_stands", "avoids_guardian_thorns", "always_triggers_silverfish",
+            "always_hurts_ender_dragons", "no_knockback", "always_kills_armor_stands", "can_break_armor_stand", "bypasses_wolf_armor", "is_player_attack",
+            "burn_from_stepping", "panic_causes", "panic_environmental_causes", "mace_smash");
+        tagRewriter.addEmptyTags(RegistryType.BANNER_PATTERN, "no_item_required", "pattern_item/flower", "pattern_item/creeper", "pattern_item/skull", "pattern_item/mojang",
+            "pattern_item/globe", "pattern_item/piglin", "pattern_item/flow", "pattern_item/guster", "pattern_item/field_masoned", "pattern_item/bordure_indented");
         super.onMappingDataLoaded();
     }
 
