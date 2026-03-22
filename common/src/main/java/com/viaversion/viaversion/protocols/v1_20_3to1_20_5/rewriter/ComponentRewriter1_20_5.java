@@ -827,11 +827,12 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
             potionEffectToTag(effectTag, effect);
             customEffects.add(effectTag);
         }
-        tag.put("custom_effects", customEffects);
+        if (!customEffects.isEmpty()) {
+            tag.put("custom_effects", customEffects);
+        }
         if (value.customName() != null) {
             tag.putString("custom_name", value.customName());
         }
-        tag.put("custom_effects", customEffects);
         return tag;
     }
 
