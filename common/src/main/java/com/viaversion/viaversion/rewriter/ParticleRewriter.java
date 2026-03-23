@@ -228,9 +228,9 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
         } else if (mappings.isItemParticle(id) && itemRewriter != null) {
             final Particle.ParticleData<Item> data = particle.getArgument(0);
             final Item item = itemRewriter.handleItemToClient(connection, data.getValue());
-            if (itemRewriter.mappedItemType() != null && itemRewriter.itemType() != itemRewriter.mappedItemType()) {
+            if (itemRewriter.mappedItemTemplateType() != null && itemRewriter.itemTemplateType() != itemRewriter.mappedItemTemplateType()) {
                 // Replace the type
-                particle.set(0, itemRewriter.mappedItemType(), item);
+                particle.set(0, itemRewriter.mappedItemTemplateType(), item);
             } else {
                 data.setValue(item);
             }
