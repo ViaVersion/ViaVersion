@@ -48,9 +48,9 @@ public class LastTags implements StorableObject {
         }
     }
 
-    public void sendLastTags(final UserConnection connection) {
+    public boolean sendLastTags(final UserConnection connection) {
         if (registryTags.isEmpty()) {
-            return;
+            return false;
         }
 
         final PacketWrapper packet = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS, connection);
@@ -64,6 +64,7 @@ public class LastTags implements StorableObject {
             }
         }
         packet.send(Protocol1_20To1_20_2.class);
+        return true;
     }
 
     public void setSentDuringConfigPhase(final boolean sentDuringConfigPhase) {

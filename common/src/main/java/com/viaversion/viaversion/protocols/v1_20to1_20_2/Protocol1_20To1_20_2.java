@@ -25,6 +25,8 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
+import com.viaversion.viaversion.api.minecraft.TagData;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
@@ -57,6 +59,8 @@ import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.Key;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -344,13 +348,22 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         // The client includes vanilla as the default feature when initially leaving the login phase
 
         final LastTags lastTags = connection.get(LastTags.class);
+        boolean sentTags = false;
         if (lastTags != null) {
             if (lastTags.sentDuringConfigPhase()) {
                 lastTags.setSentDuringConfigPhase(false);
+                sentTags = true;
             } else {
                 // The server might still follow up with a tags packet, but we wouldn't know
-                lastTags.sendLastTags(connection);
+                sentTags = lastTags.sendLastTags(connection);
             }
+        }
+
+        if (!sentTags) {
+            // Send an empty tags packet to allow adding to it in later protocols
+            final PacketWrapper packet = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS, connection);
+            packet.write(Types.VAR_INT, 0);
+            packet.send(Protocol1_20To1_20_2.class);
         }
 
         if (lastResourcePack != null && connection.getProtocolInfo().protocolVersion() == ProtocolVersion.v1_20_2) {
