@@ -166,6 +166,26 @@ public interface ViaPlatform<T> {
     }
 
     /**
+     * Append extra details to the player details payload sent to the server or proxy.
+     * This is only used if {@link ViaVersionConfig#sendPlayerDetails()} is true.
+     *
+     * @param connection The UserConnection
+     * @param payload    The constructed payload
+     */
+    default void appendExtraPlayerDetails(UserConnection connection, JsonObject payload) {
+    }
+
+    /**
+     * Append extra details to the server details payload sent to client or proxy.
+     * This is only used if {@link ViaVersionConfig#sendPlayerDetails()} is true.
+     *
+     * @param connection The UserConnection
+     * @param payload    The constructed payload
+     */
+    default void appendExtraServerDetails(UserConnection connection, JsonObject payload) {
+    }
+
+    /**
      * Send a custom payload to from a player to the server.
      *
      * @param connection The UserConnection
