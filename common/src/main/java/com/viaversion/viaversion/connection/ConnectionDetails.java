@@ -78,6 +78,7 @@ public final class ConnectionDetails {
         payload.addProperty("version", clientVersion.getOriginalVersion());
         payload.addProperty("versionName", clientVersion.getName());
         payload.addProperty("versionType", clientVersion.getVersionType().name());
+        Via.getPlatform().modifyPlayerDetails(connection, payload);
 
         Via.getPlatform().sendCustomPayload(connection, channel, payload.toString().getBytes(StandardCharsets.UTF_8));
     }
@@ -102,6 +103,7 @@ public final class ConnectionDetails {
         payload.addProperty("version", serverVersion.getOriginalVersion());
         payload.addProperty("versionName", serverVersion.getName());
         payload.addProperty("versionType", serverVersion.getVersionType().name());
+        Via.getPlatform().modifyServerDetails(connection, payload);
 
         Via.getPlatform().sendCustomPayloadToClient(connection, channel, payload.toString().getBytes(StandardCharsets.UTF_8));
     }

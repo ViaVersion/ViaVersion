@@ -166,6 +166,30 @@ public interface ViaPlatform<T> {
     }
 
     /**
+     * Modify the player details payload before it is sent.
+     * This method allows adding, changing, or removing fields from the payload.
+     * It is only called if {@link ViaVersionConfig#sendPlayerDetails()} is true.
+     *
+     * @param connection The UserConnection
+     * @param payload    The constructed payload to modify
+     */
+    default void modifyPlayerDetails(UserConnection connection, JsonObject payload) {
+        // To be overridden if needed
+    }
+
+    /**
+     * Modify the server details payload before it is sent.
+     * This method allows adding, changing, or removing fields from the payload.
+     * It is only called if {@link ViaVersionConfig#sendPlayerDetails()} is true.
+     *
+     * @param connection The UserConnection
+     * @param payload    The constructed payload to modify
+     */
+    default void modifyServerDetails(UserConnection connection, JsonObject payload) {
+        // To be overridden if needed
+    }
+
+    /**
      * Send a custom payload to from a player to the server.
      *
      * @param connection The UserConnection
