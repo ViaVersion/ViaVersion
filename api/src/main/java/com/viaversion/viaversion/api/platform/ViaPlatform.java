@@ -174,6 +174,7 @@ public interface ViaPlatform<T> {
      * @param payload    The constructed payload to modify
      */
     default void modifyPlayerDetails(UserConnection connection, JsonObject payload) {
+        // To be overridden if needed
     }
 
     /**
@@ -185,6 +186,7 @@ public interface ViaPlatform<T> {
      * @param payload    The constructed payload to modify
      */
     default void modifyServerDetails(UserConnection connection, JsonObject payload) {
+        // To be overridden if needed
     }
 
     /**
