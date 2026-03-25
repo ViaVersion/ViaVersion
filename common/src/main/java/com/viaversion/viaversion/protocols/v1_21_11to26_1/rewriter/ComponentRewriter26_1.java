@@ -32,10 +32,10 @@ public final class ComponentRewriter26_1 extends NBTComponentRewriter<Clientboun
     @Override
     protected void handleShowItem(final UserConnection connection, final CompoundTag itemTag, final CompoundTag componentsTag) {
         super.handleShowItem(connection, itemTag, componentsTag);
-        if (componentsTag == null) {
-            return;
-        }
 
-        // Remove or update data from componentsTag
+        final int count = itemTag.getInt("count");
+        if (count == 0) {
+            itemTag.putInt("count", 1);
+        }
     }
 }
