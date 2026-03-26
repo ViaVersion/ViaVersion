@@ -126,6 +126,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 final ItemHasherBase itemHasher = itemHasher(connection);
                 final HashedItem originalHashedItem = itemHasher.originalHashedItem(customDataHash, item);
                 if (originalHashedItem != null) {
+                    originalHashedItem.setAmount(item.amount());
                     return originalHashedItem;
                 }
             }
