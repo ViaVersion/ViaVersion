@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
 import com.viaversion.viaversion.util.Key;
@@ -82,6 +83,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             case "trim_material" -> updateTrimMaterials(entries);
             case "jukebox_song" -> updateJukeboxSongs(entries);
             case "worldgen/biome" -> updateBiomes(entries);
+            case "dialog" -> updateDialogs(connection, entries);
         }
 
         final BiConsumer<String, CompoundTag> registryEntryHandler = this.registryEntryHandlers.get(key);
@@ -155,6 +157,54 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
                 dimensionDataMap.put(key, dimensionData);
             }
             protocol.getEntityRewriter().tracker(connection).setDimensions(dimensionDataMap);
+        }
+    }
+
+    public void updateDialogs(final UserConnection connection, final RegistryEntry[] entries) {
+        if (protocol.getMappingData() != null && protocol.getMappingData().getFullItemMappings() == null) {
+            return;
+        }
+        for (final RegistryEntry entry : entries) {
+            if (entry.tag() != null) {
+                updateDialog(connection, (CompoundTag) entry.tag());
+            }
+        }
+    }
+
+    @Override
+    public void updateDialog(final UserConnection connection, final CompoundTag tag) {
+        final ListTag<CompoundTag> bodiesTag = tag.getListTag("body", CompoundTag.class);
+        if (bodiesTag == null) {
+            final CompoundTag bodyTag = tag.getCompoundTag("body");
+            if (bodyTag != null) {
+                updateDialogBody(connection, bodyTag); // inlined
+            }
+            return;
+        }
+
+        for (final CompoundTag entry : bodiesTag) {
+            updateDialogBody(connection, entry);
+        }
+    }
+
+    public void updateDialogBody(final UserConnection connection, final CompoundTag tag) {
+        final String type = tag.getString("type");
+        if (!Key.equals(type, "item")) {
+            return;
+        }
+
+        final StringTag itemTag = tag.getStringTag("item");
+        if (itemTag != null) {
+            final String mappedId = protocol.getMappingData().getFullItemMappings().mappedIdentifier(itemTag.getValue());
+            if (mappedId != null) {
+                itemTag.setValue(mappedId);
+            }
+            return;
+        }
+
+        final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
+        if (componentRewriter != null) {
+            componentRewriter.handleShowItem(connection, tag.getCompoundTag("item"));
         }
     }
 

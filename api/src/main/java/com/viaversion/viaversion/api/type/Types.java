@@ -107,6 +107,7 @@ import com.viaversion.viaversion.api.type.types.math.LowPrecisionVectorType;
 import com.viaversion.viaversion.api.type.types.math.QuaternionType;
 import com.viaversion.viaversion.api.type.types.math.Vector3fType;
 import com.viaversion.viaversion.api.type.types.math.VectorType;
+import com.viaversion.viaversion.api.type.types.misc.CompoundTagHolderType;
 import com.viaversion.viaversion.api.type.types.misc.CompoundTagType;
 import com.viaversion.viaversion.api.type.types.misc.GameProfileType;
 import com.viaversion.viaversion.api.type.types.misc.HolderSetType;
@@ -207,6 +208,7 @@ public final class Types {
     public static final Type<CompoundTag[]> NAMED_COMPOUND_TAG_ARRAY = new ArrayType<>(Types.NAMED_COMPOUND_TAG);
     public static final Type<CompoundTag> COMPOUND_TAG = new CompoundTagType();
     public static final Type<CompoundTag> OPTIONAL_COMPOUND_TAG = CompoundTagType.OptionalCompoundTagType.type();
+    public static final HolderType<CompoundTag> TRUSTED_COMPOUND_TAG_HOLDER = new CompoundTagHolderType();
 
     public static final Type<Tag> TAG = new TagType();
     public static final Type<Tag[]> TAG_ARRAY = new ArrayType<>(TAG);

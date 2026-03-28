@@ -43,6 +43,7 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPacket1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPackets1_21_11;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
@@ -92,6 +93,8 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
         registerMerchantOffers1_20_5(ClientboundPackets1_21_11.MERCHANT_OFFERS);
         registerContainerClick1_21_5(ServerboundPackets26_1.CONTAINER_CLICK);
         registerSetCreativeModeSlot1_21_5(ServerboundPackets26_1.SET_CREATIVE_MODE_SLOT);
+        registerShowDialog(ClientboundPackets1_21_11.SHOW_DIALOG);
+        registerShowDialogDirect(ClientboundConfigurationPackets1_21_9.SHOW_DIALOG);
 
         final RecipeDisplayRewriter<ClientboundPacket1_21_11> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(protocol);
         recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_11.UPDATE_RECIPES);
