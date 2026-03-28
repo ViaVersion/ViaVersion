@@ -17,12 +17,12 @@
  */
 package com.viaversion.viaversion.common;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-public abstract class PlatformTestBase {
+final class APlatformBootstrapTest {
 
-    @BeforeAll
-    static void loadPlatform() throws InterruptedException {
+    @Test
+    void platformLoads() throws InterruptedException {
         PlatformTestLoader.ensureLoaded();
     }
 }

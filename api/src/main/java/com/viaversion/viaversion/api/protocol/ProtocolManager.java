@@ -249,7 +249,17 @@ public interface ProtocolManager {
      *
      * @return true if the executor has now been shut down
      */
-    boolean checkForMappingCompletion();
+    default boolean checkForMappingCompletion() {
+        return checkForMappingCompletion(false);
+    }
+
+    /**
+     * Shuts down the executor and uncaches mappings if all futures have been completed.
+     *
+     * @param propagateErrors whether to propagate errors from the futures to the caller
+     * @return true if the executor has now been shut down
+     */
+    boolean checkForMappingCompletion(boolean propagateErrors);
 
     /**
      * Executes the given runnable asynchronously, adding a {@link CompletableFuture}

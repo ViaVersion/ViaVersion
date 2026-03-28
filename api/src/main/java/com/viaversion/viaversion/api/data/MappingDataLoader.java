@@ -81,8 +81,9 @@ public class MappingDataLoader {
         for (final Map.Entry<String, Tag> entry : globalIdentifiers.entrySet()) {
             //noinspection unchecked
             final ListTag<StringTag> value = (ListTag<StringTag>) entry.getValue();
-            final String[] array = new String[value.size()];
-            for (int i = 0, size = value.size(); i < size; i++) {
+            final int size = value.size();
+            final String[] array = new String[size];
+            for (int i = 0; i < size; i++) {
                 array[i] = value.get(i).getValue();
             }
             GLOBAL_IDENTIFIER_INDEXES.put(entry.getKey(), array);

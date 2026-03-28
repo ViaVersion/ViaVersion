@@ -97,6 +97,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -115,9 +116,7 @@ import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Function;
 import java.util.logging.Level;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ProtocolManagerImpl implements ProtocolManager {
@@ -499,7 +498,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public boolean checkForMappingCompletion() {
+    public boolean checkForMappingCompletion(final boolean propagateErrors) {
         mappingLoaderLock.readLock().lock();
         try {
             if (mappingsLoaded) {
@@ -510,6 +509,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
                 // Return if any future hasn't completed yet
                 if (!future.isDone()) {
                     return false;
+                }
+                if (propagateErrors) {
+                    future.join();
                 }
             }
 
@@ -522,7 +524,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Runnable runnable) {
-        CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor).exceptionally(mappingLoaderThrowable(protocolClass));
+        CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor)
+            .whenComplete(($, t) -> logIfErrored(protocolClass, t));
 
         mappingLoaderLock.writeLock().lock();
         try {
@@ -534,8 +537,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Class<? extends Protocol> dependsOn, Runnable runnable) {
-        CompletableFuture<Void> future = getMappingLoaderFuture(dependsOn)
-            .whenCompleteAsync((v, throwable) -> runnable.run(), mappingLoaderExecutor).exceptionally(mappingLoaderThrowable(protocolClass));
+        CompletableFuture<Void> future = getMappingLoaderFuture(dependsOn).thenRunAsync(runnable, mappingLoaderExecutor)
+            .whenComplete(($, t) -> logIfErrored(protocolClass, t));
 
         mappingLoaderLock.writeLock().lock();
         try {
@@ -586,10 +589,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
         MappingDataLoader.INSTANCE.clearCache();
     }
 
-    private Function<Throwable, Void> mappingLoaderThrowable(Class<? extends Protocol> protocolClass) {
-        return throwable -> {
+    private void logIfErrored(final Class<? extends Protocol> protocolClass, @Nullable final Throwable throwable) {
+        if (throwable != null) {
             Via.getPlatform().getLogger().log(Level.SEVERE, "Error during loading of " + protocolClass.getSimpleName(), throwable);
-            return null;
-        };
+        }
     }
 }
