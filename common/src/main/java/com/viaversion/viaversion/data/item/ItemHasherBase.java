@@ -116,6 +116,8 @@ public class ItemHasherBase implements ItemHasher {
                 entry.setValue(clientProvidedHash);
             }
         }
+
+        originalItem.setAmount(clientItem.amount());
         return originalItem;
     }
 

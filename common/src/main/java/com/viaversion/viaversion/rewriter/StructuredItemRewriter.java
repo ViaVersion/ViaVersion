@@ -112,9 +112,10 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             return;
         }
 
-        // Always has to be AFTER any modification - Use the custom_data hash as a key to the original hashes.
+        // Always has to be AFTER any modification - Use the custom_data hash as a key to the original data (excluding amount, as that will simply be when copying).
         // This is much easier/cheaper than tracking via the full hashed item, as collisions are both acceptable and still unlikely.
         final CompoundTag originalHashes = new CompoundTag();
+        originalHashes.putInt("id", originalHashedItem.identifier());
         for (final Int2IntMap.Entry entry : originalHashedItem.dataHashesById().int2IntEntrySet()) {
             originalHashes.putInt(Integer.toString(entry.getIntKey()), entry.getIntValue());
         }
