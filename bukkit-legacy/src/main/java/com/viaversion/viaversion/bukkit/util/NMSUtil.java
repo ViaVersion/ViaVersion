@@ -49,6 +49,20 @@ public final class NMSUtil {
         }
     }
 
+    public static Class<?> nms(String className, String... fallbackFullClassNames) throws ClassNotFoundException {
+        try {
+            return Class.forName(NMS + "." + className);
+        } catch (ClassNotFoundException ignored) {
+        }
+        for (final String fallbackFullClassName : fallbackFullClassNames) {
+            try {
+                return Class.forName(fallbackFullClassName);
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+        throw new ClassNotFoundException(className);
+    }
+
     public static Class<?> obc(String className) throws ClassNotFoundException {
         return Class.forName(BASE + "." + className);
     }
