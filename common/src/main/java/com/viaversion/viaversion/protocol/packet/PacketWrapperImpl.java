@@ -599,11 +599,12 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public void consumeReadsOnly(final Runnable runnable) {
+        final boolean previous = this.allActionsRead;
         this.allActionsRead = true;
         try {
             runnable.run();
         } finally {
-            this.allActionsRead = false;
+            this.allActionsRead = previous;
         }
     }
 

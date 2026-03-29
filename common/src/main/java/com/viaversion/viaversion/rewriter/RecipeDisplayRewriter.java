@@ -43,7 +43,7 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
         slotDisplayHandlers.put("item", this::handleItemId);
         slotDisplayHandlers.put("item_stack", this::handleItem);
         slotDisplayHandlers.put("tag", wrapper -> wrapper.passthrough(Types.STRING));
-        slotDisplayHandlers.put("dye", this::handleDyeSlotDisplay);
+        slotDisplayHandlers.put("dyed", this::handleDyedSlotDisplay);
         slotDisplayHandlers.put("smithing_trim", this::handleSmithingTrimSlotDisplay);
         slotDisplayHandlers.put("with_remainder", this::handleWithRemainderSlotDisplay);
         slotDisplayHandlers.put("composite", this::handleSlotDisplayList);
@@ -143,14 +143,17 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
         final FullMappings mappings = protocol.getMappingData().getSlotDisplayMappings();
         final int type = wrapper.read(Types.VAR_INT);
         final int mappedType = mappings.getNewId(type);
-        if (mappedType == -1) {
-            // Write dummy
+        if (mappedType != -1) {
+            wrapper.write(Types.VAR_INT, mappedType);
+            runSlotDisplayHandler(wrapper, mappings, type);
+        } else {
+            // Write a dummy item if needed
             wrapper.write(Types.VAR_INT, 0);
-            return;
+            wrapper.consumeReadsOnly(() -> runSlotDisplayHandler(wrapper, mappings, type));
         }
+    }
 
-        wrapper.write(Types.VAR_INT, mappedType);
-
+    private void runSlotDisplayHandler(final PacketWrapper wrapper, final FullMappings mappings, final int type) {
         final String identifier = mappings.identifier(type); // use the original type
         final SlotDisplayConsumer handler = slotDisplayHandlers.get(Key.stripMinecraftNamespace(identifier));
         if (handler != null) {
@@ -182,7 +185,7 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
         wrapper.write(Types.VAR_INT, mappedDataComponentType);
     }
 
-    protected void handleDyeSlotDisplay(final PacketWrapper wrapper) {
+    protected void handleDyedSlotDisplay(final PacketWrapper wrapper) {
         handleSlotDisplay(wrapper); // Dye
         handleSlotDisplay(wrapper); // Target
     }
@@ -195,6 +198,7 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
 
         final int[] ids = items.ids();
         for (int i = 0; i < ids.length; i++) {
+            final int id = ids[i];
             ids[i] = rewriteItemId(ids[i]);
         }
     }
