@@ -47,6 +47,7 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPack
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.BlockItemPacketRewriter26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.ComponentRewriter26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.EntityPacketRewriter26_1;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.storage.TagsSent;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundConfigurationPackets1_21_9;
@@ -93,6 +94,13 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             sendSoundVariants(wrapper, "cow_sound_variant", MAPPINGS.cowSoundVariants());
             sendSoundVariants(wrapper, "pig_sound_variant", MAPPINGS.pigSoundVariants());
             sendSoundVariants(wrapper, "chicken_sound_variant", MAPPINGS.chickenSoundVariants());
+
+            // Make sure the client gets damage types and banner patterns, even if the server doesn't send tags
+            if (!wrapper.user().has(TagsSent.class)) {
+                final PacketWrapper tagsPacket = wrapper.create(ClientboundConfigurationPackets1_21_9.UPDATE_TAGS);
+                tagsPacket.write(Types.VAR_INT, 0);
+                tagsPacket.send(Protocol1_21_11To26_1.class, false);
+            }
         });
 
         addRequiredRegistryEntries();
@@ -136,8 +144,8 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
         });
         registerClientbound(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA, registryDataRewriter::handle);
 
-        tagRewriter.registerGeneric(ClientboundPackets1_21_11.UPDATE_TAGS);
-        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21_9.UPDATE_TAGS);
+        registerClientbound(ClientboundPackets1_21_11.UPDATE_TAGS, this::handleTags);
+        registerClientbound(ClientboundConfigurationPackets1_21_9.UPDATE_TAGS, this::handleTags);
 
         componentRewriter.registerOpenScreen1_14(ClientboundPackets1_21_11.OPEN_SCREEN);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_11.SET_ACTION_BAR_TEXT);
@@ -177,6 +185,11 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             wrapper.write(Types.FLOAT, tickDayTime ? 1F : 0F); // Tick rate
         });
         cancelServerbound(ServerboundPackets26_1.SET_GAME_RULE);
+    }
+
+    private void handleTags(final PacketWrapper wrapper) {
+        tagRewriter.handleGeneric(wrapper);
+        wrapper.user().put(new TagsSent());
     }
 
     private void sendSoundVariants(final PacketWrapper wrapper, final String key, final CompoundTag tag) {
