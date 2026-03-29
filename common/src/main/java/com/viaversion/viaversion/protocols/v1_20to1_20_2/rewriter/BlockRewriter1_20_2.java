@@ -40,6 +40,10 @@ public final class BlockRewriter1_20_2 extends BlockRewriter<ClientboundPackets1
     @Override
     public void handleBlockEntity(final UserConnection connection, final BlockEntity blockEntity) {
         final CompoundTag tag = blockEntity.tag();
+        if (tag == null) {
+            return;
+        }
+
         final Tag primaryEffect = tag.remove("Primary");
         if (primaryEffect instanceof NumberTag && ((NumberTag) primaryEffect).asInt() != 0) {
             tag.put("primary_effect", new StringTag(PotionEffects1_20_2.idToKeyOrLuck(((NumberTag) primaryEffect).asInt() - 1)));
