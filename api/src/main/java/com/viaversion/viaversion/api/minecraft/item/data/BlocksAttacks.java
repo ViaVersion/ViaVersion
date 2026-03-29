@@ -82,7 +82,13 @@ public record BlocksAttacks(
                 .writeOptional("disable_cooldown_scale", Types.FLOAT, value.disableCooldownScale(), 1F)
                 .writeOptional("damage_reductions", DamageReduction.ARRAY_TYPE, value.damageReductions(), defaultDamageReductions)
                 .writeOptional("item_damage", ItemDamageFunction.TYPE, value.itemDamage(), defaultItemDamage)
-                .writeOptional("bypassed_by", Types.TAG_KEY, value.bypassedBy() != null ? Key.of(value.bypassedBy().tagKey()) : null)
+                .writeOptional(
+                    "bypassed_by",
+                    Types.TAG_KEY,
+                    (value.bypassedBy() != null && value.bypassedBy().tagKey() != null)
+                        ? Key.of(value.bypassedBy().tagKey())
+                        : null
+                )
                 .writeOptional("block_sound", Types.SOUND_EVENT, value.blockSound())
                 .writeOptional("disabled_sound", Types.SOUND_EVENT, value.disableSound()));
         }
