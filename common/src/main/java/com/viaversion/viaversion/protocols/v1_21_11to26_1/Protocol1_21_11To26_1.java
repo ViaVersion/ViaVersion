@@ -93,6 +93,11 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             sendSoundVariants(wrapper, "cow_sound_variant", MAPPINGS.cowSoundVariants());
             sendSoundVariants(wrapper, "pig_sound_variant", MAPPINGS.pigSoundVariants());
             sendSoundVariants(wrapper, "chicken_sound_variant", MAPPINGS.chickenSoundVariants());
+
+            // Make sure the client gets damage types and banner patterns, even if the server doesn't send tags
+            final PacketWrapper tagsPacket = wrapper.create(ClientboundConfigurationPackets1_21_9.UPDATE_TAGS);
+            tagsPacket.write(Types.VAR_INT, 0);
+            tagsPacket.send(Protocol1_21_11To26_1.class, false);
         });
 
         addRequiredRegistryEntries();
