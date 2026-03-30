@@ -206,15 +206,10 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             case "dialog_list" -> {
                 updateInlinedTag(connection, tag.getCompoundTag("exit_action"), "label");
 
-                final ListTag<Tag> dialogsTag = tag.getListTag("dialogs", Tag.class);
+                final ListTag<CompoundTag> dialogsTag = tag.getListTag("dialogs", CompoundTag.class);
                 if (dialogsTag != null) {
-                    for (final Tag dialog : dialogsTag) {
-                        if (!(dialog instanceof CompoundTag dialogTag)) {
-                            // Only update inlined references which can contain items or components
-                            continue;
-                        }
-
-                        updateDialog(connection, dialogTag);
+                    for (final CompoundTag entry : dialogsTag) {
+                        updateDialog(connection, entry);
                     }
                     break;
                 }
