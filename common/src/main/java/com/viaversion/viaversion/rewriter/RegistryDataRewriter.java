@@ -173,24 +173,121 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
 
     @Override
     public void updateDialog(final UserConnection connection, final CompoundTag tag) {
+        final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
+        if (componentRewriter != null) {
+            componentRewriter.processTag(connection, tag.get("title"));
+            componentRewriter.processTag(connection, tag.get("external_title"));
+        }
+
+        final ListTag<CompoundTag> inputsTag = tag.getListTag("inputs", CompoundTag.class);
+        if (inputsTag != null) {
+            for (final CompoundTag input : inputsTag) {
+                final String type = input.getString("type");
+                if (Key.equals(type, "single_option")) {
+                    final ListTag<CompoundTag> optionsTag = input.getListTag("options", CompoundTag.class);
+                    if (optionsTag != null) {
+                        for (final CompoundTag entry : optionsTag) {
+                            updateInlinedTag(connection, entry, "display");
+                        }
+                    }
+                }
+
+                updateInlinedTag(connection, input, "label");
+            }
+        }
+
+        final String type = tag.getString("type");
+        switch (Key.stripMinecraftNamespace(type)) {
+            case "confirmation" -> {
+                updateInlinedTag(connection, tag.getCompoundTag("yes"), "label");
+                updateInlinedTag(connection, tag.getCompoundTag("no"), "label");
+            }
+
+            case "dialog_list" -> {
+                updateInlinedTag(connection, tag.getCompoundTag("exit_action"), "label");
+
+                final ListTag<Tag> dialogsTag = tag.getListTag("dialogs", Tag.class);
+                if (dialogsTag != null) {
+                    for (final Tag dialog : dialogsTag) {
+                        if (!(dialog instanceof CompoundTag dialogTag)) {
+                            // Only update inlined references which can contain items or components
+                            continue;
+                        }
+
+                        updateDialog(connection, dialogTag);
+                    }
+                    break;
+                }
+
+                final CompoundTag dialogTag = tag.getCompoundTag("dialogs");
+                if (dialogTag != null) {
+                    updateDialog(connection, dialogTag); // inlined, even if the name is wrong /shrug
+                }
+            }
+
+            case "multi_action" -> {
+                updateInlinedTag(connection, tag.getCompoundTag("exit_action"), "label");
+
+                final ListTag<CompoundTag> actionsTag = tag.getListTag("actions", CompoundTag.class);
+                if (actionsTag != null) {
+                    for (final CompoundTag entry : actionsTag) {
+                        updateInlinedTag(connection, entry, "label");
+                        updateInlinedTag(connection, entry, "tooltip");
+                    }
+                }
+            }
+
+            case "notice" -> updateInlinedTag(connection, tag.getCompoundTag("action"), "label");
+            case "server_links" -> updateInlinedTag(connection, tag.getCompoundTag("exit_action"), "label");
+        }
+
         final ListTag<CompoundTag> bodiesTag = tag.getListTag("body", CompoundTag.class);
-        if (bodiesTag == null) {
-            final CompoundTag bodyTag = tag.getCompoundTag("body");
-            if (bodyTag != null) {
-                updateDialogBody(connection, bodyTag); // inlined
+        if (bodiesTag != null) {
+            for (final CompoundTag entry : bodiesTag) {
+                updateDialogBody(connection, entry);
             }
             return;
         }
 
-        for (final CompoundTag entry : bodiesTag) {
-            updateDialogBody(connection, entry);
+        final CompoundTag bodyTag = tag.getCompoundTag("body");
+        if (bodyTag != null) {
+            updateDialogBody(connection, bodyTag); // inlined
+        }
+    }
+
+    protected void updateInlinedTag(final UserConnection connection, final CompoundTag tag, final String key) {
+        if (tag == null) {
+            return;
+        }
+
+        final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
+        if (componentRewriter != null) {
+            componentRewriter.processTag(connection, tag.get(key));
         }
     }
 
     public void updateDialogBody(final UserConnection connection, final CompoundTag tag) {
         final String type = tag.getString("type");
+
+        final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
+        if (Key.equals(type, "plain_message")) {
+            if (componentRewriter != null) {
+                componentRewriter.processTag(connection, tag.get("contents"));
+            }
+            return;
+        }
+
         if (!Key.equals(type, "item")) {
             return;
+        }
+
+        if (componentRewriter != null) {
+            // Either a plain message or an inlined component
+            final Tag description = tag.get("description");
+            componentRewriter.processTag(connection, description);
+            if (description instanceof final CompoundTag descriptionTag) {
+                componentRewriter.processTag(connection, descriptionTag.get("contents"));
+            }
         }
 
         final StringTag itemTag = tag.getStringTag("item");
@@ -202,7 +299,6 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             return;
         }
 
-        final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
         if (componentRewriter != null) {
             componentRewriter.handleShowItem(connection, tag.getCompoundTag("item"));
         }
