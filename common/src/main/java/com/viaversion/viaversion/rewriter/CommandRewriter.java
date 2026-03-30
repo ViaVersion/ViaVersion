@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Key;
 import java.util.HashMap;
@@ -141,9 +142,10 @@ public class CommandRewriter<C extends ClientboundPacketType> {
                 Preconditions.checkNotNull(newArgumentType, "No mapping for argument type %s", argumentType);
 
                 boolean removedRegistryArgument = false;
-                if (protocol.getRegistryDataRewriter() != null && REGISTRY_ARGUMENT_TYPES.contains(Key.stripMinecraftNamespace(newArgumentType))) {
+                final RegistryDataRewriter registryDataRewriter = protocol.getRegistryDataRewriter();
+                if (registryDataRewriter != null && registryDataRewriter.hasRegistriesToRemove() && REGISTRY_ARGUMENT_TYPES.contains(Key.stripMinecraftNamespace(argumentType))) {
                     final String registry = wrapper.read(Types.STRING);
-                    if (protocol.getRegistryDataRewriter().shouldRemoveRegistry(registry)) {
+                    if (registryDataRewriter.shouldRemoveRegistry(registry)) {
                         // Map removed registry arguments to a plain quotable string
                         removedRegistryArgument = true;
                         wrapper.write(Types.VAR_INT, mappedArgumentTypeId("brigadier:string"));

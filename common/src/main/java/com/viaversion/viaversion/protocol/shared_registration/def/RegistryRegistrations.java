@@ -90,7 +90,7 @@ final class RegistryRegistrations {
 
     static <CU extends ClientboundPacketType> void registerCommands1_19(final RegistrationContext<CU, ?> ctx) {
         if ((ctx.protocol().getMappingData() != null && !Mappings.isIntIdIdentity(ctx.protocol().getMappingData().getArgumentTypeMappings()))
-            || (ctx.protocol().getRegistryDataRewriter() != null && ctx.protocol().getRegistryDataRewriter().hasRegistriesToRemove())) {
+            || ctx.protocol().getRegistryDataRewriter() != null) {
             ctx.clientbound(ClientboundPackets1_19_3.COMMANDS, new CommandRewriter1_19_4<>(ctx.protocol())::registerDeclareCommands1_19);
         }
     }
