@@ -36,7 +36,7 @@ public final class BlockPacketRewriter1_21_5 extends BlockRewriter<ClientboundPa
     private final Protocol1_21_4To1_21_5 protocol;
 
     public BlockPacketRewriter1_21_5(final Protocol1_21_4To1_21_5 protocol) {
-        super(protocol, Types.BLOCK_POSITION1_14, Types.COMPOUND_TAG, ChunkType1_20_2::new, ChunkType1_21_5::new);
+        super(protocol, Types.BLOCK_POSITION1_14, Types.TRUSTED_COMPOUND_TAG, ChunkType1_20_2::new, ChunkType1_21_5::new);
         this.protocol = protocol;
     }
 

@@ -31,7 +31,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class BlockRewriter1_21_5<C extends ClientboundPacketType> extends BlockRewriter<C> {
 
     public BlockRewriter1_21_5(final Protocol<C, ?, ?, ?> protocol, final ChunkTypeSupplier chunkTypeSupplier, @Nullable final ChunkTypeSupplier mappedChunkTypeSupplier) {
-        super(protocol, Types.BLOCK_POSITION1_14, Types.COMPOUND_TAG, chunkTypeSupplier, mappedChunkTypeSupplier);
+        super(protocol, Types.BLOCK_POSITION1_14, Types.TRUSTED_COMPOUND_TAG, chunkTypeSupplier, mappedChunkTypeSupplier);
     }
 
     public BlockRewriter1_21_5(final Protocol<C, ?, ?, ?> protocol, final ChunkTypeSupplier chunkTypeSupplier) {

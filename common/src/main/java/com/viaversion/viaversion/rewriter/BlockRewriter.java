@@ -84,7 +84,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public static <C extends ClientboundPacketType> BlockRewriter<C> for1_20_2(final Protocol<C, ?, ?, ?> protocol, final ChunkTypeSupplier chunkTypeSupplier, final ChunkTypeSupplier mappedChunkTypeSupplier) {
-        return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_14, Types.COMPOUND_TAG, chunkTypeSupplier, mappedChunkTypeSupplier);
+        return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_14, Types.TRUSTED_COMPOUND_TAG, chunkTypeSupplier, mappedChunkTypeSupplier);
     }
     // See the block package for more recent versions
 

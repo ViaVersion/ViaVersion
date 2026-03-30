@@ -33,7 +33,7 @@ import com.viaversion.viaversion.util.TagUtil;
 public final class BlockPacketRewriter1_21_4 extends BlockRewriter<ClientboundPacket1_21_2> {
 
     public BlockPacketRewriter1_21_4(final Protocol1_21_2To1_21_4 protocol) {
-        super(protocol, Types.BLOCK_POSITION1_14, Types.COMPOUND_TAG, ChunkType1_20_2::new, null);
+        super(protocol, Types.BLOCK_POSITION1_14, Types.TRUSTED_COMPOUND_TAG, ChunkType1_20_2::new, null);
     }
 
     @Override
