@@ -71,6 +71,12 @@ public class ItemHashTest extends PlatformTestBase {
         hasher.reset();
     }
 
+    private HashOps hasher(final Class<? extends Protocol<?, ?, ?, ?>> protocolClass) {
+        final Protocol<?, ?, ?, ?> protocol = Via.getManager().getProtocolManager().getProtocol(protocolClass);
+        final CodecRegistryContext context = new CodecRegistryContext(null, CodecContext.RegistryAccess.of(protocol), false);
+        return new HashOps(context, HashFunction.CRC32C);
+    }
+
     @Test
     void testNumberAndKey() {
         final UseCooldown useCooldown = new UseCooldown(0.5f, ":stick");
