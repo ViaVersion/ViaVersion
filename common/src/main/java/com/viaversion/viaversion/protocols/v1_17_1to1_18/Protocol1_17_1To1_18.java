@@ -77,14 +77,7 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void onMappingDataLoaded() {
-        Types1_18.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.ITEM1_13_2)
-            .reader("vibration", ParticleType.Readers.VIBRATION);
+        ParticleType.Fillers.fill1_18(this, Types1_18.PARTICLE);
 
         tagRewriter.renameTag(RegistryType.BLOCK, "minecraft:lava_pool_stone_replaceables", "minecraft:lava_pool_stone_cannot_replace");
 

@@ -103,16 +103,8 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
         WorldPacketRewriter1_14.caveAir = MAPPINGS.getBlockStateMappings().getNewId(8592);
 
         EntityTypes1_14.initialize(this);
-        Types1_13_2.PARTICLE.filler(this, false)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("item", ParticleType.Readers.ITEM1_13_2);
-        Types1_14.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("item", ParticleType.Readers.ITEM1_13_2);
+        ParticleType.Fillers.fill1_13_2(this, Types1_13_2.PARTICLE, false);
+        ParticleType.Fillers.fill1_13_2(this, Types1_14.PARTICLE, true);
 
         tagRewriter.addEmptyTag(RegistryType.BLOCK, "bamboo_plantable_on");
 

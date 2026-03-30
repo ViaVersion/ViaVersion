@@ -93,16 +93,7 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
     @Override
     protected void onMappingDataLoaded() {
         EntityTypes1_19_4.initialize(this);
-        Types1_19_4.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.ITEM1_13_2)
-            .reader("vibration", ParticleType.Readers.VIBRATION1_19)
-            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK);
+        ParticleType.Fillers.fill1_19(this, Types1_19_4.PARTICLE);
 
         super.onMappingDataLoaded();
     }

@@ -206,11 +206,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     protected void onMappingDataLoaded() {
         EntityTypes1_16.initialize(this);
-        Types1_16.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("item", ParticleType.Readers.ITEM1_13_2);
+        ParticleType.Fillers.fill1_13_2(this, Types1_16.PARTICLE, true);
 
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:crimson_stems", "minecraft:non_flammable_wood", "minecraft:piglin_loved",
             "minecraft:piglin_repellents", "minecraft:soul_fire_base_blocks", "minecraft:warped_stems");

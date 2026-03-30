@@ -169,13 +169,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
     @Override
     protected void onMappingDataLoaded() {
         EntityTypes1_17.initialize(this);
-        Types1_17.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.ITEM1_13_2)
-            .reader("vibration", ParticleType.Readers.VIBRATION);
+        ParticleType.Fillers.fill1_17(this, Types1_17.PARTICLE);
 
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:axolotl_tempt_items", "minecraft:candles", "minecraft:cluster_max_harvestables",
             "minecraft:copper_ores", "minecraft:freeze_immune_wearables", "minecraft:occludes_vibration_signals");

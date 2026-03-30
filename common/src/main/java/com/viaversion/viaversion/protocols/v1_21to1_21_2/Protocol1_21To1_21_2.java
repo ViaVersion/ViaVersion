@@ -216,20 +216,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     @Override
     protected void onMappingDataLoaded() {
         EntityTypes1_21_2.initialize(this);
-        VersionedTypes.V1_21_2.particle.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust_pillar", ParticleType.Readers.BLOCK)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("block_crumble", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST1_21_2)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION1_21_2)
-            .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
-            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK)
-            .reader("entity_effect", ParticleType.Readers.COLOR)
-            .reader("trail", ParticleType.Readers.TRAIL1_21_2)
-            .reader("item", ParticleType.Readers.item(VersionedTypes.V1_21_2.item));
+        ParticleType.Fillers.fill1_21_2(this);
         VersionedTypes.V1_21_2.structuredData.filler(this).add(StructuredDataKey.CUSTOM_DATA, StructuredDataKey.MAX_STACK_SIZE, StructuredDataKey.MAX_DAMAGE,
             StructuredDataKey.UNBREAKABLE1_20_5, StructuredDataKey.RARITY, StructuredDataKey.HIDE_TOOLTIP, StructuredDataKey.DAMAGE_RESISTANT1_21_2,
             StructuredDataKey.CUSTOM_NAME, StructuredDataKey.LORE, StructuredDataKey.ENCHANTMENTS1_20_5, StructuredDataKey.CAN_PLACE_ON1_20_5,

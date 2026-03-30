@@ -65,16 +65,7 @@ public final class Protocol1_19_4To1_20 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void onMappingDataLoaded() {
-        Types1_20.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.ITEM1_13_2)
-            .reader("vibration", ParticleType.Readers.VIBRATION1_19)
-            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK);
+        ParticleType.Fillers.fill1_19(this, Types1_20.PARTICLE);
 
         tagRewriter.removeTag(RegistryType.BLOCK, "minecraft:replaceable_plants");
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:decorated_pot_ingredients", "minecraft:decorated_pot_sherds");

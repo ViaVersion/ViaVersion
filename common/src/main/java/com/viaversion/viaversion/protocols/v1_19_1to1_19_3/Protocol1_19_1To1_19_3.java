@@ -331,17 +331,8 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void onMappingDataLoaded() {
-        Types1_19_3.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.ITEM1_13_2)
-            .reader("vibration", ParticleType.Readers.VIBRATION1_19)
-            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK);
         EntityTypes1_19_3.initialize(this);
+        ParticleType.Fillers.fill1_19(this, Types1_19_3.PARTICLE);
 
         tagRewriter.removeTag(RegistryType.ITEM, "minecraft:overworld_natural_logs");
         tagRewriter.removeTag(RegistryType.BLOCK, "minecraft:non_flammable_wood");
