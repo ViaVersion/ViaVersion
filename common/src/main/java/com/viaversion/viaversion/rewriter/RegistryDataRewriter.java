@@ -199,12 +199,12 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         final String type = tag.getString("type");
         switch (Key.stripMinecraftNamespace(type)) {
             case "confirmation" -> {
-                updateInlinedTag(connection, tag.getCompoundTag("yes"), "label");
-                updateInlinedTag(connection, tag.getCompoundTag("no"), "label");
+                updateDialogAction(connection, tag.getCompoundTag("yes"));
+                updateDialogAction(connection, tag.getCompoundTag("no"));
             }
 
             case "dialog_list" -> {
-                updateInlinedTag(connection, tag.getCompoundTag("exit_action"), "label");
+                updateDialogAction(connection, tag.getCompoundTag("exit_action"));
 
                 final ListTag<CompoundTag> dialogsTag = tag.getListTag("dialogs", CompoundTag.class);
                 if (dialogsTag != null) {
@@ -221,19 +221,18 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             }
 
             case "multi_action" -> {
-                updateInlinedTag(connection, tag.getCompoundTag("exit_action"), "label");
+                updateDialogAction(connection, tag.getCompoundTag("exit_action"));
 
                 final ListTag<CompoundTag> actionsTag = tag.getListTag("actions", CompoundTag.class);
                 if (actionsTag != null) {
                     for (final CompoundTag entry : actionsTag) {
-                        updateInlinedTag(connection, entry, "label");
-                        updateInlinedTag(connection, entry, "tooltip");
+                        updateDialogAction(connection, entry);
                     }
                 }
             }
 
-            case "notice" -> updateInlinedTag(connection, tag.getCompoundTag("action"), "label");
-            case "server_links" -> updateInlinedTag(connection, tag.getCompoundTag("exit_action"), "label");
+            case "notice" -> updateDialogAction(connection, tag.getCompoundTag("action"));
+            case "server_links" -> updateDialogAction(connection, tag.getCompoundTag("exit_action"));
         }
 
         final ListTag<CompoundTag> bodiesTag = tag.getListTag("body", CompoundTag.class);
@@ -248,6 +247,11 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         if (bodyTag != null) {
             updateDialogBody(connection, bodyTag); // inlined
         }
+    }
+
+    public void updateDialogAction(final UserConnection connection, final CompoundTag tag) {
+        updateInlinedTag(connection, tag, "label");
+        updateInlinedTag(connection, tag, "tooltip");
     }
 
     protected void updateInlinedTag(final UserConnection connection, final CompoundTag tag, final String key) {
