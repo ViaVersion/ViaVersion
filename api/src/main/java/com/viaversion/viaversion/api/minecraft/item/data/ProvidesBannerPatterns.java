@@ -24,18 +24,11 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.RegistryKey;
-import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderSetType;
 
 public record ProvidesBannerPatterns(HolderSet patterns) {
 
-    public static final Type<ProvidesBannerPatterns> TYPE = new TransformingType<>(Types.HOLDER_SET, ProvidesBannerPatterns.class, ProvidesBannerPatterns::new, ProvidesBannerPatterns::patterns) {
-        @Override
-        public void write(final Ops ops, final ProvidesBannerPatterns value) {
-            ops.writeMap(map -> map.write("items", new HolderSetType(RegistryKey.of("banner_pattern")), value.patterns));
-        }
-    };
+    public static final Type<ProvidesBannerPatterns> TYPE = TransformingType.of(new HolderSetType(RegistryKey.of("banner_pattern")), ProvidesBannerPatterns.class, ProvidesBannerPatterns::new, ProvidesBannerPatterns::patterns);
 }

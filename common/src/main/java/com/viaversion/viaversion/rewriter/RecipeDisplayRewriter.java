@@ -198,7 +198,6 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
 
         final int[] ids = items.ids();
         for (int i = 0; i < ids.length; i++) {
-            final int id = ids[i];
             ids[i] = rewriteItemId(ids[i]);
         }
     }
