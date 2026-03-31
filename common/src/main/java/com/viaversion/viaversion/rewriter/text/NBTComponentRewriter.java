@@ -92,6 +92,10 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
         }
 
         final CompoundTag dialogTag = clickEventTag.getCompoundTag("dialog");
+        if (dialogTag == null) {
+            return;
+        }
+
         final RegistryDataRewriter registryRewriter = protocol.getRegistryDataRewriter();
         if (registryRewriter != null) {
             registryRewriter.updateDialog(connection, dialogTag);
