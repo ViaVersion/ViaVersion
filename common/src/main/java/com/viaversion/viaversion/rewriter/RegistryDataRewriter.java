@@ -383,7 +383,19 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     }
 
     public void updateEnchantmentTerm(final CompoundTag term) {
-        if (Key.equals(term.getString("condition"), "entity_properties")) {
+        if (Key.equals(term.getString("condition"), "all_of") || Key.equals(term.getString("condition"), "any_of")) {
+            final ListTag<CompoundTag> terms = term.getListTag("terms", CompoundTag.class);
+            if (terms != null) {
+                for (final CompoundTag childTerm : terms) {
+                    updateEnchantmentTerm(childTerm);
+                }
+            }
+        } else if (Key.equals(term.getString("condition"), "inverted")) {
+            final CompoundTag childTerm = term.getCompoundTag("term");
+            if (childTerm != null) {
+                updateEnchantmentTerm(childTerm);
+            }
+        } else if (Key.equals(term.getString("condition"), "entity_properties")) {
             final CompoundTag predicate = term.getCompoundTag("predicate");
             if (predicate != null) {
                 updateType(predicate, "type", protocol.getMappingData().getEntityMappings());
