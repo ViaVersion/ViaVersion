@@ -180,19 +180,19 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         }
 
         final ListTag<CompoundTag> inputsTag = tag.getListTag("inputs", CompoundTag.class);
-        if (inputsTag != null) {
+        if (inputsTag != null && componentRewriter != null) {
             for (final CompoundTag input : inputsTag) {
+                updateTextComponent(connection, input, "label");
+
                 final String type = input.getString("type");
-                if (Key.equals(type, "single_option")) {
-                    final ListTag<CompoundTag> optionsTag = input.getListTag("options", CompoundTag.class);
-                    if (optionsTag != null) {
-                        for (final CompoundTag entry : optionsTag) {
-                            updateInlinedTag(connection, entry, "display");
-                        }
-                    }
+                if (!Key.equals(type, "single_option")) {
+                    continue;
                 }
 
-                updateInlinedTag(connection, input, "label");
+                final ListTag<CompoundTag> optionsTag = input.getListTag("options", CompoundTag.class);
+                if (optionsTag != null) {
+                    optionsTag.forEach(option -> updateTextComponent(connection, option, "display"));
+                }
             }
         }
 
@@ -202,104 +202,79 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
                 updateDialogAction(connection, tag.getCompoundTag("yes"));
                 updateDialogAction(connection, tag.getCompoundTag("no"));
             }
-
             case "dialog_list" -> {
                 updateDialogAction(connection, tag.getCompoundTag("exit_action"));
 
                 final ListTag<CompoundTag> dialogsTag = tag.getListTag("dialogs", CompoundTag.class);
                 if (dialogsTag != null) {
-                    for (final CompoundTag entry : dialogsTag) {
-                        updateDialog(connection, entry);
+                    dialogsTag.forEach(dialog -> updateDialog(connection, dialog));
+                } else {
+                    final CompoundTag dialogTag = tag.getCompoundTag("dialogs");
+                    if (dialogTag != null) {
+                        updateDialog(connection, dialogTag); // inlined
                     }
-                    break;
-                }
-
-                final CompoundTag dialogTag = tag.getCompoundTag("dialogs");
-                if (dialogTag != null) {
-                    updateDialog(connection, dialogTag); // inlined, even if the name is wrong /shrug
                 }
             }
-
             case "multi_action" -> {
                 updateDialogAction(connection, tag.getCompoundTag("exit_action"));
 
                 final ListTag<CompoundTag> actionsTag = tag.getListTag("actions", CompoundTag.class);
                 if (actionsTag != null) {
-                    for (final CompoundTag entry : actionsTag) {
-                        updateDialogAction(connection, entry);
-                    }
+                    actionsTag.forEach(action -> updateDialogAction(connection, action));
                 }
             }
-
             case "notice" -> updateDialogAction(connection, tag.getCompoundTag("action"));
             case "server_links" -> updateDialogAction(connection, tag.getCompoundTag("exit_action"));
         }
 
         final ListTag<CompoundTag> bodiesTag = tag.getListTag("body", CompoundTag.class);
         if (bodiesTag != null) {
-            for (final CompoundTag entry : bodiesTag) {
-                updateDialogBody(connection, entry);
+            bodiesTag.forEach(body -> updateDialogBody(connection, body));
+        } else {
+            final CompoundTag bodyTag = tag.getCompoundTag("body");
+            if (bodyTag != null) {
+                updateDialogBody(connection, bodyTag); // inlined
             }
-            return;
-        }
-
-        final CompoundTag bodyTag = tag.getCompoundTag("body");
-        if (bodyTag != null) {
-            updateDialogBody(connection, bodyTag); // inlined
         }
     }
 
     public void updateDialogAction(final UserConnection connection, final CompoundTag tag) {
-        updateInlinedTag(connection, tag, "label");
-        updateInlinedTag(connection, tag, "tooltip");
+        updateTextComponent(connection, tag, "label");
+        updateTextComponent(connection, tag, "tooltip");
     }
 
-    protected void updateInlinedTag(final UserConnection connection, final CompoundTag tag, final String key) {
-        if (tag == null) {
-            return;
-        }
-
-        final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
-        if (componentRewriter != null) {
-            componentRewriter.processTag(connection, tag.get(key));
+    protected void updateTextComponent(final UserConnection connection, @Nullable final CompoundTag tag, final String key) {
+        if (tag != null && protocol.getComponentRewriter() != null) {
+            protocol.getComponentRewriter().processTag(connection, tag.get(key));
         }
     }
 
     public void updateDialogBody(final UserConnection connection, final CompoundTag tag) {
         final String type = tag.getString("type");
-
         final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
         if (Key.equals(type, "plain_message")) {
             if (componentRewriter != null) {
                 componentRewriter.processTag(connection, tag.get("contents"));
             }
-            return;
-        }
-
-        if (!Key.equals(type, "item")) {
-            return;
-        }
-
-        if (componentRewriter != null) {
-            // Either a plain message or an inlined component
-            final Tag description = tag.get("description");
-            componentRewriter.processTag(connection, description);
-            if (description instanceof final CompoundTag descriptionTag) {
-                componentRewriter.processTag(connection, descriptionTag.get("contents"));
+        } else if (Key.equals(type, "item")) {
+            if (componentRewriter != null) {
+                // Either a plain message or an inlined component
+                final Tag description = tag.get("description");
+                componentRewriter.processTag(connection, description);
+                if (description instanceof final CompoundTag descriptionTag) {
+                    componentRewriter.processTag(connection, descriptionTag.get("contents"));
+                }
             }
-        }
 
-        final StringTag itemTag = tag.getStringTag("item");
-        if (itemTag != null) {
-            final String mappedId = protocol.getMappingData().getFullItemMappings().mappedIdentifier(itemTag.getValue());
-            if (mappedId != null) {
-                itemTag.setValue(mappedId);
+            final StringTag itemIdTag = tag.getStringTag("item");
+            if (itemIdTag != null) {
+                final String mappedId = protocol.getMappingData().getFullItemMappings().mappedIdentifier(itemIdTag.getValue());
+                if (mappedId != null) {
+                    itemIdTag.setValue(mappedId);
+                }
+            } else if (componentRewriter != null) {
+                componentRewriter.handleShowItem(connection, tag.getCompoundTag("item"));
             }
-            return;
-        }
-
-        if (componentRewriter != null) {
-            componentRewriter.handleShowItem(connection, tag.getCompoundTag("item"));
         }
     }
 
