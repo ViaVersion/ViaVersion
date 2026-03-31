@@ -180,7 +180,7 @@ public interface ViaPlatform<T> {
     /**
      * Modify the server details payload before it is sent.
      * This method allows adding, changing, or removing fields from the payload.
-     * It is only called if {@link ViaVersionConfig#sendPlayerDetails()} is true.
+     * It is only called if {@link ViaVersionConfig#sendServerDetails()} is true.
      *
      * @param connection The UserConnection
      * @param payload    The constructed payload to modify
