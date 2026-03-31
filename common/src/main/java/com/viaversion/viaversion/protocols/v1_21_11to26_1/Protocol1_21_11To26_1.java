@@ -49,6 +49,7 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPack
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.BlockItemPacketRewriter26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.ComponentRewriter26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.EntityPacketRewriter26_1;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.RegistryDataRewriter26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.storage.PlayerSneaking;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.storage.TagsSent;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
@@ -78,7 +79,7 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
     private final ParticleRewriter<ClientboundPacket1_21_11> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket1_21_11> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket1_21_11> componentRewriter = new ComponentRewriter26_1(this);
-    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
+    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter26_1(this);
     private final RecipeDisplayRewriter<ClientboundPacket1_21_11> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(this);
     private final BlockRewriter<ClientboundPacket1_21_11> blockRewriter = new BlockRewriter1_21_5<>(this, ChunkType1_21_5::new, ChunkType26_1::new);
 

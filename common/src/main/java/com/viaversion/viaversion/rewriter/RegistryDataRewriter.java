@@ -382,7 +382,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         }
     }
 
-    private void updateEnchantmentTerm(final CompoundTag term) {
+    public void updateEnchantmentTerm(final CompoundTag term) {
         if (Key.equals(term.getString("condition"), "entity_properties")) {
             final CompoundTag predicate = term.getCompoundTag("predicate");
             if (predicate != null) {
