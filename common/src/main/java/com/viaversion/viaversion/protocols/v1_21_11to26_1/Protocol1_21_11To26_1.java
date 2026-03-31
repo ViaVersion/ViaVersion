@@ -122,8 +122,12 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             tag.put("baby_sounds", sounds.copy());
         });
         registryDataRewriter.addHandler("wolf_variant", (key, tag) -> {
-            final Tag assets = tag.get("assets");
-            tag.put("baby_assets", assets.copy());
+            final CompoundTag assets = tag.getCompoundTag("assets");
+            final CompoundTag babyAssets = new CompoundTag();
+            for (final Map.Entry<String, Tag> entry : assets.entrySet()) {
+                babyAssets.putString(entry.getKey(), entry.getValue().getValue() + "_baby");
+            }
+            tag.put("baby_assets", babyAssets);
         });
         registryDataRewriter.addHandler("frog_variant", (key, tag) -> swapEntityNameAffix("frog", tag));
         swapAffixAndAddAssetId("chicken_variant", "chicken");
@@ -131,7 +135,7 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
         swapAffixAndAddAssetId("pig_variant", "pig");
         registryDataRewriter.addHandler("cat_variant", (key, tag) -> {
             addEntityNamePrefix("cat", tag);
-            addBabyAssetId("cat", tag);
+            addBabyAssetId(tag);
         });
         registryDataRewriter.addHandler("dimension_type", (key, tag) -> {
             tag.putBoolean("has_ender_dragon_fight", Key.equals(key, "the_end"));
@@ -235,11 +239,11 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
     private void swapAffixAndAddAssetId(final String registryKey, final String affix) {
         registryDataRewriter.addHandler(registryKey, (key, tag) -> {
             swapEntityNameAffix(affix, tag);
-            addBabyAssetId(affix, tag);
+            addBabyAssetId(tag);
         });
     }
 
-    private void addBabyAssetId(final String key, final CompoundTag tag) {
+    private void addBabyAssetId(final CompoundTag tag) {
         final String assetId = tag.getString("asset_id");
         tag.putString("baby_asset_id", assetId + "_baby");
     }
