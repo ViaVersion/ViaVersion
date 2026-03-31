@@ -807,7 +807,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             idLength = propertiesStartIndex;
         }
         if (tagStartIndex != -1) {
-            idLength = Math.min(propertiesStartIndex, tagStartIndex);
+            idLength = propertiesStartIndex != -1 ? Math.min(propertiesStartIndex, tagStartIndex) : tagStartIndex;
         }
 
         final String identifier = rawPredicate.substring(0, idLength);
@@ -1070,7 +1070,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final Fireworks fireworks = new Fireworks(
             flightDuration,
             explosionsTag != null ? explosionsTag.stream().limit(256).
-                map(this::readExplosion).toArray(FireworkExplosion[]::new) : new FireworkExplosion[0]
+                                    map(this::readExplosion).toArray(FireworkExplosion[]::new) : new FireworkExplosion[0]
         );
         data.set(StructuredDataKey.FIREWORKS, fireworks);
     }
