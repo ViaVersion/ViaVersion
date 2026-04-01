@@ -27,7 +27,6 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPacket1_21_11;
-import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPackets1_21_11;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPacket1_21_11, Protocol1_21_11To26_1> {

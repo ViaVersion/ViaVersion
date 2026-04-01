@@ -109,7 +109,25 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
         });
 
         addRequiredRegistryEntries();
-        registryDataRewriter.addHandler("timeline", (key, tag) -> tag.putString("clock", "overworld"));
+        registryDataRewriter.addHandler("timeline", (key, tag) -> {
+            tag.putString("clock", "overworld");
+
+            // Workaround for GH-4877 where the server can send namespaced ease function names in 1.21.11,
+            // this shouldn't be possible/allowed but for some reason does.
+            // TODO investigate this further
+            final CompoundTag tracksTag = tag.getCompoundTag("tracks");
+            if (tracksTag == null) {
+                return;
+            }
+
+            for (final Tag value : tracksTag.values()) {
+                final CompoundTag track = (CompoundTag) value;
+                final StringTag ease = track.getStringTag("ease");
+                if (ease != null) {
+                    ease.setValue(Key.stripNamespace(ease.getValue()));
+                }
+            }
+        });
         registryDataRewriter.addHandler("wolf_sound_variant", (key, tag) -> {
             final CompoundTag sounds = new CompoundTag();
             for (final Map.Entry<String, Tag> entry : tag.entrySet()) {
