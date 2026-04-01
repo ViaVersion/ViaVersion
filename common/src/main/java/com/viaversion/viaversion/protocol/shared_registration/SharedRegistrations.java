@@ -67,6 +67,11 @@ public final class SharedRegistrations {
         }
 
         final ProtocolVersion version = protocol.getServerVersion();
+        if (version.getVersionType() != protocol.getClientVersion().getVersionType()) {
+            // Built on continuous version ranges
+            return;
+        }
+
         final List<VersionedTemplateGroup> groups = versionedTemplates.get(version.getVersionType());
         if (groups == null) {
             return;
