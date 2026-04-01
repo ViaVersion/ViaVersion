@@ -366,7 +366,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         PacketMapping packetMapping = PacketMapping.of(mappedPacketId, handler);
         if (!override && serverboundMappings.hasMapping(state, unmappedPacketId)) {
             Via.getPlatform().getLogger().log(Level.WARNING, unmappedPacketId + " already registered!" +
-                " If this override is intentional, set override to true. Stacktrace: ", new Exception());
+                " If this override is intentional, use replaceServerbound instead. Stacktrace: ", new Exception());
         }
         serverboundMappings.addMapping(state, unmappedPacketId, packetMapping);
     }
@@ -382,7 +382,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         PacketMapping packetMapping = PacketMapping.of(mappedPacketId, handler);
         if (!override && clientboundMappings.hasMapping(state, unmappedPacketId)) {
             Via.getPlatform().getLogger().log(Level.WARNING, unmappedPacketId + " already registered!" +
-                " If override is intentional, set override to true. Stacktrace: ", new Exception());
+                " If override is intentional, use replaceClientbound instead. Stacktrace: ", new Exception());
         }
         clientboundMappings.addMapping(state, unmappedPacketId, packetMapping);
     }
@@ -442,7 +442,8 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
 
         PacketMapping packetMapping = PacketMapping.of(mappedPacketType, handler);
         if (!override && packetMappings.hasMapping(packetType)) {
-            throw new IllegalArgumentException("Packet type " + packetType + " already registered! If override is intentional, set override to true.");
+            throw new IllegalArgumentException("Packet type " + packetType + " already registered! If override is intentional, use "
+                + (packetType.direction() == Direction.SERVERBOUND ? "replaceServerbound" : "replaceClientbound") + " instead.");
         }
         packetMappings.addMapping(packetType, packetMapping);
     }
