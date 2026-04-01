@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
-import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 // Replace if needed
@@ -62,12 +61,6 @@ final class EntityPacketRewriter99_1 extends EntityRewriter<ClientboundPacket26_
             entityDataTypes.componentType,
             entityDataTypes.optionalComponentType
         );
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        // IF ENTITY TYPES CHANGED: Automatically map entity id changes AFTER entity ids have been loaded
-        mapTypes();
     }
 
     @Override

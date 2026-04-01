@@ -272,11 +272,6 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
     }
 
     @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
-    }
-
-    @Override
     public EntityType typeFromId(final int type) {
         return EntityTypes1_21_5.getTypeFromId(type);
     }

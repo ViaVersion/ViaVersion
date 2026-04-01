@@ -78,11 +78,6 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
     }
 
     @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
-    }
-
-    @Override
     public EntityType typeFromId(final int type) {
         return EntityTypes1_21_11.getTypeFromId(type);
     }

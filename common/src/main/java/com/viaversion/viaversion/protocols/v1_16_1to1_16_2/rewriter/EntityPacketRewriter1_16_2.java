@@ -94,11 +94,6 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
     }
 
     @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
-    }
-
-    @Override
     public EntityType typeFromId(int type) {
         return EntityTypes1_16_2.getTypeFromId(type);
     }

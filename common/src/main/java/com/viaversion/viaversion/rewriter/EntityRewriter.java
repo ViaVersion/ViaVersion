@@ -155,6 +155,13 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         return typeMappings != null ? typeMappings.getNewIdOrDefault(id, id) : id;
     }
 
+    @Override
+    public void onMappingDataLoaded() {
+        if (protocol.getMappingData() != null && !Mappings.isFullIdentity(protocol.getMappingData().getEntityMappings())) {
+            mapTypes();
+        }
+    }
+
     public @Nullable Mappings typeMappings() {
         return typeMappings;
     }
