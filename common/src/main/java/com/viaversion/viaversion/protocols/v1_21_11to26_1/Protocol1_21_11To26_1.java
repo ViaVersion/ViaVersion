@@ -49,6 +49,7 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPack
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.BlockItemPacketRewriter26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.ComponentRewriter26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.EntityPacketRewriter26_1;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.storage.PlayerSneaking;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.storage.TagsSent;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
@@ -270,6 +271,7 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_11.PLAYER));
         addItemHasher(connection, new ItemHasherBase(this, connection));
+        connection.put(new PlayerSneaking());
     }
 
     @Override

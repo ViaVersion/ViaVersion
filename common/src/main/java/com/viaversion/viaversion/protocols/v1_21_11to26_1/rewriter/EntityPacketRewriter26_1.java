@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.storage.PlayerSneaking;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPacket1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPackets1_21_11;
@@ -38,6 +39,15 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
 
     @Override
     public void registerPackets() {
+        protocol.appendClientbound(ClientboundPackets1_21_11.RESPAWN, wrapper -> {
+            wrapper.user().get(PlayerSneaking.class).setSneaking(false);
+        });
+
+        protocol.registerServerbound(ServerboundPackets26_1.PLAYER_INPUT, wrapper -> {
+            final byte flags = wrapper.passthrough(Types.BYTE);
+            final boolean pressingShift = (flags & 1 << 5) != 0;
+            wrapper.user().get(PlayerSneaking.class).setSneaking(pressingShift);
+        });
         protocol.registerServerbound(ServerboundPackets26_1.INTERACT, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT);
             wrapper.write(Types.VAR_INT, 0); // Interact
@@ -56,16 +66,14 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
             interactAtPacket.write(Types.BOOLEAN, secondaryAction);
             interactAtPacket.sendToServer(Protocol1_21_11To26_1.class);
         });
-        protocol.registerServerbound(ServerboundPackets26_1.ATTACK, ServerboundPackets1_21_6.INTERACT, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Entity ID
-            wrapper.write(Types.VAR_INT, 1); // Attack
-            wrapper.write(Types.BOOLEAN, false); // Secondary action
-        });
-        protocol.registerServerbound(ServerboundPackets26_1.SPECTATE_ENTITY, ServerboundPackets1_21_6.INTERACT, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Entity ID
-            wrapper.write(Types.VAR_INT, 1); // Attack
-            wrapper.write(Types.BOOLEAN, true); // Secondary action
-        });
+        protocol.registerServerbound(ServerboundPackets26_1.ATTACK, ServerboundPackets1_21_6.INTERACT, this::writeInteract);
+        protocol.registerServerbound(ServerboundPackets26_1.SPECTATE_ENTITY, ServerboundPackets1_21_6.INTERACT, this::writeInteract);
+    }
+
+    private void writeInteract(final PacketWrapper wrapper) {
+        wrapper.passthrough(Types.VAR_INT); // Entity ID
+        wrapper.write(Types.VAR_INT, 1); // Attack
+        wrapper.write(Types.BOOLEAN, wrapper.user().get(PlayerSneaking.class).sneaking()); // Secondary action
     }
 
     @Override
