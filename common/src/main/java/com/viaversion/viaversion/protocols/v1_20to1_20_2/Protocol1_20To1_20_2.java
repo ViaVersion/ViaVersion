@@ -386,11 +386,6 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    protected void registerConfigurationChangeHandlers() {
-        // Don't handle it in the transitioning protocol
-    }
-
-    @Override
     public void init(final UserConnection user) {
         user.put(new ConfigurationState());
         addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19_4.PLAYER));
