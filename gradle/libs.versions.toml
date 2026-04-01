@@ -10,7 +10,7 @@ mcstructs = "5-3.3.1-SNAPSHOT"
 
 # Common provided
 netty = "4.0.20.Final"
-guava = "17.0"
+guava = "23.0"
 
 junit = "6.0.3"
 platformLauncher = "6.0.3"
