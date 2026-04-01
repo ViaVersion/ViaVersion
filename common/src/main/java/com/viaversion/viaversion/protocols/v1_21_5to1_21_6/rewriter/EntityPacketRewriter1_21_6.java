@@ -50,7 +50,7 @@ public final class EntityPacketRewriter1_21_6 extends EntityRewriter<Clientbound
         registerLogin1_20_5(ClientboundPackets1_21_5.LOGIN);
         registerRespawn1_20_5(ClientboundPackets1_21_5.RESPAWN);
 
-        protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
+        protocol.registerClientbound(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
             // send server links dialog as vanilla doesn't show server links by default otherwise
             final PacketWrapper dialogsPacket = PacketWrapper.create(ClientboundConfigurationPackets1_21.REGISTRY_DATA, wrapper.user());
             dialogsPacket.write(Types.STRING, "minecraft:dialog");
