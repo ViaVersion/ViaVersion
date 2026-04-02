@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.BlocksAttacks;
@@ -72,21 +73,11 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
 
     @Override
     protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
-        // Uses null instead of empty items now
-        final Item[] containerData = container.get(protocol.types().structuredDataKeys().container);
-        if (containerData != null) {
-            for (int i = 0; i < containerData.length; i++) {
-                if (containerData[i].isEmpty()) {
-                    containerData[i] = null;
-                }
-            }
-        }
-
-        upgradeData(protocol, container);
+        upgradeData(protocol, protocol.types().structuredDataKeys(), container);
         super.handleItemDataComponentsToClient(connection, item, container);
     }
 
-    public static void upgradeData(final Protocol<?, ?, ?, ?> protocol, final StructuredDataContainer container) {
+    public static void upgradeData(final Protocol<?, ?, ?, ?> protocol, final StructuredDataKeys1_21_11 dataKeys, final StructuredDataContainer container) {
         container.replace(StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.JUKEBOX_PLAYABLE26_1, jukeboxPlayable -> upgradeHolder(protocol, jukeboxPlayable.song(), "jukebox_playable"));
         container.replace(StructuredDataKey.INSTRUMENT1_21_5, StructuredDataKey.INSTRUMENT26_1, instrument -> upgradeHolder(protocol, instrument, "instrument"));
         container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL1_21_5, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, providesTrimMaterial -> upgradeHolder(protocol, providesTrimMaterial.material(), "trim_material"));
@@ -96,6 +87,16 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
         container.replace(StructuredDataKey.PROVIDES_BANNER_PATTERNS1_21_5, StructuredDataKey.PROVIDES_BANNER_PATTERNS26_1, key -> new ProvidesBannerPatterns(HolderSet.of(key.original())));
         container.replace(StructuredDataKey.DAMAGE_RESISTANT1_21_2, StructuredDataKey.DAMAGE_RESISTANT26_1, damageResistant -> new DamageResistant26_1(HolderSet.of(damageResistant.typesTagKey().original())));
         container.replaceKey(StructuredDataKey.BLOCKS_ATTACKS1_21_5, StructuredDataKey.BLOCKS_ATTACKS26_1);
+
+        // Uses null instead of empty items now
+        final Item[] containerData = container.get(dataKeys.container);
+        if (containerData != null) {
+            for (int i = 0; i < containerData.length; i++) {
+                if (containerData[i].isEmpty()) {
+                    containerData[i] = null;
+                }
+            }
+        }
     }
 
     private static @Nullable Integer upgradeEitherVariant(final Protocol<?, ?, ?, ?> protocol, final Either<Integer, String> eitherHolder, final String registry) {
@@ -117,20 +118,11 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
 
     @Override
     protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
-        final Item[] containerData = container.get(protocol.mappedTypes().structuredDataKeys().container);
-        if (containerData != null) {
-            for (int i = 0; i < containerData.length; i++) {
-                if (containerData[i] == null) {
-                    containerData[i] = StructuredItem.empty();
-                }
-            }
-        }
-
-        downgradeData(container);
+        downgradeData(protocol.mappedTypes().structuredDataKeys(), container);
         super.handleItemDataComponentsToServer(connection, item, container);
     }
 
-    public static void downgradeData(final StructuredDataContainer container) {
+    public static void downgradeData(final StructuredDataKeys1_21_11 dataKeys, final StructuredDataContainer container) {
         container.replace(StructuredDataKey.JUKEBOX_PLAYABLE26_1, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, jukeboxPlayable -> new JukeboxPlayable(jukeboxPlayable, true));
         container.replace(StructuredDataKey.INSTRUMENT26_1, StructuredDataKey.INSTRUMENT1_21_5, EitherHolder::of);
         container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, StructuredDataKey.PROVIDES_TRIM_MATERIAL1_21_5, providesTrimMaterial -> new ProvidesTrimMaterial(EitherHolder.of(providesTrimMaterial)));
@@ -153,6 +145,15 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
         container.remove(StructuredDataKey.CHICKEN_SOUND_VARIANT);
         container.remove(StructuredDataKey.COW_SOUND_VARIANT);
         container.remove(StructuredDataKey.PIG_SOUND_VARIANT);
+
+        final Item[] containerData = container.get(dataKeys.container);
+        if (containerData != null) {
+            for (int i = 0; i < containerData.length; i++) {
+                if (containerData[i] == null) {
+                    containerData[i] = StructuredItem.empty();
+                }
+            }
+        }
     }
 
     private static @Nullable Key tagOrNull(final HolderSet holderSet) {
