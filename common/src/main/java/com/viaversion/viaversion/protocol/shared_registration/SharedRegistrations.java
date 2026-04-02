@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocol.shared_registration;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Central registry for shared packet registrations that are automatically applied
@@ -69,6 +71,11 @@ public final class SharedRegistrations {
         final ProtocolVersion version = protocol.getServerVersion();
         final ProtocolVersion clientVersion = protocol.getClientVersion();
         if (version == null || clientVersion == null) {
+            if (Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().log(Level.WARNING,
+                    "Skipping shared registrations for {0}: version={1}, clientVersion={2}",
+                    new Object[]{protocol.getClass().getSimpleName(), String.valueOf(version), String.valueOf(clientVersion)});
+            }
             return;
         }
         if (version.getVersionType() != clientVersion.getVersionType()) {
