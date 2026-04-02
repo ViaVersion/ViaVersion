@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocol.shared_registration.def;
 import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocol.shared_registration.PacketBound;
 import com.viaversion.viaversion.protocol.shared_registration.RegistrationContext;
@@ -157,21 +156,13 @@ final class TextComponentRegistrations {
     }
 
     static <CU extends ClientboundPacketType> void registerComponents1_21(final RegistrationContext<CU, ?> ctx, final ComponentRewriterBase<CU> cr) {
-        common1_21_1(ctx, cr, Types.VAR_INT);
-    }
-
-    private static <CU extends ClientboundPacketType> void common1_21_1(final RegistrationContext<CU, ?> ctx, final ComponentRewriterBase<CU> cr, final Type<?> chatType) {
         common1_20_5(ctx, cr);
         ctx.clientbound(ClientboundPackets1_21.SET_PLAYER_TEAM, cr::registerSetPlayerTeam1_13);
         ctx.clientbound(ClientboundPackets1_21.DISGUISED_CHAT, cr::registerDisguisedChat);
         if (cr instanceof final JsonNBTComponentRewriter<CU> jcr) {
-            ctx.clientbound(ClientboundPackets1_21.PLAYER_CHAT, cu -> jcr.registerPlayerChat(cu, chatType));
+            ctx.clientbound(ClientboundPackets1_21.PLAYER_CHAT, cu -> jcr.registerPlayerChat(cu, ChatType.TYPE));
             ctx.clientbound(ClientboundPackets1_21.PLAYER_INFO_UPDATE, jcr::registerPlayerInfoUpdate1_20_3);
         }
-    }
-
-    static <CU extends ClientboundPacketType> void registerComponents1_21_2(final RegistrationContext<CU, ?> ctx, final ComponentRewriterBase<CU> cr) {
-        common1_21_1(ctx, cr, ChatType.TYPE);
     }
 
     static <CU extends ClientboundPacketType> void registerComponents1_21_4(final RegistrationContext<CU, ?> ctx, final ComponentRewriterBase<CU> cr) {

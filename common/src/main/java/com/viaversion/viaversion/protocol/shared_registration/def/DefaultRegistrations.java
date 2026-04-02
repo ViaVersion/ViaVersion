@@ -81,8 +81,7 @@ public final class DefaultRegistrations {
                 .to(ProtocolVersion.v1_20_3, TextComponentRegistrations::registerComponents1_19)
                 .to(ProtocolVersion.v1_20_5, TextComponentRegistrations::registerComponents1_20_3)
                 .to(ProtocolVersion.v1_21, TextComponentRegistrations::registerComponents1_20_5)
-                .to(ProtocolVersion.v1_21_2, TextComponentRegistrations::registerComponents1_21)
-                .to(ProtocolVersion.v1_21_4, TextComponentRegistrations::registerComponents1_21_2)
+                .to(ProtocolVersion.v1_21_4, TextComponentRegistrations::registerComponents1_21)
                 .to(ProtocolVersion.v1_21_5, TextComponentRegistrations::registerComponents1_21_4)
             )
             .ranges(TextComponentRegistrations::nbtText, ProtocolVersion.v1_21_5, b -> b
