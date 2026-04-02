@@ -54,6 +54,7 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
             final int hand = wrapper.passthrough(Types.VAR_INT);
             final Vector3d location = wrapper.read(Types.LOW_PRECISION_VECTOR);
             final boolean secondaryAction = wrapper.passthrough(Types.BOOLEAN);
+            wrapper.user().get(PlayerSneaking.class).setSneaking(secondaryAction);
 
             // Send interact at as well
             final PacketWrapper interactAtPacket = wrapper.create(ServerboundPackets1_21_6.INTERACT);
