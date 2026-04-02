@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPacket1_21_11;
@@ -36,6 +37,14 @@ public final class ComponentRewriter26_1 extends NBTComponentRewriter<Clientboun
         final int count = itemTag.getInt("count");
         if (count == 0) {
             itemTag.putInt("count", 1);
+        }
+    }
+
+    @Override
+    protected void handleTranslate(final UserConnection connection, final CompoundTag parentTag, final StringTag translateTag) {
+        switch (translateTag.getValue()) {
+            case "commands.time.set" -> translateTag.setValue("Set the time to %s");
+            case "commands.time.query" -> translateTag.setValue("The time is %s");
         }
     }
 }
