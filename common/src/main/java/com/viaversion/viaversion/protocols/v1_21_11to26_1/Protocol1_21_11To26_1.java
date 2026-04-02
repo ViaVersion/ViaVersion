@@ -163,10 +163,17 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             wrapper.write(Types.FLOAT, 0F); // Partial tick
             wrapper.write(Types.FLOAT, tickDayTime ? 1F : 0F); // Tick rate
         });
-        cancelServerbound(ServerboundPackets26_1.SET_GAME_RULE);
 
         replaceClientbound(ClientboundPackets1_21_11.UPDATE_TAGS, this::handleTags);
         replaceClientbound(ClientboundConfigurationPackets1_21_9.UPDATE_TAGS, this::handleTags);
+
+        cancelServerbound(ServerboundPackets26_1.SET_GAME_RULE);
+        registerServerbound(ServerboundPackets26_1.CLIENT_COMMAND, wrapper -> {
+            final int action = wrapper.passthrough(Types.VAR_INT);
+            if (action == 2) { // Request game rule values
+                wrapper.cancel();
+            }
+        });
     }
 
     private void handleTags(final PacketWrapper wrapper) {
