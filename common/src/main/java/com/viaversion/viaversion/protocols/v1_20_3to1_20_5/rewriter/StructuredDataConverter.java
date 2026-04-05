@@ -655,6 +655,10 @@ public final class StructuredDataConverter {
                 getBackupTag(tag).putInt("ominous_bottle_amplifier", data);
             }
         });
+        register(StructuredDataKey.MAP_POST_PROCESSING, (data, tag) -> {
+        });
+        register(StructuredDataKey.CREATIVE_SLOT_LOCK, (data, tag) -> {
+        });
     }
 
     private int unmappedItemId(final int id) {
