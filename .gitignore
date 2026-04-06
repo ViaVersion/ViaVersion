@@ -19,6 +19,8 @@ classes/
 *.ipr
 *.iws
 
+benchmark/
+
 # VSCode
 
 .settings/

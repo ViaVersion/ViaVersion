@@ -92,6 +92,19 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     /**
+     * Registers a first-pass handler to remap entity data types via {@code rewriter.protocol().mappedTypes().entityDataTypes().byId(typeId)}
+     * <p>
+     * Removed source types are intentionally left untouched during the initial handler, so entity-specific handlers can
+     * still manually remap them before the final cancellation runs (unless something sent invalid packets for untracked entities).
+     *
+     * @return configurable type remapper
+     */
+    public EntityDataFilter.DataTypeMapper dataTypeMapper() {
+        Preconditions.checkNotNull(protocol.mappedTypes(), "Protocol does not override mappedTypes, use filter().mapDataType instead");
+        return new EntityDataFilter.DataTypeMapper(this);
+    }
+
+    /**
      * Registers an entity data filter.
      * Note that {@link EntityDataFilter.Builder#register()} already calls this method.
      *
@@ -99,7 +112,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      * @throws IllegalArgumentException if the filter is already registered
      */
     public void registerFilter(EntityDataFilter filter) {
-        Preconditions.checkArgument(!entityDataFilters.contains(filter));
         entityDataFilters.add(filter);
     }
 

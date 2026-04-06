@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.minecraft.PaintingVariant;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
-import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
@@ -177,17 +176,17 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
 
     @Override
     protected void registerRewrites() {
-        filter().handler((event, data) -> {
-            final EntityDataType type = data.dataType();
-            if (type == VersionedTypes.V1_20_5.entityDataTypes.wolfVariantType) {
-                final int variant = data.value();
-                data.setTypeAndValue(VersionedTypes.V1_21.entityDataTypes.wolfVariantType, Holder.of(variant));
-            } else if (type == VersionedTypes.V1_20_5.entityDataTypes.paintingVariantType) {
-                final int variant = data.value();
-                data.setTypeAndValue(VersionedTypes.V1_21.entityDataTypes.paintingVariantType, Holder.of(variant));
-            } else {
-                data.setDataType(VersionedTypes.V1_21.entityDataTypes.byId(type.typeId()));
-            }
+        dataTypeMapper()
+            .skip(VersionedTypes.V1_20_5.entityDataTypes.wolfVariantType)
+            .skip(VersionedTypes.V1_20_5.entityDataTypes.paintingVariantType)
+            .register();
+        filter().dataType(VersionedTypes.V1_20_5.entityDataTypes.paintingVariantType).handler((event, data) -> {
+            final int variant = data.value();
+            data.setTypeAndValue(VersionedTypes.V1_21.entityDataTypes.paintingVariantType, Holder.of(variant));
+        });
+        filter().dataType(VersionedTypes.V1_20_5.entityDataTypes.wolfVariantType).handler((event, data) -> {
+            final int variant = data.value();
+            data.setTypeAndValue(VersionedTypes.V1_21.entityDataTypes.wolfVariantType, Holder.of(variant));
         });
         registerEntityDataTypeHandler(
             VersionedTypes.V1_21.entityDataTypes.itemType,

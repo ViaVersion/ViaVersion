@@ -80,22 +80,12 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
     @Override
     protected void registerRewrites() {
         final EntityDataTypes26_1 entityDataTypes = protocol.mappedTypes().entityDataTypes();
-        filter().mapDataType(id -> {
-            int mappedId = id;
-            if (mappedId >= entityDataTypes.catSoundVariant.typeId()) {
-                mappedId++;
-            }
-            if (mappedId >= entityDataTypes.cowSoundVariant.typeId()) {
-                mappedId++;
-            }
-            if (mappedId >= entityDataTypes.pigSoundVariant.typeId()) {
-                mappedId++;
-            }
-            if (mappedId >= entityDataTypes.chickenSoundVariant.typeId()) {
-                mappedId++;
-            }
-            return entityDataTypes.byId(mappedId);
-        });
+        dataTypeMapper()
+            .added(entityDataTypes.catSoundVariant)
+            .added(entityDataTypes.cowSoundVariant)
+            .added(entityDataTypes.pigSoundVariant)
+            .added(entityDataTypes.chickenSoundVariant)
+            .register();
         registerEntityDataTypeHandler(
             entityDataTypes.itemType,
             entityDataTypes.blockStateType,

@@ -41,15 +41,13 @@ final class EntityPacketRewriter99_1 extends EntityRewriter<ClientboundPacket26_
     @Override
     protected void registerRewrites() {
         final EntityDataTypes26_1 entityDataTypes = protocol.mappedTypes().entityDataTypes();
-        filter().mapDataType(entityDataTypes::byId);
-        /* ... or something this if entity data classes changed
-        filter().mapDataType(typeId -> {
-            int id = typeId;
-            if (id >= SomeAddedIndex) {
-                id++;
-            }
-            return entityDataTypes.byId(id);
-        });*/
+        dataTypeMapper().register();
+        /* ... or like this for additions and removals that are not at the very end
+        dataTypeMapper()
+            .added(entityDataTypes.catSoundVariant)
+            .removed(entityDataTypes.cowSoundVariant)
+            .skip(entityDataTypes.pigSoundVariant) // if neither removed nor added, but the value type has to be changed separately
+            .register();*/
 
         // Registers registry type id changes
         registerEntityDataTypeHandler(

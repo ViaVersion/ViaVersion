@@ -23,12 +23,10 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_4;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.Protocol1_21_2To1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 
 public final class EntityPacketRewriter1_21_4 extends EntityRewriter<ClientboundPacket1_21_2, Protocol1_21_2To1_21_4> {
 
@@ -67,7 +65,7 @@ public final class EntityPacketRewriter1_21_4 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
-        filter().mapDataType(VersionedTypes.V1_21_4.entityDataTypes::byId);
+        dataTypeMapper().register();
 
         registerEntityDataTypeHandler(
             VersionedTypes.V1_21_4.entityDataTypes.itemType,

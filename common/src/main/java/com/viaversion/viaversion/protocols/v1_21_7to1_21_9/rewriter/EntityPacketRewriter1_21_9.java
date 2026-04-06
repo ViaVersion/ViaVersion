@@ -103,24 +103,11 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
     protected void registerRewrites() {
         final EntityDataTypes1_21_5 unmappedEntityDataTypes = protocol.types().entityDataTypes();
         final EntityDataTypes1_21_9 entityDataTypes = protocol.mappedTypes().entityDataTypes();
-        filter().handler((event, data) -> {
-            int id = data.dataType().typeId();
-            if (id == unmappedEntityDataTypes.compoundTagType.typeId()) {
-                if (event.entityType() == null) {
-                    // Remove unhandled data from bad packets here
-                    event.cancel();
-                }
-                return; // Handled below
-            }
-            if (id > unmappedEntityDataTypes.compoundTagType.typeId()) {
-                id--;
-            }
-            if (id > entityDataTypes.armadilloState.typeId()) {
-                id += 2; // copper golem and weathering copper state
-            }
-            data.setDataType(entityDataTypes.byId(id));
-        });
-
+        dataTypeMapper()
+            .added(entityDataTypes.copperGolemState)
+            .added(entityDataTypes.weatheringCopperState)
+            .removed(unmappedEntityDataTypes.compoundTagType)
+            .register();
         registerEntityDataTypeHandler(
             entityDataTypes.itemType,
             entityDataTypes.blockStateType,

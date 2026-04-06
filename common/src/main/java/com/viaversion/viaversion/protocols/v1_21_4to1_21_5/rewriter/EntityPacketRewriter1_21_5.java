@@ -186,28 +186,16 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
-        filter().handler((event, data) -> {
-            final int id = data.dataType().typeId();
-            if (id == VersionedTypes.V1_21_4.entityDataTypes.wolfVariantType.typeId()) {
-                final Holder<WolfVariant> wolfVariant = data.value();
-                data.setTypeAndValue(VersionedTypes.V1_21_5.entityDataTypes.wolfVariantType, wolfVariant.hasId() ? wolfVariant.id() : 0);
-                return;
-            }
-
-            int mappedId = id;
-            if (mappedId >= VersionedTypes.V1_21_5.entityDataTypes.cowVariantType.typeId()) {
-                mappedId++;
-            }
-            if (mappedId >= VersionedTypes.V1_21_5.entityDataTypes.wolfSoundVariantType.typeId()) {
-                mappedId++;
-            }
-            if (mappedId >= VersionedTypes.V1_21_5.entityDataTypes.pigVariantType.typeId()) {
-                mappedId++;
-            }
-            if (mappedId >= VersionedTypes.V1_21_5.entityDataTypes.chickenVariantType.typeId()) {
-                mappedId++;
-            }
-            data.setDataType(VersionedTypes.V1_21_5.entityDataTypes.byId(mappedId));
+        dataTypeMapper()
+            .added(VersionedTypes.V1_21_5.entityDataTypes.cowVariantType)
+            .added(VersionedTypes.V1_21_5.entityDataTypes.wolfSoundVariantType)
+            .added(VersionedTypes.V1_21_5.entityDataTypes.pigVariantType)
+            .added(VersionedTypes.V1_21_5.entityDataTypes.chickenVariantType)
+            .skip(VersionedTypes.V1_21_4.entityDataTypes.wolfVariantType)
+            .register();
+        filter().dataType(VersionedTypes.V1_21_4.entityDataTypes.wolfVariantType).handler((event, data) -> {
+            final Holder<WolfVariant> wolfVariant = data.value();
+            data.setTypeAndValue(VersionedTypes.V1_21_5.entityDataTypes.wolfVariantType, wolfVariant.hasId() ? wolfVariant.id() : 0);
         });
 
         registerEntityDataTypeHandler(

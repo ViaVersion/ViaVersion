@@ -53,12 +53,7 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
     @Override
     protected void registerRewrites() {
         final EntityDataTypes1_21_11 entityDataTypes = protocol.mappedTypes().entityDataTypes();
-        filter().mapDataType(id -> {
-            if (id >= entityDataTypes.zombieNautilusVariantType.typeId()) {
-                id++;
-            }
-            return entityDataTypes.byId(id);
-        });
+        dataTypeMapper().added(entityDataTypes.zombieNautilusVariantType).register();
         registerEntityDataTypeHandler(
             entityDataTypes.itemType,
             entityDataTypes.blockStateType,
