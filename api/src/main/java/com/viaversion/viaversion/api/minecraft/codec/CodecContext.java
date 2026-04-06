@@ -53,7 +53,7 @@ public interface CodecContext {
          * Returns the key for a stored mapping type and its numeric id.
          *
          * @param mappingType mapping type
-         * @param id numeric id
+         * @param id          numeric id
          * @return the key
          */
         Key key(MappingData.MappingType mappingType, int id);
@@ -62,7 +62,7 @@ public interface CodecContext {
          * Returns the numeric id for a stored mapping type and its identifier.
          *
          * @param mappingType mapping type
-         * @param identifier identifier
+         * @param identifier  identifier
          * @return the numeric id, or -1 if not found
          */
         int id(MappingData.MappingType mappingType, String identifier);
@@ -75,7 +75,7 @@ public interface CodecContext {
          * Returns the key for a client-synchronized registry element.
          *
          * @param registry registry key
-         * @param id numeric id
+         * @param id       numeric id
          * @return the key
          */
         Key registryKey(String registry, int id);

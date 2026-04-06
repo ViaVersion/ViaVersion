@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.data.item.ItemHasher;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
@@ -37,6 +38,8 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.MappingDataListener;
 import com.viaversion.viaversion.api.rewriter.Rewriter;
+import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.protocol.shared_registration.SharedRegistrations;
@@ -277,10 +280,21 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         }
     }
 
+    protected void addEntityTracker(UserConnection connection) {
+        final EntityType playerEntityType = getEntityRewriter().typeFromId("player");
+        Preconditions.checkNotNull(playerEntityType, "Player entity type not found");
+        connection.addEntityTracker(this.getClass(), new EntityTrackerBase(connection, playerEntityType));
+    }
+
     protected void addEntityTracker(UserConnection connection, EntityTracker tracker) {
         connection.addEntityTracker(this.getClass(), tracker);
     }
 
+    protected void addItemHasher(UserConnection connection) {
+        connection.addItemHasher(this.getClass(), new ItemHasherBase(this, connection));
+    }
+
+    @Deprecated(forRemoval = true)
     protected void addItemHasher(UserConnection connection, ItemHasher hasher) {
         connection.addItemHasher(this.getClass(), hasher);
     }

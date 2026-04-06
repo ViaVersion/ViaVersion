@@ -112,6 +112,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      * @throws IllegalArgumentException if the filter is already registered
      */
     public void registerFilter(EntityDataFilter filter) {
+        Preconditions.checkArgument(!entityDataFilters.contains(filter));
         entityDataFilters.add(filter);
     }
 

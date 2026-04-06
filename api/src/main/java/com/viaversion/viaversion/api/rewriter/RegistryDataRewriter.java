@@ -23,8 +23,8 @@
 package com.viaversion.viaversion.api.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 

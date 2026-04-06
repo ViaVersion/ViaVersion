@@ -25,8 +25,6 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPack
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundPacket1_21_9;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 
-// To replace if needed:
-//   RecipeDisplayRewriter
 final class BlockItemPacketRewriter99_1 extends StructuredItemRewriter<ClientboundPacket26_1, ServerboundPacket1_21_9, Protocol98_1To99_1> {
 
     public BlockItemPacketRewriter99_1(final Protocol98_1To99_1 protocol) {
@@ -36,9 +34,7 @@ final class BlockItemPacketRewriter99_1 extends StructuredItemRewriter<Clientbou
     @Override
     public void registerPackets() {
         // Common block, item, recipe, and entity registrations are handled by SharedRegistrations
-
-        // registerOpenScreen(ClientboundPackets26_1.OPEN_SCREEN); If a new container type was added; also remove from the component rewriter registration
-        // OR add new serializers to RecipeDisplayRewriter, or extend the last one for changes
+        // If recipe serializers changed: add new serializers to RecipeDisplayRewriter, or extend the last one for changes
     }
 
     @Override
@@ -49,20 +45,21 @@ final class BlockItemPacketRewriter99_1 extends StructuredItemRewriter<Clientbou
 
     @Override
     protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
-        upgradeData(item, container);
+        upgradeData(container);
         super.handleItemDataComponentsToClient(connection, item, container);
-    }
-
-    public static void upgradeData(final Item item, final StructuredDataContainer container) { // public for VB
     }
 
     @Override
     protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
-        downgradeData(item, container);
+        downgradeData(container);
         super.handleItemDataComponentsToServer(connection, item, container);
     }
 
-    public static void downgradeData(final Item item, final StructuredDataContainer container) {
+    // public for VB
+    public static void upgradeData(final StructuredDataContainer container) {
+    }
+
+    public static void downgradeData(final StructuredDataContainer container) {
     }
 
     @Override

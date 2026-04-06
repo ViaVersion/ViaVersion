@@ -24,7 +24,6 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPack
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 // Replace if needed
-//  VersionedTypes
 //  EntityTypes1_21_11
 final class EntityPacketRewriter99_1 extends EntityRewriter<ClientboundPacket26_1, Protocol98_1To99_1> {
 
@@ -34,8 +33,7 @@ final class EntityPacketRewriter99_1 extends EntityRewriter<ClientboundPacket26_
 
     @Override
     public void registerPackets() {
-        // Common entity registrations (SET_ENTITY_DATA, REMOVE_ENTITIES, PLAYER_ABILITIES,
-        // GAME_EVENT, LOGIN, RESPAWN) are handled by SharedRegistrations.
+        // Common entity registrations (including LOGIN, RESPAWN) are handled by SharedRegistrations.
     }
 
     @Override

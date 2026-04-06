@@ -64,7 +64,6 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.TabCompleteTracker;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ServerboundPackets1_12_1;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.GsonUtil;
@@ -678,7 +677,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
                     String stringMode = mode == 0 ? "SEQUENCE"
                         : mode == 1 ? "AUTO"
-                        : "REDSTONE";
+                          : "REDSTONE";
 
                     wrapper.write(Types.BOOLEAN, (flags & 0x1) != 0); // Track output
                     wrapper.write(Types.STRING, stringMode);
@@ -719,8 +718,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     public String transform(PacketWrapper wrapper, Integer mode) {
                         return mode == 0 ? "SAVE"
                             : mode == 1 ? "LOAD"
-                            : mode == 2 ? "CORNER"
-                            : "DATA";
+                              : mode == 2 ? "CORNER"
+                                : "DATA";
                     }
                 });
                 map(Types.STRING); // Name
@@ -735,7 +734,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     public String transform(PacketWrapper wrapper, Integer mirror) {
                         return mirror == 0 ? "NONE"
                             : mirror == 1 ? "LEFT_RIGHT"
-                            : "FRONT_BACK";
+                              : "FRONT_BACK";
                     }
                 });
                 map(Types.VAR_INT, new ValueTransformer<>(Types.STRING) { // Rotation
@@ -743,8 +742,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     public String transform(PacketWrapper wrapper, Integer rotation) {
                         return rotation == 0 ? "NONE"
                             : rotation == 1 ? "CLOCKWISE_90"
-                            : rotation == 2 ? "CLOCKWISE_180"
-                            : "COUNTERCLOCKWISE_90";
+                              : rotation == 2 ? "CLOCKWISE_180"
+                                : "COUNTERCLOCKWISE_90";
                     }
                 });
                 map(Types.STRING);

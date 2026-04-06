@@ -19,7 +19,6 @@ package com.viaversion.viaversion.rewriter;
 
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
-import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;

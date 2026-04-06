@@ -34,8 +34,6 @@ import com.viaversion.viaversion.codec.CodecRegistryContext;
 import com.viaversion.viaversion.codec.hash.HashFunction;
 import com.viaversion.viaversion.codec.hash.HashOps;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -58,7 +56,7 @@ public class ItemHasherBase implements ItemHasher {
     /**
      * Returns the hashed item for the given item. Not all data may be successfully hashed.
      *
-     * @param item the item to hash
+     * @param item   the item to hash
      * @param mapped whether the item is mapped to the client version
      * @return the hashed item
      */
@@ -83,7 +81,7 @@ public class ItemHasherBase implements ItemHasher {
     /**
      * Tracks the data for the given data container, storing the original hashes via the now transformed data hashes.
      *
-     * @param customData custom_data tag
+     * @param customData         custom_data tag
      * @param originalHashedItem the original (pre-transformed) hashed item
      */
     public void trackOriginalHashedItem(final CompoundTag customData, final HashedItem originalHashedItem) {
@@ -97,7 +95,7 @@ public class ItemHasherBase implements ItemHasher {
      * Returns a copy of the original hashed item for a given custom_data hash.
      *
      * @param customDataHash custom_data hash
-     * @param clientItem the hashed item from the client that the original should be retrieved for
+     * @param clientItem     the hashed item from the client that the original should be retrieved for
      * @return the original hashed item, or null if not found
      */
     public @Nullable HashedItem originalHashedItem(final int customDataHash, final HashedItem clientItem) {

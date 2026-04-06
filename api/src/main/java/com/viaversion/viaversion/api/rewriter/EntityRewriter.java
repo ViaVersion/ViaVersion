@@ -76,9 +76,9 @@ public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter
     /**
      * Handles and transforms entity data of an entity.
      *
-     * @param entityId     entity id
-     * @param dataList full, mutable list of entity data
-     * @param connection   user connection
+     * @param entityId   entity id
+     * @param dataList   full, mutable list of entity data
+     * @param connection user connection
      */
     void handleEntityData(int entityId, List<EntityData> dataList, UserConnection connection);
 
