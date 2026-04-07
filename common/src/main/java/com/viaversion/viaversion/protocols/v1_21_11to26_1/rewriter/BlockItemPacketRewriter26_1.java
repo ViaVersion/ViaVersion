@@ -78,7 +78,7 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
     }
 
     public static void upgradeData(final Protocol<?, ?, ?, ?> protocol, final StructuredDataKeys1_21_11 dataKeys, final StructuredDataContainer container) {
-        container.replace(StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.JUKEBOX_PLAYABLE26_1, jukeboxPlayable -> upgradeHolder(protocol, jukeboxPlayable.song(), "jukebox_playable"));
+        container.replace(StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.JUKEBOX_PLAYABLE26_1, jukeboxPlayable -> upgradeHolder(protocol, jukeboxPlayable.song(), "jukebox_song"));
         container.replace(StructuredDataKey.INSTRUMENT1_21_5, StructuredDataKey.INSTRUMENT26_1, instrument -> upgradeHolder(protocol, instrument, "instrument"));
         container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL1_21_5, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, providesTrimMaterial -> upgradeHolder(protocol, providesTrimMaterial.material(), "trim_material"));
         container.replace(StructuredDataKey.CHICKEN_VARIANT1_21_5, StructuredDataKey.CHICKEN_VARIANT26_1, chickenVariant -> upgradeEitherVariant(protocol, chickenVariant, "chicken_variant"));
