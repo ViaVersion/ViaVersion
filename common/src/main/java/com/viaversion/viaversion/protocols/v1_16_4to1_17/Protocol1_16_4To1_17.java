@@ -38,11 +38,9 @@ import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.ComponentRewri
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.EntityPacketRewriter1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.ItemPacketRewriter1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.WorldPacketRewriter1_17;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_17> {
 
@@ -52,6 +50,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
     private final ParticleRewriter<ClientboundPackets1_16_2> particleRewriter = new ParticleRewriter<>(this);
     private final ComponentRewriter1_17 componentRewriter = new ComponentRewriter1_17(this);
     private final TagRewriter<ClientboundPackets1_16_2> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPackets1_16_2> blockRewriter = BlockRewriter.for1_14(this);
 
     public Protocol1_16_4To1_17() {
         super(ClientboundPackets1_16_2.class, ClientboundPackets1_17.class, ServerboundPackets1_16_2.class, ServerboundPackets1_17.class);
@@ -84,23 +83,6 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
             wrapper.write(Types.STRING, RegistryType.GAME_EVENT.identifier());
             tagRewriter.appendNewTags(wrapper, RegistryType.GAME_EVENT);
         });
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_16_2.AWARD_STATS);
-
-        componentRewriter.registerComponentPacket(ClientboundPackets1_16_2.CHAT);
-        componentRewriter.registerBossEvent(ClientboundPackets1_16_2.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_16_2.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets1_16_2.TAB_LIST);
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_16_2.OPEN_SCREEN);
-        componentRewriter.registerSetPlayerTeam1_13(ClientboundPackets1_16_2.SET_PLAYER_TEAM);
-        componentRewriter.registerSetObjective(ClientboundPackets1_16_2.SET_OBJECTIVE);
-        componentRewriter.registerPing();
-
-        SoundRewriter<ClientboundPackets1_16_2> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND);
-        soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND_ENTITY);
-
-        particleRewriter.registerLevelParticles1_13(ClientboundPackets1_16_2.LEVEL_PARTICLES, Types.DOUBLE);
 
         registerClientbound(ClientboundPackets1_16_2.RESOURCE_PACK, wrapper -> {
             wrapper.passthrough(Types.STRING);
@@ -187,13 +169,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
     @Override
     protected void onMappingDataLoaded() {
         EntityTypes1_17.initialize(this);
-        Types1_17.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.ITEM1_13_2)
-            .reader("vibration", ParticleType.Readers.VIBRATION);
+        ParticleType.Fillers.fill1_17(this, Types1_17.PARTICLE);
 
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:axolotl_tempt_items", "minecraft:candles", "minecraft:cluster_max_harvestables",
             "minecraft:copper_ores", "minecraft:freeze_immune_wearables", "minecraft:occludes_vibration_signals");
@@ -228,12 +204,17 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
+    public BlockRewriter<ClientboundPackets1_16_2> getBlockRewriter() {
+        return blockRewriter;
+    }
+
+    @Override
     public ParticleRewriter<ClientboundPackets1_16_2> getParticleRewriter() {
         return particleRewriter;
     }
 
     @Override
-    public @Nullable ComponentRewriter1_17 getComponentRewriter() {
+    public ComponentRewriter1_17 getComponentRewriter() {
         return componentRewriter;
     }
 

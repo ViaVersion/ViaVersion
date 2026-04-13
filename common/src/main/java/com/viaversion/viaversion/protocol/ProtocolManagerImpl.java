@@ -23,6 +23,7 @@ import com.google.common.collect.Range;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
@@ -38,6 +39,7 @@ import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionType;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocol.packet.VersionedPacketTransformerImpl;
+import com.viaversion.viaversion.protocol.shared_registration.def.DefaultRegistrations;
 import com.viaversion.viaversion.protocols.base.InitialBaseProtocol;
 import com.viaversion.viaversion.protocols.base.v1_16.ClientboundBaseProtocol1_16;
 import com.viaversion.viaversion.protocols.base.v1_7.ClientboundBaseProtocol1_7;
@@ -76,6 +78,7 @@ import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.Protocol1_20_2To1_20_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.Protocol1_20To1_20_2;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.Protocol1_21_2To1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.Protocol1_21_5To1_21_6;
@@ -94,6 +97,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -112,9 +116,7 @@ import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Function;
 import java.util.logging.Level;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ProtocolManagerImpl implements ProtocolManager {
@@ -145,6 +147,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
             worker.setName("Via-Mappingloader-" + threadIndex.incrementAndGet());
             return worker;
         }, ForkJoinWorkerThread.getDefaultUncaughtExceptionHandler(), true);
+
+        DefaultRegistrations.apply();
     }
 
     public void registerProtocols() {
@@ -213,6 +217,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
         registerProtocol(new Protocol1_21_6To1_21_7(), ProtocolVersion.v1_21_7, ProtocolVersion.v1_21_6);
         registerProtocol(new Protocol1_21_7To1_21_9(), ProtocolVersion.v1_21_9, ProtocolVersion.v1_21_7);
         registerProtocol(new Protocol1_21_9To1_21_11(), ProtocolVersion.v1_21_11, ProtocolVersion.v1_21_9);
+
+        registerProtocol(new Protocol1_21_11To26_1(), ProtocolVersion.v26_1, ProtocolVersion.v1_21_11);
     }
 
     @Override
@@ -222,8 +228,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void registerProtocol(Protocol protocol, List<ProtocolVersion> supportedClientVersion, ProtocolVersion serverVersion) {
-        // Register the protocol's handlers
-        protocol.initialize();
+        // Set the server version on AbstractProtocol instances before initialization
+        if (protocol instanceof AbstractProtocol<?, ?, ?, ?> abstractProtocol) {
+            abstractProtocol.setServerVersion(serverVersion);
+            abstractProtocol.setClientVersion(supportedClientVersion.stream().max(ProtocolVersion::compareTo).orElseThrow());
+        }
 
         // Clear cache as this may make new routes.
         if (!pathCache.isEmpty()) {
@@ -245,14 +254,22 @@ public class ProtocolManagerImpl implements ProtocolManager {
             refreshVersions();
         }
 
-        if (protocol.hasMappingDataToLoad()) {
-            if (mappingLoaderExecutor != null) {
-                // Submit mapping data loading
-                addMappingLoaderFuture(protocol.getClass(), protocol::loadMappingData);
+        // Load mapping data and register the protocol's handlers
+        if (!protocol.hasMappingDataToLoad()) {
+            protocol.initialize();
+            return;
+        }
+
+        // Submit mapping data loading
+        if (mappingLoaderExecutor != null) {
+            if (protocol.dependsOn() != null) {
+                addMappingLoaderFuture(protocol.getClass(), protocol.dependsOn(), protocol::loadMappingData);
             } else {
-                // Late protocol adding - just do it on the current thread
-                protocol.loadMappingData();
+                addMappingLoaderFuture(protocol.getClass(), protocol::loadMappingData);
             }
+        } else {
+            // Late protocol adding - just do it on the current thread
+            protocol.loadMappingData();
         }
     }
 
@@ -481,7 +498,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public boolean checkForMappingCompletion() {
+    public boolean checkForMappingCompletion(final boolean propagateErrors) {
         mappingLoaderLock.readLock().lock();
         try {
             if (mappingsLoaded) {
@@ -492,6 +509,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
                 // Return if any future hasn't completed yet
                 if (!future.isDone()) {
                     return false;
+                }
+                if (propagateErrors) {
+                    future.join();
                 }
             }
 
@@ -504,7 +524,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Runnable runnable) {
-        CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor).exceptionally(mappingLoaderThrowable(protocolClass));
+        CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor)
+            .whenComplete(($, t) -> logIfErrored(protocolClass, t));
 
         mappingLoaderLock.writeLock().lock();
         try {
@@ -516,8 +537,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Class<? extends Protocol> dependsOn, Runnable runnable) {
-        CompletableFuture<Void> future = getMappingLoaderFuture(dependsOn)
-            .whenCompleteAsync((v, throwable) -> runnable.run(), mappingLoaderExecutor).exceptionally(mappingLoaderThrowable(protocolClass));
+        CompletableFuture<Void> future = getMappingLoaderFuture(dependsOn).thenRunAsync(runnable, mappingLoaderExecutor)
+            .whenComplete(($, t) -> logIfErrored(protocolClass, t));
 
         mappingLoaderLock.writeLock().lock();
         try {
@@ -568,10 +589,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
         MappingDataLoader.INSTANCE.clearCache();
     }
 
-    private Function<Throwable, Void> mappingLoaderThrowable(Class<? extends Protocol> protocolClass) {
-        return throwable -> {
-            Via.getPlatform().getLogger().log(Level.SEVERE, "Error during mapping loading of " + protocolClass.getSimpleName(), throwable);
-            return null;
-        };
+    private void logIfErrored(final Class<? extends Protocol> protocolClass, @Nullable final Throwable throwable) {
+        if (throwable != null) {
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Error during loading of " + protocolClass.getSimpleName(), throwable);
+        }
     }
 }

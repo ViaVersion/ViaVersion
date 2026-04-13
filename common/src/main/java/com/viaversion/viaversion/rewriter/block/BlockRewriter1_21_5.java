@@ -26,11 +26,16 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BlockRewriter1_21_5<C extends ClientboundPacketType> extends BlockRewriter<C> {
 
-    public BlockRewriter1_21_5(final Protocol<C, ?, ?, ?> protocol) {
-        super(protocol, Types.BLOCK_POSITION1_14, Types.COMPOUND_TAG);
+    public BlockRewriter1_21_5(final Protocol<C, ?, ?, ?> protocol, final ChunkTypeSupplier chunkTypeSupplier, @Nullable final ChunkTypeSupplier mappedChunkTypeSupplier) {
+        super(protocol, Types.BLOCK_POSITION1_14, Types.TRUSTED_COMPOUND_TAG, chunkTypeSupplier, mappedChunkTypeSupplier);
+    }
+
+    public BlockRewriter1_21_5(final Protocol<C, ?, ?, ?> protocol, final ChunkTypeSupplier chunkTypeSupplier) {
+        this(protocol, chunkTypeSupplier, null);
     }
 
     @Override

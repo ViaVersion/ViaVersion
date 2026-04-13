@@ -17,6 +17,8 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.viaversion.viaversion.api.data.FullMappings;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -24,13 +26,28 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
+import java.util.HashMap;
+import java.util.Map;
 
 // Base for 1.21.2 and onwards
 public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
+    protected final Map<String, SlotDisplayConsumer> slotDisplayHandlers = new HashMap<>();
     protected final Protocol<C, ?, ?, ?> protocol;
 
     public RecipeDisplayRewriter(final Protocol<C, ?, ?, ?> protocol) {
         this.protocol = protocol;
+
+        // empty and any_fuel are empty
+        slotDisplayHandlers.put("with_any_potion", this::handleSlotDisplay);
+        slotDisplayHandlers.put("only_with_component", this::handleOnlyWithComponentSlotDisplay);
+        slotDisplayHandlers.put("item", this::handleItemId);
+        slotDisplayHandlers.put("item_stack", this::handleItem);
+        slotDisplayHandlers.put("tag", wrapper -> wrapper.passthrough(Types.STRING));
+        slotDisplayHandlers.put("dyed", this::handleDyedSlotDisplay);
+        slotDisplayHandlers.put("smithing_trim", this::handleSmithingTrimSlotDisplay);
+        slotDisplayHandlers.put("with_remainder", this::handleWithRemainderSlotDisplay);
+        slotDisplayHandlers.put("composite", this::handleSlotDisplayList);
     }
 
     public void registerUpdateRecipes(final C packetType) {
@@ -124,15 +141,24 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
     }
 
     protected void handleSlotDisplay(final PacketWrapper wrapper) {
-        // empty and any_fuel are empty
-        final int type = wrapper.passthrough(Types.VAR_INT);
-        switch (type) {
-            case 2 -> handleItemId(wrapper); // Item type
-            case 3 -> handleItem(wrapper); // Item
-            case 4 -> wrapper.passthrough(Types.STRING); // Tag key
-            case 5 -> handleSmithingTrimSlotDisplay(wrapper); // Smithing trim
-            case 6 -> handleWithRemainderSlotDisplay(wrapper); // With remainder
-            case 7 -> handleSlotDisplayList(wrapper); // Composite
+        final FullMappings mappings = protocol.getMappingData().getSlotDisplayMappings();
+        final int type = wrapper.read(Types.VAR_INT);
+        final int mappedType = mappings.getNewId(type);
+        if (mappedType != -1) {
+            wrapper.write(Types.VAR_INT, mappedType);
+            runSlotDisplayHandler(wrapper, mappings, type);
+        } else {
+            // Write a dummy item if needed
+            wrapper.write(Types.VAR_INT, 0);
+            wrapper.consumeReadsOnly(() -> runSlotDisplayHandler(wrapper, mappings, type));
+        }
+    }
+
+    private void runSlotDisplayHandler(final PacketWrapper wrapper, final FullMappings mappings, final int type) {
+        final String identifier = mappings.identifier(type); // use the original type
+        final SlotDisplayConsumer handler = slotDisplayHandlers.get(Key.stripMinecraftNamespace(identifier));
+        if (handler != null) {
+            handler.accept(wrapper);
         }
     }
 
@@ -154,6 +180,17 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
         handleSlotDisplay(wrapper); // Remainder
     }
 
+    protected void handleOnlyWithComponentSlotDisplay(final PacketWrapper wrapper) {
+        handleSlotDisplay(wrapper); // Source
+        final int mappedDataComponentType = protocol.getMappingData().getDataComponentSerializerMappings().getNewIdOrDefault(wrapper.read(Types.VAR_INT), 0);
+        wrapper.write(Types.VAR_INT, mappedDataComponentType);
+    }
+
+    protected void handleDyedSlotDisplay(final PacketWrapper wrapper) {
+        handleSlotDisplay(wrapper); // Dye
+        handleSlotDisplay(wrapper); // Target
+    }
+
     protected void handleIngredient(final PacketWrapper wrapper) {
         final HolderSet items = wrapper.passthrough(Types.HOLDER_SET);
         if (items.hasTagKey()) {
@@ -173,14 +210,15 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
 
     protected void handleItem(final PacketWrapper wrapper) {
         final ItemRewriter<?> itemRewriter = protocol.getItemRewriter();
-        final Item item = wrapper.read(itemRewriter.itemType());
+        final Item item = wrapper.read(itemRewriter.itemTemplateType());
         itemRewriter.handleItemToClient(wrapper.user(), item);
-        wrapper.write(itemRewriter.mappedItemType(), item);
+        wrapper.write(itemRewriter.mappedItemTemplateType(), item);
     }
 
     protected int rewriteItemId(final int id) {
-        if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
-            return protocol.getMappingData().getItemMappings().getNewIdOrDefault(id, id);
+        final MappingData mappingData = protocol.getMappingData();
+        if (mappingData != null && mappingData.getItemMappings() != null) {
+            return mappingData.getItemMappings().getNewIdOrDefault(id, id);
         }
         return id;
     }
@@ -190,5 +228,11 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
             final int id = ids[i];
             ids[i] = rewriteItemId(id);
         }
+    }
+
+    @FunctionalInterface
+    public interface SlotDisplayConsumer {
+
+        void accept(PacketWrapper wrapper);
     }
 }

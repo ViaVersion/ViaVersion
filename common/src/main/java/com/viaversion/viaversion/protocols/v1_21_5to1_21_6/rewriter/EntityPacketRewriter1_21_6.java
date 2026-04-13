@@ -42,14 +42,6 @@ public final class EntityPacketRewriter1_21_6 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_21_5.ADD_ENTITY, EntityTypes1_21_6.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_21_5.SET_ENTITY_DATA);
-        registerRemoveEntities(ClientboundPackets1_21_5.REMOVE_ENTITIES);
-        registerPlayerAbilities(ClientboundPackets1_21_5.PLAYER_ABILITIES);
-        registerGameEvent(ClientboundPackets1_21_5.GAME_EVENT);
-        registerLogin1_20_5(ClientboundPackets1_21_5.LOGIN);
-        registerRespawn1_20_5(ClientboundPackets1_21_5.RESPAWN);
-
         protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
             // send server links dialog as vanilla doesn't show server links by default otherwise
             final PacketWrapper dialogsPacket = PacketWrapper.create(ClientboundConfigurationPackets1_21.REGISTRY_DATA, wrapper.user());
@@ -109,7 +101,7 @@ public final class EntityPacketRewriter1_21_6 extends EntityRewriter<Clientbound
     @Override
     protected void registerRewrites() {
         final EntityDataTypes1_21_5 entityDataTypes = VersionedTypes.V1_21_6.entityDataTypes;
-        filter().mapDataType(entityDataTypes::byId);
+        dataTypeMapper().register();
         registerEntityDataTypeHandler(
             entityDataTypes.itemType,
             entityDataTypes.blockStateType,
@@ -121,11 +113,6 @@ public final class EntityPacketRewriter1_21_6 extends EntityRewriter<Clientbound
         );
 
         filter().type(EntityTypes1_21_6.HANGING_ENTITY).addIndex(8); // Direction
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

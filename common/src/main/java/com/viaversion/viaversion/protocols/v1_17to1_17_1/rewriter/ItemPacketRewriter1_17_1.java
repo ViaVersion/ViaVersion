@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,22 +42,16 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
 
     @Override
     public void registerPackets() {
-        registerMerchantOffers(ClientboundPackets1_17.MERCHANT_OFFERS);
-        registerSetEquipment(ClientboundPackets1_17.SET_EQUIPMENT);
-        registerAdvancements(ClientboundPackets1_17.UPDATE_ADVANCEMENTS);
-
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_17.UPDATE_RECIPES);
 
-        registerSetCreativeModeSlot(ServerboundPackets1_17.SET_CREATIVE_MODE_SLOT);
-
-        protocol.registerClientbound(ClientboundPackets1_17.CONTAINER_SET_SLOT, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_17.CONTAINER_SET_SLOT, wrapper -> {
             wrapper.passthrough(Types.BYTE); // Container id
             wrapper.write(Types.VAR_INT, 0); // Add arbitrary state id
             wrapper.passthrough(Types.SHORT); // Slot id
             passthroughClientboundItem(wrapper);
         });
 
-        protocol.registerClientbound(ClientboundPackets1_17.CONTAINER_SET_CONTENT, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_17.CONTAINER_SET_CONTENT, wrapper -> {
             wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
             wrapper.write(Types.VAR_INT, 0); // Add arbitrary state id
             // Length encoded as var int now
@@ -70,7 +64,7 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
             wrapper.write(Types.ITEM1_13_2, null);
         });
 
-        protocol.registerServerbound(ServerboundPackets1_17.CONTAINER_CLICK, wrapper -> {
+        protocol.replaceServerbound(ServerboundPackets1_17.CONTAINER_CLICK, wrapper -> {
             wrapper.passthrough(Types.BYTE); // Container id
             wrapper.read(Types.VAR_INT); // Remove state id
             wrapper.passthrough(Types.SHORT); // Slot

@@ -60,7 +60,7 @@ public class InformativeException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        final StringBuilder builder = new StringBuilder("Please report this on the Via support Discord or open an issue on the relevant GitHub repository\n");
+        final StringBuilder builder = new StringBuilder("Please report the full error (!) from the console on the Via support Discord or open an issue on the relevant GitHub repository.\n");
         boolean first = true;
         for (final DataEntry entry : dataEntries) {
             if (!first) {

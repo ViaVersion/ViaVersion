@@ -107,11 +107,8 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
             wrapper.write(Types.SHORT, (short) 0); // velocity
         });
 
-        registerTrackerWithData(ClientboundPackets1_15.ADD_ENTITY, EntityTypes1_16.FALLING_BLOCK);
-        registerTracker(ClientboundPackets1_15.ADD_MOB);
         registerTracker(ClientboundPackets1_15.ADD_PLAYER, EntityTypes1_16.PLAYER);
         registerSetEntityData(ClientboundPackets1_15.SET_ENTITY_DATA, Types1_14.ENTITY_DATA_LIST, Types1_16.ENTITY_DATA_LIST);
-        registerRemoveEntities(ClientboundPackets1_15.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_15.RESPAWN, new PacketHandlers() {
             @Override
@@ -225,11 +222,6 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
             int angerTime = (mask & 0x02) != 0 ? Integer.MAX_VALUE : 0;
             event.createExtraData(new EntityData(20, Types1_16.ENTITY_DATA_TYPES.varIntType, angerTime));
         });
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

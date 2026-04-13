@@ -37,6 +37,7 @@ public interface ViaVersionCommand {
     /**
      * Removes a subcommand by name, can be used to unload default subcommands which are not supported
      * on the platform.
+     *
      * @param name Subcommand name
      */
     void removeSubCommand(String name);

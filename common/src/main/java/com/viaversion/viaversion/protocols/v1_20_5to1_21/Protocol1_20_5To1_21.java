@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
@@ -47,9 +48,8 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.ComponentRewri
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.EntityPacketRewriter1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.Key;
@@ -67,6 +67,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     private final ParticleRewriter<ClientboundPacket1_20_5> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket1_20_5> tagRewriter = new TagRewriter<>(this);
     private final JsonNBTComponentRewriter<ClientboundPacket1_20_5> componentRewriter = new ComponentRewriter1_21(this);
+    private final BlockRewriter<ClientboundPacket1_20_5> blockRewriter = BlockRewriter.for1_20_2(this, ChunkType1_20_2::new);
 
     public Protocol1_20_5To1_21() {
         super(ClientboundPacket1_20_5.class, ClientboundPacket1_21.class, ServerboundPacket1_20_5.class, ServerboundPacket1_20_5.class);
@@ -76,36 +77,14 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     protected void registerPackets() {
         super.registerPackets();
 
-        tagRewriter.registerGeneric(ClientboundPackets1_20_5.UPDATE_TAGS);
-        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_5.UPDATE_TAGS);
-
-        final SoundRewriter<ClientboundPacket1_20_5> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_5.SOUND);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_5.SOUND_ENTITY);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_20_5.AWARD_STATS);
-
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_20_5.OPEN_SCREEN);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_5.SET_ACTION_BAR_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_5.SET_TITLE_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_5.SET_SUBTITLE_TEXT);
-        componentRewriter.registerBossEvent(ClientboundPackets1_20_5.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_5.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets1_20_5.TAB_LIST);
-        componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_20_5.PLAYER_COMBAT_KILL);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_5.SYSTEM_CHAT);
-
-        particleRewriter.registerLevelParticles1_20_5(ClientboundPackets1_20_5.LEVEL_PARTICLES);
-        particleRewriter.registerExplode1_20_5(ClientboundPackets1_20_5.EXPLODE); // Rewrites the included sound and particles
-
-        registerClientbound(ClientboundPackets1_20_5.DISGUISED_CHAT, wrapper -> {
+        replaceClientbound(ClientboundPackets1_20_5.DISGUISED_CHAT, wrapper -> {
             componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_TAG)); // Message
 
             // Holder time
             final int chatType = wrapper.read(Types.VAR_INT);
             wrapper.write(ChatType.TYPE, Holder.of(chatType));
         });
-        registerClientbound(ClientboundPackets1_20_5.PLAYER_CHAT, wrapper -> {
+        replaceClientbound(ClientboundPackets1_20_5.PLAYER_CHAT, wrapper -> {
             wrapper.passthrough(Types.UUID); // Sender
             wrapper.passthrough(Types.VAR_INT); // Index
             wrapper.passthrough(Types.OPTIONAL_SIGNATURE_BYTES); // Signature
@@ -185,20 +164,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void onMappingDataLoaded() {
-        super.onMappingDataLoaded();
-
-        VersionedTypes.V1_21.particle.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("dust_pillar", ParticleType.Readers.BLOCK)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.item(VersionedTypes.V1_21.item))
-            .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
-            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK)
-            .reader("entity_effect", ParticleType.Readers.COLOR);
+        ParticleType.Fillers.fill1_20_5(this, mappedTypes().particle());
         VersionedTypes.V1_21.structuredData.filler(this)
             .add(StructuredDataKey.CUSTOM_DATA).add(StructuredDataKey.MAX_STACK_SIZE).add(StructuredDataKey.MAX_DAMAGE)
             .add(StructuredDataKey.DAMAGE).add(StructuredDataKey.UNBREAKABLE1_20_5).add(StructuredDataKey.RARITY)
@@ -220,7 +186,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
             .add(StructuredDataKey.LOCK1_20_5).add(StructuredDataKey.CONTAINER_LOOT).add(StructuredDataKey.TOOL1_20_5)
             .add(StructuredDataKey.ITEM_NAME).add(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER)
             .add(StructuredDataKey.FOOD1_21).add(StructuredDataKey.JUKEBOX_PLAYABLE1_21).add(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21);
-
+        super.onMappingDataLoaded();
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:blocks_wind_charge_explosions");
         tagRewriter.addEmptyTags(RegistryType.ENTITY, "minecraft:can_turn_in_boats", "minecraft:deflects_projectiles", "minecraft:immune_to_infested",
             "minecraft:immune_to_oozing", "minecraft:no_anger_from_wind_charge");
@@ -252,6 +218,11 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     @Override
     public BlockItemPacketRewriter1_21 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPacket1_20_5> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

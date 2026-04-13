@@ -103,10 +103,11 @@ import com.viaversion.viaversion.api.type.types.math.BlockPositionType1_8;
 import com.viaversion.viaversion.api.type.types.math.ChunkPositionType;
 import com.viaversion.viaversion.api.type.types.math.EulerAngleType;
 import com.viaversion.viaversion.api.type.types.math.GlobalBlockPositionType;
-import com.viaversion.viaversion.api.type.types.math.MovementVectorType;
+import com.viaversion.viaversion.api.type.types.math.LowPrecisionVectorType;
 import com.viaversion.viaversion.api.type.types.math.QuaternionType;
 import com.viaversion.viaversion.api.type.types.math.Vector3fType;
 import com.viaversion.viaversion.api.type.types.math.VectorType;
+import com.viaversion.viaversion.api.type.types.misc.CompoundTagHolderType;
 import com.viaversion.viaversion.api.type.types.misc.CompoundTagType;
 import com.viaversion.viaversion.api.type.types.misc.GameProfileType;
 import com.viaversion.viaversion.api.type.types.misc.HolderSetType;
@@ -198,13 +199,16 @@ public final class Types {
     public static final Type<Vector> VECTOR = new VectorType();
     public static final Type<Vector3f> VECTOR3F = new Vector3fType();
     public static final Type<Quaternion> QUATERNION = new QuaternionType();
-    public static final Type<Vector3d> MOVEMENT_VECTOR = new MovementVectorType();
+    public static final Type<Vector3d> LOW_PRECISION_VECTOR = new LowPrecisionVectorType();
+    @Deprecated(forRemoval = true)
+    public static final Type<Vector3d> MOVEMENT_VECTOR = LOW_PRECISION_VECTOR;
 
     public static final Type<CompoundTag> NAMED_COMPOUND_TAG = new NamedCompoundTagType();
     public static final Type<CompoundTag> OPTIONAL_NAMED_COMPOUND_TAG = new NamedCompoundTagType.OptionalNamedCompoundTagType();
     public static final Type<CompoundTag[]> NAMED_COMPOUND_TAG_ARRAY = new ArrayType<>(Types.NAMED_COMPOUND_TAG);
     public static final Type<CompoundTag> COMPOUND_TAG = new CompoundTagType();
     public static final Type<CompoundTag> OPTIONAL_COMPOUND_TAG = CompoundTagType.OptionalCompoundTagType.type();
+    public static final HolderType<CompoundTag> TRUSTED_COMPOUND_TAG_HOLDER = new CompoundTagHolderType();
 
     public static final Type<Tag> TAG = new TagType();
     public static final Type<Tag[]> TAG_ARRAY = new ArrayType<>(TAG);

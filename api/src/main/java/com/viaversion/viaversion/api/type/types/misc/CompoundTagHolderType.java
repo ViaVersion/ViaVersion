@@ -20,21 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item.data;
+package com.viaversion.viaversion.api.type.types.misc;
 
-import com.viaversion.viaversion.api.minecraft.codec.Ops;
-import com.viaversion.viaversion.api.type.TransformingType;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.util.Key;
+import io.netty.buffer.ByteBuf;
 
-public record DamageResistant(Key typesTagKey) {
+public final class CompoundTagHolderType extends HolderType<CompoundTag> {
 
-    public static final Type<DamageResistant> TYPE = new TransformingType<>(Types.IDENTIFIER, DamageResistant.class, DamageResistant::new, DamageResistant::typesTagKey) {
+    @Override
+    public CompoundTag readDirect(final ByteBuf buffer) {
+        return Types.TRUSTED_COMPOUND_TAG.read(buffer);
+    }
 
-        @Override
-        public void write(final Ops ops, final DamageResistant value) {
-            ops.writeMap(map -> map.write("types", Types.TAG_KEY, value.typesTagKey));
-        }
-    };
+    @Override
+    public void writeDirect(final ByteBuf buffer, final CompoundTag value) {
+        Types.TRUSTED_COMPOUND_TAG.write(buffer, value);
+    }
 }

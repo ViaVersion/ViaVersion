@@ -30,10 +30,10 @@ import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesP
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.CommandRewriter1_19_4;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPackets1_20_3;
@@ -47,9 +47,8 @@ import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPacket1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPackets1_20_2;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import java.nio.charset.StandardCharsets;
@@ -65,6 +64,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
     private final ParticleRewriter<ClientboundPacket1_20_2> particleRewriter = new ParticleRewriter<>(this);
     private final EntityPacketRewriter1_20_3 entityRewriter = new EntityPacketRewriter1_20_3(this);
     private final TagRewriter<ClientboundPacket1_20_2> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPacket1_20_2> blockRewriter = BlockRewriter.for1_20_2(this, ChunkType1_20_2::new);
 
     public Protocol1_20_2To1_20_3() {
         super(ClientboundPacket1_20_2.class, ClientboundPacket1_20_3.class, ServerboundPacket1_20_2.class, ServerboundPacket1_20_3.class);
@@ -75,16 +75,6 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
         super.registerPackets();
 
         cancelServerbound(ServerboundPackets1_20_3.CONTAINER_SLOT_STATE_CHANGED);
-
-        tagRewriter.registerGeneric(ClientboundPackets1_20_2.UPDATE_TAGS);
-        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
-
-        final SoundRewriter<ClientboundPacket1_20_2> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_2.SOUND);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_2.SOUND_ENTITY);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_20_2.AWARD_STATS);
-        new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_20_2.COMMANDS);
 
         registerClientbound(ClientboundPackets1_20_2.SET_SCORE, wrapper -> {
             wrapper.passthrough(Types.STRING); // Owner
@@ -132,7 +122,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
         });
 
         // Components are now (mostly) written as nbt instead of json strings
-        registerClientbound(ClientboundPackets1_20_2.UPDATE_ADVANCEMENTS, wrapper -> {
+        replaceClientbound(ClientboundPackets1_20_2.UPDATE_ADVANCEMENTS, wrapper -> {
             wrapper.passthrough(Types.BOOLEAN); // Reset/clear
             final int size = wrapper.passthrough(Types.VAR_INT); // Mapping size
             for (int i = 0; i < size; i++) {
@@ -250,7 +240,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
             convertOptionalComponent(wrapper); // Target name
         });
         registerClientbound(ClientboundPackets1_20_2.SYSTEM_CHAT, this::convertComponent);
-        registerClientbound(ClientboundPackets1_20_2.OPEN_SCREEN, wrapper -> {
+        replaceClientbound(ClientboundPackets1_20_2.OPEN_SCREEN, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Container id
 
             final int containerTypeId = wrapper.read(Types.VAR_INT);
@@ -348,17 +338,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
     @Override
     protected void onMappingDataLoaded() {
         EntityTypes1_20_3.initialize(this);
-        Types1_20_3.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.item(Types.ITEM1_20_2))
-            .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
-            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK);
-
+        ParticleType.Fillers.fill1_20_3(this, Types1_20_3.PARTICLE);
         super.onMappingDataLoaded();
     }
 
@@ -375,6 +355,11 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
     @Override
     public BlockItemPacketRewriter1_20_3 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPacket1_20_2> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

@@ -41,11 +41,9 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_19_1.ADD_ENTITY, EntityTypes1_19_3.FALLING_BLOCK);
         registerTracker(ClientboundPackets1_19_1.ADD_EXPERIENCE_ORB, EntityTypes1_19_3.EXPERIENCE_ORB);
         registerTracker(ClientboundPackets1_19_1.ADD_PLAYER, EntityTypes1_19_3.PLAYER);
         registerSetEntityData(ClientboundPackets1_19_1.SET_ENTITY_DATA, Types1_19.ENTITY_DATA_LIST, Types1_19_3.ENTITY_DATA_LIST);
-        registerRemoveEntities(ClientboundPackets1_19_1.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_19_1.LOGIN, new PacketHandlers() {
             @Override
@@ -169,11 +167,6 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                 data.setValue(pose + 1);
             }
         });
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

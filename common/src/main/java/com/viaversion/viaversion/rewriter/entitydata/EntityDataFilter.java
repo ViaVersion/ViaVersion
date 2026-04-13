@@ -22,8 +22,14 @@ import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.AbstractEntityDataTypes;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntArraySet;
+import it.unimi.dsi.fastutil.ints.IntComparators;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -32,6 +38,10 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
 
     public EntityDataFilter {
         Preconditions.checkNotNull(handler, "EntityDataHandler cannot be null");
+    }
+
+    public EntityDataFilter(final EntityDataHandler handler) {
+        this(null, true, null, -1, handler);
     }
 
     /**
@@ -82,7 +92,7 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
     /**
      * Returns whether if the entity data should be handled by this filter.
      *
-     * @param type     entity type
+     * @param type       entity type
      * @param entityData entityData
      * @return whether the data should be filtered
      */
@@ -211,6 +221,7 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
             register();
         }
 
+        // Mainly for pre-1.20.5 use
         public void mapDataType(Int2ObjectFunction<EntityDataType> updateFunction) {
             handler((event, data) -> {
                 EntityDataType mappedType = updateFunction.apply(data.dataType().typeId());
@@ -293,7 +304,112 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
          * @return created data filter
          */
         public EntityDataFilter build() {
+            Preconditions.checkNotNull(handler, "EntityDataHandler cannot be null");
             return new EntityDataFilter(type, filterFamily, dataType, index, handler);
+        }
+    }
+
+    public static final class DataTypeMapper {
+        private final IntList addedTypeIds = new IntArrayList();
+        private final IntList removedTypeIds = new IntArrayList();
+        private final IntSet skippedTypeIds = new IntArraySet();
+        private final EntityRewriter<?, ?> rewriter;
+        private final AbstractEntityDataTypes mappedDataTypes;
+
+        public DataTypeMapper(final EntityRewriter<?, ?> rewriter) {
+            this.rewriter = rewriter;
+            this.mappedDataTypes = rewriter.protocol().mappedTypes().entityDataTypes();
+        }
+
+        /**
+         * Marks a mapped entity data type as added.
+         *
+         * @param dataType added mapped entity data type
+         * @return self
+         */
+        public DataTypeMapper added(final EntityDataType dataType) {
+            Preconditions.checkArgument(dataType.getClass() == mappedDataTypes.getDataTypeClass());
+            this.addedTypeIds.add(dataType.typeId());
+            return this;
+        }
+
+        /**
+         * Marks an unmapped entity data type as removed.
+         * <p>
+         * Matching unmapped types are left untouched for the regular handlers to process and must be canceled or updated manually.
+         *
+         * @param dataType removed unmapped entity data type
+         * @return self
+         */
+        public DataTypeMapper removed(final EntityDataType dataType) {
+            Preconditions.checkArgument(dataType.getClass() == rewriter.protocol().types().entityDataTypes().getDataTypeClass());
+            this.removedTypeIds.add(dataType.typeId());
+            return this;
+        }
+
+        /**
+         * Skips automatic remapping for an unmapped entity data type so another handler can process it later.
+         *
+         * @param dataType unmapped entity data type to leave untouched
+         * @return self
+         */
+        public DataTypeMapper skip(final EntityDataType dataType) {
+            Preconditions.checkArgument(dataType.getClass() == rewriter.protocol().types().entityDataTypes().getDataTypeClass());
+            this.skippedTypeIds.add(dataType.typeId());
+            return this;
+        }
+
+        public void register() {
+            if (addedTypeIds.isEmpty() && removedTypeIds.isEmpty() && skippedTypeIds.isEmpty()) {
+                // Simple handler
+                rewriter.filter().handler((event, data) -> {
+                    final EntityDataType dataType = mappedDataTypes.byId(data.dataType().typeId());
+                    data.setDataType(dataType);
+                });
+                return;
+            }
+
+            this.addedTypeIds.sort(IntComparators.NATURAL_COMPARATOR);
+            this.removedTypeIds.sort(IntComparators.OPPOSITE_COMPARATOR);
+
+            rewriter.registerFilter(new EntityDataFilter((event, data) -> {
+                // Do not cancel removed elements yet so that filters can handle them (unless something sent an invalid packet for untracked entities)
+                final EntityDataType mappedType = mappedType(data.dataType());
+                if (mappedType != null) {
+                    data.setDataType(mappedType);
+                } else if (event.entityType() == null) {
+                    event.cancel();
+                }
+            }));
+        }
+
+        private @Nullable EntityDataType mappedType(final EntityDataType dataType) {
+            if (skippedTypeIds.contains(dataType.typeId()) || shouldCancel(dataType)) {
+                return null;
+            }
+
+            final int mappedId = mappedTypeId(dataType.typeId());
+            return mappedDataTypes.byId(mappedId);
+        }
+
+        private boolean shouldCancel(final EntityDataType dataType) {
+            return !removedTypeIds.isEmpty() && removedTypeIds.contains(dataType.typeId());
+        }
+
+        private int mappedTypeId(int typeId) {
+            // Starts with the highest removed
+            for (final int removedTypeId : removedTypeIds) {
+                if (typeId > removedTypeId) {
+                    typeId--;
+                }
+            }
+            // Starts with the first added
+            for (final int addedTypeId : addedTypeIds) {
+                if (typeId >= addedTypeId) {
+                    typeId++;
+                }
+            }
+            return typeId;
         }
     }
 }

@@ -39,14 +39,6 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_21_9(ClientboundPackets1_21_9.ADD_ENTITY, EntityTypes1_21_11.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_21_9.SET_ENTITY_DATA);
-        registerRemoveEntities(ClientboundPackets1_21_9.REMOVE_ENTITIES);
-        registerPlayerAbilities(ClientboundPackets1_21_9.PLAYER_ABILITIES);
-        registerGameEvent(ClientboundPackets1_21_9.GAME_EVENT);
-        registerLogin1_20_5(ClientboundPackets1_21_9.LOGIN);
-        registerRespawn1_20_5(ClientboundPackets1_21_9.RESPAWN);
-
         protocol.registerServerbound(ServerboundPackets1_21_6.PLAYER_ACTION, wrapper -> {
             final int action = wrapper.passthrough(Types.VAR_INT);
             // cancel spear "stab" packets sent by the client
@@ -61,12 +53,7 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
     @Override
     protected void registerRewrites() {
         final EntityDataTypes1_21_11 entityDataTypes = protocol.mappedTypes().entityDataTypes();
-        filter().mapDataType(id -> {
-            if (id >= entityDataTypes.zombieNautilusVariantType.typeId()) {
-                id++;
-            }
-            return entityDataTypes.byId(id);
-        });
+        dataTypeMapper().added(entityDataTypes.zombieNautilusVariantType).register();
         registerEntityDataTypeHandler(
             entityDataTypes.itemType,
             entityDataTypes.blockStateType,
@@ -83,11 +70,6 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
             final byte arm = data.value();
             data.setTypeAndValue(entityDataTypes.humanoidArmType, (int) arm);
         }));
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

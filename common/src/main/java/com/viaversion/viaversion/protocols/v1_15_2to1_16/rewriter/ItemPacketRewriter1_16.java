@@ -57,7 +57,7 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
             clearPacket.send(Protocol1_15_2To1_16.class);
         };
 
-        protocol.registerClientbound(ClientboundPackets1_15.OPEN_SCREEN, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_15.OPEN_SCREEN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // Window Id
@@ -106,12 +106,6 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
             }
         });
 
-        registerCooldown(ClientboundPackets1_15.COOLDOWN);
-        registerSetContent(ClientboundPackets1_15.CONTAINER_SET_CONTENT);
-        registerMerchantOffers(ClientboundPackets1_15.MERCHANT_OFFERS);
-        registerSetSlot(ClientboundPackets1_15.CONTAINER_SET_SLOT);
-        registerAdvancements(ClientboundPackets1_15.UPDATE_ADVANCEMENTS);
-
         protocol.registerClientbound(ClientboundPackets1_15.SET_EQUIPPED_ITEM, ClientboundPackets1_16.SET_EQUIPMENT, new PacketHandlers() {
             @Override
             public void register() {
@@ -126,9 +120,6 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
         });
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_15.UPDATE_RECIPES);
-
-        registerContainerClick(ServerboundPackets1_16.CONTAINER_CLICK);
-        registerSetCreativeModeSlot(ServerboundPackets1_16.SET_CREATIVE_MODE_SLOT);
 
         protocol.registerServerbound(ServerboundPackets1_16.CONTAINER_CLOSE, wrapper -> {
             InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);

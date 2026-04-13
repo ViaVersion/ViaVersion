@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
@@ -38,10 +37,9 @@ import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.ItemPacketRewr
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.PlayerPacketRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.WorldPacketRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.storage.EntityTracker1_14;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.ProtocolLogger;
@@ -55,6 +53,7 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
     private final ItemPacketRewriter1_14 itemRewriter = new ItemPacketRewriter1_14(this);
     private final ParticleRewriter<ClientboundPackets1_13> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_13> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPackets1_13> blockRewriter = BlockRewriter.for1_14(this);
 
     public Protocol1_13_2To1_14() {
         super(ClientboundPackets1_13.class, ClientboundPackets1_14.class, ServerboundPackets1_13.class, ServerboundPackets1_14.class);
@@ -66,11 +65,6 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
 
         WorldPacketRewriter1_14.register(this);
         PlayerPacketRewriter1_14.register(this);
-
-        new SoundRewriter<>(this).registerSound(ClientboundPackets1_13.SOUND);
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_13.AWARD_STATS);
-
-        particleRewriter.registerLevelParticles1_13(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
 
         JsonNBTComponentRewriter<ClientboundPackets1_13> componentRewriter = new ComponentRewriter1_14<>(this);
         componentRewriter.registerComponentPacket(ClientboundPackets1_13.CHAT);
@@ -109,16 +103,8 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
         WorldPacketRewriter1_14.caveAir = MAPPINGS.getBlockStateMappings().getNewId(8592);
 
         EntityTypes1_14.initialize(this);
-        Types1_13_2.PARTICLE.filler(this, false)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("item", ParticleType.Readers.ITEM1_13_2);
-        Types1_14.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("item", ParticleType.Readers.ITEM1_13_2);
+        ParticleType.Fillers.fill1_13_2(this, Types1_13_2.PARTICLE, false);
+        ParticleType.Fillers.fill1_13_2(this, Types1_14.PARTICLE, true);
 
         tagRewriter.addEmptyTag(RegistryType.BLOCK, "bamboo_plantable_on");
 
@@ -149,6 +135,11 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public ItemPacketRewriter1_14 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPackets1_13> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

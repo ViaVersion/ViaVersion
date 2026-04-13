@@ -44,7 +44,6 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.GroundFlagTrack
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.TeleportAckCancelStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -72,10 +71,6 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_21.ADD_ENTITY, EntityTypes1_21_2.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_21.SET_ENTITY_DATA);
-        registerRemoveEntities(ClientboundPackets1_21.REMOVE_ENTITIES);
-
         protocol.appendClientbound(ClientboundPackets1_21.ADD_ENTITY, wrapper -> {
             final int entityType = wrapper.get(Types.VAR_INT, 1);
 
@@ -118,10 +113,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             instrumentsPacket.send(Protocol1_21To1_21_2.class);
         });
 
-        final RegistryDataRewriter registryDataRewriter = registryDataRewriter();
-        protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
-
-        protocol.registerClientbound(ClientboundPackets1_21.LOGIN, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_21.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.INT); // Entity id
@@ -148,7 +140,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_21.RESPAWN, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_21.RESPAWN, wrapper -> {
             final int dimensionId = wrapper.passthrough(Types.VAR_INT);
             final String world = wrapper.passthrough(Types.STRING);
             wrapper.passthrough(Types.LONG); // Seed
@@ -452,27 +444,6 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         });
     }
 
-    private RegistryDataRewriter registryDataRewriter() {
-        final CompoundTag enderpearlData = new CompoundTag();
-        enderpearlData.putString("scaling", "when_caused_by_living_non_player");
-        enderpearlData.putString("message_id", "fall");
-        enderpearlData.putFloat("exhaustion", 0.0F);
-
-        final CompoundTag maceSmashData = new CompoundTag();
-        maceSmashData.putString("scaling", "when_caused_by_living_non_player");
-        maceSmashData.putString("message_id", "mace_smash");
-        maceSmashData.putFloat("exhaustion", 0.1F);
-
-        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
-        registryDataRewriter.addEntries(
-            "damage_type",
-            new RegistryEntry("minecraft:ender_pearl", enderpearlData),
-            new RegistryEntry("minecraft:mace_smash", maceSmashData)
-        );
-        registryDataRewriter.addEnchantmentEffectRewriter("damage_item", tag -> tag.putString("type", "change_item_damage"));
-        return registryDataRewriter;
-    }
-
     private void handleOnGround(final PacketWrapper wrapper) {
         final GroundFlagTracker tracker = wrapper.user().get(GroundFlagTracker.class);
 
@@ -504,7 +475,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
-        filter().mapDataType(VersionedTypes.V1_21_2.entityDataTypes::byId);
+        dataTypeMapper().register();
 
         registerEntityDataTypeHandler(
             VersionedTypes.V1_21_2.entityDataTypes.itemType,
@@ -675,10 +646,5 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
     @Override
     public EntityType typeFromId(final int type) {
         return EntityTypes1_21_2.getTypeFromId(type);
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 }

@@ -43,12 +43,12 @@ public record BlocksAttacks(
     float disableCooldownScale,
     DamageReduction[] damageReductions,
     ItemDamageFunction itemDamage,
-    @Nullable String bypassedByTag,
+    @Nullable HolderSet bypassedBy, // always a tag before 26.1
     @Nullable Holder<SoundEvent> blockSound,
     @Nullable Holder<SoundEvent> disableSound
 ) implements Rewritable {
 
-    public static final Type<BlocksAttacks> TYPE = new Type<>(BlocksAttacks.class) {
+    public static final Type<BlocksAttacks> TYPE1_21_5 = new Type<>(BlocksAttacks.class) {
 
         @Override
         public BlocksAttacks read(final ByteBuf buffer) {
@@ -59,7 +59,7 @@ public record BlocksAttacks(
             final String bypassedByTag = Types.OPTIONAL_STRING.read(buffer);
             final Holder<SoundEvent> blockSound = Types.OPTIONAL_SOUND_EVENT.read(buffer);
             final Holder<SoundEvent> disableSound = Types.OPTIONAL_SOUND_EVENT.read(buffer);
-            return new BlocksAttacks(blockDelaySeconds, disableCooldownScale, damageReductions, itemDamage, bypassedByTag, blockSound, disableSound);
+            return new BlocksAttacks(blockDelaySeconds, disableCooldownScale, damageReductions, itemDamage, bypassedByTag != null ? HolderSet.of(bypassedByTag) : null, blockSound, disableSound);
         }
 
         @Override
@@ -68,7 +68,7 @@ public record BlocksAttacks(
             buffer.writeFloat(value.disableCooldownScale());
             DamageReduction.ARRAY_TYPE.write(buffer, value.damageReductions());
             ItemDamageFunction.TYPE.write(buffer, value.itemDamage());
-            Types.OPTIONAL_STRING.write(buffer, value.bypassedByTag());
+            Types.OPTIONAL_STRING.write(buffer, value.bypassedBy() != null ? value.bypassedBy().tagKey() : null);
             Types.OPTIONAL_SOUND_EVENT.write(buffer, value.blockSound());
             Types.OPTIONAL_SOUND_EVENT.write(buffer, value.disableSound());
         }
@@ -82,7 +82,47 @@ public record BlocksAttacks(
                 .writeOptional("disable_cooldown_scale", Types.FLOAT, value.disableCooldownScale(), 1F)
                 .writeOptional("damage_reductions", DamageReduction.ARRAY_TYPE, value.damageReductions(), defaultDamageReductions)
                 .writeOptional("item_damage", ItemDamageFunction.TYPE, value.itemDamage(), defaultItemDamage)
-                .writeOptional("bypassed_by", Types.TAG_KEY, value.bypassedByTag() != null ? Key.of(value.bypassedByTag()) : null)
+                .writeOptional("bypassed_by", Types.TAG_KEY, value.bypassedBy() != null ? Key.of(value.bypassedBy().tagKey()) : null)
+                .writeOptional("block_sound", Types.SOUND_EVENT, value.blockSound())
+                .writeOptional("disabled_sound", Types.SOUND_EVENT, value.disableSound()));
+        }
+    };
+
+    public static final Type<BlocksAttacks> TYPE26_1 = new Type<>(BlocksAttacks.class) {
+
+        @Override
+        public BlocksAttacks read(final ByteBuf buffer) {
+            final float blockDelaySeconds = buffer.readFloat();
+            final float disableCooldownScale = buffer.readFloat();
+            final DamageReduction[] damageReductions = DamageReduction.ARRAY_TYPE.read(buffer);
+            final ItemDamageFunction itemDamage = ItemDamageFunction.TYPE.read(buffer);
+            final HolderSet bypassedByTag = Types.OPTIONAL_HOLDER_SET.read(buffer);
+            final Holder<SoundEvent> blockSound = Types.OPTIONAL_SOUND_EVENT.read(buffer);
+            final Holder<SoundEvent> disableSound = Types.OPTIONAL_SOUND_EVENT.read(buffer);
+            return new BlocksAttacks(blockDelaySeconds, disableCooldownScale, damageReductions, itemDamage, bypassedByTag, blockSound, disableSound);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final BlocksAttacks value) {
+            buffer.writeFloat(value.blockDelaySeconds());
+            buffer.writeFloat(value.disableCooldownScale());
+            DamageReduction.ARRAY_TYPE.write(buffer, value.damageReductions());
+            ItemDamageFunction.TYPE.write(buffer, value.itemDamage());
+            Types.OPTIONAL_HOLDER_SET.write(buffer, value.bypassedBy());
+            Types.OPTIONAL_SOUND_EVENT.write(buffer, value.blockSound());
+            Types.OPTIONAL_SOUND_EVENT.write(buffer, value.disableSound());
+        }
+
+        @Override
+        public void write(final Ops ops, final BlocksAttacks value) {
+            final DamageReduction[] defaultDamageReductions = {new DamageReduction(90, null, 0, 1)};
+            final ItemDamageFunction defaultItemDamage = new ItemDamageFunction(1, 0, 1);
+            ops.writeMap(map -> map
+                .writeOptional("block_delay_seconds", Types.FLOAT, value.blockDelaySeconds(), 0F)
+                .writeOptional("disable_cooldown_scale", Types.FLOAT, value.disableCooldownScale(), 1F)
+                .writeOptional("damage_reductions", DamageReduction.ARRAY_TYPE, value.damageReductions(), defaultDamageReductions)
+                .writeOptional("item_damage", ItemDamageFunction.TYPE, value.itemDamage(), defaultItemDamage)
+                .writeOptional("bypassed_by", Types.HOLDER_SET, value.bypassedBy())
                 .writeOptional("block_sound", Types.SOUND_EVENT, value.blockSound())
                 .writeOptional("disabled_sound", Types.SOUND_EVENT, value.disableSound()));
         }
@@ -92,7 +132,7 @@ public record BlocksAttacks(
     public BlocksAttacks rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         final Holder<SoundEvent> blockSound = SoundEvent.rewriteHolder(this.blockSound, Rewritable.soundRewriteFunction(protocol, clientbound));
         final Holder<SoundEvent> disableSound = SoundEvent.rewriteHolder(this.disableSound, Rewritable.soundRewriteFunction(protocol, clientbound));
-        return new BlocksAttacks(this.blockDelaySeconds, this.disableCooldownScale, this.damageReductions, this.itemDamage, this.bypassedByTag, blockSound, disableSound);
+        return new BlocksAttacks(this.blockDelaySeconds, this.disableCooldownScale, this.damageReductions, this.itemDamage, this.bypassedBy, blockSound, disableSound);
     }
 
     public record DamageReduction(float horizontalBlockingAngle, @Nullable HolderSet type, float base, float factor) {

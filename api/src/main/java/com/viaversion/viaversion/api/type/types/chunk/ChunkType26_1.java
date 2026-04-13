@@ -20,17 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.protocol;
+package com.viaversion.viaversion.api.type.types.chunk;
 
-/**
- * A simple protocol which does not have any packet types.
- * <p>
- * {@link AbstractProtocol} should be preferred over this class in most cases.
- */
-public abstract class AbstractSimpleProtocol extends AbstractProtocol<SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes,
-    SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes> implements SimpleProtocol {
+public final class ChunkType26_1 extends ChunkType1_21_5 {
 
-    protected AbstractSimpleProtocol() {
-        super(null, null, null, null);
+    public ChunkType26_1(final int ySectionCount, final int globalPaletteBlockBits, final int globalPaletteBiomeBits) {
+        super(new ChunkSectionType26_1(globalPaletteBlockBits, globalPaletteBiomeBits), ySectionCount);
     }
 }

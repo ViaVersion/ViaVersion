@@ -62,6 +62,17 @@ public interface ChunkSection {
     void setNonAirBlocksCount(int nonAirBlocksCount);
 
     /**
+     * Returns the number of fluid blocks in this section.
+     * <p>
+     * Available with versions 26.1+.
+     *
+     * @return fluid blocks in this section
+     */
+    int getFluidCount();
+
+    void setFluidCount(int fluidCount);
+
+    /**
      * Returns whether this section holds light data.
      * Only true for &lt; 1.14 chunks.
      *

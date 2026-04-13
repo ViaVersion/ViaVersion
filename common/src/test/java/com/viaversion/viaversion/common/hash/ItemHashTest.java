@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,6 +71,12 @@ public class ItemHashTest extends PlatformTestBase {
         hasher.reset();
     }
 
+    private HashOps hasher(final Class<? extends Protocol<?, ?, ?, ?>> protocolClass) {
+        final Protocol<?, ?, ?, ?> protocol = Via.getManager().getProtocolManager().getProtocol(protocolClass);
+        final CodecRegistryContext context = new CodecRegistryContext(null, CodecContext.RegistryAccess.of(protocol), false);
+        return new HashOps(context, HashFunction.CRC32C);
+    }
+
     @Test
     void testNumberAndKey() {
         final UseCooldown useCooldown = new UseCooldown(0.5f, ":stick");
@@ -107,13 +113,13 @@ public class ItemHashTest extends PlatformTestBase {
 
     @Test
     void testMapInList2() {
-        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys.container.type(), new Item[]{new StructuredItem(1, 1)});
+        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys().container.type(), new Item[]{new StructuredItem(1, 1)});
         Assertions.assertEquals(231516551, hasher.hash(), "container hash mismatch");
     }
 
     @Test
     void testContainerWithEmptyItem() {
-        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys.container.type(), new Item[]{StructuredItem.empty(), new StructuredItem(1, 1)});
+        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys().container.type(), new Item[]{StructuredItem.empty(), new StructuredItem(1, 1)});
         Assertions.assertEquals(1506540737, hasher.hash(), "container hash mismatch");
     }
 

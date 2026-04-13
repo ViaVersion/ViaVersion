@@ -74,11 +74,9 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_20_3.ADD_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
         registerSetEntityData(ClientboundPackets1_20_3.SET_ENTITY_DATA, Types1_20_3.ENTITY_DATA_LIST, VersionedTypes.V1_20_5.entityDataList);
-        registerRemoveEntities(ClientboundPackets1_20_3.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_20_3.SET_EQUIPMENT, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_20_3.SET_EQUIPMENT, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT); // Entity id
             final EntityType type = tracker(wrapper.user()).entityType(entityId);
 
@@ -557,11 +555,6 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
             particle.getArgument(0).setValue(withAlpha(color));
         }
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

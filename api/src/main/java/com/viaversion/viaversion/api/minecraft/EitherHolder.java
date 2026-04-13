@@ -38,7 +38,7 @@ public interface EitherHolder<T> {
     /**
      * Returns an indirect holder via the resource key.
      *
-     * @param key  the resource key
+     * @param key the resource key
      * @param <T> the type of the value
      * @return a new holder with the given resource key
      */

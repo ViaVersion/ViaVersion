@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -46,10 +47,10 @@ import com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter.WorldPacketRew
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.DimensionRegistryStorage;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.NonceStorage1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.SequenceStorage;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.CipherUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -63,6 +64,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
     private final ParticleRewriter<ClientboundPackets1_18> particleRewriter = new ParticleRewriter<>(this);
     private final ComponentRewriter1_19 componentRewriter = new ComponentRewriter1_19(this);
     private final TagRewriter<ClientboundPackets1_18> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPackets1_18> blockRewriter = BlockRewriter.for1_18(this, ChunkType1_18::new);
 
     public Protocol1_18_2To1_19() {
         super(ClientboundPackets1_18.class, ClientboundPackets1_19.class, ServerboundPackets1_17.class, ServerboundPackets1_19.class);
@@ -70,16 +72,13 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        tagRewriter.registerGeneric(ClientboundPackets1_18.UPDATE_TAGS);
-
-        entityRewriter.register();
-        itemRewriter.register();
+        super.registerPackets();
         WorldPacketRewriter1_19.register(this);
 
         cancelClientbound(ClientboundPackets1_18.ADD_VIBRATION_SIGNAL);
 
         final SoundRewriter<ClientboundPackets1_18> soundRewriter = new SoundRewriter<>(this);
-        registerClientbound(ClientboundPackets1_18.SOUND, new PacketHandlers() {
+        replaceClientbound(ClientboundPackets1_18.SOUND, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // Sound id
@@ -93,7 +92,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                 handler(soundRewriter.getSoundHandler());
             }
         });
-        registerClientbound(ClientboundPackets1_18.SOUND_ENTITY, new PacketHandlers() {
+        replaceClientbound(ClientboundPackets1_18.SOUND_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // Sound id
@@ -119,8 +118,6 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_18.AWARD_STATS);
-
         final PacketHandler singleNullTextComponentMapper = wrapper -> wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.user(), wrapper.read(Types.COMPONENT)));
         registerClientbound(ClientboundPackets1_18.SET_TITLE_TEXT, singleNullTextComponentMapper);
         registerClientbound(ClientboundPackets1_18.SET_SUBTITLE_TEXT, singleNullTextComponentMapper);
@@ -145,13 +142,6 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                 wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.user(), wrapper.read(Types.COMPONENT))); // Suffix
             }
         });
-
-        componentRewriter.registerBossEvent(ClientboundPackets1_18.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_18.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets1_18.TAB_LIST);
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_18.OPEN_SCREEN);
-        componentRewriter.registerPlayerCombatKill(ClientboundPackets1_18.PLAYER_COMBAT_KILL);
-        componentRewriter.registerPing();
 
         registerClientbound(ClientboundPackets1_18.PLAYER_INFO, wrapper -> {
             final int action = wrapper.passthrough(Types.VAR_INT);
@@ -336,17 +326,8 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void onMappingDataLoaded() {
-        Types1_19.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.ITEM1_13_2)
-            .reader("vibration", ParticleType.Readers.VIBRATION1_19)
-            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK);
         EntityTypes1_19.initialize(this);
+        ParticleType.Fillers.fill1_19(this, Types1_19.PARTICLE);
 
         tagRewriter.removeTag(RegistryType.ITEM, "minecraft:occludes_vibration_signals");
         tagRewriter.renameTag(RegistryType.ITEM, "minecraft:carpets", "minecraft:wool_carpets");
@@ -390,6 +371,11 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
     @Override
     public ItemPacketRewriter1_19 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPackets1_18> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

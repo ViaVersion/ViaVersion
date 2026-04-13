@@ -47,9 +47,8 @@ import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.EntityPacketRe
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.ItemPacketRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.WorldPacketRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.InventoryTracker1_16;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.Key;
@@ -67,6 +66,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
     private final ParticleRewriter<ClientboundPackets1_15> particleRewriter = new ParticleRewriter<>(this);
     private final ComponentRewriter1_16 componentRewriter = new ComponentRewriter1_16(this);
     private final TagRewriter<ClientboundPackets1_15> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPackets1_15> blockRewriter = BlockRewriter.for1_14(this);
 
     public Protocol1_15_2To1_16() {
         super(ClientboundPackets1_15.class, ClientboundPackets1_16.class, ServerboundPackets1_14.class, ServerboundPackets1_16.class);
@@ -79,10 +79,6 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         WorldPacketRewriter1_16.register(this);
 
         tagRewriter.register(ClientboundPackets1_15.UPDATE_TAGS, RegistryType.ENTITY);
-        particleRewriter.registerLevelParticles1_13(ClientboundPackets1_15.LEVEL_PARTICLES, Types.DOUBLE);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_15.AWARD_STATS);
-
         // Login Success
         registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
             // Transform string to a uuid
@@ -126,7 +122,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // Handle (relevant) component cases for translatable and score changes
-        registerClientbound(ClientboundPackets1_15.CHAT, new PacketHandlers() {
+        replaceClientbound(ClientboundPackets1_15.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.COMPONENT);
@@ -137,13 +133,6 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                 });
             }
         });
-        componentRewriter.registerBossEvent(ClientboundPackets1_15.BOSS_EVENT);
-        componentRewriter.registerTitle(ClientboundPackets1_15.SET_TITLES);
-        componentRewriter.registerPlayerCombat(ClientboundPackets1_15.PLAYER_COMBAT);
-
-        SoundRewriter<ClientboundPackets1_15> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound(ClientboundPackets1_15.SOUND);
-        soundRewriter.registerSound(ClientboundPackets1_15.SOUND_ENTITY);
 
         registerServerbound(ServerboundPackets1_16.INTERACT, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Entity Id
@@ -217,11 +206,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     protected void onMappingDataLoaded() {
         EntityTypes1_16.initialize(this);
-        Types1_16.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("item", ParticleType.Readers.ITEM1_13_2);
+        ParticleType.Fillers.fill1_13_2(this, Types1_16.PARTICLE, true);
 
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:crimson_stems", "minecraft:non_flammable_wood", "minecraft:piglin_loved",
             "minecraft:piglin_repellents", "minecraft:soul_fire_base_blocks", "minecraft:warped_stems");
@@ -256,6 +241,11 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public ItemPacketRewriter1_16 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPackets1_15> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

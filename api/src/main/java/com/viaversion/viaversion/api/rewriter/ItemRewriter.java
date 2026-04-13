@@ -102,6 +102,16 @@ public interface ItemRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter<T
         return itemArrayType();
     }
 
+    @Nullable
+    default Type<Item> itemTemplateType() {
+        return itemType();
+    }
+
+    @Nullable
+    default Type<Item> mappedItemTemplateType() {
+        return mappedItemType();
+    }
+
     /**
      * Returns the NBT tag name used for storing original item data.
      *

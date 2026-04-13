@@ -28,7 +28,12 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.EitherType;
 import com.viaversion.viaversion.util.Either;
 
+/**
+ * 1.21.11-only damage type.
+ *
+ * @param id registry int or string id
+ */
 public record DamageType(Either<Integer, String> id) {
 
-    public static final Type<DamageType> TYPE = TransformingType.of(new EitherType<>(Types.VAR_INT, Types.STRING), DamageType.class, DamageType::new, DamageType::id);
+    public static final Type<DamageType> TYPE1_21_11 = TransformingType.of(new EitherType<>(Types.VAR_INT, Types.STRING), DamageType.class, DamageType::new, DamageType::id);
 }

@@ -48,7 +48,6 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CommandBlockProvid
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.HandItemProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientWorld1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
-import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
 import java.util.ArrayList;
 import java.util.Optional;

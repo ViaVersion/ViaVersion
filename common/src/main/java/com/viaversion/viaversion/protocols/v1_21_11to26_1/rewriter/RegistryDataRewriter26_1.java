@@ -15,26 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.template;
+package com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPacket1_21_6;
-import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
+import com.viaversion.viaversion.util.Key;
 
-final class ComponentRewriter1_99 extends NBTComponentRewriter<ClientboundPacket1_21_6> {
+public final class RegistryDataRewriter26_1 extends RegistryDataRewriter {
 
-    public ComponentRewriter1_99(final Protocol1_98To1_99 protocol) {
+    public RegistryDataRewriter26_1(final Protocol<?, ?, ?, ?> protocol) {
         super(protocol);
     }
 
     @Override
-    protected void handleShowItem(final UserConnection connection, final CompoundTag itemTag, final CompoundTag componentsTag) {
-        super.handleShowItem(connection, itemTag, componentsTag);
-        if (componentsTag == null) {
-            return;
+    public void updateEnchantmentTerm(final CompoundTag term) {
+        if (Key.equals(term.getString("condition"), "time_check")) {
+            term.putString("clock", "overworld");
         }
 
-        // Remove or update data from componentsTag
+        super.updateEnchantmentTerm(term);
     }
 }

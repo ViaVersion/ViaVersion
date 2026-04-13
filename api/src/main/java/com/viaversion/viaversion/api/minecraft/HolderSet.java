@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
@@ -40,6 +41,7 @@ public interface HolderSet {
      * @return a new holder set
      */
     static HolderSet of(final String tagKey) {
+        Preconditions.checkNotNull(tagKey);
         return new HolderSetImpl.Tag(tagKey);
     }
 
@@ -50,6 +52,7 @@ public interface HolderSet {
      * @return a new holder set
      */
     static HolderSet of(final int[] ids) {
+        Preconditions.checkNotNull(ids);
         return new HolderSetImpl.Ids(ids);
     }
 

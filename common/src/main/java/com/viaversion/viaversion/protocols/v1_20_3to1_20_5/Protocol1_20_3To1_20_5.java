@@ -28,12 +28,12 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
-import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.CommandRewriter1_19_4;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPackets1_20_3;
@@ -55,8 +55,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStor
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ScoreboardTeamStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.TagKeys;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.ProtocolLogger;
@@ -80,6 +79,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
     private final ParticleRewriter1_20_5 particleRewriter = new ParticleRewriter1_20_5(this);
     private final TagRewriter<ClientboundPacket1_20_3> tagRewriter = new TagRewriter<>(this);
     private final ComponentRewriter1_20_5<ClientboundPacket1_20_3> componentRewriter = new ComponentRewriter1_20_5<>(this, VersionedTypes.V1_20_5.structuredData);
+    private final BlockRewriter<ClientboundPacket1_20_3> blockRewriter = BlockRewriter.for1_20_2(this, ChunkType1_20_2::new);
 
     public Protocol1_20_3To1_20_5() {
         super(ClientboundPacket1_20_3.class, ClientboundPacket1_20_5.class, ServerboundPacket1_20_3.class, ServerboundPacket1_20_5.class);
@@ -89,34 +89,6 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
     protected void registerPackets() {
         super.registerPackets();
 
-        registerClientbound(ClientboundPackets1_20_3.UPDATE_TAGS, this::updateTags);
-        registerClientbound(ClientboundConfigurationPackets1_20_3.UPDATE_TAGS, this::updateTags);
-
-        final SoundRewriter<ClientboundPacket1_20_3> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_3.SOUND);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_3.SOUND_ENTITY);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_20_3.AWARD_STATS);
-
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SYSTEM_CHAT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.DISGUISED_CHAT);
-        componentRewriter.registerPlayerChat(ClientboundPackets1_20_3.PLAYER_CHAT, Types.VAR_INT);
-        componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_20_3.PLAYER_COMBAT_KILL);
-
-        // People add item hovers to all sorts of weird places...
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_20_3.OPEN_SCREEN);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SET_ACTION_BAR_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SET_TITLE_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SET_SUBTITLE_TEXT);
-        componentRewriter.registerBossEvent(ClientboundPackets1_20_3.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.DISCONNECT);
-        componentRewriter.registerComponentPacket(ClientboundConfigurationPackets1_20_3.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets1_20_3.TAB_LIST);
-        componentRewriter.registerPlayerInfoUpdate1_20_3(ClientboundPackets1_20_3.PLAYER_INFO_UPDATE);
-        componentRewriter.registerSetObjective(ClientboundPackets1_20_3.SET_OBJECTIVE);
-        componentRewriter.registerSetScore1_20_3(ClientboundPackets1_20_3.SET_SCORE);
-        componentRewriter.registerPing();
-
         registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO, wrapper -> {
             wrapper.passthrough(Types.STRING); // Server ID
             wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE); // Public key
@@ -124,8 +96,8 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             wrapper.write(Types.BOOLEAN, true); // Authenticate
         });
 
-        registerClientbound(ClientboundPackets1_20_3.SERVER_DATA, wrapper -> {
-            wrapper.passthrough(Types.TRUSTED_TAG); // MOTD
+        replaceClientbound(ClientboundPackets1_20_3.SERVER_DATA, wrapper -> {
+            componentRewriter.passthroughAndProcess(wrapper); // MOTD
             wrapper.passthrough(Types.OPTIONAL_BYTE_ARRAY_PRIMITIVE); // Icon
 
             // Moved to join game
@@ -220,8 +192,6 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
 
         registerClientbound(ClientboundPackets1_20_3.START_CONFIGURATION, wrapper -> wrapper.user().put(new AcknowledgedMessagesStorage()));
 
-        new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_20_3.COMMANDS);
-
         registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
             wrapper.passthrough(Types.UUID); // UUID
             wrapper.passthrough(Types.STRING); // Name
@@ -229,7 +199,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             wrapper.write(Types.BOOLEAN, strictErrorHandling);
         });
 
-        registerClientbound(ClientboundPackets1_20_3.SET_PLAYER_TEAM, wrapper -> {
+        replaceClientbound(ClientboundPackets1_20_3.SET_PLAYER_TEAM, wrapper -> {
             final ScoreboardTeamStorage storage = wrapper.user().get(ScoreboardTeamStorage.class);
 
             final String teamName = wrapper.passthrough(Types.STRING);
@@ -307,18 +277,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
     @Override
     protected void onMappingDataLoaded() {
         EntityTypes1_20_5.initialize(this);
-        VersionedTypes.V1_20_5.particle.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("dust_pillar", ParticleType.Readers.BLOCK)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.item(VersionedTypes.V1_20_5.item))
-            .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
-            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK)
-            .reader("entity_effect", ParticleType.Readers.COLOR);
+        ParticleType.Fillers.fill1_20_5(this, VersionedTypes.V1_20_5.particle);
         VersionedTypes.V1_20_5.structuredData.filler(this)
             .add(StructuredDataKey.CUSTOM_DATA).add(StructuredDataKey.MAX_STACK_SIZE).add(StructuredDataKey.MAX_DAMAGE)
             .add(StructuredDataKey.DAMAGE).add(StructuredDataKey.UNBREAKABLE1_20_5).add(StructuredDataKey.RARITY)
@@ -375,6 +334,11 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
     @Override
     public BlockItemPacketRewriter1_20_5 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPacket1_20_3> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

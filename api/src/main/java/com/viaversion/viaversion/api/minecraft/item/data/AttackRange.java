@@ -56,8 +56,8 @@ public record AttackRange(float minRange, float maxRange,
         @Override
         public void write(final Ops ops, final AttackRange AttackRange) {
             ops.writeMap(map -> map
-                .writeOptional("min_range", Types.FLOAT, AttackRange.minRange, 0F)
-                .writeOptional("max_range", Types.FLOAT, AttackRange.maxRange, 3F)
+                .writeOptional("min_reach", Types.FLOAT, AttackRange.minRange, 0F)
+                .writeOptional("max_reach", Types.FLOAT, AttackRange.maxRange, 3F)
                 .writeOptional("min_creative_reach", Types.FLOAT, AttackRange.minCreativeRange, 0F)
                 .writeOptional("max_creative_reach", Types.FLOAT, AttackRange.maxCreativeRange, 5F)
                 .writeOptional("hitbox_margin", Types.FLOAT, AttackRange.hitboxMargin, 0.3F)

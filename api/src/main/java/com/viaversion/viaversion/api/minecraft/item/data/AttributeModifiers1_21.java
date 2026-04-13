@@ -37,6 +37,7 @@ import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean showInTooltip) implements Copyable, Rewritable {
 
@@ -226,7 +227,7 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
     }
 
     public static class Display implements Copyable {
-        public static final String[] DISPLAY_TYPES = {"default", "hidden", "override_text"};
+        public static final String[] DISPLAY_TYPES = {"default", "hidden", "override"};
         public static final Display DEFAULT = new Display(0);
         private final int id;
 
@@ -245,6 +246,17 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
         @Override
         public Display copy() {
             return this;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (!(o instanceof final Display display)) return false;
+            return id == display.id;
+        }
+
+        @Override
+        public int hashCode() {
+            return id;
         }
     }
 
@@ -270,6 +282,20 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
         @Override
         public OverrideText copy() {
             return new OverrideText(this.component.copy());
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (!(o instanceof final OverrideText that)) return false;
+            if (!super.equals(o)) return false;
+            return Objects.equals(component, that.component);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = super.hashCode();
+            result = 31 * result + Objects.hashCode(component);
+            return result;
         }
     }
 }

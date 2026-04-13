@@ -43,6 +43,10 @@ public abstract class AbstractEntityDataTypes implements EntityDataTypes {
         return values;
     }
 
+    public Class<? extends EntityDataType> getDataTypeClass() {
+        return byId(0).getClass();
+    }
+
     protected EntityDataType add(final int typeId, final Type<?> type) {
         if (values[typeId] != null) {
             throw new IllegalArgumentException("Entity data type ID " + typeId + " is already registered as " + values[typeId]);

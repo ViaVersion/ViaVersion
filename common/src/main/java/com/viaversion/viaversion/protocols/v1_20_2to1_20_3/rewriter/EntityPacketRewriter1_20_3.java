@@ -44,9 +44,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_20_2.ADD_ENTITY, EntityTypes1_20_3.FALLING_BLOCK);
         registerSetEntityData(ClientboundPackets1_20_2.SET_ENTITY_DATA, Types1_20_2.ENTITY_DATA_LIST, Types1_20_3.ENTITY_DATA_LIST);
-        registerRemoveEntities(ClientboundPackets1_20_2.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_2.REGISTRY_DATA, new PacketHandlers() {
             @Override
@@ -135,11 +133,6 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
             null
         );
         registerBlockStateHandler(EntityTypes1_20_3.ABSTRACT_MINECART, 11);
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

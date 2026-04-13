@@ -48,7 +48,7 @@ public final class Key {
      * Creates a new key with the given namespace and path.
      *
      * @param namespace the namespace of the identifier
-     * @param path the path of the identifier
+     * @param path      the path of the identifier
      * @return a new key with the given namespace and path
      */
     public static Key of(final String namespace, final String path) {

@@ -77,6 +77,14 @@ public interface FullMappings extends BiMappings {
      */
     @Nullable String mappedIdentifier(String identifier);
 
+    /**
+     * Returns whether the int id mappings are identity mappings.
+     *
+     * @return whether the int id mappings are identity mappings
+     * @see #isIdentity()
+     */
+    boolean isIntIdIdentity();
+
     @Override
     FullMappings inverse();
 }

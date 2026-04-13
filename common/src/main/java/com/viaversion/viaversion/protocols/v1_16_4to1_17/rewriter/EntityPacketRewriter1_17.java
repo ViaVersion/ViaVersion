@@ -43,8 +43,6 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData(ClientboundPackets1_16_2.ADD_ENTITY, EntityTypes1_17.FALLING_BLOCK);
-        registerTracker(ClientboundPackets1_16_2.ADD_MOB);
         registerTracker(ClientboundPackets1_16_2.ADD_PLAYER, EntityTypes1_17.PLAYER);
         registerSetEntityData(ClientboundPackets1_16_2.SET_ENTITY_DATA, Types1_16.ENTITY_DATA_LIST, Types1_17.ENTITY_DATA_LIST);
 
@@ -188,11 +186,6 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
 
         // Attachment position removed
         filter().type(EntityTypes1_17.SHULKER).removeIndex(17);
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

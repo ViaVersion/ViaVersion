@@ -63,6 +63,11 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
                     final CompoundTag damageTypeRegistry = protocol.getMappingData().damageTypesRegistry();
                     registry.put("minecraft:damage_type", damageTypeRegistry);
 
+                    final CompoundTag trimMaterialRegistry = new CompoundTag();
+                    trimMaterialRegistry.putString("type", "minecraft:trim_material");
+                    trimMaterialRegistry.put("value", new ListTag<>(CompoundTag.class));
+                    registry.put("minecraft:trim_material", trimMaterialRegistry);
+
                     final ListTag<CompoundTag> biomes = TagUtil.getRegistryEntries(registry, "worldgen/biome");
                     for (final CompoundTag biomeTag : biomes) {
                         final CompoundTag biomeData = biomeTag.getCompoundTag("element");
@@ -201,8 +206,6 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
             wrapper.write(Types.BYTE, event);
         });
 
-        registerTrackerWithData1_19(ClientboundPackets1_19_3.ADD_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
-        registerRemoveEntities(ClientboundPackets1_19_3.REMOVE_ENTITIES);
         registerSetEntityData(ClientboundPackets1_19_3.SET_ENTITY_DATA, Types1_19_3.ENTITY_DATA_LIST, Types1_19_4.ENTITY_DATA_LIST);
     }
 
@@ -231,11 +234,6 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
         });
 
         filter().type(EntityTypes1_19_4.ABSTRACT_HORSE).removeIndex(18); // Owner UUID
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

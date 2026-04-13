@@ -60,14 +60,14 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
      * Rewrites an item to the client, including item hash tracking if necessary.
      *
      * @param connection user connection
-     * @param item item
+     * @param item       item
      * @return the rewritten item, can be the same or a new object
      * @see #handleItemDataComponentsToClient(UserConnection, Item, StructuredDataContainer)
      * @see #handleItemToServer(UserConnection, Item)
      */
     @Override
     public Item handleItemToClient(UserConnection connection, Item item) {
-        if (item.isEmpty()) {
+        if (Item.isEmpty(item)) {
             return item;
         }
 
@@ -112,9 +112,10 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             return;
         }
 
-        // Always has to be AFTER any modification - Use the custom_data hash as a key to the original hashes.
+        // Always has to be AFTER any modification - Use the custom_data hash as a key to the original data (excluding amount, as that will simply be when copying).
         // This is much easier/cheaper than tracking via the full hashed item, as collisions are both acceptable and still unlikely.
         final CompoundTag originalHashes = new CompoundTag();
+        originalHashes.putInt("id", originalHashedItem.identifier());
         for (final Int2IntMap.Entry entry : originalHashedItem.dataHashesById().int2IntEntrySet()) {
             originalHashes.putInt(Integer.toString(entry.getIntKey()), entry.getIntValue());
         }
@@ -128,7 +129,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
 
     @Override
     public Item handleItemToServer(UserConnection connection, Item item) {
-        if (item.isEmpty()) {
+        if (Item.isEmpty(item)) {
             return item;
         }
 
@@ -169,8 +170,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
      * Always remember to call the super method.
      *
      * @param connection user connection
-     * @param item item to update
-     * @param container item data container
+     * @param item       item to update
+     * @param container  item data container
      */
     protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
         if (protocol.getComponentRewriter() != null) {
@@ -288,8 +289,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     /**
      * Stores inconvertible data in a backup tag. Called before data component modification to the item.
      *
-     * @param connection user connection
-     * @param item item to save data for
+     * @param connection    user connection
+     * @param item          item to save data for
      * @param dataContainer item data container
      */
     protected void backupInconvertibleData(final UserConnection connection, final Item item, final StructuredDataContainer dataContainer, final CompoundTag backupTag) {
@@ -298,8 +299,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     /**
      * Restored inconvertible backup data from the item. Called after rewritables and before the remaining data component modification.
      *
-     * @param item item
-     * @param container item data container
+     * @param item       item
+     * @param container  item data container
      * @param customData custom data tag
      */
     protected void restoreBackupData(final Item item, final StructuredDataContainer container, final CompoundTag customData) {
@@ -392,6 +393,22 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
 
             wrapper.passthrough(Types.SHORT); // Slot
             passthroughLengthPrefixedItem(wrapper);
+        });
+    }
+
+    public void registerShowDialog(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            final Holder<CompoundTag> holder = wrapper.passthrough(Types.TRUSTED_COMPOUND_TAG_HOLDER);
+            if (holder.isDirect()) {
+                protocol.getRegistryDataRewriter().updateDialog(wrapper.user(), holder.value());
+            }
+        });
+    }
+
+    public void registerShowDialogDirect(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            final CompoundTag dialogTag = wrapper.passthrough(Types.TRUSTED_COMPOUND_TAG);
+            protocol.getRegistryDataRewriter().updateDialog(wrapper.user(), dialogTag);
         });
     }
 }

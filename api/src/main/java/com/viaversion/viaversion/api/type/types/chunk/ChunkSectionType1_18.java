@@ -31,8 +31,8 @@ import io.netty.buffer.ByteBuf;
 
 public class ChunkSectionType1_18 extends Type<ChunkSection> {
 
-    private final PaletteTypeBase blockPaletteType;
-    private final PaletteTypeBase biomePaletteType;
+    protected final PaletteTypeBase blockPaletteType;
+    protected final PaletteTypeBase biomePaletteType;
 
     public ChunkSectionType1_18(final int globalPaletteBlockBits, final int globalPaletteBiomeBits) {
         super(ChunkSection.class);

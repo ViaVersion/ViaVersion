@@ -252,7 +252,6 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
             }
         });
 
-        registerRemoveEntities(ClientboundPackets1_13.REMOVE_ENTITIES);
         registerSetEntityData(ClientboundPackets1_13.SET_ENTITY_DATA, Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST);
     }
 
@@ -386,7 +385,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
 
     @Override
     public void onMappingDataLoaded() {
-        mapTypes();
+        super.onMappingDataLoaded();
         if (Via.getConfig().translateOcelotToCat()) {
             // A better solution for this would be to despawn the ocelot and spawn a cat in its place, but that would
             // require a lot of data tracking and is not worth the effort.

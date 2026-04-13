@@ -37,7 +37,7 @@ public class DisplayLeaksSubCmd implements ViaSubCommand {
 
     @Override
     public String usage() {
-        return "displayleaks <level>";
+        return "displayleaks [level]";
     }
 
     @Override

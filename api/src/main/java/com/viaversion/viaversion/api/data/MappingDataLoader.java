@@ -81,8 +81,9 @@ public class MappingDataLoader {
         for (final Map.Entry<String, Tag> entry : globalIdentifiers.entrySet()) {
             //noinspection unchecked
             final ListTag<StringTag> value = (ListTag<StringTag>) entry.getValue();
-            final String[] array = new String[value.size()];
-            for (int i = 0, size = value.size(); i < size; i++) {
+            final int size = value.size();
+            final String[] array = new String[size];
+            for (int i = 0; i < size; i++) {
                 array[i] = value.get(i).getValue();
             }
             GLOBAL_IDENTIFIER_INDEXES.put(entry.getKey(), array);
@@ -272,13 +273,60 @@ public class MappingDataLoader {
 
     public @Nullable List<String> identifiersFromGlobalIds(final CompoundTag mappingsTag, final String key) {
         final Mappings mappings = loadMappings(mappingsTag, key);
-        if (mappings == null) {
+        return mappings != null ? identifiers(mappings, key) : null;
+
+    }
+
+    /**
+     * Returns a pair of identifier lists, also keeping track of whether the two lists are equal.
+     *
+     * @param unmappedTag unmapped mappings tag
+     * @param mappedTag   mapped mappings tag
+     * @param key         mappings key
+     * @return pair of identifier lists
+     */
+    public @Nullable IdentifiersPair identifiersFromGlobalIds(final CompoundTag unmappedTag, final CompoundTag mappedTag, final String key) {
+        final Mappings unmapped = loadMappings(unmappedTag, key);
+        if (unmapped == null) {
             return null;
         }
 
+        final Mappings mapped = loadMappings(mappedTag, key);
+        if (mapped == null) {
+            return null;
+        }
+
+        final int size = unmapped.size();
+        if (size != mapped.size()) {
+            return new IdentifiersPair(identifiers(unmapped, key), identifiers(mapped, key), false);
+        }
+
+        // Small optimization to only load one array and reduce loading for full mappings
+        final List<String> unmappedIdentifiers = new ArrayList<>(size);
+        final List<String> mappedIdentifiers = new ArrayList<>(size);
+        boolean identity = true;
+        for (int i = 0; i < size; i++) {
+            final int unmappedGlobalId = unmapped.getNewId(i);
+            final int mappedGlobalId = mapped.getNewId(i);
+            final String unmappedIdentifier = identifierFromGlobalId(key, unmappedGlobalId);
+            if (unmappedGlobalId == mappedGlobalId) {
+                unmappedIdentifiers.add(unmappedIdentifier);
+                mappedIdentifiers.add(unmappedIdentifier);
+                continue;
+            }
+
+            identity = false;
+            unmappedIdentifiers.add(unmappedIdentifier);
+            mappedIdentifiers.add(identifierFromGlobalId(key, mappedGlobalId));
+        }
+        return identity ? new IdentifiersPair(unmappedIdentifiers) : new IdentifiersPair(unmappedIdentifiers, mappedIdentifiers);
+    }
+
+    private List<String> identifiers(final Mappings mappings, final String key) {
         final List<String> identifiers = new ArrayList<>(mappings.size());
         for (int i = 0; i < mappings.size(); i++) {
-            identifiers.add(identifierFromGlobalId(key, mappings.getNewId(i)));
+            final int globalId = mappings.getNewId(i);
+            identifiers.add(identifierFromGlobalId(key, globalId));
         }
         return identifiers;
     }
@@ -341,5 +389,16 @@ public class MappingDataLoader {
     public interface MappingsSupplier<T extends Mappings, V> {
 
         T create(V mappings, int mappedSize);
+    }
+
+    public record IdentifiersPair(List<String> unmapped, List<String> mapped, boolean identity) {
+
+        public IdentifiersPair(final List<String> unmapped, final List<String> mapped) {
+            this(unmapped, mapped, false);
+        }
+
+        public IdentifiersPair(final List<String> identifiers) {
+            this(identifiers, identifiers, true);
+        }
     }
 }

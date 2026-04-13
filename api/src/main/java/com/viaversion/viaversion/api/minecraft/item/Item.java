@@ -76,4 +76,23 @@ public interface Item extends ItemBase {
      */
     @Override
     Item copy();
+
+    /**
+     * Returns whether the item is a template item.
+     *
+     * @return whether the item is a template item
+     */
+    default boolean isTemplate() {
+        return false;
+    }
+
+    /**
+     * Returns whether the item is null or empty.
+     *
+     * @param item item
+     * @return whether the item is null or empty
+     */
+    static boolean isEmpty(@Nullable final Item item) {
+        return item == null || item.isEmpty();
+    }
 }

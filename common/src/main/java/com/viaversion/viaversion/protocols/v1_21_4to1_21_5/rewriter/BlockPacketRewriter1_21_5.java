@@ -23,6 +23,8 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
@@ -34,7 +36,7 @@ public final class BlockPacketRewriter1_21_5 extends BlockRewriter<ClientboundPa
     private final Protocol1_21_4To1_21_5 protocol;
 
     public BlockPacketRewriter1_21_5(final Protocol1_21_4To1_21_5 protocol) {
-        super(protocol, Types.BLOCK_POSITION1_14, Types.COMPOUND_TAG);
+        super(protocol, Types.BLOCK_POSITION1_14, Types.TRUSTED_COMPOUND_TAG, ChunkType1_20_2::new, ChunkType1_21_5::new);
         this.protocol = protocol;
     }
 

@@ -29,6 +29,8 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.FullMappings;
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -80,16 +82,16 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
         });
     }
 
-    public void registerPing() {
+    public void registerLoginDisconnect() {
         // Always json
         protocol.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper -> processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)));
     }
 
+    // Usually called via item rewriters
     public void registerOpenScreen1_14(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Id
             wrapper.passthrough(Types.VAR_INT); // Window Type
-            passthroughAndProcess(wrapper);
         });
     }
 
@@ -378,7 +380,8 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
     }
 
     protected void handleAttributeModifiers(final CompoundTag tag) {
-        if (protocol.getMappingData().getAttributeMappings() == null) {
+        final FullMappings mappings = protocol.getMappingData().getAttributeMappings();
+        if (Mappings.isFullIdentity(mappings)) {
             return;
         }
 
@@ -393,7 +396,7 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
                 return false;
             }
 
-            final String mappedId = protocol.getMappingData().getAttributeMappings().mappedIdentifier(typeTag.getValue());
+            final String mappedId = mappings.mappedIdentifier(typeTag.getValue());
             if (mappedId != null) {
                 typeTag.setValue(mappedId);
                 return false;

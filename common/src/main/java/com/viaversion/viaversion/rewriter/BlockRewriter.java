@@ -48,32 +48,51 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     protected final Protocol<C, ?, ?, ?> protocol;
     private final Type<BlockPosition> positionType;
     private final Type<CompoundTag> compoundTagType;
+    private final ChunkTypeSupplier chunkTypeSupplier;
+    private final ChunkTypeSupplier mappedChunkTypeSupplier;
 
-    public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<BlockPosition> positionType, Type<CompoundTag> compoundTagType) {
+    public BlockRewriter(
+        final Protocol<C, ?, ?, ?> protocol,
+        final Type<BlockPosition> positionType, final Type<CompoundTag> compoundTagType,
+        final ChunkTypeSupplier chunkTypeSupplier, @Nullable final ChunkTypeSupplier mappedChunkTypeSupplier
+    ) {
         this.protocol = protocol;
         this.positionType = positionType;
         this.compoundTagType = compoundTagType;
+        this.chunkTypeSupplier = chunkTypeSupplier;
+        this.mappedChunkTypeSupplier = mappedChunkTypeSupplier;
     }
 
     public static <C extends ClientboundPacketType> BlockRewriter<C> legacy(final Protocol<C, ?, ?, ?> protocol) {
-        return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_8, Types.NAMED_COMPOUND_TAG);
+        return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_8, Types.NAMED_COMPOUND_TAG, null, null);
     }
 
     public static <C extends ClientboundPacketType> BlockRewriter<C> for1_14(final Protocol<C, ?, ?, ?> protocol) {
-        return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_14, Types.NAMED_COMPOUND_TAG);
+        return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_14, Types.NAMED_COMPOUND_TAG, null, null);
     }
 
-    public static <C extends ClientboundPacketType> BlockRewriter<C> for1_20_2(final Protocol<C, ?, ?, ?> protocol) {
-        return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_14, Types.COMPOUND_TAG);
+    public static <C extends ClientboundPacketType> BlockRewriter<C> for1_18(final Protocol<C, ?, ?, ?> protocol, final ChunkTypeSupplier chunkTypeSupplier) {
+        return for1_18(protocol, chunkTypeSupplier, null);
+    }
+
+    public static <C extends ClientboundPacketType> BlockRewriter<C> for1_18(final Protocol<C, ?, ?, ?> protocol, final ChunkTypeSupplier chunkTypeSupplier, final ChunkTypeSupplier mappedChunkTypeSupplier) {
+        return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_14, Types.NAMED_COMPOUND_TAG, chunkTypeSupplier, mappedChunkTypeSupplier);
+    }
+
+    public static <C extends ClientboundPacketType> BlockRewriter<C> for1_20_2(final Protocol<C, ?, ?, ?> protocol, final ChunkTypeSupplier chunkTypeSupplier) {
+        return for1_20_2(protocol, chunkTypeSupplier, null);
+    }
+
+    public static <C extends ClientboundPacketType> BlockRewriter<C> for1_20_2(final Protocol<C, ?, ?, ?> protocol, final ChunkTypeSupplier chunkTypeSupplier, final ChunkTypeSupplier mappedChunkTypeSupplier) {
+        return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_14, Types.TRUSTED_COMPOUND_TAG, chunkTypeSupplier, mappedChunkTypeSupplier);
     }
     // See the block package for more recent versions
 
     public void registerBlockEvent(C packetType) {
+        if (Mappings.isIntIdIdentity(protocol.getMappingData().getBlockMappings())) {
+            return;
+        }
         protocol.registerClientbound(packetType, wrapper -> {
-            if (protocol.getMappingData().getBlockMappings() == null) {
-                return;
-            }
-
             wrapper.passthrough(positionType); // Location
             wrapper.passthrough(Types.UNSIGNED_BYTE); // Action id
             wrapper.passthrough(Types.UNSIGNED_BYTE); // Action param
@@ -91,6 +110,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerBlockUpdate(C packetType) {
+        if (Mappings.isIntIdIdentity(protocol.getMappingData().getBlockStateMappings())) {
+            return;
+        }
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(positionType);
 
@@ -100,6 +122,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerChunkBlocksUpdate(C packetType) {
+        if (Mappings.isIntIdIdentity(protocol.getMappingData().getBlockStateMappings())) {
+            return;
+        }
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.INT); // Chunk X
             wrapper.passthrough(Types.INT); // Chunk Z
@@ -110,6 +135,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerSectionBlocksUpdate(C packetType) {
+        if (Mappings.isIntIdIdentity(protocol.getMappingData().getBlockStateMappings())) {
+            return;
+        }
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.LONG); // Chunk position
             wrapper.passthrough(Types.BOOLEAN); // Suppress light updates
@@ -120,6 +148,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerSectionBlocksUpdate1_20(C packetType) {
+        if (Mappings.isIntIdIdentity(protocol.getMappingData().getBlockStateMappings())) {
+            return;
+        }
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.LONG); // Chunk position
             for (BlockChangeRecord record : wrapper.passthrough(Types.VAR_LONG_BLOCK_CHANGE_ARRAY)) {
@@ -133,13 +164,25 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         registerBlockUpdate(packetType);
     }
 
-    public void registerLevelEvent(C packetType, int playRecordId, int blockBreakId) {
+    public void registerLevelEvent1_13(C packetType) {
+        registerLevelEvent(packetType, 1010, 2001);
+    }
+
+    public void registerLevelEvent1_21(C packetType) {
+        registerLevelEvent(packetType, -1, 2001);
+    }
+
+    private void registerLevelEvent(C packetType, int playRecordId, int blockBreakId) {
+        final MappingData mappingData = protocol.getMappingData();
+        if (mappingData == null
+            || Mappings.isIntIdIdentity(mappingData.getItemMappings()) && Mappings.isIntIdIdentity(mappingData.getBlockStateMappings())) {
+            return;
+        }
         protocol.registerClientbound(packetType, wrapper -> {
             final int id = wrapper.passthrough(Types.INT);
             wrapper.passthrough(positionType);
 
             final int data = wrapper.read(Types.INT);
-            final MappingData mappingData = protocol.getMappingData();
             if (playRecordId != -1 && id == playRecordId && mappingData.getItemMappings() != null) {
                 wrapper.write(Types.INT, mappingData.getNewItemId(data));
             } else if (id == blockBreakId && mappingData.getBlockStateMappings() != null) {
@@ -148,10 +191,6 @@ public class BlockRewriter<C extends ClientboundPacketType> {
                 wrapper.write(Types.INT, data);
             }
         });
-    }
-
-    public void registerLevelEvent1_21(C packetType, int blockBreakId) {
-        registerLevelEvent(packetType, -1, blockBreakId);
     }
 
     public void registerLevelChunk(C packetType, Type<Chunk> chunkType, Type<Chunk> newChunkType) {
@@ -185,9 +224,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         }
     }
 
-    public void registerLevelChunk1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier) {
+    public void registerLevelChunk1_18(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            final Chunk chunk = handleChunk1_19(wrapper, chunkTypeSupplier);
+            final Chunk chunk = handleChunk1_18(wrapper);
             handleBlockEntities(chunk, wrapper.user());
         });
     }
@@ -230,14 +269,19 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         }
     }
 
-    public Chunk handleChunk1_19(PacketWrapper wrapper, ChunkTypeSupplier chunkTypeSupplier) {
+    public Chunk handleChunk1_18(PacketWrapper wrapper) {
         final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
         Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
         Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
-        final Type<Chunk> chunkType = chunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
-            MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
-            MathUtil.ceilLog2(tracker.biomesSent()));
-        final Chunk chunk = wrapper.passthrough(chunkType);
+        final Type<Chunk> chunkType = createChunkType(chunkTypeSupplier, tracker, false);
+        final Type<Chunk> mappedChunkType = mappedChunkTypeSupplier != null
+            ? createChunkType(mappedChunkTypeSupplier, tracker, true)
+            : chunkType;
+        final Chunk chunk = wrapper.passthroughAndMap(chunkType, mappedChunkType);
+        if (Mappings.isIntIdIdentity(protocol.getMappingData().getBlockStateMappings())) {
+            return chunk;
+        }
+
         for (final ChunkSection section : chunk.getSections()) {
             final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
             for (int i = 0; i < blockPalette.size(); i++) {
@@ -248,7 +292,16 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         return chunk;
     }
 
-    public void registerBlockEntityData(C packetType) {
+    protected Type<Chunk> createChunkType(ChunkTypeSupplier supplier, EntityTracker tracker, boolean mapped) {
+        final Mappings mappings = protocol.getMappingData().getBlockStateMappings();
+        return supplier.supply(
+            tracker.currentWorldSectionHeight(),
+            MathUtil.ceilLog2(mapped ? mappings.mappedSize() : mappings.size()),
+            MathUtil.ceilLog2(tracker.biomesSent())
+        );
+    }
+
+    public void registerBlockEntityData1_18(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             final BlockPosition position = wrapper.passthrough(positionType);
 

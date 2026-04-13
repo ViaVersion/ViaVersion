@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16_2;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.Protocol1_16_1To1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,12 +34,7 @@ public class WorldPacketRewriter1_16_2 {
     private static final BlockChangeRecord[] EMPTY_RECORDS = new BlockChangeRecord[0];
 
     public static void register(Protocol1_16_1To1_16_2 protocol) {
-        BlockRewriter<ClientboundPackets1_16> blockRewriter = BlockRewriter.for1_14(protocol);
-
-        blockRewriter.registerBlockEvent(ClientboundPackets1_16.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_16.BLOCK_UPDATE);
-        blockRewriter.registerBlockBreakAck(ClientboundPackets1_16.BLOCK_BREAK_ACK);
-        blockRewriter.registerLevelChunk(ClientboundPackets1_16.LEVEL_CHUNK, ChunkType1_16.TYPE, ChunkType1_16_2.TYPE);
+        protocol.getBlockRewriter().registerLevelChunk(ClientboundPackets1_16.LEVEL_CHUNK, ChunkType1_16.TYPE, ChunkType1_16_2.TYPE);
 
         protocol.registerClientbound(ClientboundPackets1_16.CHUNK_BLOCKS_UPDATE, ClientboundPackets1_16_2.SECTION_BLOCKS_UPDATE, wrapper -> {
             wrapper.cancel();
@@ -78,7 +72,5 @@ public class WorldPacketRewriter1_16_2 {
                 newPacket.send(Protocol1_16_1To1_16_2.class);
             }
         });
-
-        blockRewriter.registerLevelEvent(ClientboundPackets1_16.LEVEL_EVENT, 1010, 2001);
     }
 }

@@ -51,6 +51,11 @@ final class PacketIdMapping implements PacketMapping {
     }
 
     @Override
+    public void setHandler(@Nullable final PacketHandler handler) {
+        this.handler = handler;
+    }
+
+    @Override
     public @Nullable PacketHandler handler() {
         return handler;
     }

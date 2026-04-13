@@ -17,20 +17,21 @@
  */
 package com.viaversion.viaversion.protocols.v1_21to1_21_2;
 
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_2;
-import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
@@ -56,9 +57,9 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.GroundFlagTrack
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.LastExplosionPowerStorage;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.TeleportAckCancelStorage;
-import com.viaversion.viaversion.rewriter.AttributeRewriter;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
+import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -78,6 +79,8 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     private final TagRewriter<ClientboundPacket1_21> tagRewriter = new TagRewriter<>(this);
     private final ComponentRewriter1_21_2 componentRewriter = new ComponentRewriter1_21_2(this);
     private final SoundRewriter<ClientboundPacket1_21> soundRewriter = new SoundRewriter<>(this);
+    private final BlockRewriter<ClientboundPacket1_21> blockRewriter = BlockRewriter.for1_20_2(this, ChunkType1_20_2::new);
+    private final RegistryDataRewriter registryDataRewriter = registryDataRewriter();
 
     public Protocol1_21To1_21_2() {
         super(ClientboundPacket1_21.class, ClientboundPacket1_21_2.class, ServerboundPacket1_20_5.class, ServerboundPacket1_21_2.class);
@@ -86,34 +89,6 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     @Override
     protected void registerPackets() {
         super.registerPackets();
-
-        tagRewriter.registerGeneric(ClientboundPackets1_21.UPDATE_TAGS);
-        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21.UPDATE_TAGS);
-
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_21.OPEN_SCREEN);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21.SET_ACTION_BAR_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21.SET_TITLE_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21.SET_SUBTITLE_TEXT);
-        componentRewriter.registerBossEvent(ClientboundPackets1_21.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21.DISCONNECT);
-        componentRewriter.registerComponentPacket(ClientboundConfigurationPackets1_21.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets1_21.TAB_LIST);
-        componentRewriter.registerSetPlayerTeam1_13(ClientboundPackets1_21.SET_PLAYER_TEAM);
-        componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21.PLAYER_COMBAT_KILL);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_21.SYSTEM_CHAT);
-        componentRewriter.registerDisguisedChat(ClientboundPackets1_21.DISGUISED_CHAT);
-        componentRewriter.registerPlayerChat(ClientboundPackets1_21.PLAYER_CHAT, ChatType.TYPE);
-        componentRewriter.registerSetObjective(ClientboundPackets1_21.SET_OBJECTIVE);
-        componentRewriter.registerSetScore1_20_3(ClientboundPackets1_21.SET_SCORE);
-        componentRewriter.registerPing();
-
-        particleRewriter.registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
-
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_21.SOUND);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_21.SOUND_ENTITY);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_21.AWARD_STATS);
-        new AttributeRewriter<>(this).register1_21(ClientboundPackets1_21.UPDATE_ATTRIBUTES);
 
         registerServerbound(ServerboundPackets1_21_2.CLIENT_INFORMATION, this::clientInformation);
         registerServerbound(ServerboundConfigurationPackets1_20_5.CLIENT_INFORMATION, this::clientInformation);
@@ -140,7 +115,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
             wrapper.write(Types.BOOLEAN, doDaylightCycle);
         });
 
-        registerClientbound(ClientboundPackets1_21.PLAYER_INFO_UPDATE, wrapper -> {
+        replaceClientbound(ClientboundPackets1_21.PLAYER_INFO_UPDATE, wrapper -> {
             final BitSet actions = wrapper.passthroughAndMap(Types.PROFILE_ACTIONS_ENUM1_19_3, Types.PROFILE_ACTIONS_ENUM1_21_2);
             if (!actions.get(5)) { // Update display name
                 return;
@@ -241,22 +216,9 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     @Override
     protected void onMappingDataLoaded() {
         EntityTypes1_21_2.initialize(this);
-        VersionedTypes.V1_21_2.particle.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust_pillar", ParticleType.Readers.BLOCK)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("block_crumble", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST1_21_2)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION1_21_2)
-            .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
-            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK)
-            .reader("entity_effect", ParticleType.Readers.COLOR)
-            .reader("trail", ParticleType.Readers.TRAIL1_21_2)
-            .reader("item", ParticleType.Readers.item(VersionedTypes.V1_21_2.item));
+        ParticleType.Fillers.fill1_21_2(this);
         VersionedTypes.V1_21_2.structuredData.filler(this).add(StructuredDataKey.CUSTOM_DATA, StructuredDataKey.MAX_STACK_SIZE, StructuredDataKey.MAX_DAMAGE,
-            StructuredDataKey.UNBREAKABLE1_20_5, StructuredDataKey.RARITY, StructuredDataKey.HIDE_TOOLTIP, StructuredDataKey.DAMAGE_RESISTANT,
+            StructuredDataKey.UNBREAKABLE1_20_5, StructuredDataKey.RARITY, StructuredDataKey.HIDE_TOOLTIP, StructuredDataKey.DAMAGE_RESISTANT1_21_2,
             StructuredDataKey.CUSTOM_NAME, StructuredDataKey.LORE, StructuredDataKey.ENCHANTMENTS1_20_5, StructuredDataKey.CAN_PLACE_ON1_20_5,
             StructuredDataKey.CAN_BREAK1_20_5, StructuredDataKey.CUSTOM_MODEL_DATA1_20_5, StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP,
             StructuredDataKey.REPAIR_COST, StructuredDataKey.CREATIVE_SLOT_LOCK, StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE,
@@ -315,6 +277,16 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
+    public BlockRewriter<ClientboundPacket1_21> getBlockRewriter() {
+        return blockRewriter;
+    }
+
+    @Override
+    public RegistryDataRewriter getRegistryDataRewriter() {
+        return registryDataRewriter;
+    }
+
+    @Override
     public ParticleRewriter1_21_2 getParticleRewriter() {
         return particleRewriter;
     }
@@ -325,7 +297,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    public ComponentRewriter getComponentRewriter() {
+    public ComponentRewriter1_21_2 getComponentRewriter() {
         return componentRewriter;
     }
 
@@ -351,5 +323,26 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
             packetTypeMap(mappedServerboundPacketType, ServerboundPackets1_20_5.class, ServerboundConfigurationPackets1_20_5.class),
             packetTypeMap(unmappedServerboundPacketType, ServerboundPackets1_21_2.class, ServerboundConfigurationPackets1_20_5.class)
         );
+    }
+
+    private RegistryDataRewriter registryDataRewriter() {
+        final CompoundTag enderpearlData = new CompoundTag();
+        enderpearlData.putString("scaling", "when_caused_by_living_non_player");
+        enderpearlData.putString("message_id", "fall");
+        enderpearlData.putFloat("exhaustion", 0.0F);
+
+        final CompoundTag maceSmashData = new CompoundTag();
+        maceSmashData.putString("scaling", "when_caused_by_living_non_player");
+        maceSmashData.putString("message_id", "mace_smash");
+        maceSmashData.putFloat("exhaustion", 0.1F);
+
+        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
+        registryDataRewriter.addEntries(
+            "damage_type",
+            new RegistryEntry("minecraft:ender_pearl", enderpearlData),
+            new RegistryEntry("minecraft:mace_smash", maceSmashData)
+        );
+        registryDataRewriter.addEnchantmentEffectRewriter("damage_item", tag -> tag.putString("type", "change_item_damage"));
+        return registryDataRewriter;
     }
 }

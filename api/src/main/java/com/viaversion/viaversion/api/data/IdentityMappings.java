@@ -38,4 +38,9 @@ public record IdentityMappings(int size, int mappedSize) implements Mappings {
     public Mappings inverse() {
         return new IdentityMappings(mappedSize, size);
     }
+
+    @Override
+    public boolean isIdentity() {
+        return true;
+    }
 }

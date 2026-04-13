@@ -37,8 +37,6 @@ import com.viaversion.viaversion.protocols.v1_17_1to1_18.rewriter.WorldPacketRew
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ChunkLightStorage;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.ProtocolLogger;
 
@@ -62,27 +60,6 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
         itemRewriter.register();
         WorldPacketRewriter1_18.register(this);
 
-        final SoundRewriter<ClientboundPackets1_17_1> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound(ClientboundPackets1_17_1.SOUND);
-        soundRewriter.registerSound(ClientboundPackets1_17_1.SOUND_ENTITY);
-
-        tagRewriter.registerGeneric(ClientboundPackets1_17_1.UPDATE_TAGS);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_17_1.AWARD_STATS);
-
-        componentRewriter.registerComponentPacket(ClientboundPackets1_17_1.CHAT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_17_1.SET_ACTION_BAR_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_17_1.SET_TITLE_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_17_1.SET_SUBTITLE_TEXT);
-        componentRewriter.registerBossEvent(ClientboundPackets1_17_1.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_17_1.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets1_17_1.TAB_LIST);
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_17_1.OPEN_SCREEN);
-        componentRewriter.registerPlayerCombatKill(ClientboundPackets1_17_1.PLAYER_COMBAT_KILL);
-        componentRewriter.registerSetPlayerTeam1_13(ClientboundPackets1_17_1.SET_PLAYER_TEAM);
-        componentRewriter.registerSetObjective(ClientboundPackets1_17_1.SET_OBJECTIVE);
-        componentRewriter.registerPing();
-
         registerServerbound(ServerboundPackets1_17.CLIENT_INFORMATION, new PacketHandlers() {
             @Override
             public void register() {
@@ -100,14 +77,7 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void onMappingDataLoaded() {
-        Types1_18.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.ITEM1_13_2)
-            .reader("vibration", ParticleType.Readers.VIBRATION);
+        ParticleType.Fillers.fill1_18(this, Types1_18.PARTICLE);
 
         tagRewriter.renameTag(RegistryType.BLOCK, "minecraft:lava_pool_stone_replaceables", "minecraft:lava_pool_stone_cannot_replace");
 
