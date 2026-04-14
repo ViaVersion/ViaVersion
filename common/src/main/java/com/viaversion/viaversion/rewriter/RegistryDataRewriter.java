@@ -399,24 +399,14 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         }
 
         final CompoundTag requirements = effectsTag.getCompoundTag("requirements");
-        final ListTag<CompoundTag> terms;
-        if (requirements != null && (terms = requirements.getListTag("terms", CompoundTag.class)) != null) {
-            for (final CompoundTag term : terms) {
-                updateEnchantmentTerm(term);
-            }
+        if (requirements != null) {
+            updateEnchantmentTerm(requirements);
         }
     }
 
     public void updateEnchantmentTerm(final CompoundTag term) {
         final String condition = term.getString("condition");
-        if (Key.equals(condition, "all_of") || Key.equals(condition, "any_of")) {
-            final ListTag<CompoundTag> terms = term.getListTag("terms", CompoundTag.class);
-            if (terms != null) {
-                for (final CompoundTag childTerm : terms) {
-                    updateEnchantmentTerm(childTerm);
-                }
-            }
-        } else if (Key.equals(condition, "inverted")) {
+        if (Key.equals(condition, "inverted")) {
             final CompoundTag childTerm = term.getCompoundTag("term");
             if (childTerm != null) {
                 updateEnchantmentTerm(childTerm);
@@ -425,9 +415,17 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             final CompoundTag predicate = term.getCompoundTag("predicate");
             if (predicate != null) {
                 updateType(predicate, "type", protocol.getMappingData().getEntityMappings());
+                updateType(predicate, "entity_type", protocol.getMappingData().getEntityMappings());
             }
         } else if (Key.equals(condition, "block_state_property")) {
             updateType(term, "block", protocol.getMappingData().getFullBlockMappings());
+        } else {
+            final ListTag<CompoundTag> terms = term.getListTag("terms", CompoundTag.class);
+            if (terms != null) {
+                for (final CompoundTag childTerm : terms) {
+                    updateEnchantmentTerm(childTerm);
+                }
+            }
         }
     }
 
@@ -488,6 +486,10 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     }
 
     private void setMappedOrDummyId(final FullMappings mappings, final StringTag tag) {
+        if (Key.stripMinecraftNamespace(tag.getValue()).startsWith("#")) {
+            return;
+        }
+
         String mappedType = mappings.mappedIdentifier(tag.getValue());
         if (mappedType == null) {
             mappedType = mappings.mappedIdentifier(0); // Dummy

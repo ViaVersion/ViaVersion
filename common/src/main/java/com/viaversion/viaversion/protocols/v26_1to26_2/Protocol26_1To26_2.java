@@ -17,6 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.v26_1to26_2;
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
@@ -46,6 +49,7 @@ import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
+import com.viaversion.viaversion.util.Key;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
@@ -58,7 +62,21 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
     private final ParticleRewriter<ClientboundPacket26_1> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket26_1> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket26_1> componentRewriter = new NBTComponentRewriter<>(this);
-    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
+    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this) {
+        @Override
+        public void updateEnchantmentTerm(final CompoundTag term) {
+            super.updateEnchantmentTerm(term);
+
+            final String condition = term.getString("condition");
+            if (Key.equals(condition, "entity_properties")) {
+                final CompoundTag predicate = term.getCompoundTag("predicate");
+                final Tag typeTag = predicate.remove("type");
+                if (typeTag != null) {
+                    predicate.put("entity_type", typeTag);
+                }
+            }
+        }
+    };
 
     public Protocol26_1To26_2() {
         super(ClientboundPacket26_1.class, ClientboundPacket26_1.class, ServerboundPacket26_1.class, ServerboundPacket26_1.class);
