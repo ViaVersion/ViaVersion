@@ -281,7 +281,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     }
 
     protected void addEntityTracker(UserConnection connection) {
-        final EntityType playerEntityType = getEntityRewriter().mappedTypeFromId("player");
+        final EntityType playerEntityType = getEntityRewriter().typeFromId("player");
         Preconditions.checkNotNull(playerEntityType, "Player entity type not found");
         connection.addEntityTracker(this.getClass(), new EntityTrackerBase(connection, playerEntityType));
     }

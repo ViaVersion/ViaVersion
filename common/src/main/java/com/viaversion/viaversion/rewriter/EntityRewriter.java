@@ -190,6 +190,13 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         return identifier;
     }
 
+    @Override
+    public @Nullable EntityType typeFromId(final String type) {
+        final FullMappings mappings = protocol().getMappingData().getEntityMappings();
+        final int id = trackMappedType ? mappings.mappedId(type) : mappings.id(type);
+        return id == -1 ? null : typeFromId(id);
+    }
+
     /**
      * Maps an entity type.
      *
@@ -308,7 +315,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     EntityType entityType = tracker(wrapper.user()).entityType(entityId);
-                    if (entityType == mappedTypeFromId("falling_block")) {
+                    if (entityType == typeFromId("falling_block")) {
                         wrapper.set(Types.INT, 0, protocol.getMappingData().getNewBlockStateId(wrapper.get(Types.INT, 0)));
                     }
                 });
@@ -330,7 +337,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             final int data = wrapper.passthrough(Types.VAR_INT);
 
             final EntityType entityType = trackAndRewrite(wrapper, entityTypeId, entityId);
-            if (protocol.getMappingData() != null && entityType == mappedTypeFromId("falling_block")) {
+            if (protocol.getMappingData() != null && entityType == typeFromId("falling_block")) {
                 final int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(data);
                 wrapper.set(Types.VAR_INT, 2, mappedBlockStateId);
             }
@@ -351,7 +358,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             wrapper.passthrough(Types.BYTE); // Head yaw
             final int data = wrapper.passthrough(Types.VAR_INT);
             final EntityType entityType = trackAndRewrite(wrapper, entityTypeId, entityId);
-            if (protocol.getMappingData() != null && entityType == mappedTypeFromId("falling_block")) {
+            if (protocol.getMappingData() != null && entityType == typeFromId("falling_block")) {
                 final int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(data);
                 wrapper.set(Types.VAR_INT, 2, mappedBlockStateId);
             }

@@ -40,10 +40,7 @@ public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter
      */
     EntityType typeFromId(int type);
 
-    default @Nullable EntityType mappedTypeFromId(final String type) {
-        final int id = protocol().getMappingData().getEntityMappings().mappedId(type);
-        return id == -1 ? null : typeFromId(id);
-    }
+    @Nullable EntityType typeFromId(String type);
 
     /**
      * Returns the entity type from the given id.
