@@ -308,7 +308,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     EntityType entityType = tracker(wrapper.user()).entityType(entityId);
-                    if (entityType == typeFromId("falling_block")) {
+                    if (entityType == newEntityType("falling_block")) {
                         wrapper.set(Types.INT, 0, protocol.getMappingData().getNewBlockStateId(wrapper.get(Types.INT, 0)));
                     }
                 });
