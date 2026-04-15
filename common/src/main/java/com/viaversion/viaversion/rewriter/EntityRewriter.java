@@ -190,6 +190,13 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         return identifier;
     }
 
+    @Override
+    public @Nullable EntityType typeFromId(final String type) {
+        final FullMappings mappings = protocol().getMappingData().getEntityMappings();
+        final int id = trackMappedType ? mappings.mappedId(type) : mappings.id(type);
+        return id == -1 ? null : typeFromId(id);
+    }
+
     /**
      * Maps an entity type.
      *
