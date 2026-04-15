@@ -69,6 +69,15 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
             wrapper.cancel();
             setDirection.send(Protocol1_16_4To1_17.class);
         });
+        protocol.appendClientbound(ClientboundPackets1_16_2.ADD_ENTITY, wrapper -> {
+            final int entityType = wrapper.get(Types.VAR_INT, 1);
+            if (entityType != EntityTypes1_17.FALLING_BLOCK.getId()) {
+                return;
+            }
+            final int data = wrapper.get(Types.INT, 0);
+            final int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(data);
+            wrapper.set(Types.INT, 0, mappedBlockStateId);
+        });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.REMOVE_ENTITIES, null, wrapper -> {
             int[] entityIds = wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE);

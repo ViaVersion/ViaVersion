@@ -330,7 +330,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             final int data = wrapper.passthrough(Types.VAR_INT);
 
             final EntityType entityType = trackAndRewrite(wrapper, entityTypeId, entityId);
-            if (protocol.getMappingData() != null && entityType == typeFromId("falling_block")) {
+            if (protocol.getMappingData() != null && entityType == newEntityType("falling_block")) {
                 final int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(data);
                 wrapper.set(Types.VAR_INT, 2, mappedBlockStateId);
             }
@@ -351,7 +351,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             wrapper.passthrough(Types.BYTE); // Head yaw
             final int data = wrapper.passthrough(Types.VAR_INT);
             final EntityType entityType = trackAndRewrite(wrapper, entityTypeId, entityId);
-            if (protocol.getMappingData() != null && entityType == typeFromId("falling_block")) {
+            if (protocol.getMappingData() != null && entityType == newEntityType("falling_block")) {
                 final int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(data);
                 wrapper.set(Types.VAR_INT, 2, mappedBlockStateId);
             }
@@ -614,6 +614,17 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
         tracker(wrapper.user()).addEntity(entityId, entityType);
         return entityType;
+    }
+
+    /**
+     * Retrieves the remapped entity type for a given entity type.
+     * This method resolves the correct entity type ID based on the protocol's mapping and returns the corresponding entity type.
+     *
+     * @param type the entity type to remap
+     * @return the remapped entity type
+     */
+    public EntityType newEntityType(final String type) {
+        return typeFromId(newEntityId(typeFromId(type).getId()));
     }
 
     // ---------------------------------------------------------------------------
