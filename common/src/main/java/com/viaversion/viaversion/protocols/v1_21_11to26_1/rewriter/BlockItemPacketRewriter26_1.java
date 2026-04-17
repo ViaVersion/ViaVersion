@@ -58,9 +58,13 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
         protocol.replaceClientbound(ClientboundPackets1_21_11.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
             final Chunk chunk = protocol.getBlockRewriter().handleChunk1_18(wrapper);
             for (final ChunkSection section : chunk.getSections()) {
+                if (section.getNonAirBlocksCount() == 0) {
+                    continue;
+                }
+
                 final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
-                for (int i = 0; i < blockPalette.size(); i++) {
-                    final int id = blockPalette.idByIndex(i);
+                for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                    final int id = blockPalette.idAt(idx);
                     if (Protocol1_21_11To26_1.MAPPINGS.fluidBlockStates().contains(id)) {
                         // Needed for certain client-side fluid interactions
                         section.setFluidCount(section.getFluidCount() + 1);

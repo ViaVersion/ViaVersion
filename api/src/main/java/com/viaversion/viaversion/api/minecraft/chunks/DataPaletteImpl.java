@@ -163,7 +163,7 @@ public final class DataPaletteImpl implements DataPalette {
         }
     }
 
-    private class ByteChunkData implements ChunkData {
+    private final class ByteChunkData implements ChunkData {
         private final byte[] data;
 
         public ByteChunkData(int size) {
@@ -187,7 +187,7 @@ public final class DataPaletteImpl implements DataPalette {
         }
     }
 
-    private static class ShortChunkData implements ChunkData {
+    private static final class ShortChunkData implements ChunkData {
         private final short[] data;
 
         public ShortChunkData(byte[] data) {
