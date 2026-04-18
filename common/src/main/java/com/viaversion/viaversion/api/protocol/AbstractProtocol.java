@@ -526,31 +526,6 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         return logger;
     }
 
-    @Override
-    public @Nullable TagRewriter<CU> getTagRewriter() {
-        return null;
-    }
-
-    @Override
-    public @Nullable ComponentRewriterBase<CU> getComponentRewriter() {
-        return null;
-    }
-
-    @Override
-    public com.viaversion.viaversion.rewriter.@Nullable ParticleRewriter<CU> getParticleRewriter() {
-        return null;
-    }
-
-    @Override
-    public com.viaversion.viaversion.rewriter.@Nullable EntityRewriter<CU, ?> getEntityRewriter() {
-        return null;
-    }
-
-    @Override
-    public com.viaversion.viaversion.rewriter.@Nullable ItemRewriter<CU, SU, ?> getItemRewriter() {
-        return null;
-    }
-
     public com.viaversion.viaversion.rewriter.@Nullable BlockRewriter<CU> getBlockRewriter() {
         return null;
     }
