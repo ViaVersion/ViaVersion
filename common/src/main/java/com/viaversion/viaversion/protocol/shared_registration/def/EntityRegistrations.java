@@ -91,6 +91,6 @@ final class EntityRegistrations {
 
 
     static @Nullable <CU extends ClientboundPacketType, SU extends ServerboundPacketType> EntityRewriter<CU, ?> entity(final RegistrationContext<CU, SU> ctx) {
-        return ctx.protocol().getEntityRewriter();
+        return (EntityRewriter<CU, ?>) ctx.protocol().getEntityRewriter();
     }
 }

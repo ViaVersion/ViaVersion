@@ -36,18 +36,21 @@ import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
+import com.viaversion.viaversion.rewriter.TagRewriter;
 
 final class RegistryRegistrations {
 
     static <CU extends ClientboundPacketType> void registerTags1_17_1(final RegistrationContext<CU, ?> ctx) {
-        if (ctx.protocol().getTagRewriter() == null) return;
-        ctx.clientbound(ClientboundPackets1_17_1.UPDATE_TAGS, ctx.protocol().getTagRewriter()::registerGeneric);
+        if (ctx.protocol().getTagRewriter() instanceof final TagRewriter tagRewriter) {
+            ctx.clientbound(ClientboundPackets1_17_1.UPDATE_TAGS, tagRewriter::registerGeneric);
+        }
     }
 
     static <CU extends ClientboundPacketType> void registerTags1_20_2(final RegistrationContext<CU, ?> ctx) {
-        if (ctx.protocol().getTagRewriter() == null) return;
-        ctx.clientbound(ClientboundPackets1_20_2.UPDATE_TAGS, ctx.protocol().getTagRewriter()::registerGeneric);
-        ctx.clientbound(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS, ctx.protocol().getTagRewriter()::registerGeneric, PacketBound.ADDED_AT_MIN);
+        if (ctx.protocol().getTagRewriter() instanceof final TagRewriter tagRewriter) {
+            ctx.clientbound(ClientboundPackets1_20_2.UPDATE_TAGS, tagRewriter::registerGeneric);
+            ctx.clientbound(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS, tagRewriter::registerGeneric, PacketBound.ADDED_AT_MIN);
+        }
     }
 
 

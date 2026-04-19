@@ -176,7 +176,7 @@ final class ItemRegistrations {
     }
 
     static @Nullable <CU extends ClientboundPacketType, SU extends ServerboundPacketType> ItemRewriter<CU, SU, ?> item(final RegistrationContext<CU, SU> ctx) {
-        return ctx.protocol().getItemRewriter();
+        return (ItemRewriter<CU, SU, ?>) ctx.protocol().getItemRewriter();
     }
 
     static @Nullable <CU extends ClientboundPacketType, SU extends ServerboundPacketType> StructuredItemRewriter<CU, SU, ?> structuredItem(final RegistrationContext<CU, SU> ctx) {

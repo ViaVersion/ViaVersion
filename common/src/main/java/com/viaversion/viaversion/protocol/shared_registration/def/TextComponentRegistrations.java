@@ -184,7 +184,7 @@ final class TextComponentRegistrations {
     }
 
     static @Nullable <CU extends ClientboundPacketType, SU extends ServerboundPacketType> ComponentRewriterBase<CU> text(final RegistrationContext<CU, SU> ctx) {
-        return ctx.protocol().getComponentRewriter();
+        return (ComponentRewriterBase<CU>) ctx.protocol().getComponentRewriter();
     }
 
 

@@ -69,6 +69,6 @@ final class ParticleRegistrations {
     }
 
     static @Nullable <CU extends ClientboundPacketType, SU extends ServerboundPacketType> ParticleRewriter<CU> particle(final RegistrationContext<CU, SU> ctx) {
-        return ctx.protocol().getParticleRewriter();
+        return (ParticleRewriter<CU>) ctx.protocol().getParticleRewriter();
     }
 }
