@@ -68,7 +68,7 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             wrapper.write(Types.SHORT, (short) 0);
         });
 
-        protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
+        protocol.registerClientbound(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
             // Old registries, but now also modifiable
             sendEntityVariants(wrapper.user(), "minecraft:frog_variant", "frog", true, "temperate", "warm", "cold");
             sendEntityVariants(wrapper.user(), "minecraft:cat_variant", "cat", false, "tabby", "black", "red", "siamese", "british_shorthair", "calico", "persian", "ragdoll", "white", "jellie", "all_black");
