@@ -42,7 +42,7 @@ public final class EntityPacketRewriter1_21_6 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        protocol.registerClientbound(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
+        protocol.appendClientbound(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
             // send server links dialog as vanilla doesn't show server links by default otherwise
             final PacketWrapper dialogsPacket = PacketWrapper.create(ClientboundConfigurationPackets1_21.REGISTRY_DATA, wrapper.user());
             dialogsPacket.write(Types.STRING, "minecraft:dialog");

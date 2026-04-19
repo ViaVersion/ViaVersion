@@ -95,7 +95,7 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
     protected void registerPackets() {
         super.registerPackets();
 
-        registerClientbound(ClientboundConfigurationPackets1_21_9.FINISH_CONFIGURATION, wrapper -> {
+        appendClientbound(ClientboundConfigurationPackets1_21_9.FINISH_CONFIGURATION, wrapper -> {
             final PacketWrapper zombieNautilusVariantsPacket = wrapper.create(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA);
             zombieNautilusVariantsPacket.write(Types.STRING, "zombie_nautilus_variant");
             final CompoundTag temperateZombieNautilus = new CompoundTag();

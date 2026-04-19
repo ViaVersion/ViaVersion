@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocol.shared_registration.def;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocol.shared_registration.SharedRegistrations;
+import com.viaversion.viaversion.protocol.shared_registration.def.base.ConfigurationRegistrations;
 
 public final class DefaultRegistrations {
 
@@ -101,6 +102,7 @@ public final class DefaultRegistrations {
 
             .since(ProtocolVersion.v1_13, RegistryRegistrations::registerStatistics1_13)
             .since(ProtocolVersion.v1_19, RegistryRegistrations::registerCommands1_19)
+            .since(ProtocolVersion.v1_20_2, ConfigurationRegistrations::registerConfigurationStateSwitching)
             .since(ProtocolVersion.v1_21, RegistryRegistrations::registerRegistryData1_21)
             .since(ProtocolVersion.v1_21, RegistryRegistrations::registerAttributes1_21)
             .since(ProtocolVersion.v1_21_2, RegistryRegistrations::registerRecipePackets1_21_2)

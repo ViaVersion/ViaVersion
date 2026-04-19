@@ -46,7 +46,7 @@ import java.util.List;
 /**
  * Initial base protocol which is kept always in the pipeline.
  * <p>
- * State tracking for configuration state is done via {@link AbstractProtocol#registerConfigurationChangeHandlers()}
+ * State tracking for configuration state is done via shared registrations.
  */
 public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseClientboundPacket, BaseServerboundPacket, BaseServerboundPacket> {
 

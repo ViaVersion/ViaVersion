@@ -115,7 +115,6 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         applySharedRegistrations();
 
         registerPackets();
-        registerConfigurationChangeHandlers();
 
         // Register the rest of the ids with no handlers if necessary
         if (unmappedClientboundPacketType != null && mappedClientboundPacketType != null
@@ -147,31 +146,6 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
 
     protected ProtocolLogger createLogger() {
         return new ProtocolLogger(getClass());
-    }
-
-    protected void registerConfigurationChangeHandlers() {
-        // Register handlers for protocol state switching
-        // Assuming ids will change too often, it is cleaner to register them here instead of the base protocols,
-        // even if there will be multiple of these handlers
-        final SU configurationAcknowledgedPacket = configurationAcknowledgedPacket();
-        if (configurationAcknowledgedPacket != null) {
-            appendServerbound(configurationAcknowledgedPacket, setClientStateHandler(State.CONFIGURATION));
-        }
-
-        final CU startConfigurationPacket = startConfigurationPacket();
-        if (startConfigurationPacket != null) {
-            appendClientbound(startConfigurationPacket, startConfigurationHandler());
-        }
-
-        final SU finishConfigurationPacket = serverboundFinishConfigurationPacket();
-        if (finishConfigurationPacket != null) {
-            appendServerbound(finishConfigurationPacket, setClientStateHandler(State.PLAY));
-        }
-
-        final CU clientboundFinishConfigurationPacket = clientboundFinishConfigurationPacket();
-        if (clientboundFinishConfigurationPacket != null) {
-            appendClientbound(clientboundFinishConfigurationPacket, setServerStateHandler(State.PLAY));
-        }
     }
 
     @Override
@@ -306,22 +280,6 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
 
     protected PacketMappings createServerboundPacketMappings() {
         return PacketMappings.arrayMappings();
-    }
-
-    protected @Nullable SU configurationAcknowledgedPacket() {
-        return packetTypesProvider.unmappedServerboundType(State.PLAY, "CONFIGURATION_ACKNOWLEDGED");
-    }
-
-    protected @Nullable CU startConfigurationPacket() {
-        return packetTypesProvider.unmappedClientboundType(State.PLAY, "START_CONFIGURATION");
-    }
-
-    protected @Nullable SU serverboundFinishConfigurationPacket() {
-        return packetTypesProvider.unmappedServerboundType(State.CONFIGURATION, "FINISH_CONFIGURATION");
-    }
-
-    protected @Nullable CU clientboundFinishConfigurationPacket() {
-        return packetTypesProvider.unmappedClientboundType(State.CONFIGURATION, "FINISH_CONFIGURATION");
     }
 
     /**
@@ -555,23 +513,6 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         }
     }
 
-    private PacketHandler setClientStateHandler(final State state) {
-        return wrapper -> wrapper.user().getProtocolInfo().setClientState(state);
-    }
-
-    private PacketHandler setServerStateHandler(final State state) {
-        return wrapper -> wrapper.user().getProtocolInfo().setServerState(state);
-    }
-
-    private PacketHandler startConfigurationHandler() {
-        return setServerStateHandler(State.CONFIGURATION).then(wrapper -> {
-            // Mimic client behaviour
-            final EntityTracker tracker = wrapper.user().getEntityTracker(getClass());
-            if (tracker != null) {
-                tracker.clear();
-            }
-        });
-    }
 
     @Override
     public final PacketTypesProvider<CU, CM, SM, SU> getPacketTypesProvider() {

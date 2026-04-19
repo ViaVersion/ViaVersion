@@ -90,7 +90,7 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
     protected void registerPackets() {
         super.registerPackets();
 
-        registerFinishConfiguration(ClientboundConfigurationPackets1_21_9.FINISH_CONFIGURATION, wrapper -> {
+        appendClientbound(ClientboundConfigurationPackets1_21_9.FINISH_CONFIGURATION, wrapper -> {
             final PacketWrapper clocksPacket = wrapper.create(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA);
             clocksPacket.write(Types.STRING, "world_clock");
             clocksPacket.write(Types.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{new RegistryEntry("minecraft:overworld", new CompoundTag())});
