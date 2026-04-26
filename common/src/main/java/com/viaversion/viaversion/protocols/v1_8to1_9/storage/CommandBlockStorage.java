@@ -22,12 +22,13 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.ChunkPosition;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class CommandBlockStorage implements StorableObject {
-    private final Map<Long, Map<BlockPosition, CompoundTag>> storedCommandBlocks = new HashMap<>();
+    private final Map<Long, Map<BlockPosition, CompoundTag>> storedCommandBlocks = new Long2ObjectOpenHashMap<>();
     private boolean permissions;
 
     public void unloadChunk(int x, int z) {

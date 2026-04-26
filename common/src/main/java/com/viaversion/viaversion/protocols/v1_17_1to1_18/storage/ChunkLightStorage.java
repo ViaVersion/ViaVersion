@@ -23,12 +23,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ChunkLightStorage implements StorableObject {
 
-    private final Map<Long, ChunkLight> lightPackets = new HashMap<>();
-    private final Set<Long> loadedChunks = new HashSet<>();
+    private final Map<Long, ChunkLight> lightPackets = new Long2ObjectOpenHashMap<>();
+    private final Set<Long> loadedChunks = new LongOpenHashSet();
 
     public void storeLight(final int x, final int z, final ChunkLight chunkLight) {
         lightPackets.put(ChunkPosition.chunkKey(x, z), chunkLight);

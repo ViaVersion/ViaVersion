@@ -18,12 +18,13 @@
 package com.viaversion.viaversion.protocols.v1_8to1_9.storage;
 
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ClientWorld1_9 extends ClientWorld {
 
-    private final Set<Long> loadedChunks = new HashSet<>();
+    private final Set<Long> loadedChunks = new LongOpenHashSet();
 
     public Set<Long> getLoadedChunks() {
         return loadedChunks;
