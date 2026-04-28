@@ -183,6 +183,14 @@ final class TextComponentRegistrations {
         ctx.clientbound(ClientboundPackets1_21_5.PLAYER_CHAT, cr::registerPlayerChat1_21_5);
     }
 
+    static <CU extends ClientboundPacketType> void registerComponents26_2(final RegistrationContext<CU, ?> ctx, final NBTComponentRewriter<CU> cr) {
+        common1_20_5(ctx, cr);
+        ctx.clientbound(ClientboundPackets1_21_5.SET_PLAYER_TEAM, cr::registerSetPlayerTeam26_2);
+        ctx.clientbound(ClientboundPackets1_21_5.DISGUISED_CHAT, cr::registerDisguisedChat);
+        ctx.clientbound(ClientboundPackets1_21_5.PLAYER_INFO_UPDATE, cr::registerPlayerInfoUpdate1_21_4);
+        ctx.clientbound(ClientboundPackets1_21_5.PLAYER_CHAT, cr::registerPlayerChat1_21_5);
+    }
+
     static @Nullable <CU extends ClientboundPacketType, SU extends ServerboundPacketType> ComponentRewriterBase<CU> text(final RegistrationContext<CU, SU> ctx) {
         return (ComponentRewriterBase<CU>) ctx.protocol().getComponentRewriter();
     }

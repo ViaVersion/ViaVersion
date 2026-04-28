@@ -104,7 +104,7 @@ public class MappingDataLoader {
             throw new IllegalArgumentException("Unknown global identifier key: " + registry);
         }
         if (globalId < 0 || globalId >= array.length) {
-            throw new IllegalArgumentException("Unknown global identifier index: " + globalId);
+            throw new IllegalArgumentException("Unknown global identifier index: " + registry + "/" + globalId);
         }
         return array[globalId];
     }
@@ -262,6 +262,13 @@ public class MappingDataLoader {
                 // Assign the changed value
                 addConsumer.addTo(mappings, changedId, values[i]);
             }
+
+            // Fill the remainder
+            if (fillBetween && nextUnhandledId != size) {
+                for (int id = nextUnhandledId; id < size; id++) {
+                    addConsumer.addTo(mappings, id, id);
+                }
+            }
         } else if (strategy == IDENTITY_ID) {
             final IntTag sizeTag = tag.getIntTag("size");
             return new IdentityMappings(sizeTag.asInt(), mappedSize);
@@ -313,6 +320,10 @@ public class MappingDataLoader {
                 unmappedIdentifiers.add(unmappedIdentifier);
                 mappedIdentifiers.add(unmappedIdentifier);
                 continue;
+            }
+
+            if (mappedGlobalId == -1) {
+                throw new IllegalArgumentException("Mapped global id -1 for unmapped global id: " + key + "/" + unmappedIdentifier + " (" + unmappedGlobalId + ")");
             }
 
             identity = false;

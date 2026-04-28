@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.v26_1to26_2;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
@@ -31,6 +30,7 @@ import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes2
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType26_1;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
@@ -70,6 +70,12 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
             final String condition = term.getString("condition");
             if (Key.equals(condition, "entity_properties")) {
                 final CompoundTag predicate = term.getCompoundTag("predicate");
+                final CompoundTag typeSpecific = predicate.removeUnchecked("type_specific");
+                if (typeSpecific != null) {
+                    updateTypeSpecificTerm(predicate, typeSpecific);
+                    return;
+                }
+
                 final Tag typeTag = predicate.remove("type");
                 if (typeTag != null) {
                     predicate.put("entity_type", typeTag);
@@ -78,14 +84,49 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
         }
     };
 
+    private void updateTypeSpecificTerm(final CompoundTag predicate, final CompoundTag typeSpecific) {
+        final String type = typeSpecific.getString("type");
+        final String strippedType = Key.stripMinecraftNamespace(type);
+        if (strippedType.equals("player") || strippedType.equals("lightning")
+            || strippedType.equals("fishing_hook") || strippedType.equals("raider")) {
+            predicate.put("type_specific/" + strippedType, typeSpecific);
+        }
+    }
+
+
     public Protocol26_1To26_2() {
         super(ClientboundPacket26_1.class, ClientboundPacket26_1.class, ServerboundPacket26_1.class, ServerboundPacket26_1.class);
     }
 
     @Override
+    protected void registerPackets() {
+        super.registerPackets();
+        replaceClientbound(ClientboundPackets26_1.SET_PLAYER_TEAM, wrapper -> {
+            wrapper.passthrough(Types.STRING); // Team Name
+            final byte action = wrapper.passthrough(Types.BYTE); // Mode
+            if (action == 0 || action == 2) {
+                componentRewriter.passthroughAndProcess(wrapper); // Display name
+
+                final byte flags = wrapper.read(Types.BYTE);
+                final int nametagVisibility = wrapper.read(Types.VAR_INT);
+                final int collisionRule = wrapper.read(Types.VAR_INT);
+                final int color = wrapper.read(Types.VAR_INT);
+
+                componentRewriter.passthroughAndProcess(wrapper); // Prefix
+                componentRewriter.passthroughAndProcess(wrapper); // Suffix
+
+                wrapper.write(Types.VAR_INT, nametagVisibility);
+                wrapper.write(Types.VAR_INT, collisionRule);
+                wrapper.write(Types.BOOL_OPTIONAL_VAR_INT, color < 16 ? color : null); // only actual colors now
+                wrapper.write(Types.BYTE, flags);
+            }
+        });
+    }
+
+    @Override
     protected void onMappingDataLoaded() {
         EntityTypes26_2.initialize(this);
-        ParticleType.Fillers.fill1_21_9(this);
+        ParticleType.Fillers.fill26_2(this);
         mappedTypes().structuredData.filler(this).add(StructuredDataKey.CUSTOM_DATA, StructuredDataKey.MAX_STACK_SIZE, StructuredDataKey.MAX_DAMAGE,
             StructuredDataKey.UNBREAKABLE1_21_5, StructuredDataKey.RARITY, StructuredDataKey.TOOLTIP_DISPLAY, StructuredDataKey.DAMAGE_RESISTANT26_1,
             StructuredDataKey.CUSTOM_NAME, StructuredDataKey.LORE, StructuredDataKey.ENCHANTMENTS1_21_5,

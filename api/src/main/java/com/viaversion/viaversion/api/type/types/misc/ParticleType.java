@@ -163,6 +163,13 @@ public class ParticleType extends DynamicType<Particle> {
             particle.add(Types.INT, Types.INT.readPrimitive(buf)); // Color
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Power
         };
+        public static final DataReader<Particle> GEYSER_BASE = (buf, particle) -> {
+            particle.add(Types.INT, Types.INT.readPrimitive(buf)); // Water blocks
+            particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Burst impulse base
+        };
+        public static final DataReader<Particle> GEYSER = (buf, particle) -> {
+            particle.add(Types.INT, Types.INT.readPrimitive(buf)); // Water blocks
+        };
 
         public static DataReader<Particle> item(Type<Item> item) {
             return (buf, particle) -> particle.add(item, item.read(buf));
@@ -259,12 +266,20 @@ public class ParticleType extends DynamicType<Particle> {
             return fill1_21_4(protocol).reader("tinted_leaves", Readers.COLOR);
         }
 
-        public static void fill1_21_9(final Protocol<?, ?, ?, ?> protocol) {
-            fill1_21_5(protocol)
+        public static DataFiller fill1_21_9(final Protocol<?, ?, ?, ?> protocol) {
+            return fill1_21_5(protocol)
                 .reader("dragon_breath", Readers.POWER)
                 .reader("effect", Readers.SPELL)
                 .reader("instant_effect", Readers.SPELL)
                 .reader("flash", Readers.COLOR);
+        }
+
+        public static void fill26_2(final Protocol<?, ?, ?, ?> protocol) {
+            fill1_21_9(protocol)
+                .reader("geyser", Readers.GEYSER)
+                .reader("geyser_base", Readers.GEYSER_BASE)
+                .reader("geyser_poof", Readers.GEYSER_BASE)
+                .reader("geyser_plume", Readers.GEYSER);
         }
     }
 }

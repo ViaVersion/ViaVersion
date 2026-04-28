@@ -179,7 +179,8 @@ public final class Types {
     public static final Type<UUID[]> UUID_ARRAY = new ArrayType<>(Types.UUID);
 
     public static final VarIntType VAR_INT = new VarIntType();
-    public static final OptionalVarIntType OPTIONAL_VAR_INT = new OptionalVarIntType();
+    public static final OptionalVarIntType OPTIONAL_VAR_INT = new OptionalVarIntType(); // compact
+    public static final OptionalType<Integer> BOOL_OPTIONAL_VAR_INT = new VarIntType.OptionalVarIntType(); // regular boolean prefixed
     public static final Type<int[]> VAR_INT_ARRAY_PRIMITIVE = new VarIntArrayType();
     public static final VarLongType VAR_LONG = new VarLongType();
 

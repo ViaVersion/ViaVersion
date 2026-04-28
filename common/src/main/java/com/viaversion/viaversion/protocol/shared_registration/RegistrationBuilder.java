@@ -122,6 +122,11 @@ public final class RegistrationBuilder {
             this.adapter = adapter;
         }
 
+        /**
+         * @param max max version, exclusive
+         * @param action registration
+         * @return self
+         */
         public TypedRangesBuilder<CU, SU, R> to(final ProtocolVersion max, final TypedRegistrationAction<CU, SU, R> action) {
             to(max, wrapAction(action));
             return this;
