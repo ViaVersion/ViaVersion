@@ -49,7 +49,7 @@ fun ShadowJar.configureRelocations() {
 }
 
 fun ShadowJar.configureExcludes() {
-    // FastUtil - we only want object, int, and certain reference maps
+    // FastUtil - we only want object, int, long-to-object, and certain reference maps
     // Object types
     exclude("it/unimi/dsi/fastutil/*/*2Reference*")
     exclude("it/unimi/dsi/fastutil/*/*Reference2Int*")
@@ -58,13 +58,17 @@ fun ShadowJar.configureExcludes() {
     exclude("it/unimi/dsi/fastutil/*/*Short*")
     exclude("it/unimi/dsi/fastutil/*/*Float*")
     exclude("it/unimi/dsi/fastutil/*/*Double*")
-    exclude("it/unimi/dsi/fastutil/*/*Long*")
+    exclude("it/unimi/dsi/fastutil/*/*2Long*")
     exclude("it/unimi/dsi/fastutil/*/*Char*")
     // Map types
     exclude("it/unimi/dsi/fastutil/*/*Custom*")
     exclude("it/unimi/dsi/fastutil/*/*Tree*")
     exclude("it/unimi/dsi/fastutil/*/*Heap*")
     exclude("it/unimi/dsi/fastutil/*/*Queue*")
+    exclude("it/unimi/dsi/fastutil/longs/*2Int*")
+    exclude("it/unimi/dsi/fastutil/longs/*ArrayMap*")
+    exclude("it/unimi/dsi/fastutil/longs/*LinkedOpenHashMap*")
+    exclude("it/unimi/dsi/fastutil/longs/*SortedMap*")
     // Crossing fingers
     exclude("it/unimi/dsi/fastutil/*/*Big*")
     exclude("it/unimi/dsi/fastutil/*/*Synchronized*")
