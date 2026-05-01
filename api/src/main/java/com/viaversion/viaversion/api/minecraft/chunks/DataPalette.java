@@ -115,7 +115,15 @@ public interface DataPalette {
      *
      * @param mapper function from old id to new id
      */
-    void replaceIds(IntUnaryOperator mapper);
+    default void replaceIds(IntUnaryOperator mapper) {
+        for (int i = 0; i < this.size(); i++) {
+            final int id = this.idByIndex(i);
+            final int newId = mapper.applyAsInt(id);
+            if (newId != id) {
+                this.setIdByIndex(i, newId);
+            }
+        }
+    }
 
     /**
      * Adds a new id to the palette.
