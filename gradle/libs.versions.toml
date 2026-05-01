@@ -14,7 +14,7 @@ guava = "17.0"
 
 junit = "6.0.3"
 platformLauncher = "6.0.3"
-checkerQual = "3.54.0"
+checkerQual = "4.0.0"
 
 # Platforms
 paper = "1.20.4-R0.1-SNAPSHOT"
