@@ -18,36 +18,21 @@
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.storage;
 
 import com.google.common.collect.EvictingQueue;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BlockConnectionStorage implements StorableObject {
-    private static Constructor<?> fastUtilLongObjectHashMap;
-
-    private final Map<Long, SectionData> blockStorage = createLongObjectMap();
+    private final Map<Long, SectionData> blockStorage = new Long2ObjectOpenHashMap<>();
     @SuppressWarnings("UnstableApiUsage")
     private final Queue<BlockPosition> modified = EvictingQueue.create(5);
 
     // Cache to retrieve section quicker
     private long lastIndex = -1;
     private SectionData lastSection;
-
-    static {
-        try {
-            //noinspection StringBufferReplaceableByString - prevent relocation
-            String className = new StringBuilder("it").append(".unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap").toString();
-            fastUtilLongObjectHashMap = Class.forName(className).getConstructor();
-            Via.getPlatform().getLogger().info("Using FastUtil Long2ObjectOpenHashMap for block connections");
-        } catch (ClassNotFoundException | NoSuchMethodException ignored) {
-        }
-    }
 
     public static void init() {
     }
@@ -144,18 +129,6 @@ public class BlockConnectionStorage implements StorableObject {
 
     private static long getChunkSectionIndex(int x, int y, int z) {
         return (((x >> 4) & 0x3FFFFFFL) << 38) | (((y >> 4) & 0xFFFL) << 26) | ((z >> 4) & 0x3FFFFFFL);
-    }
-
-    private <T> Map<Long, T> createLongObjectMap() {
-        if (fastUtilLongObjectHashMap != null) {
-            try {
-                //noinspection unchecked
-                return (Map<Long, T>) fastUtilLongObjectHashMap.newInstance();
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-        return new HashMap<>();
     }
 
     private static final class SectionData {
