@@ -52,39 +52,38 @@ public final class CompactArrayUtil {
     }
 
     public static long[] createCompactArrayWithPadding(int bitsPerEntry, int entries, IntToLongFunction valueGetter) {
-        long maxEntryValue = (1L << bitsPerEntry) - 1;
-        char valuesPerLong = (char) (64 / bitsPerEntry);
-        int magicIndex = valuesPerLong - 1;
-        long divideAdd = RECIPROCAL_MULT_AND_ADD[magicIndex];
-        long divideMul = divideAdd != 0 ? divideAdd : 0x80000000L; // Special case for the 0x80000000/0x00000000 tuple
-        int divideShift = RECIPROCAL_RIGHT_SHIFT[magicIndex];
-        int size = (entries + valuesPerLong - 1) / valuesPerLong;
+        final long maxEntryValue = (1L << bitsPerEntry) - 1;
+        final int valuesPerLong = (char) (64 / bitsPerEntry);
+        final int size = (entries + valuesPerLong - 1) / valuesPerLong;
+        final long[] data = new long[size];
 
-        long[] data = new long[size];
-
-        for (int i = 0; i < entries; i++) {
-            long value = valueGetter.applyAsLong(i);
-            int cellIndex = (int) (i * divideMul + divideAdd >> 32L >> divideShift);
-            int bitIndex = (i - cellIndex * valuesPerLong) * bitsPerEntry;
-            data[cellIndex] = data[cellIndex] & ~(maxEntryValue << bitIndex) | (value & maxEntryValue) << bitIndex;
+        int i = 0;
+        for (int cellIndex = 0; cellIndex < size; cellIndex++) {
+            long cell = 0L;
+            int bitIndex = 0;
+            final int limit = Math.min(i + valuesPerLong, entries);
+            while (i < limit) {
+                cell |= (valueGetter.applyAsLong(i++) & maxEntryValue) << bitIndex;
+                bitIndex += bitsPerEntry;
+            }
+            data[cellIndex] = cell;
         }
-
         return data;
     }
 
     public static void iterateCompactArrayWithPadding(int bitsPerEntry, int entries, long[] data, BiIntConsumer consumer) {
-        long maxEntryValue = (1L << bitsPerEntry) - 1;
-        char valuesPerLong = (char) (64 / bitsPerEntry);
-        int magicIndex = valuesPerLong - 1;
-        long divideAdd = RECIPROCAL_MULT_AND_ADD[magicIndex];
-        long divideMul = divideAdd != 0 ? divideAdd : 0x80000000L;
-        int divideShift = RECIPROCAL_RIGHT_SHIFT[magicIndex];
+        final long maxEntryValue = (1L << bitsPerEntry) - 1;
+        final int valuesPerLong = 64 / bitsPerEntry;
+        final int size = data.length;
 
-        for (int i = 0; i < entries; i++) {
-            int cellIndex = (int) (i * divideMul + divideAdd >> 32L >> divideShift);
-            int bitIndex = (i - cellIndex * valuesPerLong) * bitsPerEntry;
-            int value = (int) (data[cellIndex] >> bitIndex & maxEntryValue);
-            consumer.consume(i, value);
+        int i = 0;
+        for (int cellIndex = 0; cellIndex < size; cellIndex++) {
+            long cell = data[cellIndex];
+            final int limit = Math.min(i + valuesPerLong, entries);
+            while (i < limit) {
+                consumer.consume(i++, (int) (cell & maxEntryValue));
+                cell >>>= bitsPerEntry;
+            }
         }
     }
 
