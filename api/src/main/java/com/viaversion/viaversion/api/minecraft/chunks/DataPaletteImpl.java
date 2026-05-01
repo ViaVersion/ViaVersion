@@ -41,7 +41,7 @@ public final class DataPaletteImpl implements DataPalette {
     }
 
     public DataPaletteImpl(final int valuesLength, final int initialSize) {
-        values = new EmptyChunkData(valuesLength);
+        values = new SingleChunkData(valuesLength);
         sizeBits = Integer.numberOfTrailingZeros(valuesLength) / 3;
         // Pre-size the palette array/map
         palette = new IntArrayList(initialSize);
@@ -190,11 +190,11 @@ public final class DataPaletteImpl implements DataPalette {
         int size();
     }
 
-    private final class EmptyChunkData implements ChunkData {
+    private final class SingleChunkData implements ChunkData {
 
         private final int size;
 
-        public EmptyChunkData(int size) {
+        public SingleChunkData(int size) {
             this.size = size;
         }
 
