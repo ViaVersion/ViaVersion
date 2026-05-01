@@ -2,7 +2,7 @@ metadata.format.version = "1.1"
 
 [versions]
 
-gson = "2.13.2"
+gson = "2.14.0"
 snakeYaml = "2.6"
 fastutil = "8.5.15"
 vianbt = "5.2.0"
