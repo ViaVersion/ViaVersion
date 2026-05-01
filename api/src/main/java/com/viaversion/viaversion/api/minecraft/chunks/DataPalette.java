@@ -22,6 +22,8 @@
  */
 package com.viaversion.viaversion.api.minecraft.chunks;
 
+import java.util.function.IntUnaryOperator;
+
 public interface DataPalette {
 
     /**
@@ -107,6 +109,13 @@ public interface DataPalette {
      * @param index             palette index
      */
     void setPaletteIndexAt(int sectionCoordinate, int index);
+
+    /**
+     * Replaces every id in the palette by applying the given mapper.
+     *
+     * @param mapper function from old id to new id
+     */
+    void replaceIds(IntUnaryOperator mapper);
 
     /**
      * Adds a new id to the palette.

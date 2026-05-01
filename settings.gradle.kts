@@ -38,6 +38,8 @@ setupViaSubproject("velocity")
 setupViaSubproject("sponge")
 setupViaSubproject("fabric")
 
+//include("benchmark")
+
 setupSubproject("viaversion") {
     projectDir = file("universal")
 }

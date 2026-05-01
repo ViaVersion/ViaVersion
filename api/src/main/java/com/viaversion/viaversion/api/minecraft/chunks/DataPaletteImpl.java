@@ -26,12 +26,13 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import java.util.function.IntUnaryOperator;
 
 public final class DataPaletteImpl implements DataPalette {
 
     private static final int DEFAULT_INITIAL_SIZE = 16;
 
-    private final IntList palette;
+    private final IntArrayList palette;
     private final Int2IntMap inversePalette;
     private final int sizeBits;
     private ChunkData values;
@@ -124,6 +125,53 @@ public final class DataPaletteImpl implements DataPalette {
     }
 
     @Override
+    public void replaceIds(final IntUnaryOperator mapper) {
+        final int oldSize = palette.size();
+        if (oldSize == 0 || values instanceof EmptyChunkData) {
+            return;
+        }
+
+        inversePalette.clear();
+        int writeIndex = 0;
+        int[] indexRemap = null;
+        int firstCollision = 0;
+
+        final int[] palette = this.palette.elements();
+        for (int readIndex = 0; readIndex < oldSize; readIndex++) {
+            final int mappedId = mapper.applyAsInt(palette[readIndex]);
+            final int existingIndex = inversePalette.putIfAbsent(mappedId, writeIndex);
+            if (existingIndex == -1) {
+                palette[writeIndex] = mappedId;
+                if (indexRemap != null) {
+                    indexRemap[readIndex - firstCollision] = writeIndex;
+                }
+                writeIndex++;
+                continue;
+            }
+
+            // The mapped value already exists in the palette. The original index will be removed at the end
+            if (indexRemap == null) {
+                indexRemap = new int[oldSize - readIndex];
+                firstCollision = readIndex;
+            }
+            indexRemap[readIndex - firstCollision] = existingIndex;
+        }
+
+        // If any mapped ids were already present (writeIndex < oldSize),
+        // collapse the entries and set values to their shifted palette indexes
+        if (indexRemap != null) {
+            this.palette.removeElements(writeIndex, oldSize);
+            final int len = values.size();
+            for (int i = 0; i < len; i++) {
+                final int oldIndex = values.get(i);
+                if (oldIndex >= firstCollision) {
+                    values.set(i, indexRemap[oldIndex - firstCollision]);
+                }
+            }
+        }
+    }
+
+    @Override
     public void addId(final int id) {
         inversePalette.put(id, palette.size());
         palette.add(id);
@@ -139,9 +187,11 @@ public final class DataPaletteImpl implements DataPalette {
         int get(int idx);
 
         void set(int idx, int val);
+
+        int size();
     }
 
-    private class EmptyChunkData implements ChunkData {
+    private final class EmptyChunkData implements ChunkData {
 
         private final int size;
 
@@ -160,6 +210,11 @@ public final class DataPaletteImpl implements DataPalette {
                 values = new ByteChunkData(size);
                 values.set(idx, val);
             }
+        }
+
+        @Override
+        public int size() {
+            return size;
         }
     }
 
@@ -185,6 +240,11 @@ public final class DataPaletteImpl implements DataPalette {
             }
             data[idx] = (byte) val;
         }
+
+        @Override
+        public int size() {
+            return data.length;
+        }
     }
 
     private static final class ShortChunkData implements ChunkData {
@@ -205,6 +265,11 @@ public final class DataPaletteImpl implements DataPalette {
         @Override
         public void set(int idx, int val) {
             data[idx] = (short) val;
+        }
+
+        @Override
+        public int size() {
+            return data.length;
         }
     }
 

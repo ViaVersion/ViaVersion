@@ -217,10 +217,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             }
 
             DataPalette palette = section.palette(PaletteType.BLOCKS);
-            for (int i = 0; i < palette.size(); i++) {
-                int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
-                palette.setIdByIndex(i, mappedBlockStateId);
-            }
+            palette.replaceIds(protocol.getMappingData()::getNewBlockStateId);
         }
     }
 
@@ -284,10 +281,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
 
         for (final ChunkSection section : chunk.getSections()) {
             final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
-            for (int i = 0; i < blockPalette.size(); i++) {
-                final int id = blockPalette.idByIndex(i);
-                blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
-            }
+            blockPalette.replaceIds(protocol.getMappingData()::getNewBlockStateId);
         }
         return chunk;
     }
