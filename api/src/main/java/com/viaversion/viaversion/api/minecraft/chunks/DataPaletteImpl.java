@@ -25,7 +25,6 @@ package com.viaversion.viaversion.api.minecraft.chunks;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.function.IntUnaryOperator;
 
 public final class DataPaletteImpl implements DataPalette {
@@ -42,7 +41,7 @@ public final class DataPaletteImpl implements DataPalette {
     }
 
     public DataPaletteImpl(final int valuesLength, final int initialSize) {
-        values = new EmptyChunkData(valuesLength);
+        values = new SingleChunkData(valuesLength);
         sizeBits = Integer.numberOfTrailingZeros(valuesLength) / 3;
         // Pre-size the palette array/map
         palette = new IntArrayList(initialSize);
@@ -127,7 +126,7 @@ public final class DataPaletteImpl implements DataPalette {
     @Override
     public void replaceIds(final IntUnaryOperator mapper) {
         final int oldSize = palette.size();
-        if (oldSize == 0 || values instanceof EmptyChunkData) {
+        if (oldSize == 0) {
             return;
         }
 
@@ -191,11 +190,11 @@ public final class DataPaletteImpl implements DataPalette {
         int size();
     }
 
-    private final class EmptyChunkData implements ChunkData {
+    private final class SingleChunkData implements ChunkData {
 
         private final int size;
 
-        public EmptyChunkData(int size) {
+        public SingleChunkData(int size) {
             this.size = size;
         }
 
