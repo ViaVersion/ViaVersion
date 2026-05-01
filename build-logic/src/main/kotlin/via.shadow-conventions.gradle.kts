@@ -70,9 +70,11 @@ fun ShadowJar.configureExcludes() {
     exclude("it/unimi/dsi/fastutil/longs/*LinkedOpenHashMap*")
     exclude("it/unimi/dsi/fastutil/longs/*SortedMap*")
     // Crossing fingers
+    exclude("it/unimi/dsi/fastutil/*Big*")
     exclude("it/unimi/dsi/fastutil/*/*Big*")
     exclude("it/unimi/dsi/fastutil/*/*Synchronized*")
     exclude("it/unimi/dsi/fastutil/*/*Unmodifiable*")
     // More
-    exclude("it/unimi/dsi/fastutil/io/TextIO")
+    exclude("it/unimi/dsi/fastutil/io/TextIO.class")
+    exclude("it/unimi/dsi/fastutil/io/BinIO.class")
 }

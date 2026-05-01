@@ -22,13 +22,14 @@ import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.ChunkPosition;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BlockStorage implements StorableObject {
     private static final IntSet WHITELIST = new IntOpenHashSet(46);
-    private final Map<Long, Map<BlockPosition, ReplacementData>> blocks = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectMap<Map<BlockPosition, ReplacementData>> blocks = new Long2ObjectOpenHashMap<>();
 
     static {
         // Flower pots

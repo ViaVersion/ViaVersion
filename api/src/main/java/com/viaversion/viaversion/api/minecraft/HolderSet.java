@@ -27,7 +27,7 @@ import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
-import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
 /**
  * Set of ids that either holds a string tag key or an array of ids.
@@ -56,19 +56,19 @@ public interface HolderSet {
         return new HolderSetImpl.Ids(ids);
     }
 
-    static HolderSet fromTag(final Tag tag, final Function<String, Integer> mappingFunction) {
+    static HolderSet fromTag(final Tag tag, final ToIntFunction<String> mappingFunction) {
         if (tag instanceof StringTag stringTag) {
             if (stringTag.getValue().startsWith("#")) {
                 return HolderSet.of(stringTag.getValue().substring(1));
             }
 
-            final int id = mappingFunction.apply(stringTag.getValue());
+            final int id = mappingFunction.applyAsInt(stringTag.getValue());
             return HolderSet.of(new int[]{id});
         } else if (tag instanceof ListTag<?> listTag) {
             final int[] ids = new int[listTag.size()];
             for (int i = 0; i < listTag.size(); i++) {
                 final String value = ((StringTag) listTag.get(i)).getValue();
-                ids[i] = mappingFunction.apply(value);
+                ids[i] = mappingFunction.applyAsInt(value);
             }
             return HolderSet.of(ids);
         }

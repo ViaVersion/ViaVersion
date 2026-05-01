@@ -20,13 +20,13 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.storage;
 import com.google.common.collect.EvictingQueue;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
-import java.util.Map;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import java.util.Queue;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BlockConnectionStorage implements StorableObject {
-    private final Map<Long, SectionData> blockStorage = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectMap<SectionData> blockStorage = new Long2ObjectOpenHashMap<>();
     @SuppressWarnings("UnstableApiUsage")
     private final Queue<BlockPosition> modified = EvictingQueue.create(5);
 
