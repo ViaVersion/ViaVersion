@@ -43,8 +43,8 @@ import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.io.FastByteBufInputStream;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
 import java.io.IOException;
 import java.util.Map;
 
@@ -58,7 +58,7 @@ public class TagType extends Type<Tag> {
 
     public TagType(final boolean limitBytes) {
         super(Tag.class);
-        this.maxBytes = limitBytes ? NamedCompoundTagType.MAX_NBT_BYTES : Integer.MAX_VALUE;
+        this.maxBytes = limitBytes ? TagLimiter.DEFAULT_MAX_BYTES : Integer.MAX_VALUE;
     }
 
     @Override
@@ -68,9 +68,9 @@ public class TagType extends Type<Tag> {
             return null;
         }
 
-        final TagLimiter tagLimiter = TagLimiter.create(this.maxBytes, NamedCompoundTagType.MAX_NESTING_LEVEL);
+        final TagLimiter tagLimiter = TagLimiter.create(this.maxBytes, TagLimiter.DEFAULT_MAX_NESTING_LEVEL);
         try {
-            return TagRegistry.read(id, new ByteBufInputStream(buffer), tagLimiter, 0);
+            return TagRegistry.read(id, new FastByteBufInputStream(buffer), tagLimiter, 0);
         } catch (final IOException e) {
             if (Via.getManager().isDebug()) {
                 throw new RuntimeException(e);

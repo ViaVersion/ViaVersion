@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types.misc;
 
+import com.viaversion.nbt.limiter.TagLimiter;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
@@ -49,7 +50,7 @@ public class CompoundTagType extends Type<CompoundTag> {
 
     public CompoundTagType(final boolean limitMaxBytes) {
         super(CompoundTag.class);
-        this.maxBytes = limitMaxBytes ? NamedCompoundTagType.MAX_NBT_BYTES : Integer.MAX_VALUE;
+        this.maxBytes = limitMaxBytes ? TagLimiter.DEFAULT_MAX_BYTES : Integer.MAX_VALUE;
     }
 
     @Override

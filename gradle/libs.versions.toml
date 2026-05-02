@@ -5,7 +5,7 @@ metadata.format.version = "1.1"
 gson = "2.13.2"
 snakeYaml = "2.6"
 fastutil = "8.5.15"
-vianbt = "5.2.0"
+vianbt = "5.2.1"
 mcstructs = "5-3.3.1-SNAPSHOT"
 
 # Common provided

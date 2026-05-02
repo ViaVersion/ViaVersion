@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.util;
 
 import java.util.function.IntToLongFunction;
+import java.util.function.IntUnaryOperator;
 
 public final class CompactArrayUtil {
     private static final long[] RECIPROCAL_MULT_AND_ADD = {
@@ -51,7 +52,7 @@ public final class CompactArrayUtil {
         throw new UnsupportedOperationException();
     }
 
-    public static long[] createCompactArrayWithPadding(int bitsPerEntry, int entries, IntToLongFunction valueGetter) {
+    public static long[] createCompactArrayWithPadding(int bitsPerEntry, int entries, IntUnaryOperator valueGetter) {
         final long maxEntryValue = (1L << bitsPerEntry) - 1;
         final int valuesPerLong = (char) (64 / bitsPerEntry);
         final int size = (entries + valuesPerLong - 1) / valuesPerLong;
@@ -63,7 +64,7 @@ public final class CompactArrayUtil {
             int bitIndex = 0;
             final int limit = Math.min(i + valuesPerLong, entries);
             while (i < limit) {
-                cell |= (valueGetter.applyAsLong(i++) & maxEntryValue) << bitIndex;
+                cell |= (valueGetter.applyAsInt(i++) & maxEntryValue) << bitIndex;
                 bitIndex += bitsPerEntry;
             }
             data[cellIndex] = cell;
