@@ -37,6 +37,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
+import com.viaversion.viaversion.data.item.OriginalHashedItem;
 import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Rewritable;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
@@ -110,6 +111,12 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     @Override
     public HashedItem handleHashedItem(final UserConnection connection, final HashedItem item) {
+        if (item instanceof OriginalHashedItem restoredItem) {
+            // Pass through until we're at the original backup protocol.
+            // This means it won't be correct every step of the way, but it will be once it reaches the target protocol
+            return restoredItem.backupTagName().equals(nbtTagName()) ? restoredItem.asRegularItem() : item;
+        }
+
         final MappingData mappingData = protocol.getMappingData();
         if (mappingData == null) {
             return item;
@@ -126,9 +133,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 // Use the original hashed item if we can find it in the cache
                 final int customDataHash = item.dataHashesById().get(customDataId);
                 final ItemHasherBase itemHasher = itemHasher(connection);
-                final HashedItem originalHashedItem = itemHasher.originalHashedItem(customDataHash, item);
+                final OriginalHashedItem originalHashedItem = itemHasher.originalHashedItem(customDataHash, item);
                 if (originalHashedItem != null) {
-                    return originalHashedItem;
+                    return originalHashedItem.backupTagName().equals(nbtTagName()) ? originalHashedItem.asRegularItem() : originalHashedItem;
                 }
             }
         }
