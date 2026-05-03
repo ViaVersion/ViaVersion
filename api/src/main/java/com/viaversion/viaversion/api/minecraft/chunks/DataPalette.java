@@ -138,7 +138,13 @@ public interface DataPalette {
      * @param oldId old id
      * @param newId new id
      */
-    void replaceId(int oldId, int newId);
+    default void replaceId(int oldId, int newId) {
+        for (int i = 0; i < this.size(); i++) {
+            if (this.idByIndex(i) == oldId) {
+                this.setIdByIndex(i, newId);
+            }
+        }
+    }
 
     /**
      * Returns the size of the palette.
