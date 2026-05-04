@@ -41,6 +41,7 @@ public class ConfigurationState implements StorableObject {
     private boolean queuedJoinGame;
     private CompoundTag lastDimensionRegistry;
     private ClientInformation clientInformation;
+    private int queuedServerboundBytes;
 
     public BridgePhase bridgePhase() {
         return bridgePhase;
@@ -70,8 +71,19 @@ public class ConfigurationState implements StorableObject {
         this.clientInformation = clientInformation;
     }
 
-    public void addPacketToQueue(final PacketWrapper wrapper, final boolean clientbound) {
-        packetQueue.add(toQueuedPacket(wrapper, clientbound, false));
+    public void addClientboundPacketToQueue(final PacketWrapper wrapper) {
+        packetQueue.add(toQueuedPacket(wrapper, true, false));
+    }
+
+    public void addServerboundPacketToQueue(final PacketWrapper wrapper) {
+        final QueuedPacket queued = toQueuedPacket(wrapper, false, false);
+        final int bytes = queued.buf().readableBytes();
+        if (packetQueue.size() > 5000 || queuedServerboundBytes + bytes > 2097152) {
+            wrapper.user().disconnect("Sent too many packets during config phase");
+            return;
+        }
+        queuedServerboundBytes += bytes;
+        packetQueue.add(queued);
     }
 
     private QueuedPacket toQueuedPacket(final PacketWrapper wrapper, final boolean clientbound, final boolean skipCurrentPipeline) {
@@ -141,6 +153,7 @@ public class ConfigurationState implements StorableObject {
         packetQueue.clear();
         bridgePhase = BridgePhase.NONE;
         queuedJoinGame = false;
+        queuedServerboundBytes = 0;
     }
 
     public boolean queuedOrSentJoinGame() {

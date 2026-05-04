@@ -272,7 +272,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             }
 
             // Queue packets sent by the server while we wait for the client to transition to the configuration state
-            configurationBridge.addPacketToQueue(packetWrapper, true);
+            configurationBridge.addClientboundPacketToQueue(packetWrapper);
             throw CancelException.generate();
         }
 
@@ -295,7 +295,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
                     }
                 }
 
-                configurationBridge.addPacketToQueue(packetWrapper, true);
+                configurationBridge.addClientboundPacketToQueue(packetWrapper);
                 throw CancelException.generate();
             }
 
@@ -315,7 +315,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             } else {
                 // Not a packet that can be mapped to the configuration protocol
                 // Includes resource pack packets to make sure it is not applied sooner than the server expects
-                configurationBridge.addPacketToQueue(packetWrapper, true);
+                configurationBridge.addClientboundPacketToQueue(packetWrapper);
                 throw CancelException.generate();
             }
             return;
@@ -375,7 +375,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
     private PacketHandler queueServerboundPacket(final ServerboundPackets1_20_2 packetType) {
         return wrapper -> {
             wrapper.setPacketType(packetType);
-            wrapper.user().get(ConfigurationState.class).addPacketToQueue(wrapper, false);
+            wrapper.user().get(ConfigurationState.class).addServerboundPacketToQueue(wrapper);
             wrapper.cancel();
         };
     }
