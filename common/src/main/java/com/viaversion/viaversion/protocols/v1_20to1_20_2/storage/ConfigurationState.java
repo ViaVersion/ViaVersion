@@ -34,6 +34,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ConfigurationState implements StorableObject {
 
+    private static final int MAX_SERVERBOUND_QUEUED_PACKETS = Integer.getInteger("viaversion.maxQueuedServerboundConfigPackets", 1000);
+    private static final int MAX_SERVERBOUND_QUEUED_BYTES = Integer.getInteger("viaversion.maxQueuedServerboundConfigPacketBytes", 1048576);
     private static final QueuedPacket[] EMPTY_PACKET_ARRAY = new QueuedPacket[0];
     private final List<QueuedPacket> packetQueue = new ArrayList<>();
     private BridgePhase bridgePhase = BridgePhase.NONE;
@@ -42,6 +44,7 @@ public class ConfigurationState implements StorableObject {
     private CompoundTag lastDimensionRegistry;
     private ClientInformation clientInformation;
     private int queuedServerboundBytes;
+    private int queuedServerboundPackets;
 
     public BridgePhase bridgePhase() {
         return bridgePhase;
@@ -78,10 +81,11 @@ public class ConfigurationState implements StorableObject {
     public void addServerboundPacketToQueue(final PacketWrapper wrapper) {
         final QueuedPacket queued = toQueuedPacket(wrapper, false, false);
         final int bytes = queued.buf().readableBytes();
-        if (packetQueue.size() > 5000 || queuedServerboundBytes + bytes > 2097152) {
+        if (queuedServerboundPackets >= MAX_SERVERBOUND_QUEUED_PACKETS || queuedServerboundBytes + bytes > MAX_SERVERBOUND_QUEUED_BYTES) {
             wrapper.user().disconnect("Sent too many packets during config phase");
             return;
         }
+        queuedServerboundPackets++;
         queuedServerboundBytes += bytes;
         packetQueue.add(queued);
     }
