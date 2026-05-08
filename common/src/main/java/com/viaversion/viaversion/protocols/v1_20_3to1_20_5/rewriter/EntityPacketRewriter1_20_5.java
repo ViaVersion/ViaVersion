@@ -278,7 +278,9 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                     storage.clear();
 
                     final byte gamemode = wrapper.get(Types.BYTE, 0);
-                    sendRangeAttributes(wrapper.user(), gamemode == GameMode.CREATIVE.id());
+                    final boolean creativeMode = gamemode == GameMode.CREATIVE.id();
+                    sendRangeAttributes(wrapper.user(), creativeMode);
+                    tracker(wrapper.user()).setInstaBuild(creativeMode);
                 });
             }
         });
@@ -293,7 +295,9 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             wrapper.passthrough(Types.LONG); // Seed
 
             final byte gamemode = wrapper.passthrough(Types.BYTE);
-            sendRangeAttributes(wrapper.user(), gamemode == GameMode.CREATIVE.id());
+            final boolean creativeMode = gamemode == GameMode.CREATIVE.id();
+            sendRangeAttributes(wrapper.user(), creativeMode);
+            tracker(wrapper.user()).setInstaBuild(creativeMode);
 
             wrapper.user().put(new ScoreboardTeamStorage());
         });
@@ -338,7 +342,14 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
             // Resend attributes either with their original list or with the creative range modifier added
             final int value = (int) Math.floor(wrapper.passthrough(Types.FLOAT) + 0.5F);
-            sendRangeAttributes(wrapper.user(), value == GameMode.CREATIVE.id());
+            final boolean creativeMode = value == GameMode.CREATIVE.id();
+            sendRangeAttributes(wrapper.user(), creativeMode);
+            tracker(wrapper.user()).setInstaBuild(creativeMode);
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_20_3.PLAYER_ABILITIES, wrapper -> {
+            final byte flags = wrapper.passthrough(Types.BYTE);
+            tracker(wrapper.user()).setInstaBuild((flags & 1 << 3) != 0);
         });
     }
 

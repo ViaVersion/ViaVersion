@@ -344,6 +344,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 recipeRewriter.handleRecipeType(wrapper, type);
             }
         });
+
+        protocol.replaceServerbound(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT, wrapper -> {
+            if (!protocol.getEntityRewriter().tracker(wrapper.user()).canInstaBuild()) {
+                wrapper.cancel();
+                return;
+            }
+            wrapper.passthrough(Types.SHORT); // Slot
+            wrapper.write(itemType(), handleItemToServer(wrapper.user(), wrapper.read(mappedItemType())));
+        });
     }
 
     public Item handleNonEmptyItemToClient(final UserConnection connection, @Nullable Item item) {

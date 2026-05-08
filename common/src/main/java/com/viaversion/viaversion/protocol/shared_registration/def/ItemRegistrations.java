@@ -135,7 +135,7 @@ final class ItemRegistrations {
         ctx.clientbound(ClientboundPackets1_21.UPDATE_ADVANCEMENTS, ir::registerAdvancements1_20_3);
         ctx.clientbound(ClientboundPackets1_21.COOLDOWN, ir::registerCooldown);
         ctx.serverbound(ServerboundPackets1_20_5.CONTAINER_CLICK, ir::registerContainerClick1_17_1);
-        ctx.serverbound(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT, ir::registerSetCreativeModeSlot);
+        ctx.serverbound(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT, ir::registerSetCreativeModeSlot1_20_5);
         ctx.clientbound(ClientboundPackets1_21.SET_EQUIPMENT, ir::registerSetEquipment);
         ctx.clientbound(ClientboundPackets1_21.OPEN_SCREEN, ir::registerOpenScreen);
         ctx.clientbound(ClientboundPackets1_21.MERCHANT_OFFERS, ir::registerMerchantOffers1_20_5);
@@ -147,7 +147,7 @@ final class ItemRegistrations {
         ctx.clientbound(ClientboundPackets1_21_2.UPDATE_ADVANCEMENTS, ir::registerAdvancements1_20_3);
         ctx.clientbound(ClientboundPackets1_21_2.COOLDOWN, ir::registerCooldown1_21_2);
         ctx.serverbound(ServerboundPackets1_21_2.CONTAINER_CLICK, ir::registerContainerClick1_21_2);
-        ctx.serverbound(ServerboundPackets1_21_2.SET_CREATIVE_MODE_SLOT, ir::registerSetCreativeModeSlot);
+        ctx.serverbound(ServerboundPackets1_21_2.SET_CREATIVE_MODE_SLOT, ir::registerSetCreativeModeSlot1_20_5);
         ctx.clientbound(ClientboundPackets1_21_2.SET_EQUIPMENT, ir::registerSetEquipment);
         ctx.clientbound(ClientboundPackets1_21_2.OPEN_SCREEN, ir::registerOpenScreen);
         ctx.clientbound(ClientboundPackets1_21_2.MERCHANT_OFFERS, ir::registerMerchantOffers1_20_5);

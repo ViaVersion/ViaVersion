@@ -256,6 +256,17 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
+    public void registerSetCreativeModeSlot1_20_5(S packetType) {
+        protocol.registerServerbound(packetType, wrapper -> {
+            if (protocol.getEntityRewriter() != null && !protocol.getEntityRewriter().tracker(wrapper.user()).canInstaBuild()) {
+                wrapper.cancel();
+                return;
+            }
+            wrapper.passthrough(Types.SHORT); // Slot
+            wrapper.write(itemType, handleItemToServer(wrapper.user(), wrapper.read(mappedItemType)));
+        });
+    }
+
     public void registerContainerClick(S packetType) {
         protocol.registerServerbound(packetType, wrapper -> {
             wrapper.passthrough(Types.BYTE); // Container ID

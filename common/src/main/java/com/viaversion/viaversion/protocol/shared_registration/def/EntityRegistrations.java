@@ -67,13 +67,11 @@ final class EntityRegistrations {
 
     static <CU extends ClientboundPacketType> void registerEntityPackets1_21_4(final RegistrationContext<CU, ?> ctx, final EntityRewriter<CU, ?> er) {
         common1_20_5(ctx, er);
-        registerGameModeTrackers1_21_4(ctx, er);
         ctx.clientbound(ClientboundPackets1_21_2.ADD_ENTITY, er::registerTrackerWithData1_19);
     }
 
     static <CU extends ClientboundPacketType> void registerEntityPackets1_21_9(final RegistrationContext<CU, ?> ctx, final EntityRewriter<CU, ?> er) {
         common1_20_5(ctx, er);
-        registerGameModeTrackers1_21_4(ctx, er);
         ctx.clientbound(ClientboundPackets1_21_9.ADD_ENTITY, er::registerTrackerWithData1_21_9);
     }
 
@@ -82,11 +80,8 @@ final class EntityRegistrations {
         ctx.clientbound(ClientboundPackets1_20_5.REMOVE_ENTITIES, er::registerRemoveEntities);
         ctx.clientbound(ClientboundPackets1_20_5.LOGIN, er::registerLogin1_20_5);
         ctx.clientbound(ClientboundPackets1_20_5.RESPAWN, er::registerRespawn1_20_5);
-    }
-
-    private static <CU extends ClientboundPacketType> void registerGameModeTrackers1_21_4(final RegistrationContext<CU, ?> ctx, final EntityRewriter<CU, ?> er) {
-        ctx.clientbound(ClientboundPackets1_21_2.GAME_EVENT, er::registerGameEvent);
-        ctx.clientbound(ClientboundPackets1_21_2.PLAYER_ABILITIES, er::registerPlayerAbilities);
+        ctx.clientbound(ClientboundPackets1_20_5.GAME_EVENT, er::registerGameEvent);
+        ctx.clientbound(ClientboundPackets1_20_5.PLAYER_ABILITIES, er::registerPlayerAbilities);
     }
 
 
