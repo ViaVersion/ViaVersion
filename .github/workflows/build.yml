@@ -26,7 +26,7 @@ jobs:
         java-version: 17
         check-latest: true
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build --stacktrace
     - name: Upload Artifacts to GitHub
       # Only upload on the preview repository as there is no CI job for it.
       if: ${{ github.repository == 'ViaVersion/ViaVersionDev' && github.ref_name == 'preview' }}
