@@ -109,7 +109,7 @@ public record RegistrationContext<CU extends ClientboundPacketType, SU extends S
         return false;
     }
 
-    private SU serverboundPacketType(final ServerboundPacketType genericPacketType) {
+    public SU serverboundPacketType(final ServerboundPacketType genericPacketType) {
         final SU type = protocol.getPacketTypesProvider().unmappedServerboundType(genericPacketType.state(), genericPacketType.getName());
         if (type == null) {
             throw new IllegalArgumentException("Could not find serverbound packet type for " + genericPacketType.state() + " " + genericPacketType.getName());
@@ -117,7 +117,7 @@ public record RegistrationContext<CU extends ClientboundPacketType, SU extends S
         return type;
     }
 
-    private CU clientboundPacketType(final ClientboundPacketType genericPacketType) {
+    public CU clientboundPacketType(final ClientboundPacketType genericPacketType) {
         final CU type = protocol.getPacketTypesProvider().unmappedClientboundType(genericPacketType.state(), genericPacketType.getName());
         if (type == null) {
             throw new IllegalArgumentException("Could not find clientbound packet type for " + genericPacketType.state() + " " + genericPacketType.getName() + " in " + protocol.getClass().getSimpleName());

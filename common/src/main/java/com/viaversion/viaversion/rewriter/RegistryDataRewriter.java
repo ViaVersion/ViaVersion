@@ -28,7 +28,9 @@ import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
@@ -139,6 +141,27 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
 
     public void addHandler(String registryKey, final BiConsumer<String, CompoundTag> handler) {
         registryEntryHandlers.put(Key.stripMinecraftNamespace(registryKey), handler);
+    }
+
+    @Override
+    public void sendMissingRegistries(final UserConnection connection) {
+        for (final Map.Entry<String, List<RegistryEntry>> entry : this.toAdd.entrySet()) {
+            if (registryKeyMappings.containsKey(entry.getKey())) {
+                continue;
+            }
+
+            final List<RegistryEntry> toAdd = entry.getValue();
+            final RegistryEntry[] entries = new RegistryEntry[toAdd.size()];
+            for (int i = 0; i < toAdd.size(); i++) {
+                entries[i] = toAdd.get(i).copy();
+            }
+
+            final ClientboundPacketType packetType = protocol.getPacketTypesProvider().mappedClientboundType(State.CONFIGURATION, "REGISTRY_DATA");
+            final PacketWrapper registryData = PacketWrapper.create(packetType, connection);
+            registryData.write(Types.STRING, entry.getKey());
+            registryData.write(Types.REGISTRY_ENTRY_ARRAY, entries);
+            registryData.send(protocol.getClass());
+        }
     }
 
     public void addEnchantmentEffectRewriter(final String key, final Consumer<CompoundTag> rewriter) {

@@ -74,6 +74,11 @@ public interface PacketTypesProvider<CU extends ClientboundPacketType, CM extend
         return map != null ? map.typeByName(typeName) : null;
     }
 
+    default @Nullable CM mappedClientboundType(final State state, final String typeName) {
+        PacketTypeMap<CM> map = mappedClientboundPacketTypes().get(state);
+        return map != null ? map.typeByName(typeName) : null;
+    }
+
     default @Nullable SU unmappedServerboundType(final State state, final String typeName) {
         PacketTypeMap<SU> map = unmappedServerboundPacketTypes().get(state);
         return map != null ? map.typeByName(typeName) : null;
