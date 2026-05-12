@@ -20,7 +20,10 @@ package com.viaversion.viaversion.protocols.v26_1to26_2.rewriter;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes26_2;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
 import com.viaversion.viaversion.protocols.v26_1to26_2.Protocol26_1To26_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
@@ -28,6 +31,31 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
 
     public EntityPacketRewriter26_2(final Protocol26_1To26_2 protocol) {
         super(protocol);
+    }
+
+    @Override
+    protected void registerPackets() {
+        super.registerPackets();
+
+        protocol.registerServerbound(ServerboundPackets26_1.SPECTATE_ENTITY, wrapper -> {
+            final Integer entityId = wrapper.read(Types.OPTIONAL_VAR_INT);
+            if (entityId != null) {
+                wrapper.write(Types.VAR_INT, entityId);
+            } else {
+                wrapper.cancel();
+            }
+        });
+
+        protocol.appendClientbound(ClientboundPackets26_1.LOGIN, wrapper -> {
+            // Continuing from the registered handler
+            wrapper.passthrough(Types.BYTE); // Previous gamemode
+            wrapper.passthrough(Types.BOOLEAN); // Debug
+            wrapper.passthrough(Types.BOOLEAN); // Flat
+            wrapper.passthrough(Types.OPTIONAL_GLOBAL_POSITION); // Last death location
+            wrapper.passthrough(Types.VAR_INT); // Portal cooldown
+            wrapper.passthrough(Types.VAR_INT); // Sea level
+            wrapper.write(Types.BOOLEAN, true); // Online mode
+        });
     }
 
     @Override

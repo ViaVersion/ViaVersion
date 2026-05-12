@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType26_1;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
@@ -121,6 +122,8 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
                 wrapper.write(Types.BYTE, flags);
             }
         });
+
+        registryDataRewriter.addEntries("jukebox_song", Protocol1_21_11To26_1.createJukeboxPlayableEntry("bounce"));
     }
 
     @Override

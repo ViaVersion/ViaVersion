@@ -239,15 +239,19 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
 
     private void addJukeboxPlayables(final String... songs) {
         for (final String song : songs) {
-            final CompoundTag songTag = new CompoundTag();
-            final CompoundTag songDescription = new CompoundTag();
-            songDescription.putString("translate", "jukebox_song.minecraft." + song);
-            songTag.put("description", songDescription);
-            songTag.putString("sound_event", "music_disc." + song);
-            songTag.putFloat("length_in_seconds", 175F);
-            songTag.putInt("comparator_output", 10);
-            registryDataRewriter.addEntries("jukebox_song", new RegistryEntry(song, songTag));
+            registryDataRewriter.addEntries("jukebox_song", createJukeboxPlayableEntry(song));
         }
+    }
+
+    public static RegistryEntry createJukeboxPlayableEntry(final String song) {
+        final CompoundTag songTag = new CompoundTag();
+        final CompoundTag songDescription = new CompoundTag();
+        songDescription.putString("translate", "jukebox_song.minecraft." + song);
+        songTag.put("description", songDescription);
+        songTag.putString("sound_event", "music_disc." + song);
+        songTag.putFloat("length_in_seconds", 175F);
+        songTag.putInt("comparator_output", 10);
+        return new RegistryEntry(song, songTag);
     }
 
     private void swapAffixAndAddAssetId(final String registryKey, final String affix) {

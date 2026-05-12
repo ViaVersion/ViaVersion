@@ -81,7 +81,7 @@ public enum ServerboundPackets26_1 implements ServerboundPacket26_1 {
     SET_STRUCTURE_BLOCK, // 0x3B
     SET_TEST_BLOCK, // 0x3C
     SIGN_UPDATE, // 0x3D
-    SPECTATE_ENTITY, // 0x3E
+    SPECTATE_ENTITY, // 0x3E // TODO rename to SPECTATOR_ACTION once a new enum is needed
     SWING, // 0x3F
     TELEPORT_TO_ENTITY, // 0x40
     TEST_INSTANCE_BLOCK_ACTION, // 0x41
