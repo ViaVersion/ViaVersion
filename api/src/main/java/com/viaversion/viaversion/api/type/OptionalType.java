@@ -26,10 +26,10 @@ import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public abstract class OptionalType<T> extends Type<T> {
+public class OptionalType<T> extends Type<T> {
     private final Type<T> type;
 
-    protected OptionalType(final Type<T> type) {
+    public OptionalType(final Type<T> type) {
         super(type.getOutputClass());
         this.type = type;
     }
