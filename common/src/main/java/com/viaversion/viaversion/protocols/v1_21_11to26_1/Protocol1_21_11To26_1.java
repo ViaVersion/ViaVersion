@@ -214,7 +214,7 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
         ponderGoatHornInstrument.putString("sound_event", "item.goat_horn.sound.0");
         ponderGoatHornInstrument.putFloat("use_duration", 7F);
         ponderGoatHornInstrument.putFloat("range", 256F);
-        registryDataRewriter.addEntries("instrument", new RegistryEntry("spear", ponderGoatHornInstrument));
+        registryDataRewriter.addEntries("instrument", new RegistryEntry("ponder_goat_horn", ponderGoatHornInstrument));
 
         addJukeboxPlayables("11", "13", "5", "blocks", "cat", "chirp", "far", "mall", "mellohi", "otherside", "pigstep", "relic", "stal", "strad", "wait", "ward", "creator", "creator_music_box", "lava_chicken", "tears", "precipice");
         addTrimMaterials("quartz", "iron", "netherite", "redstone", "copper", "gold", "emerald", "diamond", "lapis", "amethyst", "resin");
