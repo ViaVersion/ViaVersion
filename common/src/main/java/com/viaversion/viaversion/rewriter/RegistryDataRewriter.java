@@ -85,7 +85,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         for (int i = 0; i < entries.length; i++) {
             keys[i] = Key.stripMinecraftNamespace(entries[i].key());
         }
-        registryKeyMappings.put(key, new KeyMappings(keys));
+        this.registryKeyMappings.put(key, new KeyMappings(keys));
         connection.get(RegistryKeyMapping.class).put(key, new KeyMappings(keys));
 
         switch (key) {
@@ -527,10 +527,6 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     @Override
     public @Nullable KeyMappings getMappings(final String registryKey) {
         return this.registryKeyMappings.get(Key.stripMinecraftNamespace(registryKey));
-    }
-
-    public void clearMappings() {
-        registryKeyMappings.clear();
     }
 
     public Map<String, KeyMappings> registryKeyMappings() {
