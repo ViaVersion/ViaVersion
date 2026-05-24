@@ -34,6 +34,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
+import com.viaversion.viaversion.rewriter.storage.RegistryKeyMapping;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.KeyMappings;
 import com.viaversion.viaversion.util.TagUtil;
@@ -53,8 +54,8 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     private final Map<String, BiConsumer<String, CompoundTag>> registryEntryHandlers = new Object2ObjectArrayMap<>();
     private final Map<String, Consumer<CompoundTag>> enchantmentEffectHandlers = new Object2ObjectArrayMap<>(); // for nested enchantment data
     private final Map<String, List<RegistryEntry>> toAdd = new Object2ObjectArrayMap<>();
+    protected final RegistryKeyMapping registryKeyMappings = new RegistryKeyMapping();
     private final Set<String> toRemove = new HashSet<>();
-    protected final Map<String, KeyMappings> registryKeyMappings = new HashMap<>();
     protected final Protocol<?, ?, ?, ?> protocol;
 
     public RegistryDataRewriter(final Protocol<?, ?, ?, ?> protocol) {
@@ -63,6 +64,10 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
 
     @Override
     public void handle(final PacketWrapper wrapper) {
+        if (!wrapper.user().has(RegistryKeyMapping.class)) {
+            wrapper.user().put(new RegistryKeyMapping());
+        }
+
         final String registryKey = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
         RegistryEntry[] entries = wrapper.read(Types.REGISTRY_ENTRY_ARRAY);
         entries = handle(wrapper.user(), registryKey, entries);
@@ -80,7 +85,8 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         for (int i = 0; i < entries.length; i++) {
             keys[i] = Key.stripMinecraftNamespace(entries[i].key());
         }
-        this.registryKeyMappings.put(key, new KeyMappings(keys));
+        registryKeyMappings.put(key, new KeyMappings(keys));
+        connection.get(RegistryKeyMapping.class).put(key, new KeyMappings(keys));
 
         switch (key) {
             case "enchantment" -> updateEnchantments(connection, entries);
@@ -146,7 +152,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     @Override
     public void sendMissingRegistries(final UserConnection connection) {
         for (final Map.Entry<String, List<RegistryEntry>> entry : this.toAdd.entrySet()) {
-            if (registryKeyMappings.containsKey(entry.getKey())) {
+            if (connection.get(RegistryKeyMapping.class).containsKey(entry.getKey())) {
                 continue;
             }
 
@@ -521,6 +527,10 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     @Override
     public @Nullable KeyMappings getMappings(final String registryKey) {
         return this.registryKeyMappings.get(Key.stripMinecraftNamespace(registryKey));
+    }
+
+    public void clearMappings() {
+        registryKeyMappings.clear();
     }
 
     public Map<String, KeyMappings> registryKeyMappings() {
