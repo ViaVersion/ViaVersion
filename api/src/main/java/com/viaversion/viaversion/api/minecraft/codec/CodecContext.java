@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.codec;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -35,7 +36,11 @@ public interface CodecContext {
 
     boolean isSupported(StructuredDataKey<?> key);
 
+    UserConnection connection();
+
     interface RegistryAccess {
+
+        UserConnection connection();
 
         Key item(int id);
 
@@ -67,8 +72,8 @@ public interface CodecContext {
          */
         int id(MappingData.MappingType mappingType, String identifier);
 
-        static RegistryAccess of(final Protocol<?, ?, ?, ?> protocol) {
-            return new RegistryAccessImpl(protocol);
+        static RegistryAccess of(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection) {
+            return new RegistryAccessImpl(protocol, connection);
         }
 
         /**

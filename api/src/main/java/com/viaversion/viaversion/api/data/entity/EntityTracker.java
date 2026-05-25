@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.data.entity;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.util.KeyMappings;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -210,4 +211,8 @@ public interface EntityTracker {
     @Nullable DimensionData dimensionData(int dimensionId);
 
     void setDimensions(Map<String, DimensionData> dimensions);
+
+    @Nullable KeyMappings registryKeys(String registryKey);
+
+    void addRegistryKeys(String registryKey, KeyMappings mappings);
 }

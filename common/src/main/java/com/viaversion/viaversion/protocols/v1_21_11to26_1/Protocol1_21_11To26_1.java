@@ -198,6 +198,9 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
         spearDamageType.putString("scaling", "when_caused_by_living_non_player");
         registryDataRewriter.addEntries("damage_type", new RegistryEntry("spear", spearDamageType));
 
+        final CompoundTag temperateChicken = new CompoundTag();
+        temperateChicken.putString("asset_id", "entity/chicken/chicken_temperate");
+        temperateChicken.putString("baby_asset_id", "entity/chicken/chicken_temperate_baby");
         final CompoundTag coldChicken = new CompoundTag();
         coldChicken.putString("asset_id", "entity/chicken/chicken_cold");
         coldChicken.putString("baby_asset_id", "entity/chicken/chicken_cold_baby");
@@ -205,7 +208,7 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
         final CompoundTag warmChicken = new CompoundTag();
         warmChicken.putString("asset_id", "entity/chicken/chicken_warm");
         warmChicken.putString("baby_asset_id", "entity/chicken/chicken_warm_baby");
-        registryDataRewriter.addEntries("chicken_variant", new RegistryEntry("cold", coldChicken), new RegistryEntry("warm", warmChicken));
+        registryDataRewriter.addEntries("chicken_variant", new RegistryEntry("temperate", temperateChicken), new RegistryEntry("cold", coldChicken), new RegistryEntry("warm", warmChicken));
 
         final CompoundTag ponderGoatHornInstrument = new CompoundTag();
         final CompoundTag ponderGoatHornDescription = new CompoundTag();

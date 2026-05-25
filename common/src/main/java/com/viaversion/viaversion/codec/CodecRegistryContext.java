@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.codec;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -47,5 +48,10 @@ public record CodecRegistryContext(Protocol<?, ?, ?, ?> protocol, RegistryAccess
 
         final VersionedTypesHolder types = mapped ? protocol.mappedTypes() : protocol.types();
         return (NOT_IMPLEMENTED.isEmpty() || !NOT_IMPLEMENTED.contains(key)) && types.structuredDataKeys().supportsOps(key);
+    }
+
+    @Override
+    public UserConnection connection() {
+        return registryAccess.connection();
     }
 }

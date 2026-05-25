@@ -197,7 +197,7 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_4.PLAYER));
-        connection.addItemHasher(this.getClass(), new ItemHashStorage1_21_5(this));
+        connection.addItemHasher(this.getClass(), new ItemHashStorage1_21_5(this, connection));
         connection.put(new MessageIndexStorage());
     }
 

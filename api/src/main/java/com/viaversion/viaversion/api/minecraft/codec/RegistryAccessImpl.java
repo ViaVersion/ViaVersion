@@ -23,29 +23,38 @@
 package com.viaversion.viaversion.api.minecraft.codec;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class RegistryAccessImpl implements CodecContext.RegistryAccess {
-    private final RegistryDataRewriter registryDataRewriter;
+    private final EntityTracker entityTracker;
     private final MappingData mappingData;
+    private final UserConnection connection;
     private final boolean mapped;
 
-    RegistryAccessImpl(final Protocol<?, ?, ?, ?> protocol) {
-        this.mappingData = protocol.getMappingData();
-        this.registryDataRewriter = protocol.getRegistryDataRewriter();
+    RegistryAccessImpl(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection) {
+        this.mappingData = Preconditions.checkNotNull(protocol.getMappingData());
+        this.entityTracker = Preconditions.checkNotNull(protocol.getEntityRewriter().tracker(connection));
+        this.connection = connection;
         this.mapped = false;
     }
 
-    private RegistryAccessImpl(final MappingData mappingData, final RegistryDataRewriter registryDataRewriter, final boolean mapped) {
+    private RegistryAccessImpl(final MappingData mappingData, final UserConnection connection, final EntityTracker entityTracker, final boolean mapped) {
         this.mappingData = mappingData;
-        this.registryDataRewriter = registryDataRewriter;
+        this.connection = connection;
+        this.entityTracker = entityTracker;
         this.mapped = mapped;
+    }
+
+    @Override
+    public UserConnection connection() {
+        return connection;
     }
 
     @Override
@@ -91,8 +100,8 @@ final class RegistryAccessImpl implements CodecContext.RegistryAccess {
 
     @Override
     public Key registryKey(final String registry, final int id) {
-        final KeyMappings mappings = registryDataRewriter.getMappings(registry);
-        Preconditions.checkNotNull(mappings, "No registry mappings for registry: " + registry);
+        final KeyMappings mappings = entityTracker.registryKeys(registry);
+        Preconditions.checkNotNull(mappings, "No registry mappings for registry: %s", registry);
         final String identifier = id >= 0 && id < mappings.size() ? mappings.idToKey(id) : null;
         return key(identifier, id);
     }
@@ -108,6 +117,6 @@ final class RegistryAccessImpl implements CodecContext.RegistryAccess {
 
     @Override
     public CodecContext.RegistryAccess withMapped(final boolean mapped) {
-        return this.mapped == mapped ? this : new RegistryAccessImpl(this.mappingData, this.registryDataRewriter, mapped);
+        return this.mapped == mapped ? this : new RegistryAccessImpl(this.mappingData, this.connection, this.entityTracker, mapped);
     }
 }
