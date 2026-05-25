@@ -77,17 +77,17 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
 
     @Override
     protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
-        upgradeData(protocol, protocol.types().structuredDataKeys(), container);
+        upgradeData(protocol, connection, protocol.types().structuredDataKeys(), container);
         super.handleItemDataComponentsToClient(connection, item, container);
     }
 
-    public static void upgradeData(final Protocol<?, ?, ?, ?> protocol, final StructuredDataKeys1_21_11 dataKeys, final StructuredDataContainer container) {
-        container.replace(StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.JUKEBOX_PLAYABLE26_1, jukeboxPlayable -> upgradeHolder(protocol, jukeboxPlayable.song(), "jukebox_song"));
-        container.replace(StructuredDataKey.INSTRUMENT1_21_5, StructuredDataKey.INSTRUMENT26_1, instrument -> upgradeHolder(protocol, instrument, "instrument"));
-        container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL1_21_5, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, providesTrimMaterial -> upgradeHolder(protocol, providesTrimMaterial.material(), "trim_material"));
-        container.replace(StructuredDataKey.CHICKEN_VARIANT1_21_5, StructuredDataKey.CHICKEN_VARIANT26_1, chickenVariant -> upgradeEitherVariant(protocol, chickenVariant, "chicken_variant"));
-        container.replace(StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT1_21_11, StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT26_1, nautilusVariant -> upgradeEitherVariant(protocol, nautilusVariant, "zombie_nautilus_variant"));
-        container.replace(StructuredDataKey.DAMAGE_TYPE1_21_11, StructuredDataKey.DAMAGE_TYPE26_1, damageType -> upgradeEitherVariant(protocol, damageType.id(), "damage_type"));
+    public static void upgradeData(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection, final StructuredDataKeys1_21_11 dataKeys, final StructuredDataContainer container) {
+        container.replace(StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.JUKEBOX_PLAYABLE26_1, jukeboxPlayable -> upgradeHolder(protocol, connection, jukeboxPlayable.song(), "jukebox_song"));
+        container.replace(StructuredDataKey.INSTRUMENT1_21_5, StructuredDataKey.INSTRUMENT26_1, instrument -> upgradeHolder(protocol, connection, instrument, "instrument"));
+        container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL1_21_5, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, providesTrimMaterial -> upgradeHolder(protocol, connection, providesTrimMaterial.material(), "trim_material"));
+        container.replace(StructuredDataKey.CHICKEN_VARIANT1_21_5, StructuredDataKey.CHICKEN_VARIANT26_1, chickenVariant -> upgradeEitherVariant(protocol, connection, chickenVariant, "chicken_variant"));
+        container.replace(StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT1_21_11, StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT26_1, nautilusVariant -> upgradeEitherVariant(protocol, connection, nautilusVariant, "zombie_nautilus_variant"));
+        container.replace(StructuredDataKey.DAMAGE_TYPE1_21_11, StructuredDataKey.DAMAGE_TYPE26_1, damageType -> upgradeEitherVariant(protocol, connection, damageType.id(), "damage_type"));
         container.replace(StructuredDataKey.PROVIDES_BANNER_PATTERNS1_21_5, StructuredDataKey.PROVIDES_BANNER_PATTERNS26_1, key -> new ProvidesBannerPatterns(HolderSet.of(key.original())));
         container.replace(StructuredDataKey.DAMAGE_RESISTANT1_21_2, StructuredDataKey.DAMAGE_RESISTANT26_1, damageResistant -> new DamageResistant26_1(HolderSet.of(damageResistant.typesTagKey().original())));
         container.replaceKey(StructuredDataKey.BLOCKS_ATTACKS1_21_5, StructuredDataKey.BLOCKS_ATTACKS26_1);
@@ -103,20 +103,20 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
         }
     }
 
-    private static @Nullable Integer upgradeEitherVariant(final Protocol<?, ?, ?, ?> protocol, final Either<Integer, String> eitherHolder, final String registry) {
-        return eitherHolder.isLeft() ? eitherHolder.left() : registryIdOrNull(protocol, registry, eitherHolder.right());
+    private static @Nullable Integer upgradeEitherVariant(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection, final Either<Integer, String> eitherHolder, final String registry) {
+        return eitherHolder.isLeft() ? eitherHolder.left() : registryIdOrNull(protocol, connection, registry, eitherHolder.right());
     }
 
-    private static <T> @Nullable Holder<T> upgradeHolder(final Protocol<?, ?, ?, ?> protocol, final EitherHolder<T> eitherHolder, final String registry) {
+    private static <T> @Nullable Holder<T> upgradeHolder(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection, final EitherHolder<T> eitherHolder, final String registry) {
         if (eitherHolder.hasHolder()) {
             return eitherHolder.holder();
         }
-        final Integer id = registryIdOrNull(protocol, registry, eitherHolder.key());
+        final Integer id = registryIdOrNull(protocol, connection, registry, eitherHolder.key());
         return id != null ? Holder.of((int) id) : null;
     }
 
-    private static @Nullable Integer registryIdOrNull(final Protocol<?, ?, ?, ?> protocol, final String registry, final String key) {
-        final int id = protocol.getRegistryDataRewriter().getMappings(registry).keyToId(key);
+    private static @Nullable Integer registryIdOrNull(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection, final String registry, final String key) {
+        final int id = protocol.getEntityRewriter().tracker(connection).registryKeys(registry).keyToId(key);
         return id != -1 ? id : null;
     }
 

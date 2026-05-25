@@ -44,8 +44,8 @@ import com.viaversion.viaversion.codec.CodecRegistryContext;
 import com.viaversion.viaversion.codec.hash.HashFunction;
 import com.viaversion.viaversion.codec.hash.HashOps;
 import com.viaversion.viaversion.common.PlatformTestBase;
+import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.protocols.v1_21_6to1_21_7.Protocol1_21_6To1_21_7;
-import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.util.KeyMappings;
 import com.viaversion.viaversion.util.UUIDUtil;
 import org.junit.jupiter.api.Assertions;
@@ -61,20 +61,16 @@ public class ItemHashTest extends PlatformTestBase {
 
     @BeforeAll
     static void loadContext() {
+        final UserConnectionImpl dummyConnection = new UserConnectionImpl(null);
         protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_21_6To1_21_7.class);
-        context = new CodecRegistryContext(null, CodecContext.RegistryAccess.of(protocol), false);
+        protocol.init(dummyConnection);
+        context = new CodecRegistryContext(null, CodecContext.RegistryAccess.of(protocol, dummyConnection), false);
         hasher = new HashOps(context, HashFunction.CRC32C);
     }
 
     @BeforeEach
     void resetHasher() {
         hasher.reset();
-    }
-
-    private HashOps hasher(final Class<? extends Protocol<?, ?, ?, ?>> protocolClass) {
-        final Protocol<?, ?, ?, ?> protocol = Via.getManager().getProtocolManager().getProtocol(protocolClass);
-        final CodecRegistryContext context = new CodecRegistryContext(null, CodecContext.RegistryAccess.of(protocol), false);
-        return new HashOps(context, HashFunction.CRC32C);
     }
 
     @Test
@@ -138,7 +134,7 @@ public class ItemHashTest extends PlatformTestBase {
 
     @Test
     void testRegistryHolderId() {
-        ((RegistryDataRewriter) protocol.getRegistryDataRewriter()).registryKeyMappings().put("banner_pattern", new KeyMappings("base"));
+        protocol.getEntityRewriter().tracker(context.connection()).addRegistryKeys("banner_pattern", new KeyMappings("base"));
         hasher.write(BannerPatternLayer.ARRAY_TYPE, new BannerPatternLayer[]{new BannerPatternLayer(Holder.of(0), 0)});
         Assertions.assertEquals(606382024, hasher.hash(), "banner_pattern hash mismatch");
     }

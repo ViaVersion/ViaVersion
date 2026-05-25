@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.storage;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext.RegistryAccess;
@@ -37,8 +38,8 @@ public class ItemHashStorage1_21_5 implements ItemHasher {
     private boolean processingClientboundInventoryPacket;
     private final CodecContext context;
 
-    public ItemHashStorage1_21_5(final Protocol1_21_4To1_21_5 protocol) {
-        final RegistryAccess registryAccess = RegistryAccess.of(protocol);
+    public ItemHashStorage1_21_5(final Protocol1_21_4To1_21_5 protocol, final UserConnection connection) {
+        final RegistryAccess registryAccess = RegistryAccess.of(protocol, connection);
         this.context = new CodecRegistryContext(protocol, registryAccess, true); // always using 1.21.5 items as input
     }
 

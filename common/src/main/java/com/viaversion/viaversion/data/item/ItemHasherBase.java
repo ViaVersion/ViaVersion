@@ -47,7 +47,7 @@ public class ItemHasherBase implements ItemHasher {
     private final CodecContext mappedContext;
 
     public ItemHasherBase(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection) {
-        final RegistryAccess registryAccess = RegistryAccess.of(protocol);
+        final RegistryAccess registryAccess = RegistryAccess.of(protocol, connection);
         this.context = new CodecRegistryContext(protocol, registryAccess, false);
         this.mappedContext = new CodecRegistryContext(protocol, registryAccess, true);
         this.connection = connection;
