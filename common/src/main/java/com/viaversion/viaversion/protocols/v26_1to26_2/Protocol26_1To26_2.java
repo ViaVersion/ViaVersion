@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes26_2;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.type.Types;
@@ -35,6 +36,7 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType26_1;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
@@ -51,6 +53,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 import com.viaversion.viaversion.util.Key;
+import java.util.UUID;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
@@ -121,6 +124,14 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
                 wrapper.write(Types.BOOL_OPTIONAL_VAR_INT, color < 16 ? color : null); // only actual colors now
                 wrapper.write(Types.BYTE, flags);
             }
+        });
+
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
+            wrapper.passthrough(Types.UUID); // UUID
+            wrapper.passthrough(Types.STRING); // Name
+            wrapper.passthrough(Types.PROFILE_PROPERTY_ARRAY);
+
+            wrapper.write(Types.UUID, UUID.randomUUID()); // Session ID
         });
 
         registryDataRewriter.addEntries("jukebox_song", Protocol1_21_11To26_1.createJukeboxPlayableEntry("bounce"));
