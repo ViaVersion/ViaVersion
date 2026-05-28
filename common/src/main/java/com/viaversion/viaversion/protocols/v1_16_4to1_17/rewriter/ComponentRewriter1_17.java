@@ -39,6 +39,7 @@ public final class ComponentRewriter1_17 extends JsonNBTComponentRewriter<Client
         mappings.put("commands.debug.reportSaved", "Created debug report in %s");
         mappings.put("commands.debug.reportFailed", "Failed to create debug report");
         mappings.put("commands.locate.success", "The nearest %s is at %s (%s blocks away)");
+        mappings.put("commands.locatebiome.success", "The nearest %s is at %s (%s blocks away)");
     }
 
     @Override
