@@ -27,7 +27,6 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
 
 public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
     private static final int SKULL_WALL_START = 5447;
-    private static final int SKULL_FLOOR_START = 5451;
     private static final int SKULL_END = 5566;
 
     @Override
@@ -43,7 +42,7 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
         int id = storage.get(position).getOriginal();
         if (id >= SKULL_WALL_START && id <= SKULL_END) {
             NumberTag rot = tag.getNumberTag("Rot");
-            if (id == SKULL_FLOOR_START && rot != null) {
+            if (rot != null) {
                 id += rot.asInt() & 0xF;
             }
 
