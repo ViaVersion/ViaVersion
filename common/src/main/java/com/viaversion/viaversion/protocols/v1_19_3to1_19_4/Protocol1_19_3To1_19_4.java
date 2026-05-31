@@ -73,6 +73,20 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
         };
         replaceClientbound(ClientboundPackets1_19_3.COMMANDS, commandRewriter::handle1_19);
 
+        registerClientbound(ClientboundPackets1_19_3.UPDATE_MOB_EFFECT, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // entity id
+            wrapper.passthrough(Types.VAR_INT); // effect id
+            wrapper.passthrough(Types.BYTE); // amplifier
+
+            int duration = wrapper.read(Types.VAR_INT);
+
+            if (duration >= 32767) { // Anything above this would display as infinite on 1.19.2 and below, and on 1.19.4+, infinite is -1
+                wrapper.write(Types.VAR_INT, -1);
+            } else {
+                wrapper.write(Types.VAR_INT, duration);
+            }
+        });
+
         registerClientbound(ClientboundPackets1_19_3.SERVER_DATA, wrapper -> {
             JsonElement element = wrapper.read(Types.OPTIONAL_COMPONENT);
             if (element != null) {
