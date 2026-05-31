@@ -41,14 +41,14 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
 
         int id = storage.get(position).getOriginal();
         if (id >= SKULL_WALL_START && id <= SKULL_END) {
+            NumberTag rot = tag.getNumberTag("Rot");
+            if (rot != null) {
+                id += rot.asInt() & 0xF;
+            }
+
             NumberTag skullType = tag.getNumberTag("SkullType");
             if (skullType != null) {
                 id += skullType.asInt() * 20;
-            }
-
-            NumberTag rot = tag.getNumberTag("Rot");
-            if (rot != null) {
-                id += rot.asInt();
             }
         } else {
             Protocol1_12_2To1_13.LOGGER.warning("Why does this block have the skull block entity? " + tag);
