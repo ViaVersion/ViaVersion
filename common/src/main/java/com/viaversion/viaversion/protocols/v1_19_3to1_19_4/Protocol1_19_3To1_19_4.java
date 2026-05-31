@@ -80,7 +80,7 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
 
             int duration = wrapper.read(Types.VAR_INT);
 
-            if (duration >= 32767) { // Anything above this would display as infinite on 1.19.2 and below, and on 1.19.4+, infinite is -1
+            if (duration >= Short.MAX_VALUE) { // Anything at or above this would display as infinite on 1.19.2 and below, and on 1.19.4+, infinite is -1
                 wrapper.write(Types.VAR_INT, -1);
             } else {
                 wrapper.write(Types.VAR_INT, duration);
