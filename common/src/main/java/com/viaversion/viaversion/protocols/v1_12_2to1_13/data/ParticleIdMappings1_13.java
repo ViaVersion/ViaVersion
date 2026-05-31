@@ -27,7 +27,6 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.WorldPacketRew
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ParticleIdMappings1_13 {
@@ -111,19 +110,14 @@ public class ParticleIdMappings1_13 {
         particles.add(new NewParticle(newId, dataHandler));
     }
 
-    // Randomized because the previous one was a lot of different colors at once! :)
     private static ParticleDataHandler reddustHandler() {
         return (particle, data) -> {
-            particle.add(Types.FLOAT, randomBool() ? 1f : 0f); // Red 0 - 1
+            particle.add(Types.FLOAT, 1f); // Red 0 - 1
             particle.add(Types.FLOAT, 0f); // Green 0 - 1
-            particle.add(Types.FLOAT, randomBool() ? 1f : 0f); // Blue 0 - 1
+            particle.add(Types.FLOAT, 0f); // Blue 0 - 1
             particle.add(Types.FLOAT, 1f);// Scale 0.01 - 4
             return particle;
         };
-    }
-
-    private static boolean randomBool() {
-        return ThreadLocalRandom.current().nextBoolean();
     }
 
     // Rewrite IconCrack items to new format :)
