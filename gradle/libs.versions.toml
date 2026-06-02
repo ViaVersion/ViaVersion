@@ -13,7 +13,7 @@ netty = "4.0.20.Final"
 guava = "17.0"
 
 junit = "6.0.3"
-platformLauncher = "6.0.3"
+platformLauncher = "6.1.0"
 checkerQual = "3.54.0"
 
 # Platforms
