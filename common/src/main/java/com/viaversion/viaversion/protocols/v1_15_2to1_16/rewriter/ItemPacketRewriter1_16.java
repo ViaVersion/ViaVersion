@@ -138,6 +138,8 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
         if (item.identifier() == 771 && tag != null) {
             CompoundTag ownerTag = tag.getCompoundTag("SkullOwner");
             if (ownerTag != null) {
+                normalizeProfileTextures(ownerTag);
+
                 StringTag idTag = ownerTag.getStringTag("Id");
                 if (idTag != null) {
                     UUID id = UUID.fromString(idTag.getValue());
@@ -178,6 +180,34 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
 
         newToOldAttributes(item);
         return item;
+    }
+
+    static void normalizeProfileTextures(final CompoundTag ownerTag) {
+        final CompoundTag propertiesTag = ownerTag.getCompoundTag("Properties");
+        if (propertiesTag == null) {
+            return;
+        }
+
+        final ListTag<CompoundTag> texturesTag = propertiesTag.getListTag("textures", CompoundTag.class);
+        if (texturesTag == null) {
+            return;
+        }
+
+        for (final CompoundTag textureTag : texturesTag) {
+            final StringTag valueTag = textureTag.getStringTag("Value");
+            if (valueTag != null) {
+                valueTag.setValue(normalizeBase64(valueTag.getValue()));
+            }
+        }
+    }
+
+    private static String normalizeBase64(final String value) {
+        final String compactValue = value.replaceAll("\\s+", "");
+        return switch (compactValue.length() & 3) {
+            case 2 -> compactValue + "==";
+            case 3 -> compactValue + "=";
+            default -> compactValue;
+        };
     }
 
     public static void oldToNewAttributes(Item item) {

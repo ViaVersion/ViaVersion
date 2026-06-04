@@ -87,6 +87,8 @@ public class WorldPacketRewriter1_16 {
             compoundTag.put("Target", new IntArrayTag(UUIDUtil.toIntArray(targetUuid)));
         } else if (id.equals("minecraft:skull") && compoundTag.getCompoundTag("Owner") != null) {
             CompoundTag ownerTag = compoundTag.removeUnchecked("Owner");
+            ItemPacketRewriter1_16.normalizeProfileTextures(ownerTag);
+
             Tag ownerUuidTag = ownerTag.remove("Id");
             if (ownerUuidTag instanceof StringTag) {
                 UUID ownerUuid = UUID.fromString(((StringTag) ownerUuidTag).getValue());
