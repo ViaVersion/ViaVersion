@@ -93,7 +93,11 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
         appendClientbound(ClientboundConfigurationPackets1_21_9.FINISH_CONFIGURATION, wrapper -> {
             final PacketWrapper clocksPacket = wrapper.create(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA);
             clocksPacket.write(Types.STRING, "world_clock");
-            clocksPacket.write(Types.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{new RegistryEntry("minecraft:overworld", new CompoundTag())});
+            clocksPacket.write(Types.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{
+                new RegistryEntry("minecraft:overworld", new CompoundTag()),
+                new RegistryEntry("minecraft:the_nether", new CompoundTag()),
+                new RegistryEntry("minecraft:the_end", new CompoundTag())
+            });
             clocksPacket.send(Protocol1_21_11To26_1.class);
 
             sendSoundVariants(wrapper, "cat_sound_variant", MAPPINGS.catSoundVariants());
