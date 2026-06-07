@@ -94,7 +94,7 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             wrapper.passthrough(Types.VAR_INT); // Amplifier
             wrapper.passthrough(Types.VAR_INT); // Duration
             byte flags = wrapper.read(Types.BYTE); // Flags
-            if (effectId == 9) { // Nausea
+            if (effectId == 8) { // Nausea
                 flags |= 0x08;
             }
             wrapper.write(Types.BYTE, flags);
