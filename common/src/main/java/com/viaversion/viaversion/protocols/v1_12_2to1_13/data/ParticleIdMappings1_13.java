@@ -87,7 +87,7 @@ public class ParticleIdMappings1_13 {
         add(16); // (43->16) endrod -> minecraft:end_rod
         add(7); // (44->7) damageindicator -> minecraft:damage_indicator
         add(40); // (45->40) sweepattack -> minecraft:sweep_attack
-        add(20, blockHandler()); // (46->20) fallingdust -> minecraft:falling_dust
+        add(20, blockHandler(160, 95)); // (46->20) fallingdust -> minecraft:falling_dust
         // BlockState	VarInt	The ID of the block state.
         add(41); // (47->41) totem -> minecraft:totem_of_undying
         add(38); // (48->38) spit -> minecraft:spit
@@ -148,8 +148,15 @@ public class ParticleIdMappings1_13 {
 
     // Handle (id+(data<<12)) encoded blocks
     private static ParticleDataHandler blockHandler() {
+        return blockHandler(-1, -1);
+    }
+
+    private static ParticleDataHandler blockHandler(int fromBlockId, int toBlockId) {
         return (particle, data) -> {
             int value = data[0];
+            if ((value & 4095) == fromBlockId) {
+                value = value & ~4095 | toBlockId;
+            }
             int combined = (((value & 4095) << 4) | (value >> 12 & 15));
             int newId = WorldPacketRewriter1_13.toNewId(combined);
 
