@@ -58,7 +58,7 @@ public final class WorldPacketRewriter1_18 {
                     final int newId = BlockEntityMappings1_18.newId(id);
                     wrapper.write(Types.VAR_INT, newId);
 
-                    handleSpawners(newId, wrapper.passthrough(Types.NAMED_COMPOUND_TAG));
+                    handleBlockEntity(newId, wrapper.passthrough(Types.NAMED_COMPOUND_TAG));
                 });
             }
         });
@@ -122,7 +122,7 @@ public final class WorldPacketRewriter1_18 {
                     protocol.getLogger().warning("Unknown block entity: " + id);
                 }
 
-                handleSpawners(typeId, tag);
+                handleBlockEntity(typeId, tag);
 
                 final byte packedXZ = (byte) ((xTag.asInt() & 15) << 4 | (zTag.asInt() & 15));
                 blockEntities.add(new BlockEntityImpl(packedXZ, yTag.asShort(), typeId, tag));
@@ -203,7 +203,11 @@ public final class WorldPacketRewriter1_18 {
         });
     }
 
-    private static void handleSpawners(int typeId, final CompoundTag tag) {
+    private static void handleBlockEntity(final int typeId, final CompoundTag tag) {
+        if (typeId == 14) {
+            ItemPacketRewriter1_18.normalizeProfileTextures(tag.getCompoundTag("SkullOwner"));
+            ItemPacketRewriter1_18.normalizeProfileTextures(tag.getCompoundTag("Owner"));
+        }
         if (typeId == 8) {
             final CompoundTag entity = tag.getCompoundTag("SpawnData");
             if (entity != null) {
