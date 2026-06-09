@@ -89,13 +89,14 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         });
 
         protocol.registerClientbound(ClientboundPackets1_21_2.UPDATE_MOB_EFFECT, ClientboundPackets1_21_5.UPDATE_MOB_EFFECT, wrapper -> {
+            // Add blending to nausea effect
             wrapper.passthrough(Types.VAR_INT); // Entity ID
             final int effectId = wrapper.passthrough(Types.VAR_INT); // Effect ID
             wrapper.passthrough(Types.VAR_INT); // Amplifier
             wrapper.passthrough(Types.VAR_INT); // Duration
             byte flags = wrapper.read(Types.BYTE); // Flags
             if (effectId == 8) { // Nausea
-                flags |= 0x08;
+                flags |= 0x08; // blend
             }
             wrapper.write(Types.BYTE, flags);
         });
