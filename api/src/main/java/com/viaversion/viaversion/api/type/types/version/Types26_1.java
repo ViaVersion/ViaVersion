@@ -34,7 +34,7 @@ public class Types26_1<K extends VersionedStructuredDataKeys, E extends Abstract
 
     public final Type<Item> itemTemplate = new ItemTemplateType26_1(structuredData);
     public final Type<Item> optionalItemTemplate = new ItemTemplateType26_1.OptionalItemTemplateType(itemTemplate);
-    public final Type<Item[]> itemTemplateArray = new ArrayType<>(itemTemplate);
+    public final ArrayType<Item> itemTemplateArray = new ArrayType<>(itemTemplate);
 
     public Types26_1(final Function<VersionedTypesHolder, K> keysSupplier, final Function<VersionedTypesHolder, E> entityDataTypesSupplier) {
         super(null, entityDataTypesSupplier);
@@ -52,7 +52,7 @@ public class Types26_1<K extends VersionedStructuredDataKeys, E extends Abstract
     }
 
     @Override
-    public Type<Item[]> itemTemplateArray() {
+    public ArrayType<Item> itemTemplateArray() {
         return itemTemplateArray;
     }
 }

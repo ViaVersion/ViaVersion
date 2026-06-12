@@ -45,6 +45,12 @@ public class ArrayType<T> extends Type<T[]> {
         this.maxLength = maxLength;
     }
 
+    private ArrayType(Class<? super T[]> outputClass, Type<T> type, int maxLength) {
+        super(type.getTypeName() + " Array", outputClass);
+        this.elementType = type;
+        this.maxLength = maxLength;
+    }
+
     public static Class<?> getArrayClass(Class<?> componentType) {
         // Should only happen once per class init.
         return Array.newInstance(componentType, 0).getClass();
@@ -100,5 +106,9 @@ public class ArrayType<T> extends Type<T[]> {
                 list.write(elementType, element);
             }
         });
+    }
+
+    public ArrayType<T> withMaxLength(final int maxLength) {
+        return new ArrayType<>(this.getOutputClass(), this.elementType, maxLength);
     }
 }

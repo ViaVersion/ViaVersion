@@ -34,7 +34,7 @@ public class StructuredDataKeys1_20_5 extends VersionedStructuredDataKeys {
 
     public StructuredDataKeys1_20_5(final VersionedTypesHolder types) {
         this.container = add("container", types.itemArray());
-        this.chargedProjectiles = add("charged_projectiles", types.itemArray());
-        this.bundleContents = add("bundle_contents", types.itemArray());
+        this.chargedProjectiles = add("charged_projectiles", types.itemArray().withMaxLength(1024));
+        this.bundleContents = add("bundle_contents", types.itemArray().withMaxLength(1024));
     }
 }

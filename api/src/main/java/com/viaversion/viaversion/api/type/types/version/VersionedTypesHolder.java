@@ -46,7 +46,7 @@ public interface VersionedTypesHolder {
      */
     Type<Item> item();
 
-    Type<Item[]> itemArray();
+    ArrayType<Item> itemArray();
 
     /**
      * Returns the unmapped item stack template type, used for certain recipes/templates in 26.1+.
@@ -57,7 +57,7 @@ public interface VersionedTypesHolder {
 
     Type<Item> optionalItemTemplate();
 
-    Type<Item[]> itemTemplateArray();
+    ArrayType<Item> itemTemplateArray();
 
     /**
      * Returns the unmapped item cost type, used in merchant offers.

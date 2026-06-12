@@ -47,7 +47,7 @@ public class Types1_20_5<K extends VersionedStructuredDataKeys, E extends Abstra
     public final Type<StructuredData<?>[]> structuredDataArray = new ArrayType<>(structuredData);
     public final Type<Item> item = new ItemType1_20_5(structuredData);
     public final Type<Item> lengthPrefixedItem = new ItemType1_20_5(lengthPrefixedStructuredData);
-    public final Type<Item[]> itemArray = new ArrayType<>(item);
+    public final ArrayType<Item> itemArray = new ArrayType<>(item);
     public final Type<Item> itemCost = new ItemCostType1_20_5(structuredDataArray);
     public final Type<Item> optionalItemCost = new ItemCostType1_20_5.OptionalItemCostType(itemCost);
     private K structuredDataKeys;
@@ -77,7 +77,7 @@ public class Types1_20_5<K extends VersionedStructuredDataKeys, E extends Abstra
     }
 
     @Override
-    public Type<Item[]> itemArray() {
+    public ArrayType<Item> itemArray() {
         return itemArray;
     }
 
@@ -92,7 +92,7 @@ public class Types1_20_5<K extends VersionedStructuredDataKeys, E extends Abstra
     }
 
     @Override
-    public Type<Item[]> itemTemplateArray() {
+    public ArrayType<Item> itemTemplateArray() {
         return itemArray;
     }
 

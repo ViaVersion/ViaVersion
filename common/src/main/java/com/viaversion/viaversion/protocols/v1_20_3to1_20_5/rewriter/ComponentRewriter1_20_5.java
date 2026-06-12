@@ -1550,8 +1550,9 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
     }
 
     protected Item[] itemArrayFromTag(final UserConnection connection, final ListTag<CompoundTag> tag) {
-        final Item[] items = new Item[tag.size()];
-        for (int i = 0; i < tag.size(); i++) {
+        final int size = Math.min(tag.size(), 1024);
+        final Item[] items = new Item[size];
+        for (int i = 0; i < size; i++) {
             items[i] = itemFromTag(connection, tag.get(i));
         }
         return items;
