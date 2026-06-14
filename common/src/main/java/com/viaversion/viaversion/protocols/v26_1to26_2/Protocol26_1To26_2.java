@@ -37,6 +37,7 @@ import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
@@ -46,6 +47,7 @@ import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundCon
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v26_1to26_2.rewriter.BlockItemPacketRewriter26_2;
 import com.viaversion.viaversion.protocols.v26_1to26_2.rewriter.EntityPacketRewriter26_2;
+import com.viaversion.viaversion.protocols.v26_1to26_2.storage.Encrypted;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
@@ -132,6 +134,11 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
             wrapper.passthrough(Types.PROFILE_PROPERTY_ARRAY);
 
             wrapper.write(Types.UUID, UUID.randomUUID()); // Session ID
+        });
+
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY, wrapper -> {
+            // Previously also used for hiding skins on offline mode servers, now moved to the login packet.
+            wrapper.user().put(new Encrypted());
         });
 
         registryDataRewriter.addEntries("jukebox_song", Protocol1_21_11To26_1.createJukeboxPlayableEntry("bounce"));

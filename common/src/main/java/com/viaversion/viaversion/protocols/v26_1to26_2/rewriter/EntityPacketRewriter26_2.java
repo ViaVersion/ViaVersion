@@ -25,6 +25,7 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPack
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
 import com.viaversion.viaversion.protocols.v26_1to26_2.Protocol26_1To26_2;
+import com.viaversion.viaversion.protocols.v26_1to26_2.storage.Encrypted;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPacket26_1, Protocol26_1To26_2> {
@@ -54,7 +55,8 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
             wrapper.passthrough(Types.OPTIONAL_GLOBAL_POSITION); // Last death location
             wrapper.passthrough(Types.VAR_INT); // Portal cooldown
             wrapper.passthrough(Types.VAR_INT); // Sea level
-            wrapper.write(Types.BOOLEAN, true); // Online mode
+            final boolean onlineMode = wrapper.user().has(Encrypted.class);
+            wrapper.write(Types.BOOLEAN, onlineMode);
         });
     }
 
