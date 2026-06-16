@@ -43,6 +43,7 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPack
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v26_1to26_2.rewriter.BlockItemPacketRewriter26_2;
@@ -50,6 +51,7 @@ import com.viaversion.viaversion.protocols.v26_1to26_2.rewriter.EntityPacketRewr
 import com.viaversion.viaversion.protocols.v26_1to26_2.storage.Encrypted;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
+import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
@@ -89,6 +91,7 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
             }
         }
     };
+    private final RecipeDisplayRewriter1_21_5<ClientboundPacket26_1> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(this);
 
     private void updateTypeSpecificTerm(final CompoundTag predicate, final CompoundTag typeSpecific) {
         final String type = typeSpecific.getString("type");
@@ -203,6 +206,11 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
     @Override
     public BlockRewriter<ClientboundPacket26_1> getBlockRewriter() {
         return blockRewriter;
+    }
+
+    @Override
+    public RecipeDisplayRewriter<ClientboundPacket26_1> getRecipeRewriter() {
+        return recipeRewriter;
     }
 
     @Override
