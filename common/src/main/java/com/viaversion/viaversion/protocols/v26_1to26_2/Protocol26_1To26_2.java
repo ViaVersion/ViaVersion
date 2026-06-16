@@ -22,6 +22,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_2;
@@ -144,6 +145,7 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
             wrapper.user().put(new Encrypted());
         });
 
+        tagRewriter.addEmptyTags(RegistryType.BLOCK, "infiniburn_nether", "infiniburn_end", "infiniburn_overworld"); // from an older version, but servers may have skipped these
         registryDataRewriter.addEntries("jukebox_song", Protocol1_21_11To26_1.createJukeboxPlayableEntry("bounce"));
     }
 
