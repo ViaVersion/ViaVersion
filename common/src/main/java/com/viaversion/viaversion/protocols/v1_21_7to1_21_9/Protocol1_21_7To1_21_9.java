@@ -61,6 +61,7 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
+import com.viaversion.viaversion.util.Limit;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
@@ -112,7 +113,7 @@ public final class Protocol1_21_7To1_21_9 extends AbstractProtocol<ClientboundPa
             wrapper.write(Types.VAR_INT, 0); // Number of block particles
         });
         registerServerbound(ServerboundPackets1_21_6.DEBUG_SAMPLE_SUBSCRIPTION, wrapper -> {
-            final int count = wrapper.read(Types.VAR_INT); // subscription count
+            final int count = Limit.max(wrapper.read(Types.VAR_INT), 32); // subscription count
             for (int i = 0; i < count; i++) {
                 final int id = wrapper.read(Types.VAR_INT); // subscription registry id
                 if (id == 0) { // DEDICATED_SERVER_TICK_TIME
