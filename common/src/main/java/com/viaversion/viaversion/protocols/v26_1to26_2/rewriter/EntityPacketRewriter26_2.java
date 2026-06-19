@@ -29,7 +29,6 @@ import com.viaversion.viaversion.protocols.v26_1to26_2.Protocol26_1To26_2;
 import com.viaversion.viaversion.protocols.v26_1to26_2.storage.Encrypted;
 import com.viaversion.viaversion.protocols.v26_1to26_2.storage.FakeEntityId;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPacket26_1, Protocol26_1To26_2> {
@@ -70,78 +69,86 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         });
 
         // Replace entity ids in a bunch of packets to make sure id zero is no longer used
-        for (final ClientboundPackets26_1 packet : Arrays.asList(
-            ClientboundPackets26_1.ADD_ENTITY, ClientboundPackets26_1.ANIMATE, ClientboundPackets26_1.DAMAGE_EVENT,
-            ClientboundPackets26_1.DEBUG_ENTITY_VALUE, ClientboundPackets26_1.ENTITY_POSITION_SYNC, ClientboundPackets26_1.HURT_ANIMATION,
-            ClientboundPackets26_1.MOVE_ENTITY_POS, ClientboundPackets26_1.MOVE_ENTITY_ROT, ClientboundPackets26_1.MOVE_ENTITY_POS_ROT,
-            ClientboundPackets26_1.MOVE_MINECART_ALONG_TRACK, ClientboundPackets26_1.PLAYER_POSITION, ClientboundPackets26_1.REMOVE_MOB_EFFECT,
-            ClientboundPackets26_1.ROTATE_HEAD, ClientboundPackets26_1.SET_CAMERA, ClientboundPackets26_1.SET_ENTITY_DATA,
-            ClientboundPackets26_1.SET_ENTITY_MOTION, ClientboundPackets26_1.SET_EQUIPMENT, ClientboundPackets26_1.PLAYER_COMBAT_KILL,
-            ClientboundPackets26_1.UPDATE_ATTRIBUTES, ClientboundPackets26_1.UPDATE_MOB_EFFECT)) {
-            protocol.appendClientbound(packet, this::fixVarIntEntityId);
-        }
-        protocol.appendClientbound(ClientboundPackets26_1.REMOVE_ENTITIES, this::fixVarIntEntityIds);
-        protocol.appendClientbound(ClientboundPackets26_1.PLAYER_LOOK_AT, wrapper -> {
+        protocol.appendClientbound(ClientboundPackets26_1.ADD_ENTITY, this::setVarIntEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.SET_ENTITY_DATA, this::setVarIntEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.SET_EQUIPMENT, this::setVarIntEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.PLAYER_COMBAT_KILL, this::setVarIntEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.UPDATE_ATTRIBUTES, this::setVarIntEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.REMOVE_ENTITIES, wrapper -> {
+            final int[] entities = wrapper.get(Types.VAR_INT_ARRAY_PRIMITIVE, 0);
+            for (int i = 0; i < entities.length; i++) {
+                entities[i] = fixEntityId(wrapper, entities[i]);
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets26_1.ANIMATE, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.DAMAGE_EVENT, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.DEBUG_ENTITY_VALUE, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.ENTITY_POSITION_SYNC, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.HURT_ANIMATION, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_ROT, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS_ROT, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_MINECART_ALONG_TRACK, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.PLAYER_POSITION, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.REMOVE_MOB_EFFECT, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.ROTATE_HEAD, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.SET_CAMERA, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.SET_ENTITY_MOTION, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.UPDATE_MOB_EFFECT, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.ENTITY_EVENT, wrapper -> wrapper.write(Types.INT, fixEntityId(wrapper, wrapper.read(Types.INT))));
+        protocol.appendClientbound(ClientboundPackets26_1.SOUND_ENTITY, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Source
+            passVarIntEntityId(wrapper);
+        });
+        protocol.registerClientbound(ClientboundPackets26_1.PLAYER_LOOK_AT, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // From anchor
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
             final boolean atEntity = wrapper.passthrough(Types.BOOLEAN);
             if (atEntity) {
-                fixVarIntEntityId(wrapper);
+                passVarIntEntityId(wrapper);
             }
         });
-        protocol.appendClientbound(ClientboundPackets26_1.SET_PASSENGERS, wrapper -> {
-            fixVarIntEntityId(wrapper); // Vehicle
-            fixVarIntEntityIds(wrapper); // Passengers
+        protocol.registerClientbound(ClientboundPackets26_1.SET_PASSENGERS, wrapper -> {
+            passVarIntEntityId(wrapper); // Vehicle
+            final int[] passengers = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
+            for (int i = 0; i < passengers.length; i++) {
+                passengers[i] = fixEntityId(wrapper, passengers[i]);
+            }
         });
-        protocol.appendClientbound(ClientboundPackets26_1.SOUND_ENTITY, wrapper -> {
-            wrapper.passthrough(Types.SOUND_EVENT); // Sound event
-            wrapper.passthrough(Types.VAR_INT); // Source
-            fixVarIntEntityId(wrapper);
-        });
-        protocol.appendClientbound(ClientboundPackets26_1.ENTITY_EVENT, this::fixIntEntityId);
-        protocol.appendClientbound(ClientboundPackets26_1.MOUNT_SCREEN_OPEN, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets26_1.MOUNT_SCREEN_OPEN, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Container id
             wrapper.passthrough(Types.VAR_INT); // Inventory columns
-            fixIntEntityId(wrapper);
+            wrapper.write(Types.INT, fixEntityId(wrapper, wrapper.read(Types.INT)));
         });
-        protocol.appendClientbound(ClientboundPackets26_1.SET_ENTITY_LINK, wrapper -> {
-            fixIntEntityId(wrapper); // Source id
-            fixIntEntityId(wrapper); // Destination id
+        protocol.registerClientbound(ClientboundPackets26_1.SET_ENTITY_LINK, wrapper -> {
+            wrapper.write(Types.INT, fixEntityId(wrapper, wrapper.read(Types.INT))); // Source id
+            wrapper.write(Types.INT, fixEntityId(wrapper, wrapper.read(Types.INT))); // Destination id
         });
-        protocol.appendClientbound(ClientboundPackets26_1.TAKE_ITEM_ENTITY, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets26_1.TAKE_ITEM_ENTITY, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Item id
-            fixVarIntEntityId(wrapper);
+            passVarIntEntityId(wrapper);
         });
 
-        protocol.appendServerbound(ServerboundPackets26_1.ATTACK, this::fixVarIntEntityId);
-        protocol.appendServerbound(ServerboundPackets26_1.INTERACT, this::fixVarIntEntityId);
-        protocol.appendServerbound(ServerboundPackets26_1.PICK_ITEM_FROM_ENTITY, this::fixVarIntEntityId);
-        protocol.appendServerbound(ServerboundPackets26_1.PLAYER_COMMAND, this::fixVarIntEntityId);
-        protocol.appendServerbound(ServerboundPackets26_1.SET_COMMAND_MINECART, this::fixVarIntEntityId);
+        protocol.appendServerbound(ServerboundPackets26_1.ATTACK, this::passVarIntEntityId);
+        protocol.appendServerbound(ServerboundPackets26_1.INTERACT, this::passVarIntEntityId);
+        protocol.appendServerbound(ServerboundPackets26_1.PICK_ITEM_FROM_ENTITY, this::passVarIntEntityId);
+        protocol.appendServerbound(ServerboundPackets26_1.PLAYER_COMMAND, this::passVarIntEntityId);
+        protocol.appendServerbound(ServerboundPackets26_1.SET_COMMAND_MINECART, this::passVarIntEntityId);
         protocol.appendServerbound(ServerboundPackets26_1.ENTITY_TAG_QUERY, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Transaction id
-            fixVarIntEntityId(wrapper);
+            passVarIntEntityId(wrapper);
         });
     }
 
-    private void fixVarIntEntityId(final PacketWrapper wrapper) {
-        wrapper.resetReader();
+    private void passVarIntEntityId(final PacketWrapper wrapper) {
         wrapper.write(Types.VAR_INT, fixEntityId(wrapper, wrapper.read(Types.VAR_INT)));
     }
 
-    private void fixIntEntityId(final PacketWrapper wrapper) {
-        wrapper.resetReader();
-        wrapper.write(Types.INT, fixEntityId(wrapper, wrapper.read(Types.INT)));
-    }
-
-    private void fixVarIntEntityIds(final PacketWrapper wrapper) {
-        wrapper.resetReader();
-        final int[] entityIds = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
-        for (int i = 0; i < entityIds.length; i++) {
-            entityIds[i] = fixEntityId(wrapper, entityIds[i]);
-        }
+    private void setVarIntEntityId(final PacketWrapper wrapper) {
+        wrapper.set(Types.VAR_INT, 0, fixEntityId(wrapper, wrapper.get(Types.VAR_INT, 0)));
     }
 
     private int fixEntityId(final PacketWrapper wrapper, final int entityId) {
