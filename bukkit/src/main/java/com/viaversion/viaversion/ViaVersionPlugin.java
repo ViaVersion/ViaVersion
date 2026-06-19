@@ -33,11 +33,9 @@ import com.viaversion.viaversion.bukkit.platform.BukkitViaTask;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaTaskTask;
 import com.viaversion.viaversion.bukkit.platform.FoliaViaTask;
 import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
-import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.connection.ConnectionDetails;
 import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.util.GsonUtil;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,14 +85,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
             ((ViaManagerImpl) Via.getManager()).init();
         } else {
             getLogger().info("ViaVersion " + getDescription().getVersion() + " is now loaded. Waiting for boot (late-bind).");
-        }
-
-        try {
-            // Do this about as early as possible and reasonable
-            incrementNextEntityId();
-        } catch (ClassNotFoundException | NoSuchMethodException ignored) {
-        } catch (ReflectiveOperationException e) {
-            getLogger().log(Level.WARNING, "Error incrementing next entity id", e);
         }
     }
 
@@ -255,7 +245,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
             final String className = Bukkit.getServer().getClass().getName();
             final String craftBukkitPackage = className.substring(0, className.lastIndexOf('.'));
             Class.forName(craftBukkitPackage + ".entity.CraftPlayer").getMethod("addChannel", String.class).invoke(player, channel);
-        } catch (final IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+        } catch (final IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+                       ClassNotFoundException e) {
             getLogger().log(Level.SEVERE, "Failed to register custom payload channel " + channel + " for player " + player.getName(), e);
             return;
         }
@@ -311,18 +302,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     public boolean isLateBind() {
         return lateBind;
-    }
-
-    private void incrementNextEntityId() throws ReflectiveOperationException {
-        // 26.2 clients no longer accept entities with the id 0.
-        // Since patching this up in the actual protocol requires dozens of packets having the 0 id changed to some arbitrary other number,
-        // or shifting EVERYTHING when it only affects <1.14 and will not occur under regular circumstances, this is the next best thing.
-        Class<?> entityClass = NMSUtil.nms("Entity");
-        Field entityCount = entityClass.getDeclaredField("entityCount");
-        entityCount.setAccessible(true);
-        if (entityCount.getInt(null) == 0) {
-            entityCount.setInt(null, 1);
-        }
     }
 
     /**
