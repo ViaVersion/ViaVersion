@@ -43,7 +43,9 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
             if (entityId != null) {
                 wrapper.write(Types.VAR_INT, entityId);
             } else {
-                wrapper.cancel();
+                // if entity id is null, they just left-clicked the air, which used to be handled by the swing packet in 1.21.10 and below (1.21.11 and 26.1.X does not send spectator left clicks at all)
+                wrapper.setPacketType(ServerboundPackets26_1.SWING);
+                wrapper.write(Types.VAR_INT, 0); // Hand to Swing, 0 = Main Hand
             }
         });
 
