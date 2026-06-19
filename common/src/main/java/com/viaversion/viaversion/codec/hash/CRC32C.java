@@ -19,30 +19,10 @@ package com.viaversion.viaversion.codec.hash;
 
 final class CRC32C implements HashFunction {
 
-    private static final int[] CRC32C_TABLE = new int[256];
-
-    static {
-        for (int i = 0; i < 256; i++) {
-            int crc = i;
-            for (int j = 0; j < 8; j++) {
-                if ((crc & 1) == 1) {
-                    crc = (crc >>> 1) ^ 0x82F63B78;
-                } else {
-                    crc >>>= 1;
-                }
-            }
-            CRC32C_TABLE[i] = crc;
-        }
-    }
-
     @Override
     public int hashBytes(final byte[] data, final int length) {
-        int crc = ~0;
-        for (int i = 0; i < length; i++) {
-            final byte b = data[i];
-            final int index = (crc ^ b) & 0xFF;
-            crc = (crc >>> 8) ^ CRC32C_TABLE[index];
-        }
-        return ~crc;
+        java.util.zip.CRC32C crc = new java.util.zip.CRC32C();
+        crc.update(data, 0, length);
+        return (int) crc.getValue();
     }
 }
