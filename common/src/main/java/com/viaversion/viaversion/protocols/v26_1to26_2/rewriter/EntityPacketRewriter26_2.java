@@ -132,12 +132,12 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
             passVarIntEntityId(wrapper);
         });
 
-        protocol.appendServerbound(ServerboundPackets26_1.ATTACK, this::passVarIntEntityId);
-        protocol.appendServerbound(ServerboundPackets26_1.INTERACT, this::passVarIntEntityId);
-        protocol.appendServerbound(ServerboundPackets26_1.PICK_ITEM_FROM_ENTITY, this::passVarIntEntityId);
-        protocol.appendServerbound(ServerboundPackets26_1.PLAYER_COMMAND, this::passVarIntEntityId);
-        protocol.appendServerbound(ServerboundPackets26_1.SET_COMMAND_MINECART, this::passVarIntEntityId);
-        protocol.appendServerbound(ServerboundPackets26_1.ENTITY_TAG_QUERY, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets26_1.ATTACK, this::passVarIntEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.INTERACT, this::passVarIntEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.PICK_ITEM_FROM_ENTITY, this::passVarIntEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.PLAYER_COMMAND, this::passVarIntEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.SET_COMMAND_MINECART, this::passVarIntEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.ENTITY_TAG_QUERY, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Transaction id
             passVarIntEntityId(wrapper);
         });
