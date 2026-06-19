@@ -113,7 +113,7 @@ public final class Protocol1_21_7To1_21_9 extends AbstractProtocol<ClientboundPa
             wrapper.write(Types.VAR_INT, 0); // Number of block particles
         });
         registerServerbound(ServerboundPackets1_21_6.DEBUG_SAMPLE_SUBSCRIPTION, wrapper -> {
-            final int count = Limit.max(wrapper.read(Types.VAR_INT), 64); // subscription count
+            final int count = Limit.max(wrapper.read(Types.VAR_INT), 32); // subscription count
             for (int i = 0; i < count; i++) {
                 final int id = wrapper.read(Types.VAR_INT); // subscription registry id
                 if (id == 0) { // DEDICATED_SERVER_TICK_TIME
