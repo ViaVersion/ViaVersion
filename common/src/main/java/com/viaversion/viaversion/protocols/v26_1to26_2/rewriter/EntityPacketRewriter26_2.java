@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes26_2;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
@@ -44,7 +45,7 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         protocol.registerServerbound(ServerboundPackets26_1.SPECTATE_ENTITY, wrapper -> {
             final Integer entityId = wrapper.read(Types.OPTIONAL_VAR_INT);
             if (entityId != null) {
-                wrapper.write(Types.VAR_INT, fixEntityId(wrapper, entityId));
+                wrapper.write(Types.VAR_INT, fromFakeEntityId(wrapper, entityId));
             } else {
                 wrapper.cancel();
             }
@@ -55,7 +56,7 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
             wrapper.user().put(new FakeEntityId(ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE, -1)));
 
             final int entityId = wrapper.get(Types.INT, 0);
-            wrapper.set(Types.INT, 0, fixEntityId(wrapper, entityId));
+            wrapper.set(Types.INT, 0, toFakeEntityId(wrapper, entityId));
 
             // Continuing from the registered handler
             wrapper.passthrough(Types.BYTE); // Previous gamemode
@@ -69,50 +70,53 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         });
 
         // Replace entity ids in a bunch of packets to make sure id zero is no longer used
-        protocol.appendClientbound(ClientboundPackets26_1.ADD_ENTITY, this::setEntityId);
-        protocol.appendClientbound(ClientboundPackets26_1.SET_ENTITY_DATA, this::setEntityId);
-        protocol.appendClientbound(ClientboundPackets26_1.SET_EQUIPMENT, this::setEntityId);
-        protocol.appendClientbound(ClientboundPackets26_1.PLAYER_COMBAT_KILL, this::setEntityId);
-        protocol.appendClientbound(ClientboundPackets26_1.UPDATE_ATTRIBUTES, this::setEntityId);
+        final PacketHandler setFakeEntityId = wrapper -> wrapper.set(Types.VAR_INT, 0, toFakeEntityId(wrapper, wrapper.get(Types.VAR_INT, 0)));
+        protocol.appendClientbound(ClientboundPackets26_1.ADD_ENTITY, setFakeEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.SET_ENTITY_DATA, setFakeEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.SET_EQUIPMENT, setFakeEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.PLAYER_COMBAT_KILL, setFakeEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.UPDATE_ATTRIBUTES, setFakeEntityId);
         protocol.appendClientbound(ClientboundPackets26_1.REMOVE_ENTITIES, wrapper -> {
             final int[] entities = wrapper.get(Types.VAR_INT_ARRAY_PRIMITIVE, 0);
             for (int i = 0; i < entities.length; i++) {
-                entities[i] = fixEntityId(wrapper, entities[i]);
+                entities[i] = toFakeEntityId(wrapper, entities[i]);
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets26_1.ANIMATE, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.DEBUG_ENTITY_VALUE, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.ENTITY_POSITION_SYNC, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.HURT_ANIMATION, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_ROT, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS_ROT, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.MOVE_MINECART_ALONG_TRACK, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.REMOVE_MOB_EFFECT, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.ROTATE_HEAD, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.SET_CAMERA, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.SET_ENTITY_MOTION, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.UPDATE_MOB_EFFECT, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.TELEPORT_ENTITY, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.PROJECTILE_POWER, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.BLOCK_DESTRUCTION, this::passEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.ENTITY_EVENT, wrapper -> wrapper.write(Types.INT, fixEntityId(wrapper, wrapper.read(Types.INT))));
+        final PacketHandler toFakeEntityId = wrapper -> wrapper.write(Types.VAR_INT, toFakeEntityId(wrapper, wrapper.read(Types.VAR_INT)));
+        final PacketHandler fromFakeEntityId = wrapper -> wrapper.write(Types.VAR_INT, fromFakeEntityId(wrapper, wrapper.read(Types.VAR_INT)));
+        protocol.registerClientbound(ClientboundPackets26_1.ANIMATE, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.DEBUG_ENTITY_VALUE, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.ENTITY_POSITION_SYNC, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.HURT_ANIMATION, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_ROT, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS_ROT, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_MINECART_ALONG_TRACK, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.REMOVE_MOB_EFFECT, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.ROTATE_HEAD, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.SET_CAMERA, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.SET_ENTITY_MOTION, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.UPDATE_MOB_EFFECT, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.TELEPORT_ENTITY, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.PROJECTILE_POWER, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.BLOCK_DESTRUCTION, toFakeEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.ENTITY_EVENT, wrapper -> wrapper.write(Types.INT, toFakeEntityId(wrapper, wrapper.read(Types.INT))));
         protocol.registerClientbound(ClientboundPackets26_1.DAMAGE_EVENT, wrapper -> {
-            this.passEntityId(wrapper); // Entity id
+            toFakeEntityId.handle(wrapper); // Entity id
             wrapper.passthrough(Types.VAR_INT); // Source type
             final Integer sourceCauseId = wrapper.passthrough(Types.OPTIONAL_VAR_INT);
             if (sourceCauseId != null) {
-                wrapper.set(Types.OPTIONAL_VAR_INT, 0, fixEntityId(wrapper, sourceCauseId));
+                wrapper.set(Types.OPTIONAL_VAR_INT, 0, toFakeEntityId(wrapper, sourceCauseId));
             }
             final Integer sourceDirectId = wrapper.passthrough(Types.OPTIONAL_VAR_INT);
             if (sourceDirectId != null) {
-                wrapper.set(Types.OPTIONAL_VAR_INT, 1, fixEntityId(wrapper, sourceDirectId));
+                wrapper.set(Types.OPTIONAL_VAR_INT, 1, toFakeEntityId(wrapper, sourceDirectId));
             }
         });
         protocol.appendClientbound(ClientboundPackets26_1.SOUND_ENTITY, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Source
-            passEntityId(wrapper);
+            toFakeEntityId.handle(wrapper);
         });
         protocol.registerClientbound(ClientboundPackets26_1.PLAYER_LOOK_AT, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // From anchor
@@ -121,50 +125,46 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
             wrapper.passthrough(Types.DOUBLE); // Z
             final boolean atEntity = wrapper.passthrough(Types.BOOLEAN);
             if (atEntity) {
-                passEntityId(wrapper);
+                toFakeEntityId.handle(wrapper);
             }
         });
         protocol.registerClientbound(ClientboundPackets26_1.SET_PASSENGERS, wrapper -> {
-            passEntityId(wrapper); // Vehicle
+            toFakeEntityId.handle(wrapper); // Vehicle
             final int[] passengers = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
             for (int i = 0; i < passengers.length; i++) {
-                passengers[i] = fixEntityId(wrapper, passengers[i]);
+                passengers[i] = toFakeEntityId(wrapper, passengers[i]);
             }
         });
         protocol.registerClientbound(ClientboundPackets26_1.MOUNT_SCREEN_OPEN, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Container id
             wrapper.passthrough(Types.VAR_INT); // Inventory columns
-            wrapper.write(Types.INT, fixEntityId(wrapper, wrapper.read(Types.INT)));
+            wrapper.write(Types.INT, toFakeEntityId(wrapper, wrapper.read(Types.INT)));
         });
         protocol.registerClientbound(ClientboundPackets26_1.SET_ENTITY_LINK, wrapper -> {
-            wrapper.write(Types.INT, fixEntityId(wrapper, wrapper.read(Types.INT))); // Source id
+            wrapper.write(Types.INT, toFakeEntityId(wrapper, wrapper.read(Types.INT))); // Source id
         });
         protocol.registerClientbound(ClientboundPackets26_1.TAKE_ITEM_ENTITY, wrapper -> {
-            passEntityId(wrapper); // Item id
-            passEntityId(wrapper); // Player id
+            toFakeEntityId.handle(wrapper); // Item id
+            toFakeEntityId.handle(wrapper); // Player id
         });
 
-        protocol.registerServerbound(ServerboundPackets26_1.ATTACK, this::passEntityId);
-        protocol.registerServerbound(ServerboundPackets26_1.INTERACT, this::passEntityId);
-        protocol.registerServerbound(ServerboundPackets26_1.PICK_ITEM_FROM_ENTITY, this::passEntityId);
-        protocol.registerServerbound(ServerboundPackets26_1.PLAYER_COMMAND, this::passEntityId);
-        protocol.registerServerbound(ServerboundPackets26_1.SET_COMMAND_MINECART, this::passEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.ATTACK, fromFakeEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.INTERACT, fromFakeEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.PICK_ITEM_FROM_ENTITY, fromFakeEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.PLAYER_COMMAND, fromFakeEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.SET_COMMAND_MINECART, fromFakeEntityId);
         protocol.registerServerbound(ServerboundPackets26_1.ENTITY_TAG_QUERY, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Transaction id
-            passEntityId(wrapper);
+            fromFakeEntityId.handle(wrapper);
         });
     }
 
-    private void passEntityId(final PacketWrapper wrapper) {
-        wrapper.write(Types.VAR_INT, fixEntityId(wrapper, wrapper.read(Types.VAR_INT)));
-    }
-
-    private void setEntityId(final PacketWrapper wrapper) {
-        wrapper.set(Types.VAR_INT, 0, fixEntityId(wrapper, wrapper.get(Types.VAR_INT, 0)));
-    }
-
-    private int fixEntityId(final PacketWrapper wrapper, final int entityId) {
+    private int toFakeEntityId(final PacketWrapper wrapper, final int entityId) {
         return entityId == 0 ? wrapper.user().get(FakeEntityId.class).id() : entityId;
+    }
+
+    private int fromFakeEntityId(final PacketWrapper wrapper, final int entityId) {
+        return entityId == wrapper.user().get(FakeEntityId.class).id() ? 0 : entityId;
     }
 
     @Override
