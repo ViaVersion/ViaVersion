@@ -52,7 +52,7 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
 
         protocol.appendClientbound(ClientboundPackets26_1.LOGIN, wrapper -> {
             // Generate a randomized negative id used as a replacement for the no longer allowed zero-entity id.
-            wrapper.user().put(new FakeEntityId(ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE, 0)));
+            wrapper.user().put(new FakeEntityId(ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE, -1)));
 
             final int entityId = wrapper.get(Types.INT, 0);
             wrapper.set(Types.INT, 0, fixEntityId(wrapper, entityId));
@@ -69,11 +69,11 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         });
 
         // Replace entity ids in a bunch of packets to make sure id zero is no longer used
-        protocol.appendClientbound(ClientboundPackets26_1.ADD_ENTITY, this::setVarIntEntityId);
-        protocol.appendClientbound(ClientboundPackets26_1.SET_ENTITY_DATA, this::setVarIntEntityId);
-        protocol.appendClientbound(ClientboundPackets26_1.SET_EQUIPMENT, this::setVarIntEntityId);
-        protocol.appendClientbound(ClientboundPackets26_1.PLAYER_COMBAT_KILL, this::setVarIntEntityId);
-        protocol.appendClientbound(ClientboundPackets26_1.UPDATE_ATTRIBUTES, this::setVarIntEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.ADD_ENTITY, this::setEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.SET_ENTITY_DATA, this::setEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.SET_EQUIPMENT, this::setEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.PLAYER_COMBAT_KILL, this::setEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.UPDATE_ATTRIBUTES, this::setEntityId);
         protocol.appendClientbound(ClientboundPackets26_1.REMOVE_ENTITIES, wrapper -> {
             final int[] entities = wrapper.get(Types.VAR_INT_ARRAY_PRIMITIVE, 0);
             for (int i = 0; i < entities.length; i++) {
@@ -81,25 +81,38 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets26_1.ANIMATE, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.DAMAGE_EVENT, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.DEBUG_ENTITY_VALUE, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.ENTITY_POSITION_SYNC, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.HURT_ANIMATION, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_ROT, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS_ROT, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.MOVE_MINECART_ALONG_TRACK, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.PLAYER_POSITION, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.REMOVE_MOB_EFFECT, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.ROTATE_HEAD, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.SET_CAMERA, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.SET_ENTITY_MOTION, this::passVarIntEntityId);
-        protocol.registerClientbound(ClientboundPackets26_1.UPDATE_MOB_EFFECT, this::passVarIntEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.ANIMATE, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.DEBUG_ENTITY_VALUE, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.ENTITY_POSITION_SYNC, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.HURT_ANIMATION, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_ROT, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS_ROT, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_MINECART_ALONG_TRACK, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.REMOVE_MOB_EFFECT, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.ROTATE_HEAD, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.SET_CAMERA, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.SET_ENTITY_MOTION, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.UPDATE_MOB_EFFECT, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.TELEPORT_ENTITY, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.PROJECTILE_POWER, this::passEntityId);
+        protocol.registerClientbound(ClientboundPackets26_1.BLOCK_DESTRUCTION, this::passEntityId);
         protocol.registerClientbound(ClientboundPackets26_1.ENTITY_EVENT, wrapper -> wrapper.write(Types.INT, fixEntityId(wrapper, wrapper.read(Types.INT))));
+        protocol.registerClientbound(ClientboundPackets26_1.DAMAGE_EVENT, wrapper -> {
+            this.passEntityId(wrapper); // Entity id
+            wrapper.passthrough(Types.VAR_INT); // Source type
+            final Integer sourceCauseId = wrapper.passthrough(Types.OPTIONAL_VAR_INT);
+            if (sourceCauseId != null) {
+                wrapper.set(Types.OPTIONAL_VAR_INT, 0, fixEntityId(wrapper, sourceCauseId));
+            }
+            final Integer sourceDirectId = wrapper.passthrough(Types.OPTIONAL_VAR_INT);
+            if (sourceDirectId != null) {
+                wrapper.set(Types.OPTIONAL_VAR_INT, 1, fixEntityId(wrapper, sourceDirectId));
+            }
+        });
         protocol.appendClientbound(ClientboundPackets26_1.SOUND_ENTITY, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Source
-            passVarIntEntityId(wrapper);
+            passEntityId(wrapper);
         });
         protocol.registerClientbound(ClientboundPackets26_1.PLAYER_LOOK_AT, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // From anchor
@@ -108,11 +121,11 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
             wrapper.passthrough(Types.DOUBLE); // Z
             final boolean atEntity = wrapper.passthrough(Types.BOOLEAN);
             if (atEntity) {
-                passVarIntEntityId(wrapper);
+                passEntityId(wrapper);
             }
         });
         protocol.registerClientbound(ClientboundPackets26_1.SET_PASSENGERS, wrapper -> {
-            passVarIntEntityId(wrapper); // Vehicle
+            passEntityId(wrapper); // Vehicle
             final int[] passengers = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
             for (int i = 0; i < passengers.length; i++) {
                 passengers[i] = fixEntityId(wrapper, passengers[i]);
@@ -125,29 +138,28 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         });
         protocol.registerClientbound(ClientboundPackets26_1.SET_ENTITY_LINK, wrapper -> {
             wrapper.write(Types.INT, fixEntityId(wrapper, wrapper.read(Types.INT))); // Source id
-            wrapper.write(Types.INT, fixEntityId(wrapper, wrapper.read(Types.INT))); // Destination id
         });
         protocol.registerClientbound(ClientboundPackets26_1.TAKE_ITEM_ENTITY, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Item id
-            passVarIntEntityId(wrapper);
+            passEntityId(wrapper); // Item id
+            passEntityId(wrapper); // Player id
         });
 
-        protocol.registerServerbound(ServerboundPackets26_1.ATTACK, this::passVarIntEntityId);
-        protocol.registerServerbound(ServerboundPackets26_1.INTERACT, this::passVarIntEntityId);
-        protocol.registerServerbound(ServerboundPackets26_1.PICK_ITEM_FROM_ENTITY, this::passVarIntEntityId);
-        protocol.registerServerbound(ServerboundPackets26_1.PLAYER_COMMAND, this::passVarIntEntityId);
-        protocol.registerServerbound(ServerboundPackets26_1.SET_COMMAND_MINECART, this::passVarIntEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.ATTACK, this::passEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.INTERACT, this::passEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.PICK_ITEM_FROM_ENTITY, this::passEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.PLAYER_COMMAND, this::passEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.SET_COMMAND_MINECART, this::passEntityId);
         protocol.registerServerbound(ServerboundPackets26_1.ENTITY_TAG_QUERY, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Transaction id
-            passVarIntEntityId(wrapper);
+            passEntityId(wrapper);
         });
     }
 
-    private void passVarIntEntityId(final PacketWrapper wrapper) {
+    private void passEntityId(final PacketWrapper wrapper) {
         wrapper.write(Types.VAR_INT, fixEntityId(wrapper, wrapper.read(Types.VAR_INT)));
     }
 
-    private void setVarIntEntityId(final PacketWrapper wrapper) {
+    private void setEntityId(final PacketWrapper wrapper) {
         wrapper.set(Types.VAR_INT, 0, fixEntityId(wrapper, wrapper.get(Types.VAR_INT, 0)));
     }
 
