@@ -45,16 +45,14 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         protocol.registerServerbound(ServerboundPackets26_1.SPECTATE_ENTITY, wrapper -> {
             final Integer entityId = wrapper.read(Types.OPTIONAL_VAR_INT);
             if (entityId != null) {
-                wrapper.write(Types.VAR_INT, fromFakeEntityId(wrapper, entityId));
+                wrapper.write(Types.VAR_INT, toOriginalEntityId(wrapper, entityId));
             } else {
                 wrapper.cancel();
             }
         });
 
         protocol.appendClientbound(ClientboundPackets26_1.LOGIN, wrapper -> {
-            // Generate a randomized negative id used as a replacement for the no longer allowed zero-entity id.
             wrapper.user().put(new FakeEntityId(ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE, -1)));
-
             final int entityId = wrapper.get(Types.INT, 0);
             wrapper.set(Types.INT, 0, toFakeEntityId(wrapper, entityId));
 
@@ -69,7 +67,8 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
             wrapper.write(Types.BOOLEAN, onlineMode);
         });
 
-        // Replace entity ids in a bunch of packets to make sure id zero is no longer used
+        // Go through **all** packets containing an entity id and replace the id with a randomized negative number if zero,
+        // as the client no longer accepts zero as a valid state.
         final PacketHandler setFakeEntityId = wrapper -> wrapper.set(Types.VAR_INT, 0, toFakeEntityId(wrapper, wrapper.get(Types.VAR_INT, 0)));
         protocol.appendClientbound(ClientboundPackets26_1.ADD_ENTITY, setFakeEntityId);
         protocol.appendClientbound(ClientboundPackets26_1.SET_ENTITY_DATA, setFakeEntityId);
@@ -84,7 +83,7 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         });
 
         final PacketHandler toFakeEntityId = wrapper -> wrapper.write(Types.VAR_INT, toFakeEntityId(wrapper, wrapper.read(Types.VAR_INT)));
-        final PacketHandler fromFakeEntityId = wrapper -> wrapper.write(Types.VAR_INT, fromFakeEntityId(wrapper, wrapper.read(Types.VAR_INT)));
+        final PacketHandler toOriginalEntityId = wrapper -> wrapper.write(Types.VAR_INT, toOriginalEntityId(wrapper, wrapper.read(Types.VAR_INT)));
         protocol.registerClientbound(ClientboundPackets26_1.ANIMATE, toFakeEntityId);
         protocol.registerClientbound(ClientboundPackets26_1.DEBUG_ENTITY_VALUE, toFakeEntityId);
         protocol.registerClientbound(ClientboundPackets26_1.ENTITY_POSITION_SYNC, toFakeEntityId);
@@ -148,14 +147,14 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
             toFakeEntityId.handle(wrapper); // Player id
         });
 
-        protocol.registerServerbound(ServerboundPackets26_1.ATTACK, fromFakeEntityId);
-        protocol.registerServerbound(ServerboundPackets26_1.INTERACT, fromFakeEntityId);
-        protocol.registerServerbound(ServerboundPackets26_1.PICK_ITEM_FROM_ENTITY, fromFakeEntityId);
-        protocol.registerServerbound(ServerboundPackets26_1.PLAYER_COMMAND, fromFakeEntityId);
-        protocol.registerServerbound(ServerboundPackets26_1.SET_COMMAND_MINECART, fromFakeEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.ATTACK, toOriginalEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.INTERACT, toOriginalEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.PICK_ITEM_FROM_ENTITY, toOriginalEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.PLAYER_COMMAND, toOriginalEntityId);
+        protocol.registerServerbound(ServerboundPackets26_1.SET_COMMAND_MINECART, toOriginalEntityId);
         protocol.registerServerbound(ServerboundPackets26_1.ENTITY_TAG_QUERY, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Transaction id
-            fromFakeEntityId.handle(wrapper);
+            toOriginalEntityId.handle(wrapper);
         });
     }
 
@@ -163,7 +162,7 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         return entityId == 0 ? wrapper.user().get(FakeEntityId.class).id() : entityId;
     }
 
-    private int fromFakeEntityId(final PacketWrapper wrapper, final int entityId) {
+    private int toOriginalEntityId(final PacketWrapper wrapper, final int entityId) {
         return entityId == wrapper.user().get(FakeEntityId.class).id() ? 0 : entityId;
     }
 
