@@ -65,7 +65,7 @@ public class ItemHashTest extends PlatformTestBase {
         protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_21_6To1_21_7.class);
         protocol.init(dummyConnection);
         context = new CodecRegistryContext(null, CodecContext.RegistryAccess.of(protocol, dummyConnection), false);
-        hasher = new HashOps(context, HashFunction.CRC32C);
+        hasher = new HashOps(context, HashFunction.crc32c());
     }
 
     @BeforeEach

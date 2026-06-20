@@ -61,7 +61,7 @@ public class ItemHasherBase implements ItemHasher {
      * @return the hashed item
      */
     public HashedItem toHashedItem(final Item item, final boolean mapped) {
-        return toHashedItem(new HashOps(mapped ? mappedContext : context, HashFunction.CRC32C), item);
+        return toHashedItem(new HashOps(mapped ? mappedContext : context, HashFunction.crc32c()), item);
     }
 
     public static HashedItem toHashedItem(final Hasher hasher, final Item item) {
@@ -137,7 +137,7 @@ public class ItemHasherBase implements ItemHasher {
     }
 
     private int hashTag(final CompoundTag tag) {
-        final HashOps hasher = new HashOps(context, HashFunction.CRC32C);
+        final HashOps hasher = new HashOps(context, HashFunction.crc32c());
         Types.TAG.write(hasher, tag);
         return hasher.hash();
     }

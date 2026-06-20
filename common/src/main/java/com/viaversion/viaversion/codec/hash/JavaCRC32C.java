@@ -17,16 +17,16 @@
  */
 package com.viaversion.viaversion.codec.hash;
 
-@FunctionalInterface
-public interface HashFunction {
+import java.util.zip.CRC32C;
 
-    static HashFunction crc32c() {
-        return Runtime.version().feature() < 9 ? new FallbackCRC32C() : new JavaCRC32C();
-    }
+final class JavaCRC32C implements HashFunction {
 
-    int hashBytes(byte[] data, int length);
+    private final CRC32C crc = new CRC32C();
 
-    default int hashBytes(final byte[] data) {
-        return this.hashBytes(data, data.length);
+    @Override
+    public int hashBytes(final byte[] data, final int length) {
+        crc.reset();
+        crc.update(data, 0, length);
+        return (int) crc.getValue();
     }
 }

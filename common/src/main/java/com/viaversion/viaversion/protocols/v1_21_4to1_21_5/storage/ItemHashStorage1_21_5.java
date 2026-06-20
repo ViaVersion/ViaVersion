@@ -48,7 +48,7 @@ public class ItemHashStorage1_21_5 implements ItemHasher {
             return;
         }
 
-        final HashOps hasher = new HashOps(context, HashFunction.CRC32C);
+        final HashOps hasher = new HashOps(context, HashFunction.crc32c());
         final int hash = hasher.context().isSupported(structuredData.key()) ? hash(hasher, structuredData) : ItemHasherBase.UNKNOWN_HASH;
         if (hash == ItemHasherBase.UNKNOWN_HASH) {
             return;

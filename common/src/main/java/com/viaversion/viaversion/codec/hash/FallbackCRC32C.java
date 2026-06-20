@@ -17,7 +17,9 @@
  */
 package com.viaversion.viaversion.codec.hash;
 
-final class CRC32C implements HashFunction {
+// Required so long as Java 8 downgraded VV jars are offered
+@Deprecated
+final class FallbackCRC32C implements HashFunction {
 
     private static final int[] CRC32C_TABLE = new int[256];
 

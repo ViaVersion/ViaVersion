@@ -51,8 +51,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ViaManagerImpl implements ViaManager {
     private final ProtocolManagerImpl protocolManager = new ProtocolManagerImpl();
@@ -245,28 +243,13 @@ public class ViaManagerImpl implements ViaManager {
         platform.getLogger().info("ViaVersion has been disabled; uninjected the platform and shut down the scheduler.");
     }
 
-    private void checkJavaVersion() { // Stolen from Paper
-        String javaVersion = System.getProperty("java.version");
-        Matcher matcher = Pattern.compile("(?:1\\.)?(\\d+)").matcher(javaVersion);
-        if (!matcher.find()) {
-            platform.getLogger().warning("Failed to determine Java version; could not parse: " + javaVersion);
-            return;
-        }
-
-        String versionString = matcher.group(1);
-        int version;
-        try {
-            version = Integer.parseInt(versionString);
-        } catch (NumberFormatException e) {
-            platform.getLogger().log(Level.WARNING, "Failed to determine Java version; could not parse: " + versionString, e);
-            return;
-        }
-
-        if (version < 17) {
+    private void checkJavaVersion() {
+        int javaVersion = Runtime.version().feature();
+        if (javaVersion < 17) {
             platform.getLogger().warning("You are running an outdated Java version, please update it to at least Java 21 (your version is " + javaVersion + ").");
             platform.getLogger().warning("ViaVersion no longer officially supports this version of Java, only offering unsupported compatibility builds.");
             platform.getLogger().warning("See https://github.com/ViaVersion/ViaVersion/releases/tag/5.0.0 for more information.");
-        } else if (version < 21) {
+        } else if (javaVersion < 21) {
             platform.getLogger().warning("Please update your Java runtime to at least Java 21 (your version is " + javaVersion + ").");
             platform.getLogger().warning("At some point in the future, ViaVersion will no longer be compatible with this version of Java.");
         }
