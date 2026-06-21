@@ -90,7 +90,7 @@ public class HashOps extends OpsBase implements Hasher {
 
     @Override
     public void writeString(final CharSequence sequence) {
-        hashBuilder.preSize(sequence.length() + Byte.BYTES + Integer.BYTES)
+        hashBuilder.preSize((sequence.length() * Character.BYTES) + Byte.BYTES + Integer.BYTES)
             .writeByte(TAG_STRING)
             .writeInt(sequence.length())
             .writeString(sequence);
