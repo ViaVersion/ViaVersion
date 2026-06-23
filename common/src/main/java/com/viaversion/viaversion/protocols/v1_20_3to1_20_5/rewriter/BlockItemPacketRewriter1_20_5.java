@@ -44,7 +44,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
+import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.AttributeModifier;
@@ -65,7 +65,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5.FoodEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
-import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
+import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffectData;
@@ -637,7 +637,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final IntArrayTag potDecorationsTag = backupTag.getIntArrayTag("pot_decorations");
         if (potDecorationsTag != null && potDecorationsTag.getValue().length == 4) {
-            data.set(StructuredDataKey.POT_DECORATIONS, new PotDecorations(potDecorationsTag.getValue()));
+            data.set(StructuredDataKey.POT_DECORATIONS1_20_5, new PotDecorations1_20_5(potDecorationsTag.getValue()));
         }
 
         final ByteTag enchantmentGlintOverride = backupTag.getByteTag("enchantment_glint_override");
@@ -968,7 +968,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
     private void updateArmorTrim(final UserConnection connection, final StructuredDataContainer data, final CompoundTag trimTag, final boolean showInTooltip) {
         final Tag materialTag = trimTag.get("material");
-        final Holder<ArmorTrimMaterial> materialHolder;
+        final Holder<ArmorTrimMaterial1_20_5> materialHolder;
         final ProtocolStorables1_20_5 storables = connection.storables(protocol);
         final ArmorTrimStorage trimStorage = storables.armorTrims();
         if (materialTag instanceof StringTag materialStringTag) {
@@ -1005,7 +1005,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 }
             }
 
-            materialHolder = Holder.of(new ArmorTrimMaterial(
+            materialHolder = Holder.of(new ArmorTrimMaterial1_20_5(
                 assetNameTag.getValue(),
                 ingredientId,
                 itemModelIndexTag != null ? itemModelIndexTag.asFloat() : 0,
@@ -1462,7 +1462,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 final String rightSherd = sherdsTag.get(2).getValue();
                 final String frontSherd = sherdsTag.get(3).getValue();
 
-                data.set(StructuredDataKey.POT_DECORATIONS, new PotDecorations(
+                data.set(StructuredDataKey.POT_DECORATIONS1_20_5, new PotDecorations1_20_5(
                     toMappedItemId(backSherd),
                     toMappedItemId(leftSherd),
                     toMappedItemId(rightSherd),

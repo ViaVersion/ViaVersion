@@ -87,7 +87,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         StructuredDataKey.BANNER_PATTERNS, StructuredDataKey.BEES1_20_5, StructuredDataKey.BLOCK_ENTITY_DATA1_20_5,
         StructuredDataKey.BLOCK_STATE, StructuredDataKey.V1_21_5.bundleContents, StructuredDataKey.V1_21_5.chargedProjectiles, StructuredDataKey.V1_21_5.container,
         StructuredDataKey.CONTAINER_LOOT, StructuredDataKey.FIREWORK_EXPLOSION, StructuredDataKey.FIREWORKS, StructuredDataKey.INSTRUMENT1_21_5, StructuredDataKey.MAP_ID,
-        StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.POT_DECORATIONS, StructuredDataKey.POTION_CONTENTS1_21_2, StructuredDataKey.TROPICAL_FISH_PATTERN,
+        StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.POT_DECORATIONS1_20_5, StructuredDataKey.POTION_CONTENTS1_21_2, StructuredDataKey.TROPICAL_FISH_PATTERN,
         StructuredDataKey.WRITTEN_BOOK_CONTENT
     );
     public static final List<StructuredDataKey<?>> NEW_DATA_TO_REMOVE = List.of(

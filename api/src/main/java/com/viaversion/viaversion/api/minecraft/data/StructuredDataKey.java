@@ -35,10 +35,10 @@ import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_2;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_5;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
+import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial26_3;
 import com.viaversion.viaversion.api.minecraft.item.data.AttackRange;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_21;
@@ -73,7 +73,8 @@ import com.viaversion.viaversion.api.minecraft.item.data.KineticWeapon;
 import com.viaversion.viaversion.api.minecraft.item.data.LockCode;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.PiercingWeapon;
-import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
+import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations26_3;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.ProvidesBannerPatterns;
 import com.viaversion.viaversion.api.minecraft.item.data.ProvidesTrimMaterial;
@@ -194,11 +195,13 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<CompoundTag> BLOCK_ENTITY_DATA1_20_5 = new StructuredDataKey<>("block_entity_data", Types.COMPOUND_TAG);
     public static final StructuredDataKey<BlockEntityData> BLOCK_ENTITY_DATA1_21_9 = new StructuredDataKey<>("block_entity_data", BlockEntityData.TYPE);
     public static final StructuredDataKey<Holder<Instrument1_20_5>> INSTRUMENT1_20_5 = new StructuredDataKey<>("instrument", Instrument1_20_5.TYPE);
-    public static final StructuredDataKey<Holder<Instrument1_21_2>> INSTRUMENT1_21_2 = new StructuredDataKey<>("instrument", Instrument1_21_2.TYPE);
+    public static final StructuredDataKey<Holder<Instrument1_21_2>> INSTRUMENT1_21_2 = new StructuredDataKey<>("instrument", Instrument1_21_2.TYPE1_21_2);
     public static final StructuredDataKey<EitherHolder<Instrument1_21_2>> INSTRUMENT1_21_5 = new StructuredDataKey<>("instrument", Instrument1_21_2.EITHER_HOLDER_TYPE);
-    public static final StructuredDataKey<Holder<Instrument1_21_2>> INSTRUMENT26_1 = new StructuredDataKey<>("instrument", Instrument1_21_2.TYPE);
+    public static final StructuredDataKey<Holder<Instrument1_21_2>> INSTRUMENT26_1 = new StructuredDataKey<>("instrument", Instrument1_21_2.TYPE1_21_2);
+    public static final StructuredDataKey<Holder<Instrument1_21_2>> INSTRUMENT26_3 = new StructuredDataKey<>("instrument", Instrument1_21_2.TYPE26_3);
     public static final StructuredDataKey<ProvidesTrimMaterial> PROVIDES_TRIM_MATERIAL1_21_5 = new StructuredDataKey<>("provides_trim_material", ProvidesTrimMaterial.TYPE);
-    public static final StructuredDataKey<Holder<ArmorTrimMaterial>> PROVIDES_TRIM_MATERIAL26_1 = new StructuredDataKey<>("provides_trim_material", ArmorTrimMaterial.TYPE1_21_5);
+    public static final StructuredDataKey<Holder<ArmorTrimMaterial1_20_5>> PROVIDES_TRIM_MATERIAL26_1 = new StructuredDataKey<>("provides_trim_material", ArmorTrimMaterial1_20_5.TYPE1_21_5);
+    public static final StructuredDataKey<Holder<ArmorTrimMaterial26_3>> PROVIDES_TRIM_MATERIAL26_3 = new StructuredDataKey<>("provides_trim_material", ArmorTrimMaterial26_3.TYPE);
     public static final StructuredDataKey<Integer> OMINOUS_BOTTLE_AMPLIFIER = new StructuredDataKey<>("ominous_bottle_amplifier", Types.VAR_INT);
     public static final StructuredDataKey<JukeboxPlayable> JUKEBOX_PLAYABLE1_21 = new StructuredDataKey<>("jukebox_playable", JukeboxPlayable.TYPE1_21);
     public static final StructuredDataKey<JukeboxPlayable> JUKEBOX_PLAYABLE1_21_5 = new StructuredDataKey<>("jukebox_playable", JukeboxPlayable.TYPE1_21_5);
@@ -214,7 +217,8 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Key> NOTE_BLOCK_SOUND = new StructuredDataKey<>("note_block_sound", Types.IDENTIFIER);
     public static final StructuredDataKey<BannerPatternLayer[]> BANNER_PATTERNS = new StructuredDataKey<>("banner_patterns", BannerPatternLayer.ARRAY_TYPE);
     public static final StructuredDataKey<Integer> BASE_COLOR = new StructuredDataKey<>("base_color", EnumTypes.DYE_COLOR);
-    public static final StructuredDataKey<PotDecorations> POT_DECORATIONS = new StructuredDataKey<>("pot_decorations", PotDecorations.TYPE);
+    public static final StructuredDataKey<PotDecorations1_20_5> POT_DECORATIONS1_20_5 = new StructuredDataKey<>("pot_decorations", PotDecorations1_20_5.TYPE);
+    public static final StructuredDataKey<PotDecorations26_3> POT_DECORATIONS26_3 = new StructuredDataKey<>("pot_decorations", PotDecorations26_3.TYPE);
     public static final StructuredDataKey<BlockStateProperties> BLOCK_STATE = new StructuredDataKey<>("block_state", BlockStateProperties.TYPE);
     public static final StructuredDataKey<Bee[]> BEES1_20_5 = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE1_20_5);
     public static final StructuredDataKey<Bee[]> BEES1_21_9 = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE1_21_9);
@@ -222,6 +226,8 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<LockCode> LOCK1_21_2 = new StructuredDataKey<>("lock", LockCode.TYPE);
     public static final StructuredDataKey<CompoundTag> CONTAINER_LOOT = new StructuredDataKey<>("container_loot", Types.COMPOUND_TAG);
     public static final StructuredDataKey<Holder<SoundEvent>> BREAK_SOUND = new StructuredDataKey<>("break_sound", Types.SOUND_EVENT);
+    public static final StructuredDataKey<Integer> PROVIDES_POTTERY_PATTERN = new StructuredDataKey<>("provides_pottery_pattern", new SynchronizedRegistryValueType(RegistryKey.of("decorated_pot_pattern")));
+    //  armor trim
 
     public static final StructuredDataKey<Integer> VILLAGER_VARIANT = new StructuredDataKey<>("villager/variant", EnumTypes.VILLAGER_TYPE);
     public static final StructuredDataKey<Integer> WOLF_VARIANT = new StructuredDataKey<>("wolf/variant", new SynchronizedRegistryValueType(RegistryKey.of("wolf_variant")));

@@ -38,6 +38,8 @@ public interface CodecContext {
 
     UserConnection connection();
 
+    Protocol<?, ?, ?, ?> protocol();
+
     interface RegistryAccess {
 
         UserConnection connection();

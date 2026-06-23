@@ -31,11 +31,11 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Rewritable;
 
-public record PotDecorations(int[] itemIds) implements Copyable, Rewritable {
+public record PotDecorations1_20_5(int[] itemIds) implements Copyable, Rewritable {
 
-    public static final Type<PotDecorations> TYPE = new TransformingType<>(Types.VAR_INT_ARRAY_PRIMITIVE, PotDecorations.class, PotDecorations::new, PotDecorations::itemIds) {
+    public static final Type<PotDecorations1_20_5> TYPE = new TransformingType<>(Types.VAR_INT_ARRAY_PRIMITIVE, PotDecorations1_20_5.class, PotDecorations1_20_5::new, PotDecorations1_20_5::itemIds) {
         @Override
-        public void write(final Ops ops, final PotDecorations value) {
+        public void write(final Ops ops, final PotDecorations1_20_5 value) {
             ops.writeList(list -> {
                 for (final int itemId : value.itemIds) {
                     list.write(Types.IDENTIFIER, ops.context().registryAccess().item(itemId));
@@ -44,7 +44,7 @@ public record PotDecorations(int[] itemIds) implements Copyable, Rewritable {
         }
     };
 
-    public PotDecorations(final int backItem, final int leftItem, final int rightItem, final int frontItem) {
+    public PotDecorations1_20_5(final int backItem, final int leftItem, final int rightItem, final int frontItem) {
         this(new int[]{backItem, leftItem, rightItem, frontItem});
     }
 
@@ -69,16 +69,16 @@ public record PotDecorations(int[] itemIds) implements Copyable, Rewritable {
     }
 
     @Override
-    public PotDecorations rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+    public PotDecorations1_20_5 rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         final int[] newItems = new int[itemIds.length];
         for (int i = 0; i < itemIds.length; i++) {
             newItems[i] = Rewritable.rewriteItem(protocol, clientbound, itemIds[i]);
         }
-        return new PotDecorations(newItems);
+        return new PotDecorations1_20_5(newItems);
     }
 
     @Override
-    public PotDecorations copy() {
-        return new PotDecorations(Copyable.copy(itemIds));
+    public PotDecorations1_20_5 copy() {
+        return new PotDecorations1_20_5(Copyable.copy(itemIds));
     }
 }

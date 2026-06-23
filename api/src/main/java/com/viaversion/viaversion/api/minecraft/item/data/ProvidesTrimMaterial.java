@@ -32,24 +32,24 @@ import com.viaversion.viaversion.api.type.types.misc.EitherHolderType;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 
-public record ProvidesTrimMaterial(EitherHolder<ArmorTrimMaterial> material) implements Rewritable {
+public record ProvidesTrimMaterial(EitherHolder<ArmorTrimMaterial1_20_5> material) implements Rewritable {
 
     public static final Type<ProvidesTrimMaterial> TYPE = new Type<>(ProvidesTrimMaterial.class) {
 
         @Override
         public ProvidesTrimMaterial read(final ByteBuf buffer) {
-            final EitherHolder<ArmorTrimMaterial> position = EitherHolderType.read(buffer, ArmorTrimMaterial.TYPE1_21_5);
+            final EitherHolder<ArmorTrimMaterial1_20_5> position = EitherHolderType.read(buffer, ArmorTrimMaterial1_20_5.TYPE1_21_5);
             return new ProvidesTrimMaterial(position);
         }
 
         @Override
         public void write(final ByteBuf buffer, final ProvidesTrimMaterial value) {
-            EitherHolderType.write(buffer, value.material, ArmorTrimMaterial.TYPE1_21_5);
+            EitherHolderType.write(buffer, value.material, ArmorTrimMaterial1_20_5.TYPE1_21_5);
         }
 
         @Override
         public void write(final Ops ops, final ProvidesTrimMaterial value) {
-            EitherHolderType.write(ops, value.material, ArmorTrimMaterial.TYPE1_21_5);
+            EitherHolderType.write(ops, value.material, ArmorTrimMaterial1_20_5.TYPE1_21_5);
         }
     };
 
@@ -59,7 +59,7 @@ public record ProvidesTrimMaterial(EitherHolder<ArmorTrimMaterial> material) imp
             return this;
         }
 
-        final ArmorTrimMaterial trimMaterial = material.holder().value();
+        final ArmorTrimMaterial1_20_5 trimMaterial = material.holder().value();
         return new ProvidesTrimMaterial(EitherHolder.of(Holder.of(trimMaterial.rewrite(connection, protocol, clientbound))));
     }
 }

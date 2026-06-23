@@ -24,7 +24,9 @@ package com.viaversion.viaversion.util;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -58,6 +60,12 @@ public interface Rewritable {
     static String rewriteItem(final Protocol<?, ?, ?, ?> protocol, final boolean clientbound, final String itemId) {
         final FullMappings mappings = protocol.getMappingData().getFullItemMappings();
         return mappings == null ? itemId : (clientbound ? mappedIdentifier(mappings, itemId) : unmappedIdentifier(mappings, itemId));
+    }
+
+    static @Nullable Item rewriteItem(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound, final Item item) {
+        final ItemRewriter<?> rewriter = protocol.getItemRewriter();
+        return rewriter == null ? item
+            : (clientbound ? rewriter.handleItemToClient(connection, item) : rewriter.handleItemToServer(connection, item));
     }
 
     static Int2IntFunction itemRewriteFunction(final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {

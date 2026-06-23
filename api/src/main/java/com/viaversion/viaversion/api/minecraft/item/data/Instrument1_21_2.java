@@ -37,9 +37,13 @@ import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 
 public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration, float range,
-                               Tag description) implements Copyable, Rewritable {
+                               int durabilityDamage, Tag description) implements Copyable, Rewritable {
 
-    public static final HolderType<Instrument1_21_2> TYPE = new HolderType<>() {
+    public Instrument1_21_2(final Holder<SoundEvent> soundEvent, final float useDuration, final float range, final Tag description) {
+        this(soundEvent, useDuration, range, 0, description);
+    }
+
+    public static final HolderType<Instrument1_21_2> TYPE1_21_2 = new HolderType<>() {
         @Override
         public Instrument1_21_2 readDirect(final ByteBuf buffer) {
             final Holder<SoundEvent> soundEvent = Types.SOUND_EVENT.read(buffer);
@@ -71,16 +75,52 @@ public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration,
             return ops.context().registryAccess().registryKey("instrument", id);
         }
     };
-    public static final EitherHolderType<Instrument1_21_2> EITHER_HOLDER_TYPE = new EitherHolderType<>(TYPE);
+    public static final EitherHolderType<Instrument1_21_2> EITHER_HOLDER_TYPE = new EitherHolderType<>(TYPE1_21_2);
+
+    public static final HolderType<Instrument1_21_2> TYPE26_3 = new HolderType<>() {
+        @Override
+        public Instrument1_21_2 readDirect(final ByteBuf buffer) {
+            final Holder<SoundEvent> soundEvent = Types.SOUND_EVENT.read(buffer);
+            final float useDuration = Types.FLOAT.readPrimitive(buffer);
+            final float range = Types.FLOAT.readPrimitive(buffer);
+            final int durabilityDamage = Types.VAR_INT.readPrimitive(buffer);
+            final Tag description = Types.TAG.read(buffer);
+            return new Instrument1_21_2(soundEvent, useDuration, range, durabilityDamage, description);
+        }
+
+        @Override
+        public void writeDirect(final ByteBuf buffer, final Instrument1_21_2 value) {
+            Types.SOUND_EVENT.write(buffer, value.soundEvent());
+            Types.FLOAT.writePrimitive(buffer, value.useDuration());
+            Types.FLOAT.writePrimitive(buffer, value.range());
+            Types.VAR_INT.writePrimitive(buffer, value.durabilityDamage());
+            Types.TAG.write(buffer, value.description());
+        }
+
+        @Override
+        public void writeDirect(final Ops ops, final Instrument1_21_2 value) {
+            ops.writeMap(map -> map
+                .write("sound_event", Types.SOUND_EVENT, value.soundEvent())
+                .write("use_duration", Types.FLOAT, value.useDuration())
+                .write("range", Types.FLOAT, value.range())
+                .write("durability_damage", Types.VAR_INT, value.durabilityDamage())
+                .write("description", Types.TAG, value.description()));
+        }
+
+        @Override
+        protected Key identifier(final Ops ops, final int id) {
+            return ops.context().registryAccess().registryKey("instrument", id);
+        }
+    };
 
     @Override
     public Instrument1_21_2 rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         final Holder<SoundEvent> soundEvent = SoundEvent.rewriteHolder(this.soundEvent, Rewritable.soundRewriteFunction(protocol, clientbound));
-        return soundEvent == this.soundEvent ? this : new Instrument1_21_2(soundEvent, useDuration, range, description);
+        return soundEvent == this.soundEvent ? this : new Instrument1_21_2(soundEvent, useDuration, range, durabilityDamage, description);
     }
 
     @Override
     public Instrument1_21_2 copy() {
-        return new Instrument1_21_2(soundEvent, useDuration, range, description.copy());
+        return new Instrument1_21_2(soundEvent, useDuration, range, durabilityDamage, description.copy());
     }
 }

@@ -35,23 +35,23 @@ import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.Map;
 
-public record ArmorTrimMaterial(String assetName, int itemId, float itemModelIndex,
-                                Map<String, String> overrideArmorMaterials,
-                                Tag description) implements Copyable, Rewritable {
+public record ArmorTrimMaterial1_20_5(String assetName, int itemId, float itemModelIndex,
+                                      Map<String, String> overrideArmorMaterials,
+                                      Tag description) implements Copyable, Rewritable {
 
-    public ArmorTrimMaterial(final String assetName, final int itemId, final Map<String, String> overrideArmorMaterials, final Tag description) {
+    public ArmorTrimMaterial1_20_5(final String assetName, final int itemId, final Map<String, String> overrideArmorMaterials, final Tag description) {
         this(assetName, itemId, 0F, overrideArmorMaterials, description);
     }
 
-    public ArmorTrimMaterial(final String assetName, final Map<String, String> overrideArmorMaterials, final Tag description) {
+    public ArmorTrimMaterial1_20_5(final String assetName, final Map<String, String> overrideArmorMaterials, final Tag description) {
         this(assetName, 0, 0F, overrideArmorMaterials, description);
     }
 
-    public static final HolderType<ArmorTrimMaterial> TYPE1_20_5 = new HolderType<>() {
+    public static final HolderType<ArmorTrimMaterial1_20_5> TYPE1_20_5 = new HolderType<>() {
         // The override key is an int, but given we don't use it at all and that creating a new type is annoying,
         // we'll just store it in the string map:tm:
         @Override
-        public ArmorTrimMaterial readDirect(final ByteBuf buffer) {
+        public ArmorTrimMaterial1_20_5 readDirect(final ByteBuf buffer) {
             final String assetName = Types.STRING.read(buffer);
             final int item = Types.VAR_INT.readPrimitive(buffer);
             final float itemModelIndex = buffer.readFloat();
@@ -65,11 +65,11 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             }
 
             final Tag description = Types.TAG.read(buffer);
-            return new ArmorTrimMaterial(assetName, item, itemModelIndex, overrideArmorMaterials, description);
+            return new ArmorTrimMaterial1_20_5(assetName, item, itemModelIndex, overrideArmorMaterials, description);
         }
 
         @Override
-        public void writeDirect(final ByteBuf buffer, final ArmorTrimMaterial value) {
+        public void writeDirect(final ByteBuf buffer, final ArmorTrimMaterial1_20_5 value) {
             Types.STRING.write(buffer, value.assetName());
             Types.VAR_INT.writePrimitive(buffer, value.itemId());
             buffer.writeFloat(value.itemModelIndex());
@@ -83,9 +83,9 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             Types.TAG.write(buffer, value.description());
         }
     };
-    public static final HolderType<ArmorTrimMaterial> TYPE1_21_2 = new HolderType<>() {
+    public static final HolderType<ArmorTrimMaterial1_20_5> TYPE1_21_2 = new HolderType<>() {
         @Override
-        public ArmorTrimMaterial readDirect(final ByteBuf buffer) {
+        public ArmorTrimMaterial1_20_5 readDirect(final ByteBuf buffer) {
             final String assetName = Types.STRING.read(buffer);
             final int item = Types.VAR_INT.readPrimitive(buffer);
             final float itemModelIndex = buffer.readFloat();
@@ -99,11 +99,11 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             }
 
             final Tag description = Types.TAG.read(buffer);
-            return new ArmorTrimMaterial(assetName, item, itemModelIndex, overrideArmorMaterials, description);
+            return new ArmorTrimMaterial1_20_5(assetName, item, itemModelIndex, overrideArmorMaterials, description);
         }
 
         @Override
-        public void writeDirect(final ByteBuf buffer, final ArmorTrimMaterial value) {
+        public void writeDirect(final ByteBuf buffer, final ArmorTrimMaterial1_20_5 value) {
             Types.STRING.write(buffer, value.assetName());
             Types.VAR_INT.writePrimitive(buffer, value.itemId());
             buffer.writeFloat(value.itemModelIndex());
@@ -117,9 +117,9 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             Types.TAG.write(buffer, value.description());
         }
     };
-    public static final HolderType<ArmorTrimMaterial> TYPE1_21_4 = new HolderType<>() {
+    public static final HolderType<ArmorTrimMaterial1_20_5> TYPE1_21_4 = new HolderType<>() {
         @Override
-        public ArmorTrimMaterial readDirect(final ByteBuf buffer) {
+        public ArmorTrimMaterial1_20_5 readDirect(final ByteBuf buffer) {
             final String assetName = Types.STRING.read(buffer);
             final int item = Types.VAR_INT.readPrimitive(buffer);
 
@@ -132,11 +132,11 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             }
 
             final Tag description = Types.TAG.read(buffer);
-            return new ArmorTrimMaterial(assetName, item, overrideArmorMaterials, description);
+            return new ArmorTrimMaterial1_20_5(assetName, item, overrideArmorMaterials, description);
         }
 
         @Override
-        public void writeDirect(final ByteBuf buffer, final ArmorTrimMaterial value) {
+        public void writeDirect(final ByteBuf buffer, final ArmorTrimMaterial1_20_5 value) {
             Types.STRING.write(buffer, value.assetName());
             Types.VAR_INT.writePrimitive(buffer, value.itemId());
 
@@ -149,9 +149,9 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             Types.TAG.write(buffer, value.description());
         }
     };
-    public static final HolderType<ArmorTrimMaterial> TYPE1_21_5 = new HolderType<>() {
+    public static final HolderType<ArmorTrimMaterial1_20_5> TYPE1_21_5 = new HolderType<>() {
         @Override
-        public ArmorTrimMaterial readDirect(final ByteBuf buffer) {
+        public ArmorTrimMaterial1_20_5 readDirect(final ByteBuf buffer) {
             final String assetName = Types.STRING.read(buffer);
 
             final int overrideArmorMaterialsSize = Types.VAR_INT.readPrimitive(buffer);
@@ -163,11 +163,11 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             }
 
             final Tag description = Types.TAG.read(buffer);
-            return new ArmorTrimMaterial(assetName, overrideArmorMaterials, description);
+            return new ArmorTrimMaterial1_20_5(assetName, overrideArmorMaterials, description);
         }
 
         @Override
-        public void writeDirect(final ByteBuf buffer, final ArmorTrimMaterial value) {
+        public void writeDirect(final ByteBuf buffer, final ArmorTrimMaterial1_20_5 value) {
             Types.STRING.write(buffer, value.assetName());
 
             Types.VAR_INT.writePrimitive(buffer, value.overrideArmorMaterials().size());
@@ -180,7 +180,7 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
         }
 
         @Override
-        public void writeDirect(final Ops ops, final ArmorTrimMaterial object) {
+        public void writeDirect(final Ops ops, final ArmorTrimMaterial1_20_5 object) {
             ops.writeMap(map -> {
                 map.write("asset_name", Types.STRING, object.assetName());
                 if (!object.overrideArmorMaterials.isEmpty()) {
@@ -201,12 +201,12 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
     };
 
     @Override
-    public ArmorTrimMaterial rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
-        return new ArmorTrimMaterial(assetName, Rewritable.rewriteItem(protocol, clientbound, itemId), itemModelIndex, overrideArmorMaterials, description);
+    public ArmorTrimMaterial1_20_5 rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        return new ArmorTrimMaterial1_20_5(assetName, Rewritable.rewriteItem(protocol, clientbound, itemId), itemModelIndex, overrideArmorMaterials, description);
     }
 
     @Override
-    public ArmorTrimMaterial copy() {
-        return new ArmorTrimMaterial(assetName, itemId, itemModelIndex, new Object2ObjectArrayMap<>(overrideArmorMaterials), description);
+    public ArmorTrimMaterial1_20_5 copy() {
+        return new ArmorTrimMaterial1_20_5(assetName, itemId, itemModelIndex, new Object2ObjectArrayMap<>(overrideArmorMaterials), description);
     }
 }

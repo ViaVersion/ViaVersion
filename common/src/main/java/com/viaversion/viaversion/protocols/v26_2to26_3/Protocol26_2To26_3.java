@@ -15,19 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v26_1to26_2;
+package com.viaversion.viaversion.protocols.v26_2to26_3;
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
-import com.viaversion.viaversion.api.minecraft.RegistryType;
+import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
-import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_2;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes26_2;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.type.Types;
@@ -35,9 +35,6 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType26_1;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
-import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
-import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
-import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
@@ -45,11 +42,9 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPack
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundConfigurationPackets1_21_9;
-import com.viaversion.viaversion.protocols.v26_1to26_2.rewriter.BlockItemPacketRewriter26_2;
-import com.viaversion.viaversion.protocols.v26_1to26_2.rewriter.EntityPacketRewriter26_2;
-import com.viaversion.viaversion.protocols.v26_1to26_2.rewriter.RegistryDataRewriter26_2;
-import com.viaversion.viaversion.connection.ProtocolStorablesBase;
-import com.viaversion.viaversion.protocols.v26_1to26_2.storage.ProtocolStorables26_2;
+import com.viaversion.viaversion.protocols.v26_2to26_3.rewriter.BlockItemPacketRewriter26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.rewriter.ComponentRewriter26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.rewriter.EntityPacketRewriter26_3;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
@@ -57,73 +52,78 @@ import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
-import java.util.UUID;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
-public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket26_1, ClientboundPacket26_1, ServerboundPacket26_1, ServerboundPacket26_1> {
+public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket26_1, ClientboundPacket26_1, ServerboundPacket26_1, ServerboundPacket26_1> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("26.1", "26.2");
-    private final EntityPacketRewriter26_2 entityRewriter = new EntityPacketRewriter26_2(this);
-    private final BlockItemPacketRewriter26_2 itemRewriter = new BlockItemPacketRewriter26_2(this);
+    public static final MappingData MAPPINGS = new MappingDataBase("26.2", "26.3");
+    private static final String[] POT_PATTERNS = {
+        "angler",
+        "archer",
+        "arms_up",
+        "blade",
+        "brewer",
+        "burn",
+        "danger",
+        "explorer",
+        "flow",
+        "friend",
+        "guster",
+        "heart",
+        "heartbreak",
+        "howl",
+        "miner",
+        "mourner",
+        "plenty",
+        "prize",
+        "scrape",
+        "sheaf",
+        "shelter",
+        "skull",
+        "snort"
+
+    };
+    private final EntityPacketRewriter26_3 entityRewriter = new EntityPacketRewriter26_3(this);
+    private final BlockItemPacketRewriter26_3 itemRewriter = new BlockItemPacketRewriter26_3(this);
     private final BlockRewriter<ClientboundPacket26_1> blockRewriter = new BlockRewriter1_21_5<>(this, ChunkType26_1::new);
     private final ParticleRewriter<ClientboundPacket26_1> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket26_1> tagRewriter = new TagRewriter<>(this);
-    private final NBTComponentRewriter<ClientboundPacket26_1> componentRewriter = new NBTComponentRewriter<>(this);
-    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter26_2(this);
-    private final RecipeDisplayRewriter1_21_5<ClientboundPacket26_1> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(this);
-    private final UUID sessionId = UUID.randomUUID(); // One shared session
+    private final NBTComponentRewriter<ClientboundPacket26_1> componentRewriter = new ComponentRewriter26_3(this);
+    private final RecipeDisplayRewriter<ClientboundPacket26_1> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(this);
+    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
 
-    public Protocol26_1To26_2() {
+    public Protocol26_2To26_3() {
         super(ClientboundPacket26_1.class, ClientboundPacket26_1.class, ServerboundPacket26_1.class, ServerboundPacket26_1.class);
     }
 
     @Override
     protected void registerPackets() {
         super.registerPackets();
-        replaceClientbound(ClientboundPackets26_1.SET_PLAYER_TEAM, wrapper -> {
-            wrapper.passthrough(Types.STRING); // Team Name
-            final byte action = wrapper.passthrough(Types.BYTE); // Mode
-            if (action == 0 || action == 2) {
-                componentRewriter.passthroughAndProcess(wrapper); // Display name
 
-                final byte flags = wrapper.read(Types.BYTE);
-                final int nametagVisibility = wrapper.read(Types.VAR_INT);
-                final int collisionRule = wrapper.read(Types.VAR_INT);
-                final int color = wrapper.read(Types.VAR_INT);
+        registryDataRewriter.addHandler("trim_material", (key, tag) -> {
+            final Tag assetName = tag.remove("asset_name");
+            tag.put("palette_id", assetName);
+        });
 
-                componentRewriter.passthroughAndProcess(wrapper); // Prefix
-                componentRewriter.passthroughAndProcess(wrapper); // Suffix
-
-                wrapper.write(Types.VAR_INT, nametagVisibility);
-                wrapper.write(Types.VAR_INT, collisionRule);
-                wrapper.write(Types.BOOL_OPTIONAL_VAR_INT, color < 16 ? color : null); // only actual colors now
-                wrapper.write(Types.BYTE, flags);
+        appendClientbound(ClientboundConfigurationPackets1_21_9.FINISH_CONFIGURATION, wrapper -> {
+            final PacketWrapper clocksPacket = wrapper.create(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA);
+            clocksPacket.write(Types.STRING, "decorated_pot_pattern");
+            final RegistryEntry[] entries = new RegistryEntry[POT_PATTERNS.length];
+            for (int i = 0; i < POT_PATTERNS.length; i++) {
+                final String key = POT_PATTERNS[i];
+                final CompoundTag tag = new CompoundTag();
+                tag.putString("asset_id", key + "_pottery_pattern");
+                entries[i] = new RegistryEntry(key, tag);
             }
+            clocksPacket.write(Types.REGISTRY_ENTRY_ARRAY, entries);
+            clocksPacket.send(Protocol26_2To26_3.class);
         });
-
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
-            wrapper.passthrough(Types.UUID); // UUID
-            wrapper.passthrough(Types.STRING); // Name
-            wrapper.passthrough(Types.PROFILE_PROPERTY_ARRAY);
-
-            wrapper.write(Types.UUID, sessionId);
-        });
-
-        registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY, wrapper -> {
-            // Previously also used for hiding skins on offline mode servers, now moved to the login packet.
-            final ProtocolStorables26_2 storables = wrapper.user().storables(Protocol26_1To26_2.this);
-            storables.setEncrypted(true);
-        });
-
-        tagRewriter.addEmptyTags(RegistryType.BLOCK, "infiniburn_nether", "infiniburn_end", "infiniburn_overworld"); // from an older version, but servers may have skipped these
-        registryDataRewriter.addEntries("jukebox_song", Protocol1_21_11To26_1.createJukeboxPlayableEntry("bounce"));
     }
 
     @Override
     protected void onMappingDataLoaded() {
-        EntityTypes26_2.initialize(this);
-        ParticleType.Fillers.fill26_2(this);
+        ParticleType.Fillers.fill1_21_9(this);
         mappedTypes().structuredData.filler(this).add(StructuredDataKey.CUSTOM_DATA, StructuredDataKey.MAX_STACK_SIZE, StructuredDataKey.MAX_DAMAGE,
             StructuredDataKey.UNBREAKABLE1_21_5, StructuredDataKey.RARITY, StructuredDataKey.TOOLTIP_DISPLAY, StructuredDataKey.DAMAGE_RESISTANT26_1,
             StructuredDataKey.CUSTOM_NAME, StructuredDataKey.LORE, StructuredDataKey.ENCHANTMENTS1_21_5,
@@ -133,10 +133,10 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
             StructuredDataKey.MAP_COLOR, StructuredDataKey.MAP_ID, StructuredDataKey.MAP_DECORATIONS, StructuredDataKey.MAP_POST_PROCESSING,
             StructuredDataKey.POTION_CONTENTS1_21_2, StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, StructuredDataKey.WRITABLE_BOOK_CONTENT,
             StructuredDataKey.WRITTEN_BOOK_CONTENT, StructuredDataKey.TRIM1_21_5, StructuredDataKey.DEBUG_STICK_STATE, StructuredDataKey.ENTITY_DATA1_21_9,
-            StructuredDataKey.BUCKET_ENTITY_DATA, StructuredDataKey.BLOCK_ENTITY_DATA1_21_9, StructuredDataKey.INSTRUMENT26_1,
+            StructuredDataKey.BUCKET_ENTITY_DATA, StructuredDataKey.BLOCK_ENTITY_DATA1_21_9, StructuredDataKey.INSTRUMENT26_3,
             StructuredDataKey.RECIPES, StructuredDataKey.LODESTONE_TRACKER, StructuredDataKey.FIREWORK_EXPLOSION, StructuredDataKey.FIREWORKS,
             StructuredDataKey.PROFILE1_21_9, StructuredDataKey.NOTE_BLOCK_SOUND, StructuredDataKey.BANNER_PATTERNS, StructuredDataKey.BASE_COLOR,
-            StructuredDataKey.POT_DECORATIONS1_20_5, StructuredDataKey.BLOCK_STATE, StructuredDataKey.BEES1_21_9, StructuredDataKey.LOCK1_21_2,
+            StructuredDataKey.POT_DECORATIONS26_3, StructuredDataKey.BLOCK_STATE, StructuredDataKey.BEES1_21_9, StructuredDataKey.LOCK1_21_2,
             StructuredDataKey.CONTAINER_LOOT, StructuredDataKey.TOOL1_21_5, StructuredDataKey.ITEM_NAME, StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER,
             StructuredDataKey.FOOD1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE26_1, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_6,
             StructuredDataKey.REPAIRABLE, StructuredDataKey.ENCHANTABLE, StructuredDataKey.CONSUMABLE1_21_2, StructuredDataKey.ATTACK_RANGE,
@@ -147,17 +147,13 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
             StructuredDataKey.TROPICAL_FISH_BASE_COLOR, StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR, StructuredDataKey.MOOSHROOM_VARIANT,
             StructuredDataKey.RABBIT_VARIANT, StructuredDataKey.PIG_VARIANT, StructuredDataKey.FROG_VARIANT, StructuredDataKey.HORSE_VARIANT,
             StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.LLAMA_VARIANT, StructuredDataKey.AXOLOTL_VARIANT, StructuredDataKey.CAT_VARIANT,
-            StructuredDataKey.CAT_COLLAR, StructuredDataKey.SHEEP_COLOR, StructuredDataKey.SHULKER_COLOR, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1,
+            StructuredDataKey.CAT_COLLAR, StructuredDataKey.SHEEP_COLOR, StructuredDataKey.SHULKER_COLOR, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_3,
             StructuredDataKey.BREAK_SOUND, StructuredDataKey.COW_VARIANT, StructuredDataKey.CHICKEN_VARIANT26_1, StructuredDataKey.WOLF_SOUND_VARIANT,
             StructuredDataKey.USE_EFFECTS, StructuredDataKey.MINIMUM_ATTACK_CHARGE, StructuredDataKey.DAMAGE_TYPE26_1, StructuredDataKey.PIERCING_WEAPON,
             StructuredDataKey.KINETIC_WEAPON, StructuredDataKey.SWING_ANIMATION, StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT26_1, StructuredDataKey.ADDITIONAL_TRADE_COST,
-            StructuredDataKey.DYE, StructuredDataKey.PIG_SOUND_VARIANT, StructuredDataKey.COW_SOUND_VARIANT, StructuredDataKey.CHICKEN_SOUND_VARIANT, StructuredDataKey.CAT_SOUND_VARIANT);
+            StructuredDataKey.DYE, StructuredDataKey.PIG_SOUND_VARIANT, StructuredDataKey.COW_SOUND_VARIANT, StructuredDataKey.CHICKEN_SOUND_VARIANT, StructuredDataKey.CAT_SOUND_VARIANT,
+            StructuredDataKey.PROVIDES_POTTERY_PATTERN);
         super.onMappingDataLoaded();
-    }
-
-    @Override
-    public ProtocolStorablesBase createStorables() {
-        return new ProtocolStorables26_2();
     }
 
     @Override
@@ -172,12 +168,12 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
     }
 
     @Override
-    public EntityPacketRewriter26_2 getEntityRewriter() {
+    public EntityPacketRewriter26_3 getEntityRewriter() {
         return entityRewriter;
     }
 
     @Override
-    public BlockItemPacketRewriter26_2 getItemRewriter() {
+    public BlockItemPacketRewriter26_3 getItemRewriter() {
         return itemRewriter;
     }
 
@@ -187,13 +183,13 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
     }
 
     @Override
-    public RecipeDisplayRewriter<ClientboundPacket26_1> getRecipeRewriter() {
-        return recipeRewriter;
+    public RegistryDataRewriter getRegistryDataRewriter() {
+        return registryDataRewriter;
     }
 
     @Override
-    public RegistryDataRewriter getRegistryDataRewriter() {
-        return registryDataRewriter;
+    public RecipeDisplayRewriter<ClientboundPacket26_1> getRecipeRewriter() {
+        return recipeRewriter;
     }
 
     @Override
@@ -212,13 +208,13 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
     }
 
     @Override
-    public Types1_20_5<StructuredDataKeys1_21_11, EntityDataTypes26_1> types() {
-        return VersionedTypes.V26_1;
+    public Types1_20_5<StructuredDataKeys26_2, EntityDataTypes26_1> types() {
+        return VersionedTypes.V26_2;
     }
 
     @Override
     public Types1_20_5<StructuredDataKeys26_2, EntityDataTypes26_1> mappedTypes() {
-        return VersionedTypes.V26_2;
+        return VersionedTypes.V26_3;
     }
 
     @Override

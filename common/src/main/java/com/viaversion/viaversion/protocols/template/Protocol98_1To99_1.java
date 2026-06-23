@@ -62,7 +62,7 @@ final class Protocol98_1To99_1 extends AbstractProtocol<ClientboundPacket26_1, C
     private final ParticleRewriter<ClientboundPacket26_1> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket26_1> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket26_1> componentRewriter = new ComponentRewriter99_1(this);
-    private final RecipeDisplayRewriter<ClientboundPacket26_1> recipeewriter = new RecipeDisplayRewriter1_21_5<>(this);
+    private final RecipeDisplayRewriter<ClientboundPacket26_1> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(this);
     private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
 
     public Protocol98_1To99_1() {
@@ -145,7 +145,7 @@ final class Protocol98_1To99_1 extends AbstractProtocol<ClientboundPacket26_1, C
 
     @Override
     public RecipeDisplayRewriter<ClientboundPacket26_1> getRecipeRewriter() {
-        return recipeewriter;
+        return recipeRewriter;
     }
 
     @Override
