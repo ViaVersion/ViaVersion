@@ -588,16 +588,11 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
             // Back from json in the string tag to plain text
             final StringTag customName = TagUtil.getNamespacedStringTag(itemComponentsTag, "custom_name");
-            if (customName == null || customName.getValue() == null || customName.getValue().equals("null")) {
+            if (customName == null || customName.getValue().isEmpty() || customName.getValue().equals("null")) {
                 return null;
             }
 
-            try {
-                return new StringTag(SerializerVersion.V1_20_5.toComponent(customName.getValue()).asUnformattedString());
-            } catch (Exception e) {
-                // If it fails to parse (e.g., malformed JSON), return empty lock to prevent client disconnect
-                return new StringTag("");
-            }
+            return new StringTag(SerializerVersion.V1_20_5.toComponent(customName.getValue()).asUnformattedString());
         });
         dataContainer.replace(StructuredDataKey.INSTRUMENT1_21_2, StructuredDataKey.INSTRUMENT1_20_5, instrument -> {
             if (instrument.hasId()) {
