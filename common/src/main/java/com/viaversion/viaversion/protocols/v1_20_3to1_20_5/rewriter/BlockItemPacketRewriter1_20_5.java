@@ -1359,7 +1359,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 properties.add(new GameProfile.Property(
                     limit(entry.getKey(), 64),
                     value,
-                    limit(signature, 1024)
+                    signature != null && !signature.isEmpty() ? limit(signature, 1024) : null
                 ));
 
                 if (properties.size() == 16) {
@@ -1611,7 +1611,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 final String signature = propertyCompoundTag.getString("Signature");
                 updatedPropertyTag.putString("name", entry.getKey());
                 updatedPropertyTag.putString("value", value);
-                if (signature != null) {
+                if (signature != null && !signature.isEmpty()) {
                     updatedPropertyTag.putString("signature", signature);
                 }
                 propertiesListTag.add(updatedPropertyTag);

@@ -1643,7 +1643,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
             final CompoundTag propertyTag = new CompoundTag();
             propertyTag.putString("name", property.name());
             propertyTag.putString("value", property.value());
-            if (property.signature() != null) {
+            if (property.signature() != null && !property.signature().isEmpty()) {
                 propertyTag.putString("signature", property.signature());
             }
             propertiesTag.add(propertyTag);
@@ -1663,7 +1663,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
             final String name = propertyTag.getString("name");
             final String value = propertyTag.getString("value");
             final String signature = propertyTag.getString("signature", null);
-            properties[i] = new GameProfile.Property(name, value, signature);
+            properties[i] = new GameProfile.Property(name, value, signature != null && !signature.isEmpty() ? signature : null);
         }
         return properties;
     }
