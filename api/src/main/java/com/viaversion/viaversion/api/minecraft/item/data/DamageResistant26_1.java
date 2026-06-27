@@ -23,10 +23,12 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.minecraft.HolderSet;
+import com.viaversion.viaversion.api.minecraft.RegistryKey;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.misc.HolderSetType;
 
 public record DamageResistant26_1(HolderSet types) {
 
@@ -34,7 +36,7 @@ public record DamageResistant26_1(HolderSet types) {
 
         @Override
         public void write(final Ops ops, final DamageResistant26_1 value) {
-            ops.writeMap(map -> map.write("types", Types.HOLDER_SET, value.types));
+            ops.writeMap(map -> map.write("types", new HolderSetType(RegistryKey.of("damage_type")), value.types));
         }
     };
 }
