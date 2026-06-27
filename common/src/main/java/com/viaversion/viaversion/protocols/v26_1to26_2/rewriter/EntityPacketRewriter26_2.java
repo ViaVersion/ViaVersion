@@ -70,7 +70,14 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         // Go through **all** packets containing an entity id and replace the id with a randomized negative number if zero,
         // as the client no longer accepts zero as a valid state.
         final PacketHandler setFakeEntityId = wrapper -> wrapper.set(Types.VAR_INT, 0, toFakeEntityId(wrapper, wrapper.get(Types.VAR_INT, 0)));
-        protocol.appendClientbound(ClientboundPackets26_1.ADD_ENTITY, setFakeEntityId);
+        protocol.appendClientbound(ClientboundPackets26_1.ADD_ENTITY, wrapper -> {
+            setFakeEntityId.handle(wrapper);
+            final EntityType entityType = typeFromId(wrapper.get(Types.VAR_INT, 1));
+            if (entityType != null && entityType.isOrHasParent(EntityTypes26_2.PROJECTILE)) {
+                // For projectiles, the data field holds the owner entity id
+                wrapper.set(Types.VAR_INT, 2, toFakeEntityId(wrapper, wrapper.get(Types.VAR_INT, 2)));
+            }
+        });
         protocol.appendClientbound(ClientboundPackets26_1.SET_ENTITY_DATA, setFakeEntityId);
         protocol.appendClientbound(ClientboundPackets26_1.SET_EQUIPMENT, setFakeEntityId);
         protocol.appendClientbound(ClientboundPackets26_1.PLAYER_COMBAT_KILL, setFakeEntityId);
