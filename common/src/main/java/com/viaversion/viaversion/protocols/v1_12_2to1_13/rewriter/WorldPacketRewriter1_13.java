@@ -51,6 +51,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class WorldPacketRewriter1_13 {
     private static final IntSet VALID_BIOMES = new IntOpenHashSet(70);
@@ -518,13 +519,35 @@ public class WorldPacketRewriter1_13 {
                             for (int i = 0; i < 3; i++) {
                                 //RGB values are represented by the X/Y/Z offset
                                 float colorValue = wrapper.get(Types.FLOAT, i + 3) * speed;
-                                if (colorValue == 0 && i == 0) {
-                                    // https://minecraft.gamepedia.com/User:Alphappy/reddust
-                                    colorValue = 1;
-                                }
+                                colorValue = redstoneDustColor(colorValue, i == 0);
                                 particle.<Float>getArgument(i).setValue(colorValue);
                                 wrapper.set(Types.FLOAT, i + 3, 0f);
                             }
+                        } else {
+                            wrapper.cancel();
+
+                            final boolean longDistance = wrapper.get(Types.BOOLEAN, 0);
+                            final float x = wrapper.get(Types.FLOAT, 0);
+                            final float y = wrapper.get(Types.FLOAT, 1);
+                            final float z = wrapper.get(Types.FLOAT, 2);
+                            final float offsetX = wrapper.get(Types.FLOAT, 3);
+                            final float offsetY = wrapper.get(Types.FLOAT, 4);
+                            final float offsetZ = wrapper.get(Types.FLOAT, 5);
+                            final ThreadLocalRandom random = ThreadLocalRandom.current();
+                            for (int i = 0; i < count; i++) {
+                                final float particleX = (float) (x + random.nextGaussian() * offsetX);
+                                final float particleY = (float) (y + random.nextGaussian() * offsetY);
+                                final float particleZ = (float) (z + random.nextGaussian() * offsetZ);
+                                sendRedstoneParticle(wrapper,
+                                    longDistance,
+                                    particleX,
+                                    particleY,
+                                    particleZ,
+                                    redstoneDustColor((float) (random.nextGaussian() * speed), true),
+                                    redstoneDustColor((float) (random.nextGaussian() * speed), false),
+                                    redstoneDustColor((float) (random.nextGaussian() * speed), false));
+                            }
+                            return;
                         }
                     }
 
@@ -561,6 +584,33 @@ public class WorldPacketRewriter1_13 {
             }
         });
 
+    }
+
+    private static float redstoneDustColor(float color, boolean red) {
+        // Vanilla 1.12 only substitutes red when the raw red value is exactly zero.
+        if (red && color == 0F) {
+            return 1F;
+        }
+        return ((int) (color * 255F) & 255) / 255F;
+    }
+
+    private static void sendRedstoneParticle(PacketWrapper wrapper, boolean longDistance, float x, float y, float z, float red, float green, float blue) {
+        final PacketWrapper particlePacket = wrapper.create(ClientboundPackets1_13.LEVEL_PARTICLES);
+        particlePacket.write(Types.INT, 11);
+        particlePacket.write(Types.BOOLEAN, longDistance);
+        particlePacket.write(Types.FLOAT, x);
+        particlePacket.write(Types.FLOAT, y);
+        particlePacket.write(Types.FLOAT, z);
+        particlePacket.write(Types.FLOAT, 0F);
+        particlePacket.write(Types.FLOAT, 0F);
+        particlePacket.write(Types.FLOAT, 0F);
+        particlePacket.write(Types.FLOAT, 0F);
+        particlePacket.write(Types.INT, 0);
+        particlePacket.write(Types.FLOAT, red);
+        particlePacket.write(Types.FLOAT, green);
+        particlePacket.write(Types.FLOAT, blue);
+        particlePacket.write(Types.FLOAT, 1F);
+        particlePacket.send(Protocol1_12_2To1_13.class);
     }
 
     public static int toNewId(int oldId) {
