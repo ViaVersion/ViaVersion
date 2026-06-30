@@ -76,4 +76,16 @@ public final class EnumType extends VarIntType {
     public enum Fallback {
         ZERO, WRAP, CLAMP
     }
+
+    public final class EnumArrayType extends VarIntArrayType {
+
+        @Override
+        public void write(final Ops ops, final int[] value) {
+            ops.writeList(list -> {
+                for (final int ordinal : value) {
+                    list.write(Types.STRING, nameFromId(ordinal));
+                }
+            });
+        }
+    }
 }

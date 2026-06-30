@@ -48,6 +48,10 @@ public final class EnumTypes {
     public static final EnumType EQUIPMENT_SLOT = new EnumType("mainhand", "feet", "legs", "chest", "head", "offhand", "body", "saddle");
     public static final EnumType SWING_ANIMATION = new EnumType("none", "whack", "stab");
     public static final EnumType ITEM_USE_ANIMATION = new EnumType("none", "eat", "drink", "block", "bow", "trident", "crossbow", "spyglass", "toot_horn", "brush", "bundle", "spear");
+    public static final EnumType DIRECTION = new EnumType("down", "up", "north", "south", "west", "east");
+    public static final EnumType TRANSFORM_PARTICLE = new EnumType("none", "scrape", "wax_on", "wax_off");
+    public static final EnumType TRAMNSFORM_DROP_STRATEGY = new EnumType("clicked_face", "from_middle");
+    public static final EnumType TRAMNSFORM_TYPE = new EnumType("single_block", "copper_chest");
     // Enums with non-ordinal ids
     public static final FakeEnumType RABBIT_VARIANT = new FakeEnumType(List.of("brown", "white", "black", "white_splotched", "gold", "salt"), of(99, "evil"));
     // Hardcoded registries

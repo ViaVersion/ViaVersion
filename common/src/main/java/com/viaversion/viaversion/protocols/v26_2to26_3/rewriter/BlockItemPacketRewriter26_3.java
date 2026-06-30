@@ -79,6 +79,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
 
     public static void downgradeData(final StructuredDataContainer container) {
         container.remove(StructuredDataKey.PROVIDES_POTTERY_PATTERN);
+        container.remove(StructuredDataKey.BLOCK_TRANSFORMER);
 
         container.replaceKey(StructuredDataKey.INSTRUMENT26_3, StructuredDataKey.INSTRUMENT26_1);
         container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL26_3, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, holder -> {

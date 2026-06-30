@@ -46,6 +46,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockEntityData;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
+import com.viaversion.viaversion.api.minecraft.item.data.BlockTransformData;
 import com.viaversion.viaversion.api.minecraft.item.data.BlocksAttacks;
 import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
@@ -169,6 +170,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<KineticWeapon> KINETIC_WEAPON = new StructuredDataKey<>("kinetic_weapon", KineticWeapon.TYPE);
     public static final StructuredDataKey<SwingAnimation> SWING_ANIMATION = new StructuredDataKey<>("swing_animation", SwingAnimation.TYPE);
     public static final StructuredDataKey<Integer> ADDITIONAL_TRADE_COST = new StructuredDataKey<>("additional_trade_cost", Types.VAR_INT);
+    public static final StructuredDataKey<BlockTransformData[]> BLOCK_TRANSFORMER = new StructuredDataKey<>("block_transformer", BlockTransformData.ARRAY_TYPE);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS1_20_5 = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE1_20_5);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS1_21_5 = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE1_21_5);
     public static final StructuredDataKey<Integer> DYE = new StructuredDataKey<>("dye", EnumTypes.DYE_COLOR);
