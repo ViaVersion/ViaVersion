@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data;
 
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.KeyMappings;
 import java.util.HashMap;
 import java.util.Map;
@@ -136,7 +137,7 @@ public final class BannerPatterns1_20_5 {
         return null;
     }
 
-    public static String[] keys() {
+    public static Key[] keys() {
         return PATTERNS.keys();
     }
 }

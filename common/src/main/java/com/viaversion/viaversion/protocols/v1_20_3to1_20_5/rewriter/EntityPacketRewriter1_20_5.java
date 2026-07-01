@@ -224,15 +224,14 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
             final PacketWrapper bannerPatternsPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
             bannerPatternsPacket.write(Types.STRING, "minecraft:banner_pattern");
-            final RegistryEntry[] patternEntries = new RegistryEntry[BannerPatterns1_20_5.keys().length];
-            final String[] keys = BannerPatterns1_20_5.keys();
+            final Key[] keys = BannerPatterns1_20_5.keys();
+            final RegistryEntry[] patternEntries = new RegistryEntry[keys.length];
             for (int i = 0; i < keys.length; i++) {
                 final CompoundTag pattern = new CompoundTag();
-                final String key = keys[i];
-                final String resourceLocation = "minecraft:" + key;
-                pattern.putString("asset_id", key);
-                pattern.putString("translation_key", "block.minecraft.banner." + key);
-                patternEntries[i] = new RegistryEntry(resourceLocation, pattern);
+                final Key key = keys[i];
+                pattern.putString("asset_id", key.path());
+                pattern.putString("translation_key", "block.minecraft.banner." + key.path());
+                patternEntries[i] = new RegistryEntry(key.toString(), pattern);
             }
             bannerPatternsPacket.write(Types.REGISTRY_ENTRY_ARRAY, patternEntries);
             bannerPatternsPacket.send(Protocol1_20_3To1_20_5.class);

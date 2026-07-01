@@ -24,10 +24,10 @@ package com.viaversion.viaversion.api.minecraft;
 
 import com.viaversion.viaversion.util.Key;
 
-record SimpleRegistryKey(Key key) implements RegistryKey {
+record SimpleRegistryKey(Key registry) implements RegistryKey {
 
     @Override
     public String toString() {
-        return key.toString();
+        return registry.toString();
     }
 }

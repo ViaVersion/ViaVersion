@@ -22,88 +22,29 @@
  */
 package com.viaversion.viaversion.api.data;
 
-import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.data.MappingDataLoader.IdentifiersPair;
 import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class FullIdentityMappings implements FullMappings {
-    private static final String[] EMPTY_ARRAY = new String[0];
-    private final Object2IntMap<String> stringToId;
-    private final String[] idToString;
-    private final Mappings mappings;
+public class FullIdentityMappings extends FullMappingsBase {
 
     public FullIdentityMappings(final IdentifiersPair identifiersPair, final Mappings mappings) {
-        Preconditions.checkNotNull(mappings, "Mappings cannot be null");
-        this.mappings = mappings;
-        this.stringToId = FullMappingsBase.toInverseMap(identifiersPair.unmapped());
-        this.idToString = identifiersPair.unmapped().toArray(EMPTY_ARRAY);
+        this(toInverseMap(identifiersPair.unmapped()), identifiersPair.unmapped().stream().map(Key::of).toArray(Key[]::new), mappings);
     }
 
-    private FullIdentityMappings(final Object2IntMap<String> stringToId, final String[] idToString, final Mappings mappings) {
-        this.stringToId = stringToId;
-        this.idToString = idToString;
-        this.mappings = mappings;
-    }
-
-    @Override
-    public int id(final String identifier) {
-        return stringToId.getInt(Key.stripMinecraftNamespace(identifier));
-    }
-
-    @Override
-    public int mappedId(final String mappedIdentifier) {
-        return id(mappedIdentifier);
-    }
-
-    @Override
-    public String identifier(final int id) {
-        if (id < 0 || id >= idToString.length) {
-            return null;
-        }
-        final String identifier = idToString[id];
-        return Key.namespaced(identifier);
+    private FullIdentityMappings(final Object2IntMap<String> stringToId, final Key[] idToKey, final Mappings mappings) {
+        super(stringToId, stringToId, idToKey, idToKey, mappings);
     }
 
     @Override
     public @Nullable String identifier(final String mappedIdentifier) {
-        final int mappedId = mappedId(mappedIdentifier);
-        if (mappedId == -1) {
-            return null;
-        }
-        final int id = mappings.inverse().getNewId(mappedId);
-        return id != -1 ? identifier(id) : null;
+        return mappedIdentifier(mappedIdentifier);
     }
 
     @Override
-    public @Nullable String mappedIdentifier(final int mappedId) {
-        return identifier(mappedId);
-    }
-
-    @Override
-    public @Nullable String mappedIdentifier(final String identifier) {
-        return identifier(identifier);
-    }
-
-    @Override
-    public int getNewId(int id) {
-        return mappings.getNewId(id);
-    }
-
-    @Override
-    public void setNewId(int id, int mappedId) {
-        mappings.setNewId(id, mappedId);
-    }
-
-    @Override
-    public int size() {
-        return mappings.size();
-    }
-
-    @Override
-    public int mappedSize() {
-        return mappings.mappedSize();
+    public @Nullable Key keyFromMappedKey(final String mappedIdentifier) {
+        return mappedKeyFromKey(mappedIdentifier);
     }
 
     @Override
@@ -117,7 +58,7 @@ public class FullIdentityMappings implements FullMappings {
     }
 
     @Override
-    public FullMappings inverse() {
-        return new FullIdentityMappings(stringToId, idToString, mappings.inverse());
+    public FullIdentityMappings inverse() {
+        return new FullIdentityMappings(stringToId, idToKey, mappings.inverse());
     }
 }

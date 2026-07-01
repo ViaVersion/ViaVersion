@@ -34,7 +34,7 @@ import com.viaversion.viaversion.util.Key;
  */
 public interface RegistryKey {
 
-    Key key();
+    Key registry();
 
     static RegistryKey of(final String key) {
         return new SimpleRegistryKey(Key.of(key));

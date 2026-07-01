@@ -100,9 +100,9 @@ public class HolderSetType extends Type<HolderSet> {
         if (registryKey instanceof final MappingData.MappingType mappingType) {
             return ops.context().registryAccess().key(mappingType, id);
         } else if (registryKey instanceof final RegistryValueType registryValueType) {
-            return Key.of(registryValueType.byId(id));
+            return registryValueType.byId(id);
         } else {
-            return ops.context().registryAccess().registryKey(registryKey.key().toString(), id);
+            return ops.context().registryAccess().registryKey(registryKey.registry().toString(), id);
         }
     }
 

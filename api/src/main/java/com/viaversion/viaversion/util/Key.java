@@ -24,6 +24,10 @@ package com.viaversion.viaversion.util;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static com.viaversion.viaversion.util.MinecraftKey.MINECRAFT_NAMESPACE;
+import static com.viaversion.viaversion.util.MinecraftKey.MINECRAFT_NAMESPACE_LENGTH;
+import static com.viaversion.viaversion.util.MinecraftKey.MINECRAFT_NAMESPACE_WITH_COLON;
+
 /**
  * Represents a Minecraft Identifier/ResourceLocation.
  * <p>
@@ -31,8 +35,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * and keep the runtime/allocation cost of {@link #original()} and {@link #toString()} minimal.
  */
 public abstract sealed class Key permits MinecraftKey, CustomKey {
-
-    static final String MINECRAFT_NAMESPACE = "minecraft";
 
     /**
      * Creates a new key with the given namespace and path.
@@ -146,8 +148,8 @@ public abstract sealed class Key permits MinecraftKey, CustomKey {
     }
 
     public static String stripMinecraftNamespace(final String identifier) {
-        if (identifier.startsWith("minecraft:")) {
-            return identifier.substring(MinecraftKey.MINECRAFT_NAMESPACE_LENGTH + 1);
+        if (identifier.startsWith(MINECRAFT_NAMESPACE_WITH_COLON)) {
+            return identifier.substring(MINECRAFT_NAMESPACE_LENGTH + 1);
         } else if (!identifier.isEmpty() && identifier.charAt(0) == ':') {
             return identifier.substring(1);
         }
@@ -161,7 +163,7 @@ public abstract sealed class Key permits MinecraftKey, CustomKey {
     public static String namespaced(final String identifier) {
         final int index = identifier.indexOf(':');
         if (index == -1) {
-            return "minecraft:" + identifier;
+            return MINECRAFT_NAMESPACE_WITH_COLON + identifier;
         } else if (index == 0) {
             return MINECRAFT_NAMESPACE + identifier;
         }

@@ -26,25 +26,25 @@ import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import java.util.Collection;
+import java.util.Arrays;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class KeyMappings {
 
     private final Object2IntMap<String> keyToId;
-    private final String[] keys;
+    private final Key[] keys;
 
-    public KeyMappings(final String... keys) {
+    public KeyMappings(final Key... keys) {
         this.keys = keys;
         keyToId = new Object2IntOpenHashMap<>(keys.length);
         keyToId.defaultReturnValue(-1);
         for (int i = 0; i < keys.length; i++) {
-            keyToId.put(keys[i], i);
+            keyToId.put(keys[i].minimized(), i);
         }
     }
 
-    public KeyMappings(final Collection<String> keys) {
-        this(keys.toArray(new String[0]));
+    public KeyMappings(final String... keys) {
+        this(Arrays.stream(keys).map(Key::of).toArray(Key[]::new));
     }
 
     public KeyMappings(final ListTag<StringTag> keys) {
@@ -55,6 +55,13 @@ public final class KeyMappings {
         if (id < 0 || id >= keys.length) {
             return null;
         }
+        return keys[id].minimized();
+    }
+
+    public @Nullable Key key(final int id) {
+        if (id < 0 || id >= keys.length) {
+            return null;
+        }
         return keys[id];
     }
 
@@ -62,7 +69,7 @@ public final class KeyMappings {
         return keyToId.getInt(Key.stripMinecraftNamespace(identifier));
     }
 
-    public String[] keys() {
+    public Key[] keys() {
         return keys;
     }
 

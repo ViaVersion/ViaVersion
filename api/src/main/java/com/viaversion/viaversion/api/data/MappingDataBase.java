@@ -167,6 +167,10 @@ public class MappingDataBase implements MappingData {
         if (mappings == null) {
             mappings = new IdentityMappings(identifiersPair.unmapped().size(), identifiersPair.mapped().size());
         }
+        return createFullMappings(identifiersPair, mappings);
+    }
+
+    protected FullMappings createFullMappings(final IdentifiersPair identifiersPair, final Mappings mappings) {
         return FullMappingsBase.of(identifiersPair, mappings);
     }
 

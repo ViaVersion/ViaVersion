@@ -43,7 +43,7 @@ public enum RegistryType implements RegistryKey {
 
     static {
         for (RegistryType type : getValues()) {
-            MAP.put(type.identifier, type);
+            MAP.put(type.identifier(), type);
         }
     }
 
@@ -55,18 +55,18 @@ public enum RegistryType implements RegistryKey {
         return MAP.get(identifier);
     }
 
-    private final String identifier;
+    private final Key key;
 
     RegistryType(final String identifier) {
-        this.identifier = identifier;
+        this.key = Key.of(identifier);
     }
 
     public String identifier() {
-        return identifier;
+        return key.path();
     }
 
     @Override
-    public Key key() {
-        return Key.of(identifier);
+    public Key registry() {
+        return this.key;
     }
 }

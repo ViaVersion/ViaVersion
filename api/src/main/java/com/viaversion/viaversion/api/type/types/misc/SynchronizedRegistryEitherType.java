@@ -42,7 +42,7 @@ public final class SynchronizedRegistryEitherType extends EitherType<Integer, St
     @Override
     public void write(final Ops ops, final Either<Integer, String> value) {
         if (value.isLeft()) {
-            final Key key = ops.context().registryAccess().registryKey(this.registryKey.key().toString(), value.left());
+            final Key key = ops.context().registryAccess().registryKey(this.registryKey.registry().toString(), value.left());
             Types.IDENTIFIER.write(ops, key);
         } else {
             Types.IDENTIFIER.write(ops, Key.of(value.right()));

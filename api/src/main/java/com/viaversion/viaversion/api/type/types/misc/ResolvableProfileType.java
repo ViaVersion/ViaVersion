@@ -87,4 +87,4 @@ public final class ResolvableProfileType extends Type<ResolvableProfile> {
             .writeOptional("model", Types.OPTIONAL_STRING, modelType)
         );
     }
-};
+}

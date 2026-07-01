@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.data;
 
+import com.viaversion.viaversion.util.Key;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -51,7 +52,10 @@ public interface FullMappings extends BiMappings {
      * @param id unmapped id
      * @return unmapped string identifier, or null if out of bounds
      */
-    @Nullable String identifier(int id);
+    default @Nullable String identifier(int id) {
+        final Key key = keyFromId(id);
+        return key != null ? key.toString() : null;
+    }
 
     /**
      * Returns the unmapped string identifier for the given mapped identifier.
@@ -59,7 +63,10 @@ public interface FullMappings extends BiMappings {
      * @param mappedIdentifier mapped identifier
      * @return unmapped string identifier, or null if not found
      */
-    @Nullable String identifier(String mappedIdentifier);
+    default @Nullable String identifier(String mappedIdentifier) {
+        final Key key = keyFromMappedKey(mappedIdentifier);
+        return key != null ? key.toString() : null;
+    }
 
     /**
      * Returns the mapped string identifier for the given mapped id.
@@ -67,7 +74,10 @@ public interface FullMappings extends BiMappings {
      * @param mappedId mapped id
      * @return mapped string identifier, or null if out of bounds
      */
-    @Nullable String mappedIdentifier(int mappedId);
+    default @Nullable String mappedIdentifier(int mappedId) {
+        final Key key = mappedKeyFromMappedId(mappedId);
+        return key != null ? key.toString() : null;
+    }
 
     /**
      * Returns the mapped string identifier for the given unmapped identifier.
@@ -75,7 +85,42 @@ public interface FullMappings extends BiMappings {
      * @param identifier unmapped identifier
      * @return mapped string identifier, or null if not found
      */
-    @Nullable String mappedIdentifier(String identifier);
+    default @Nullable String mappedIdentifier(String identifier) {
+        final Key key = mappedKeyFromKey(identifier);
+        return key != null ? key.toString() : null;
+    }
+
+    /**
+     * Returns the unmapped key for the given mapped id.
+     *
+     * @param id unmapped id
+     * @return unmapped key, or null if out of bounds
+     */
+    @Nullable Key keyFromId(int id);
+
+    /**
+     * Returns the unmapped key for the given mapped identifier.
+     *
+     * @param mappedIdentifier mapped identifier
+     * @return unmapped key, or null if not found
+     */
+    @Nullable Key keyFromMappedKey(String mappedIdentifier);
+
+    /**
+     * Returns the mapped key for the given mapped id.
+     *
+     * @param mappedId mapped id
+     * @return mapped key, or null if out of bounds
+     */
+    @Nullable Key mappedKeyFromMappedId(int mappedId);
+
+    /**
+     * Returns the mapped key for the given unmapped identifier.
+     *
+     * @param identifier unmapped identifier
+     * @return mapped key, or null if not found
+     */
+    @Nullable Key mappedKeyFromKey(String identifier);
 
     /**
      * Returns whether the int id mappings are identity mappings.

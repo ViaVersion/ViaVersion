@@ -25,6 +25,8 @@ package com.viaversion.viaversion.util;
 
 abstract sealed class MinecraftKey extends Key {
 
+    static final String MINECRAFT_NAMESPACE = "minecraft";
+    static final String MINECRAFT_NAMESPACE_WITH_COLON = "minecraft:";
     static final int MINECRAFT_NAMESPACE_LENGTH = MINECRAFT_NAMESPACE.length();
     private final String path;
 
@@ -111,7 +113,7 @@ abstract sealed class MinecraftKey extends Key {
         @Override
         public String toString() {
             if (identifier == null) {
-                identifier = MINECRAFT_NAMESPACE + ':' + this.path();
+                identifier = MINECRAFT_NAMESPACE_WITH_COLON + this.path();
             }
             return identifier;
         }
@@ -138,7 +140,7 @@ abstract sealed class MinecraftKey extends Key {
         @Override
         public String toString() {
             if (identifier == null) {
-                identifier = MINECRAFT_NAMESPACE + ':' + this.path();
+                identifier = MINECRAFT_NAMESPACE_WITH_COLON + this.path();
             }
             return identifier;
         }

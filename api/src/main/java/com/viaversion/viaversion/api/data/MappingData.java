@@ -196,9 +196,15 @@ public interface MappingData {
     enum MappingType implements RegistryKey {
         ITEM, BLOCK, SOUND, ENTITY_TYPE;
 
+        private final Key key;
+
+        MappingType() {
+            this.key = Key.of(name().toLowerCase(Locale.ROOT));
+        }
+
         @Override
-        public Key key() {
-            return Key.of(name().toLowerCase(Locale.ROOT));
+        public Key registry() {
+            return this.key;
         }
     }
 }

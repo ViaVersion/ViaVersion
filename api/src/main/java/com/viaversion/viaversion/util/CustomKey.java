@@ -64,7 +64,7 @@ final class CustomKey extends Key {
 
     @Override
     public String minimized() {
-        return this.toString();
+        return this.original;
     }
 
     @Override

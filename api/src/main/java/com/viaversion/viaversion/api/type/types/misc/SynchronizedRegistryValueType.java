@@ -38,7 +38,7 @@ public final class SynchronizedRegistryValueType extends VarIntType {
 
     @Override
     public void write(final Ops ops, final Integer value) {
-        final Key key = ops.context().registryAccess().registryKey(this.registryKey.key().toString(), value);
+        final Key key = ops.context().registryAccess().registryKey(this.registryKey.registry().toString(), value);
         Types.IDENTIFIER.write(ops, key);
     }
 }

@@ -31,27 +31,26 @@ import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class FullMappingsBase implements FullMappings {
-    private static final String[] EMPTY_ARRAY = new String[0];
-    private final Object2IntMap<String> stringToId;
-    private final Object2IntMap<String> mappedStringToId;
-    private final String[] idToString;
-    private final String[] mappedIdToString;
-    private final Mappings mappings;
+    protected final Object2IntMap<String> stringToId;
+    protected final Object2IntMap<String> mappedStringToId;
+    protected final Key[] idToKey;
+    protected final Key[] mappedIdToKey;
+    protected final Mappings mappings;
 
     public FullMappingsBase(final IdentifiersPair identifiersPair, final Mappings mappings) {
         Preconditions.checkNotNull(mappings, "Mappings cannot be null");
         this.mappings = mappings;
         this.stringToId = toInverseMap(identifiersPair.unmapped());
-        this.idToString = identifiersPair.unmapped().toArray(EMPTY_ARRAY);
+        this.idToKey = identifiersPair.unmapped().stream().map(Key::of).toArray(Key[]::new);
         this.mappedStringToId = toInverseMap(identifiersPair.mapped());
-        this.mappedIdToString = identifiersPair.mapped().toArray(EMPTY_ARRAY);
+        this.mappedIdToKey = identifiersPair.mapped().stream().map(Key::of).toArray(Key[]::new);
     }
 
-    private FullMappingsBase(final Object2IntMap<String> stringToId, final Object2IntMap<String> mappedStringToId, final String[] idToString, final String[] mappedIdToString, final Mappings mappings) {
+    protected FullMappingsBase(final Object2IntMap<String> stringToId, final Object2IntMap<String> mappedStringToId, final Key[] idToKey, final Key[] mappedIdToKey, final Mappings mappings) {
         this.stringToId = stringToId;
         this.mappedStringToId = mappedStringToId;
-        this.idToString = idToString;
-        this.mappedIdToString = mappedIdToString;
+        this.idToKey = idToKey;
+        this.mappedIdToKey = mappedIdToKey;
         this.mappings = mappings;
     }
 
@@ -79,45 +78,43 @@ public class FullMappingsBase implements FullMappings {
     }
 
     @Override
-    public String identifier(final int id) {
-        if (id < 0 || id >= idToString.length) {
+    public @Nullable Key keyFromId(final int id) {
+        if (id < 0 || id >= idToKey.length) {
             return null;
         }
 
-        final String identifier = idToString[id];
-        return Key.namespaced(identifier);
+        return idToKey[id];
     }
 
     @Override
-    public @Nullable String identifier(final String mappedIdentifier) {
+    public @Nullable Key keyFromMappedKey(final String mappedIdentifier) {
         final int mappedId = mappedId(mappedIdentifier);
         if (mappedId == -1) {
             return null;
         }
 
         final int id = mappings.inverse().getNewId(mappedId);
-        return id != -1 ? identifier(id) : null;
+        return id != -1 ? keyFromId(id) : null;
     }
 
     @Override
-    public @Nullable String mappedIdentifier(final int mappedId) {
-        if (mappedId < 0 || mappedId >= mappedIdToString.length) {
+    public @Nullable Key mappedKeyFromMappedId(final int mappedId) {
+        if (mappedId < 0 || mappedId >= mappedIdToKey.length) {
             return null;
         }
 
-        final String identifier = mappedIdToString[mappedId];
-        return Key.namespaced(identifier);
+        return mappedIdToKey[mappedId];
     }
 
     @Override
-    public @Nullable String mappedIdentifier(final String identifier) {
+    public @Nullable Key mappedKeyFromKey(final String identifier) {
         final int id = id(identifier);
         if (id == -1) {
             return null;
         }
 
         final int mappedId = mappings.getNewId(id);
-        return mappedId != -1 ? mappedIdentifier(mappedId) : null;
+        return mappedId != -1 ? mappedKeyFromMappedId(mappedId) : null;
     }
 
     @Override
@@ -147,6 +144,6 @@ public class FullMappingsBase implements FullMappings {
 
     @Override
     public FullMappings inverse() {
-        return new FullMappingsBase(mappedStringToId, stringToId, mappedIdToString, idToString, mappings.inverse());
+        return new FullMappingsBase(mappedStringToId, stringToId, mappedIdToKey, idToKey, mappings.inverse());
     }
 }

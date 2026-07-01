@@ -102,17 +102,16 @@ final class RegistryAccessImpl implements CodecContext.RegistryAccess {
     public Key registryKey(final String registry, final int id) {
         final KeyMappings mappings = entityTracker.registryKeys(registry);
         Preconditions.checkNotNull(mappings, "No registry mappings for registry: %s", registry);
-        final String identifier = id >= 0 && id < mappings.size() ? mappings.idToKey(id) : null;
-        return key(identifier, id);
+        return keyOrUnknown(mappings.key(id), id);
     }
 
     private Key key(final FullMappings mappings, final int id) {
-        final String identifier = mapped ? mappings.mappedIdentifier(id) : mappings.identifier(id);
-        return key(identifier, id);
+        final Key key = mapped ? mappings.mappedKeyFromMappedId(id) : mappings.keyFromId(id);
+        return keyOrUnknown(key, id);
     }
 
-    private Key key(@Nullable final String identifier, final int id) {
-        return identifier != null ? Key.of(identifier) : Key.of("viaversion", "unknown/" + id);
+    private Key keyOrUnknown(@Nullable final Key key, final int id) {
+        return key != null ? key : Key.of("viaversion", "unknown/" + id);
     }
 
     @Override
