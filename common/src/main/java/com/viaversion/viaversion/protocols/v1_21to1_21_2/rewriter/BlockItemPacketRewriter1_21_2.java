@@ -588,7 +588,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
             // Back from json in the string tag to plain text
             final StringTag customName = TagUtil.getNamespacedStringTag(itemComponentsTag, "custom_name");
-            if (customName == null) {
+            if (customName == null || customName.getValue().equals("null")) {
                 return null;
             }
 
