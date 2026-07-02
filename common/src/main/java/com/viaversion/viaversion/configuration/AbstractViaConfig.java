@@ -72,6 +72,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     private String reloadDisconnectMessage;
     private boolean logOtherConversionErrors;
     private boolean logTextComponentConversionErrors;
+    private boolean multiReddustColorFix;
     private boolean disable1_13TabComplete;
     private boolean teamColourFix;
     private boolean serversideBlockConnections;
@@ -146,6 +147,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
         blockedDisconnectMessage = getString("block-disconnect-msg", "You are using an unsupported Minecraft version!");
         reloadDisconnectMessage = getString("reload-disconnect-msg", "Server reload, please rejoin!");
         teamColourFix = getBoolean("team-colour-fix", true);
+        multiReddustColorFix = getBoolean("multi-reddust-color-fix", false);
         disable1_13TabComplete = getBoolean("disable-1_13-auto-complete", false);
         serversideBlockConnections = getBoolean("serverside-blockconnections", true);
         reduceBlockStorageMemory = getBoolean("reduce-blockstorage-memory", false);
@@ -473,6 +475,11 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     @Override
     public String getReloadDisconnectMsg() {
         return reloadDisconnectMessage;
+    }
+
+    @Override
+    public boolean isMultiReddustColorFix() {
+        return multiReddustColorFix;
     }
 
     @Override

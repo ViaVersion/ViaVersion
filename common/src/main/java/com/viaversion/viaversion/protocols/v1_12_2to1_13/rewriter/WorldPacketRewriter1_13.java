@@ -513,17 +513,18 @@ public class WorldPacketRewriter1_13 {
                         float speed = wrapper.get(Types.FLOAT, 6);
                         // Only handle for count = 0
                         if (count == 0) {
+                            // Change count and speed
                             wrapper.set(Types.INT, 1, 1);
                             wrapper.set(Types.FLOAT, 6, 0f);
 
                             for (int i = 0; i < 3; i++) {
-                                //RGB values are represented by the X/Y/Z offset
-                                float colorValue = wrapper.get(Types.FLOAT, i + 3) * speed;
-                                colorValue = redstoneDustColor(colorValue, i == 0);
+                                // RGB values are represented by the X/Y/Z offset
+                                float offset = wrapper.get(Types.FLOAT, i + 3);
+                                float colorValue = redstoneDustColor(speed, offset, i == 0);
                                 particle.<Float>getArgument(i).setValue(colorValue);
                                 wrapper.set(Types.FLOAT, i + 3, 0f);
                             }
-                        } else {
+                        } else if (Via.getConfig().isMultiReddustColorFix()) {
                             wrapper.cancel();
 
                             final boolean longDistance = wrapper.get(Types.BOOLEAN, 0);
@@ -543,9 +544,9 @@ public class WorldPacketRewriter1_13 {
                                     particleX,
                                     particleY,
                                     particleZ,
-                                    redstoneDustColor((float) (random.nextGaussian() * speed), true),
-                                    redstoneDustColor((float) (random.nextGaussian() * speed), false),
-                                    redstoneDustColor((float) (random.nextGaussian() * speed), false));
+                                    redstoneDustColor((float) random.nextGaussian(), speed, true),
+                                    redstoneDustColor((float) random.nextGaussian(), speed, false),
+                                    redstoneDustColor((float) random.nextGaussian(), speed, false));
                             }
                             return;
                         }
@@ -586,8 +587,9 @@ public class WorldPacketRewriter1_13 {
 
     }
 
-    private static float redstoneDustColor(float color, boolean red) {
-        // Vanilla 1.12 only substitutes red when the raw red value is exactly zero.
+    private static float redstoneDustColor(float speed, float offset, boolean red) {
+        // Vanilla 1.12 substitutes red when the raw red value is zero
+        float color = speed * offset;
         if (red && color == 0F) {
             return 1F;
         }
