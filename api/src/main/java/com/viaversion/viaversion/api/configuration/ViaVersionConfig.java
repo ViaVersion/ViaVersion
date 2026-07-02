@@ -261,6 +261,8 @@ public interface ViaVersionConfig extends Config {
      */
     boolean isChunkBorderFix();
 
+    boolean isMultiReddustColorFix();
+
     /**
      * Should we make team colours based on the last colour in team prefix
      *
