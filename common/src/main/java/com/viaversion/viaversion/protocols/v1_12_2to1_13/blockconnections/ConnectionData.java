@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.BlockConnectionProvider;
@@ -162,7 +163,8 @@ public final class ConnectionData {
     }
 
     public static void init() {
-        if (!Via.getConfig().isServersideBlockConnections()) {
+        final ProtocolVersion version = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
+        if (!Via.getConfig().isServersideBlockConnections() || (version.isKnown() && version.newerThan(ProtocolVersion.v1_12_2))) {
             return;
         }
 
