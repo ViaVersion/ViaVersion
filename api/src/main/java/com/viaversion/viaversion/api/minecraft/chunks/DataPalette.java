@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.chunks;
 
+import com.viaversion.viaversion.util.CompactArrayUtil;
 import java.util.function.IntUnaryOperator;
 
 public interface DataPalette {
@@ -144,6 +145,18 @@ public interface DataPalette {
                 this.setIdByIndex(i, newId);
             }
         }
+    }
+
+    /**
+     * Packs the section values into a compact long array as used by the protocol.
+     *
+     * @param bitsPerValue bits used per value
+     * @param entries      number of values
+     * @param rawIds       whether to pack raw ids instead of palette indexes (direct palette)
+     * @return compact long array of the values
+     */
+    default long[] createPackedValues(final int bitsPerValue, final int entries, final boolean rawIds) {
+        return CompactArrayUtil.createCompactArrayWithPadding(bitsPerValue, entries, rawIds ? this::idAt : this::paletteIndexAt);
     }
 
     /**

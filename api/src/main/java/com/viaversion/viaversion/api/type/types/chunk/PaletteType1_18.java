@@ -83,8 +83,11 @@ public class PaletteType1_18 extends PaletteTypeBase {
         final int valuesPerLong = (char) (64 / bitsPerValue);
         final int expectedLength = (type.size() + valuesPerLong - 1) / valuesPerLong;
         if (values.length == expectedLength) {
-            CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerValue, type.size(), values,
-                bitsPerValue == globalPaletteBits ? palette::setIdAt : palette::setPaletteIndexAt);
+            if (bitsPerValue == globalPaletteBits) {
+                CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerValue, type.size(), values, palette::setIdAt);
+            } else {
+                palette.setPaletteIndexes(values, bitsPerValue, valuesPerLong);
+            }
         }
     }
 
@@ -120,11 +123,7 @@ public class PaletteType1_18 extends PaletteTypeBase {
             return;
         }
 
-        final long[] values = CompactArrayUtil.createCompactArrayWithPadding(
-            bitsPerValue,
-            type.size(),
-            bitsPerValue == globalPaletteBits ? palette::idAt : palette::paletteIndexAt
-        );
+        final long[] values = palette.createPackedValues(bitsPerValue, type.size(), bitsPerValue == globalPaletteBits);
         Types.LONG_ARRAY_PRIMITIVE.write(buffer, values);
     }
 

@@ -88,6 +88,67 @@ public final class CompactArrayUtil {
         }
     }
 
+    // ------------------------------------------------------
+    // Utility methods for packing/unpacking raw data at once and without indirection.
+    // They go value-first instead of cell-first
+
+    public static void packWithPadding(final byte[] values, final long[] out, final int bitsPerEntry) {
+        final long maxEntryValue = (1L << bitsPerEntry) - 1;
+        long cell = 0L;
+        int bitIndex = 0;
+        int outIndex = 0;
+        for (final byte value : values) {
+            cell |= (value & maxEntryValue) << bitIndex;
+            bitIndex += bitsPerEntry;
+            if (bitIndex + bitsPerEntry > 64) {
+                out[outIndex++] = cell;
+                cell = 0L;
+                bitIndex = 0;
+            }
+        }
+        if (bitIndex != 0) {
+            out[outIndex] = cell;
+        }
+    }
+
+    public static void packWithPadding(final short[] values, final long[] out, final int bitsPerEntry) {
+        final long maxEntryValue = (1L << bitsPerEntry) - 1;
+        long cell = 0L;
+        int bitIndex = 0;
+        int outIndex = 0;
+        for (final short value : values) {
+            cell |= (value & maxEntryValue) << bitIndex;
+            bitIndex += bitsPerEntry;
+            if (bitIndex + bitsPerEntry > 64) {
+                out[outIndex++] = cell;
+                cell = 0L;
+                bitIndex = 0;
+            }
+        }
+        if (bitIndex != 0) {
+            out[outIndex] = cell;
+        }
+    }
+
+    public static void unpackWithPadding(final long[] data, final byte[] out, final int bitsPerEntry) {
+        final long maxEntryValue = (1L << bitsPerEntry) - 1;
+        final int valuesPerLong = 64 / bitsPerEntry;
+        long cell = 0L;
+        int cellIndex = 0;
+        int remaining = 0;
+        for (int i = 0; i < out.length; i++) {
+            if (remaining == 0) {
+                cell = data[cellIndex++];
+                remaining = valuesPerLong;
+            }
+            out[i] = (byte) (cell & maxEntryValue);
+            cell >>>= bitsPerEntry;
+            remaining--;
+        }
+    }
+
+    // ------------------------------------------------------
+
     public static long[] createCompactArray(int bitsPerEntry, int entries, IntToLongFunction valueGetter) {
         long maxEntryValue = (1L << bitsPerEntry) - 1;
         long[] data = new long[(int) Math.ceil(entries * bitsPerEntry / 64.0)];
