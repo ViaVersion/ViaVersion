@@ -58,6 +58,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.UUIDUtil;
 import java.util.UUID;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
@@ -93,6 +94,7 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
         }
     };
     private final RecipeDisplayRewriter1_21_5<ClientboundPacket26_1> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(this);
+    private final UUID sessionId = UUID.randomUUID(); // One shared session
 
     private void updateTypeSpecificTerm(final CompoundTag predicate, final CompoundTag typeSpecific) {
         final String type = typeSpecific.getString("type");
@@ -137,7 +139,7 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
             wrapper.passthrough(Types.STRING); // Name
             wrapper.passthrough(Types.PROFILE_PROPERTY_ARRAY);
 
-            wrapper.write(Types.UUID, UUID.randomUUID()); // Session ID
+            wrapper.write(Types.UUID, sessionId);
         });
 
         registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY, wrapper -> {

@@ -54,6 +54,7 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.KeyMappings;
 import com.viaversion.viaversion.util.TagUtil;
+import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.Arrays;
@@ -406,7 +407,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
         for (int i = 0; i < entries.length; i++) {
             if (entries[i] == null) {
-                entries[i] = first.withKey(UUID.randomUUID().toString());
+                entries[i] = first.withKey(UUIDUtil.randomUUID().toString());
             }
         }
     }

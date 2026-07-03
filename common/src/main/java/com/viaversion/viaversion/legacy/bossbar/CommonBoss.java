@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.UUIDUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -54,7 +55,7 @@ public class CommonBoss implements BossBar {
         Preconditions.checkNotNull(title, "Title cannot be null");
         Preconditions.checkArgument((health >= 0 && health <= 1), "Health must be between 0 and 1. Input: " + health);
 
-        this.uuid = UUID.randomUUID();
+        this.uuid = UUIDUtil.randomUUID();
         this.title = title;
         this.health = health;
         this.color = color == null ? BossColor.PURPLE : color;

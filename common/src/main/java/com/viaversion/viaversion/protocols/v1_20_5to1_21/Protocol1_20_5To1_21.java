@@ -159,7 +159,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
         }
 
         uuid = UUIDUtil.parseUUID(Key.stripNamespace(id).toUpperCase(Locale.ROOT));
-        return uuid != null ? uuid : UUID.randomUUID();
+        return uuid != null ? uuid : UUIDUtil.randomUUID();
     }
 
     @Override

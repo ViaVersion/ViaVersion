@@ -39,6 +39,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -79,7 +80,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     }
 
     public UUID getEntityUUID(int id) {
-        return uuidMap.computeIfAbsent(id, k -> UUID.randomUUID());
+        return uuidMap.computeIfAbsent(id, k -> UUIDUtil.randomUUID());
     }
 
     public void setSecondHand(Item item) {

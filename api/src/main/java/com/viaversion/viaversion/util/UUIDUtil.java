@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.util;
 
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class UUIDUtil {
@@ -48,5 +49,21 @@ public final class UUIDUtil {
         } catch (final IllegalArgumentException e) {
             return null;
         }
+    }
+
+    /**
+     * Returns a random UUID, similar to {@link UUID#randomUUID()}, but without using {@link java.security.SecureRandom} and its synchronization.
+     * <p>
+     * Should not be used where a UUID should be unpredictable.
+     *
+     * @return random UUID
+     */
+    public static UUID randomUUID() {
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
+        long most = random.nextLong();
+        long least = random.nextLong();
+        most = (most & 0xffffffffffff0fffL) | 0x0000000000004000L; // version 4
+        least = (least & 0x3fffffffffffffffL) | 0x8000000000000000L; // IETF variant
+        return new UUID(most, least);
     }
 }
