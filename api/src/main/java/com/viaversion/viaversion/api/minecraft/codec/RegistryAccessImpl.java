@@ -39,8 +39,8 @@ final class RegistryAccessImpl implements CodecContext.RegistryAccess {
     private final boolean mapped;
 
     RegistryAccessImpl(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection) {
-        this.mappingData = Preconditions.checkNotNull(protocol.getMappingData());
-        this.entityTracker = Preconditions.checkNotNull(protocol.getEntityRewriter().tracker(connection));
+        this.mappingData = Preconditions.checkNotNull(protocol.getMappingData(), "No mapping data present for protocol");
+        this.entityTracker = Preconditions.checkNotNull(protocol.getEntityRewriter().tracker(connection), "Entity tracker has to be added first");
         this.connection = connection;
         this.mapped = false;
     }

@@ -54,7 +54,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     T extends Protocol<C, ?, ?, S>> extends ItemRewriter<C, S, T> {
 
     public static final String MARKER_KEY = "VV|custom_data";
-    private static final String ORIGINAL_HASHES_KEY = "VV|original_hashes";
+    protected static final String ORIGINAL_HASHES_KEY = "VV|original_hashes";
 
     public StructuredItemRewriter(T protocol) {
         super(protocol);
@@ -189,7 +189,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         updateHashedItemDataComponentIds(item, mappingData.getDataComponentSerializerMappings().inverse());
     }
 
-    private boolean isFirstServerbound(final UserConnection connection) {
+    protected boolean isFirstServerbound(final UserConnection connection) {
         // Only actually cache the original item once in the final clientbound/first serverbound protocol
         for (final Protocol<?, ?, ?, ?> protocol : connection.getProtocolInfo().getPipeline().pipes()) {
             if (connection.getItemHasher(protocol.getClass()) instanceof ItemHasherBase) {
