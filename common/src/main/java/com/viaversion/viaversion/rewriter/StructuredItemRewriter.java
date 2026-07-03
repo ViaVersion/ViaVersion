@@ -56,7 +56,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     public static final String MARKER_KEY = "VV|custom_data";
     protected static final String ORIGINAL_HASHES_KEY = "VV|original_hashes";
 
-    public StructuredItemRewriter(T protocol) {
+    public StructuredItemRewriter(final T protocol) {
         super(protocol);
     }
 
@@ -70,7 +70,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
      * @see #handleItemToServer(UserConnection, Item)
      */
     @Override
-    public Item handleItemToClient(UserConnection connection, Item item) {
+    public Item handleItemToClient(final UserConnection connection, final Item item) {
         if (Item.isEmpty(item)) {
             return item;
         }
@@ -97,7 +97,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         handleItemDataComponentsToClient(connection, item, dataContainer);
 
         if (originalHashedItem != null) {
-            storeOriginalHashedItem(connection, item, itemHasher, originalHashedItem); // has to be called AFTER all modifications - override handleItemDataComponentsToClient instead of this method if needed
+            storeOriginalHashedItemIfNeeded(connection, item, itemHasher, originalHashedItem); // has to be called AFTER all modifications - override handleItemDataComponentsToClient instead of this method if needed
         }
         return item;
     }
@@ -122,7 +122,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         final CompoundTag originalHashes;
         if (customData != null && (originalHashes = customData.getCompoundTag(ORIGINAL_HASHES_KEY)) != null) {
             if (isFirstServerbound(connection)) {
-                // Get the item that was originally saved when there was the first hash change to cache in this protocol
+                // Get the item that was originally saved when there was the first hash change to cache in this protocol,
+                // so that it can be cached in the hasher
                 return backedUpOriginalHashes(originalHashes, item);
             }
             // If the original has already been saved and this isn't the final clientbound protocol, no need to do anything else
@@ -143,7 +144,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
      * @param hasher             hasher
      * @param originalHashedItem pre-modification hashed item
      */
-    protected void storeOriginalHashedItem(final UserConnection connection, final Item item, final ItemHasherBase hasher, final HashedItem originalHashedItem) {
+    protected void storeOriginalHashedItemIfNeeded(final UserConnection connection, final Item item, final ItemHasherBase hasher, final HashedItem originalHashedItem) {
         if (originalHashedItem == null || (originalHashedItem.dataHashesById().isEmpty() && originalHashedItem.removedDataIds().isEmpty())) {
             return;
         }
@@ -162,6 +163,10 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             return;
         }
 
+        storeOriginalHashedItemInTag(connection, item, hasher, originalHashedItem);
+    }
+
+    protected void storeOriginalHashedItemInTag(final UserConnection connection, final Item item, final ItemHasherBase hasher, final HashedItem originalHashedItem) {
         // Always has to be AFTER any modification - Use the custom_data hash as a key to the original data (excluding amount, as that will simply be when copying).
         // This is much easier/cheaper than tracking via the full hashed item, as collisions are both acceptable and still unlikely.
         final CompoundTag originalHashes = new CompoundTag();
@@ -175,7 +180,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         final CompoundTag customTag = createCustomTag(item);
         customTag.put(ORIGINAL_HASHES_KEY, originalHashes);
 
-        if (isFirstServerbound(connection)) {
+        if (isFirstServerbound(connection)) { // = the last clientbound protocol: actually cache it now to be retreived during serverbound packets
             hasher.trackOriginalHashedItem(customTag, originalHashedItem, nbtTagName());
         }
     }
