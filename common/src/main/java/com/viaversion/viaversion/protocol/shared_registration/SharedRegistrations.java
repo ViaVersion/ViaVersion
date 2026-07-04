@@ -78,7 +78,7 @@ public final class SharedRegistrations {
         }
 
         for (final VersionedTemplateGroup group : groups) {
-            if (group.min().newerThan(version)) { // TODO binary search?
+            if (group.min().newerThan(version)) {
                 // Sorted by the minimum, so we can stop early if we're out
                 break;
             }

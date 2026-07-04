@@ -27,6 +27,8 @@ import com.viaversion.viaversion.util.CompactArrayUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
+import java.util.function.IntConsumer;
+import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 
 public final class DataPaletteImpl implements DataPalette {
@@ -229,6 +231,41 @@ public final class DataPaletteImpl implements DataPalette {
             inversePalette.put(id, palette.size());
         }
         palette.add(id);
+    }
+
+    private static final ThreadLocal<boolean[]> MATCHING_INDEXES = ThreadLocal.withInitial(() -> new boolean[ChunkSection.SIZE]);
+
+    @Override
+    public void forEachMatchingCoordinate(final IntPredicate idPredicate, final IntConsumer coordinateConsumer) {
+        final int size = size();
+        if (size > ChunkSection.SIZE) { // Shouldn't ever happen normally, but is technically possible...
+            for (int idx = 0, len = this.values.size(); idx < len; idx++) {
+                if (idPredicate.test(idAt(idx))) {
+                    coordinateConsumer.accept(idx);
+                }
+            }
+            return;
+        }
+
+        // Instead of going through every single coordinate value (4096 for block sections), check the palette ids first.
+        // Reuse a thread-local array for quick checking against palette indexes.
+        final boolean[] matching = MATCHING_INDEXES.get();
+        boolean any = false;
+        for (int i = 0; i < size; i++) {
+            final boolean match = idPredicate.test(idByIndex(i));
+            matching[i] = match;
+            any |= match;
+        }
+
+        if (!any) {
+            return;
+        }
+
+        for (int idx = 0, len = this.values.size(); idx < len; idx++) {
+            if (matching[paletteIndexAt(idx)]) {
+                coordinateConsumer.accept(idx);
+            }
+        }
     }
 
     @Override

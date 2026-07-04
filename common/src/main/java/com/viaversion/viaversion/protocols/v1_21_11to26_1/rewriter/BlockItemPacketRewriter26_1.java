@@ -63,14 +63,12 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
                 }
 
                 final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
-                for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
-                    final int id = blockPalette.idAt(idx);
-                    if (Protocol1_21_11To26_1.MAPPINGS.fluidBlockStates().contains(id)) {
-                        // Needed for certain client-side fluid interactions
-                        section.setFluidCount(section.getFluidCount() + 1);
-                    }
-                }
+                blockPalette.forEachMatchingCoordinate(id -> Protocol1_21_11To26_1.MAPPINGS.fluidBlockStates().contains(id), $ -> {
+                    // Needed for certain client-side fluid interactions
+                    section.setFluidCount(section.getFluidCount() + 1);
+                });
             }
+
             protocol.getBlockRewriter().handleBlockEntities(chunk, wrapper.user());
         });
     }
