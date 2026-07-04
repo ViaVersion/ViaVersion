@@ -30,6 +30,7 @@ import com.viaversion.viaversion.protocols.v26_1to26_2.Protocol26_1To26_2;
 import com.viaversion.viaversion.protocols.v26_1to26_2.storage.Encrypted;
 import com.viaversion.viaversion.protocols.v26_1to26_2.storage.FakeEntityId;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandler;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPacket26_1, Protocol26_1To26_2> {
@@ -67,8 +68,8 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
             wrapper.write(Types.BOOLEAN, onlineMode);
         });
 
-        // Go through **all** packets containing an entity id and replace the id with a randomized negative number if zero,
-        // as the client no longer accepts zero as a valid state.
+        // Iterate through **all** packets containing an entity ID and replace it with a randomized negative value if the ID is zero,
+        // since the client no longer accepts zero as a valid entity ID.
         final PacketHandler setFakeEntityId = wrapper -> wrapper.set(Types.VAR_INT, 0, toFakeEntityId(wrapper, wrapper.get(Types.VAR_INT, 0)));
         protocol.appendClientbound(ClientboundPackets26_1.ADD_ENTITY, wrapper -> {
             setFakeEntityId.handle(wrapper);
@@ -148,6 +149,7 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         });
         protocol.registerClientbound(ClientboundPackets26_1.SET_ENTITY_LINK, wrapper -> {
             wrapper.write(Types.INT, toFakeEntityId(wrapper, wrapper.read(Types.INT))); // Source id
+            // Destination id can be zero - ignore it
         });
         protocol.registerClientbound(ClientboundPackets26_1.TAKE_ITEM_ENTITY, wrapper -> {
             toFakeEntityId.handle(wrapper); // Item id
@@ -189,6 +191,16 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
 
         filter().type(EntityTypes26_2.ABSTRACT_CUBE_MOB).addIndex(16); // baby
         filter().type(EntityTypes26_2.ABSTRACT_CUBE_MOB).addIndex(17); // age locked
+
+        final EntityDataHandler toFakeEntityId = (event, data) -> {
+            final Integer target = data.value();
+            if (target != null) {
+                data.setValue(target == 0 ? event.user().get(FakeEntityId.class).id() : target);
+            }
+        };
+        filter().type(EntityTypes26_2.FROG).index(19).handler(toFakeEntityId); // Tongue target
+        filter().type(EntityTypes26_2.FIREWORK_ROCKET).index(9).handler(toFakeEntityId); // Attached to target
+        // Guardian & Wither use zero as default - ignore them
     }
 
     @Override
