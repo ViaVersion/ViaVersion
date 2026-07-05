@@ -174,7 +174,7 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
     }
 
     private int toOriginalEntityId(final PacketWrapper wrapper, final int entityId) {
-        return entityId == wrapper.user().get(FakeEntityId.class).id() ? 0 : entityId;
+        return entityId < -1 && entityId == wrapper.user().get(FakeEntityId.class).id() ? 0 : entityId;
     }
 
     @Override
