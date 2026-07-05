@@ -196,8 +196,8 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
                 wrapper.setPacketType(ClientboundPackets1_19_4.DAMAGE_EVENT);
                 wrapper.write(Types.VAR_INT, entityId);
                 wrapper.write(Types.VAR_INT, damageType);
-                wrapper.write(Types.VAR_INT, 0); // No source entity
-                wrapper.write(Types.VAR_INT, 0); // No direct source entity
+                wrapper.write(Types.OPTIONAL_VAR_INT, null); // No source entity
+                wrapper.write(Types.OPTIONAL_VAR_INT, null); // No direct source entity
                 wrapper.write(Types.BOOLEAN, false); // No source position
                 return;
             }

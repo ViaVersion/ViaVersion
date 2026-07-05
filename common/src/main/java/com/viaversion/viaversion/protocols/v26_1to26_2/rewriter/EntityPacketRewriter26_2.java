@@ -114,9 +114,14 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets26_1.DAMAGE_EVENT, wrapper -> {
             toFakeEntityId.handle(wrapper); // Entity id
             wrapper.passthrough(Types.VAR_INT); // Source type
-            // ?????
-            wrapper.write(Types.VAR_INT, toFakeEntityId(wrapper, wrapper.read(Types.VAR_INT) - 1) + 1); // Source cause id
-            wrapper.write(Types.VAR_INT, toFakeEntityId(wrapper, wrapper.read(Types.VAR_INT) - 1) + 1); // Source direct id
+            final Integer sourceCauseId = wrapper.passthrough(Types.OPTIONAL_VAR_INT);
+            if (sourceCauseId != null) {
+                wrapper.set(Types.OPTIONAL_VAR_INT, 0, toFakeEntityId(wrapper, sourceCauseId));
+            }
+            final Integer sourceDirectId = wrapper.passthrough(Types.OPTIONAL_VAR_INT);
+            if (sourceDirectId != null) {
+                wrapper.set(Types.OPTIONAL_VAR_INT, 1, toFakeEntityId(wrapper, sourceDirectId));
+            }
         });
         protocol.appendClientbound(ClientboundPackets26_1.SOUND_ENTITY, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Source
