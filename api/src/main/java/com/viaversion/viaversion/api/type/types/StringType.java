@@ -22,7 +22,6 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
-import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
@@ -35,6 +34,7 @@ public class StringType extends Type<String> {
     private static final int MAX_CHAR_UTF_8_LENGTH = Character.toString(Character.MAX_VALUE)
         .getBytes(StandardCharsets.UTF_8).length;
     private final int maxLength;
+    private final int maxByteLength;
 
     public StringType() {
         this(Short.MAX_VALUE);
@@ -43,21 +43,22 @@ public class StringType extends Type<String> {
     public StringType(int maxLength) {
         super(String.class);
         this.maxLength = maxLength;
+        this.maxByteLength = maxLength * MAX_CHAR_UTF_8_LENGTH;
     }
 
     @Override
     public String read(ByteBuf buffer) {
         int len = Types.VAR_INT.readPrimitive(buffer);
-
-        Preconditions.checkArgument(len <= maxLength * MAX_CHAR_UTF_8_LENGTH,
-            "Cannot receive string longer than " + maxLength + " * " + MAX_CHAR_UTF_8_LENGTH + " bytes (got %s bytes)", len);
+        if (len > maxByteLength) {
+            throw new IllegalArgumentException("Cannot receive string longer than " + maxLength + " * " + MAX_CHAR_UTF_8_LENGTH + " bytes (got " + len + " bytes)");
+        }
 
         String string = buffer.toString(buffer.readerIndex(), len, StandardCharsets.UTF_8);
         buffer.skipBytes(len);
 
-        Preconditions.checkArgument(string.length() <= maxLength,
-            "Cannot receive string longer than " + maxLength + " characters (got %s bytes)", string.length());
-
+        if (string.length() > maxLength) {
+            throw new IllegalArgumentException("Cannot receive string longer than " + maxLength + " characters (got " + string.length() + ")");
+        }
         return string;
     }
 

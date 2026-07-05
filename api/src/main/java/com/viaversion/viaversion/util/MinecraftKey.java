@@ -85,9 +85,13 @@ abstract sealed class MinecraftKey extends Key {
     }
 
     static boolean isValidPath(final String path) {
+        // Effectively the same as !(c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '_' || c == '-' || c == '.' || c == '/')
+        // but with less branches, making use of char being unsigned and the fact the separation chars are right after the numbers
         for (int i = 0, length = path.length(); i < length; i++) {
             final char c = path.charAt(i);
-            if (!(c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '_' || c == '-' || c == '.' || c == '/')) {
+            if ((char) (c - 'a') > 25    // not a-z
+                && (char) (c - '-') > 12 // not - . / 0-9
+                && c != '_') {
                 return false;
             }
         }
