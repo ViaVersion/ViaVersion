@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.connection;
 
-import com.google.common.cache.CacheBuilder;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.StorableObject;
@@ -43,30 +42,28 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.CodecException;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.SplittableRandom;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class UserConnectionImpl implements UserConnection {
-    private static final int PASSTHROUGH_DATA_BYTES = Long.BYTES * 2 + 2;
+    private static final int PASSTHROUGH_DATA_BYTES = Long.BYTES + 2;
     private static final AtomicLong IDS = new AtomicLong();
     private final long id = IDS.incrementAndGet();
+    private final SplittableRandom random = new SplittableRandom();
     private final Map<Class<?>, StorableObject> storedObjects = new ConcurrentHashMap<>();
     private final Map<Class<? extends Protocol>, EntityTracker> entityTrackers = new Reference2ObjectOpenHashMap<>();
     private final Map<Class<? extends Protocol>, ItemHasher> itemHashers = new Reference2ObjectOpenHashMap<>();
     private final Map<Class<? extends Protocol>, ClientWorld> clientWorlds = new Reference2ObjectOpenHashMap<>();
     private final PacketTracker packetTracker = new PacketTracker(this);
-    private final Set<UUID> passthroughTokens = Collections.newSetFromMap(CacheBuilder.newBuilder()
-        .expireAfterWrite(10, TimeUnit.SECONDS)
-        .<UUID, Boolean>build().asMap());
+    private final LongSet passthroughTokens = new LongOpenHashSet();
     private final ProtocolInfo protocolInfo = new ProtocolInfoImpl();
     private final Channel channel;
     private final boolean clientSide;
@@ -261,7 +258,7 @@ public class UserConnectionImpl implements UserConnection {
             if (shouldTransformPacket()) {
                 // Bypass serverbound packet decoder transforming
                 Types.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
-                Types.UUID.write(buf, generatePassthroughToken());
+                Types.LONG.writePrimitive(buf, generatePassthroughToken());
             }
 
             buf.writeBytes(packet);
@@ -346,11 +343,13 @@ public class UserConnectionImpl implements UserConnection {
         }
 
         final int id = Types.VAR_INT.readPrimitive(buf);
-        if (id == PacketWrapper.PASSTHROUGH_ID) {
-            if (!passthroughTokens.remove(Types.UUID.read(buf))) {
-                throw new IllegalArgumentException("Invalid token");
+        if (id == PacketWrapper.PASSTHROUGH_ID && buf.readableBytes() >= Long.BYTES) {
+            if (removePassthroughToken(buf.readLong())) {
+                return;
             }
-            return;
+
+            // Move reader back and treat it like a regular packet
+            buf.readerIndex(buf.readerIndex() - Long.BYTES);
         }
 
         final int valuesReaderIndex = buf.readerIndex();
@@ -443,10 +442,22 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public UUID generatePassthroughToken() {
-        UUID token = UUID.randomUUID();
-        passthroughTokens.add(token);
-        return token;
+    public long generatePassthroughToken() {
+        // Don't use TLR so it's not entirely predictable; use SplittableRandom over Random since it actually has a 64 bit seed
+        while (true) {
+            synchronized (passthroughTokens) {
+                final long token = random.nextLong();
+                if (passthroughTokens.add(token)) {
+                    return token;
+                }
+            }
+        }
+    }
+
+    private boolean removePassthroughToken(final long token) {
+        synchronized (passthroughTokens) {
+            return passthroughTokens.remove(token);
+        }
     }
 
     @Override

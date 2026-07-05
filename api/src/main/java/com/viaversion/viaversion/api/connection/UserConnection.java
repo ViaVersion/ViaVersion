@@ -365,10 +365,10 @@ public interface UserConnection {
     }
 
     /**
-     * Returns a newly generated uuid that will let a packet be passed through without
+     * Returns a newly generated token that will let a packet be passed through without
      * transforming its contents if used together with {@link PacketWrapper#PASSTHROUGH_ID}.
      *
      * @return generated passthrough token
      */
-    UUID generatePassthroughToken();
+    long generatePassthroughToken();
 }
