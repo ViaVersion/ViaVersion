@@ -156,7 +156,13 @@ public interface DataPalette {
      * @param coordinateConsumer consumer to run over applicable coordinate indices (not ids!)
      * @see #idAt(int)
      */
-    void forEachMatchingCoordinate(IntPredicate idPredicate, IntConsumer coordinateConsumer);
+    default void forEachMatchingCoordinate(IntPredicate idPredicate, IntConsumer coordinateConsumer) {
+        for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+            if (idPredicate.test(idAt(idx))) {
+                coordinateConsumer.accept(idx);
+            }
+        }
+    }
 
     /**
      * Packs the section values into a compact long array as used by the protocol.
