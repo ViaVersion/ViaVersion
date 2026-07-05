@@ -51,6 +51,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -64,10 +65,10 @@ public class MappingDataLoader {
     private static final byte CHANGES_ID = 2;
     private static final byte IDENTITY_ID = 3;
 
-    private final Map<String, CompoundTag> mappingsCache = new HashMap<>();
+    private final Map<String, CompoundTag> mappingsCache = new ConcurrentHashMap<>();
     private final Class<?> dataLoaderClass;
     private final String dataPath;
-    private boolean cacheValid = true;
+    private volatile boolean cacheValid = true;
 
     public MappingDataLoader(final Class<?> dataLoaderClass, final String dataPath) {
         this.dataLoaderClass = dataLoaderClass;
@@ -110,8 +111,8 @@ public class MappingDataLoader {
     }
 
     public void clearCache() {
-        mappingsCache.clear();
         cacheValid = false;
+        mappingsCache.clear();
     }
 
     /**
@@ -160,17 +161,14 @@ public class MappingDataLoader {
             return loadNBTFromFile(name);
         }
 
-        CompoundTag data = mappingsCache.get(name);
-        if (data != null) {
-            return data;
+        if (cache) {
+            // Also blocks concurrent loaders of the same file until the first one has finished
+            return mappingsCache.computeIfAbsent(name, this::loadNBTFromFile);
         }
 
-        data = loadNBTFromFile(name);
-
-        if (cache && data != null) {
-            mappingsCache.put(name, data);
-        }
-        return data;
+        // Still do a lookup, but don't store it
+        final CompoundTag data = mappingsCache.get(name);
+        return data != null ? data : loadNBTFromFile(name);
     }
 
     public @Nullable CompoundTag loadNBT(final String name) {
@@ -334,8 +332,9 @@ public class MappingDataLoader {
     }
 
     private List<String> identifiers(final Mappings mappings, final String key) {
-        final List<String> identifiers = new ArrayList<>(mappings.size());
-        for (int i = 0; i < mappings.size(); i++) {
+        final int size = mappings.size();
+        final List<String> identifiers = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
             final int globalId = mappings.getNewId(i);
             identifiers.add(identifierFromGlobalId(key, globalId));
         }
