@@ -96,8 +96,9 @@ public final class ComponentUtil {
         }
         return TagUtil.handleDeep(input, (key, tag) -> {
             if (tag instanceof StringTag stringTag) {
-                final byte[] value = stringTag.getValue().getBytes(StandardCharsets.UTF_8);
-                if (value.length > MAX_UNSIGNED_SHORT) {
+                final String value = stringTag.getValue();
+                // Cheap upper bound check first, then check the actual bytes
+                if (value.length() > MAX_UNSIGNED_SHORT / 3 && value.getBytes(StandardCharsets.UTF_8).length > MAX_UNSIGNED_SHORT) {
                     stringTag.setValue("{}");
                 }
             }

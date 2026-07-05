@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.IntTag;
+import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
@@ -373,7 +374,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
 
     protected void updateTextComponent(final UserConnection connection, final Item item, final StructuredDataKey<Tag> key, final String backupKey) {
         final Tag name = item.dataContainer().get(key);
-        if (name == null) {
+        // Skip primitive tags - processTag only handles compound and list tags
+        if (!(name instanceof CompoundTag) && !(name instanceof ListTag)) {
             return;
         }
 
@@ -473,7 +475,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             final StructuredDataKey<?> key = keys.get(i);
             final StructuredDataKey<?> mappedKey = mappedKeys.get(i);
             replaceKeyUnchecked(container, key, mappedKey);
-        }
+            }
     }
 
     private static <T> void replaceKeyUnchecked(final StructuredDataContainer container, final StructuredDataKey<T> key, final StructuredDataKey<?> mappedKey) {
