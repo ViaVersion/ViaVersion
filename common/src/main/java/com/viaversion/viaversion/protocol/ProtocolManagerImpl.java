@@ -94,15 +94,15 @@ import com.viaversion.viaversion.protocols.v26_1to26_2.Protocol26_1To26_2;
 import com.viaversion.viaversion.util.MathUtil;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -323,17 +323,13 @@ public class ProtocolManagerImpl implements ProtocolManager {
         }
 
         // Calculate path
-        Object2ObjectSortedMap<ProtocolVersion, Protocol> outputPath = getProtocolPath(new Object2ObjectLinkedOpenHashMap<>(), clientVersion, serverVersion);
-        if (outputPath == null) {
+        List<ProtocolPathEntry> path = calculateProtocolPath(clientVersion, serverVersion);
+        if (path == null) {
             // Also cache that there is no path
             pathCache.put(protocolKey, List.of());
             return null;
         }
 
-        List<ProtocolPathEntry> path = new ArrayList<>(outputPath.size());
-        for (Map.Entry<ProtocolVersion, Protocol> entry : outputPath.entrySet()) {
-            path.add(new ProtocolPathEntryImpl(entry.getKey(), entry.getValue()));
-        }
         pathCache.put(protocolKey, path);
         return path;
     }
@@ -349,56 +345,70 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     /**
-     * Calculates a path to get from an input protocol to the server's protocol.
+     * Calculates the shortest path to get from an input protocol to the server's protocol using a breadth-first search.
      *
-     * @param current       current items in the path
-     * @param clientVersion current input version
+     * @param clientVersion input version
      * @param serverVersion desired output version
-     * @return path that has been generated, null if failed
+     * @return shortest path to the server version, or null if none exists
      */
-    private @Nullable Object2ObjectSortedMap<ProtocolVersion, Protocol> getProtocolPath(Object2ObjectSortedMap<ProtocolVersion, Protocol> current, ProtocolVersion clientVersion, ProtocolVersion serverVersion) {
-        if (current.size() > maxProtocolPathSize) return null; // Fail-safe, protocol too complicated.
+    private @Nullable List<ProtocolPathEntry> calculateProtocolPath(ProtocolVersion clientVersion, ProtocolVersion serverVersion) {
+        Set<ProtocolVersion> visited = new HashSet<>();
+        visited.add(clientVersion);
 
-        // First, check if there is any protocols for this
-        Object2ObjectMap<ProtocolVersion, Protocol> toServerProtocolMap = registryMap.get(clientVersion);
-        if (toServerProtocolMap == null) {
-            return null; // Not supported
-        }
+        Deque<PathNode> queue = new ArrayDeque<>();
+        queue.add(new PathNode(null, clientVersion, null, 0));
 
-        // Next, check if there is a direct, single Protocol path
-        Protocol protocol = toServerProtocolMap.get(serverVersion);
-        if (protocol != null) {
-            current.put(serverVersion, protocol);
-            return current; // Easy solution
-        }
+        PathNode node;
+        while ((node = queue.poll()) != null) {
+            if (node.depth() > maxProtocolPathSize){
+                continue; // Fail-safe, protocol too complicated
+            }
 
-        // There might be a more advanced solution... So we'll see if any of the others can get us there
-        Object2ObjectSortedMap<ProtocolVersion, Protocol> shortest = null;
-        for (Map.Entry<ProtocolVersion, Protocol> entry : toServerProtocolMap.entrySet()) {
-            // Ensure we don't go back to already contained versions
-            ProtocolVersion translatedToVersion = entry.getKey();
-            if (current.containsKey(translatedToVersion)) continue;
+            Object2ObjectMap<ProtocolVersion, Protocol> toServerProtocolMap = registryMap.get(node.version());
+            if (toServerProtocolMap == null) {
+                continue; // Not supported
+            }
 
-            // Check if the new version is farther away than the current client version
-            if (maxPathDeltaIncrease != -1 && translatedToVersion.getVersionType() == clientVersion.getVersionType()) {
-                final int delta = Math.abs(serverVersion.getVersion() - translatedToVersion.getVersion()) - Math.abs(serverVersion.getVersion() - clientVersion.getVersion());
-                if (delta > maxPathDeltaIncrease) {
+            // Check if there is a direct protocol path; always preferred over paths through other versions,
+            // even if it first moves farther away from the server version
+            Protocol protocol = toServerProtocolMap.get(serverVersion);
+            if (protocol != null) {
+                return reconstructPath(new PathNode(node, serverVersion, protocol, node.depth() + 1));
+            }
+
+            for (Map.Entry<ProtocolVersion, Protocol> entry : toServerProtocolMap.entrySet()) {
+                // Ensure we don't go back to already visited versions
+                ProtocolVersion translatedToVersion = entry.getKey();
+                if (visited.contains(translatedToVersion)) {
                     continue;
                 }
-            }
 
-            // Create a copy
-            Object2ObjectSortedMap<ProtocolVersion, Protocol> newCurrent = new Object2ObjectLinkedOpenHashMap<>(current);
-            newCurrent.put(translatedToVersion, entry.getValue());
+                // Check if the new version is farther away than the current client version
+                if (maxPathDeltaIncrease != -1 && translatedToVersion.getVersionType() == node.version().getVersionType()) {
+                    final int delta = Math.abs(serverVersion.getVersion() - translatedToVersion.getVersion()) - Math.abs(serverVersion.getVersion() - node.version().getVersion());
+                    if (delta > maxPathDeltaIncrease) {
+                        continue;
+                    }
+                }
 
-            // Calculate the rest of the protocol starting from translatedToVersion and take the shortest
-            newCurrent = getProtocolPath(newCurrent, translatedToVersion, serverVersion);
-            if (newCurrent != null && (shortest == null || newCurrent.size() < shortest.size())) {
-                shortest = newCurrent;
+                // Go on to the next node
+                visited.add(translatedToVersion);
+                queue.add(new PathNode(node, translatedToVersion, entry.getValue(), node.depth() + 1));
             }
         }
+        return null; // No path found
+    }
 
-        return shortest; // null if none found
+    private List<ProtocolPathEntry> reconstructPath(PathNode node) {
+        // Go back the full path again to build the final list
+        final ProtocolPathEntry[] path = new ProtocolPathEntry[node.depth()];
+        for (PathNode current = node; current.protocol() != null; current = current.parent()) {
+            path[current.depth() - 1] = new ProtocolPathEntryImpl(current.version(), current.protocol());
+        }
+        return List.of(path);
+    }
+
+    private record PathNode(@Nullable PathNode parent, ProtocolVersion version, @Nullable Protocol protocol, int depth) {
     }
 
     @Override
