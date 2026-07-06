@@ -38,7 +38,7 @@ public enum ServerboundPackets1_20_5 implements ServerboundPacket1_20_5 {
     CONTAINER_SLOT_STATE_CHANGED, // 0x10
     COOKIE_RESPONSE, // 0x11
     CUSTOM_PAYLOAD, // 0x12
-    DEBUG_SAMPLE_SUBSCRIPTION, // 0x13
+    DEBUG_SUBSCRIPTION_REQUEST, // 0x13
     EDIT_BOOK, // 0x14
     ENTITY_TAG_QUERY, // 0x15
     INTERACT, // 0x16

@@ -58,7 +58,7 @@ public enum ClientboundPackets1_21_9 implements ClientboundPacket1_21_9 {
     EXPLODE, // 0x24
     FORGET_LEVEL_CHUNK, // 0x25
     GAME_EVENT, // 0x26
-    GAME_EVENT_TEST_HIGHLIGHT_POS, // 0x27
+    GAME_TEST_HIGHLIGHT_POS, // 0x27
     HORSE_SCREEN_OPEN, // 0x28
     HURT_ANIMATION, // 0x29
     INITIALIZE_BORDER, // 0x2A

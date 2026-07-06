@@ -59,7 +59,7 @@ public enum ClientboundPackets26_1 implements ClientboundPacket26_1 {
     FORGET_LEVEL_CHUNK, // 0x25
     GAME_EVENT, // 0x26
     GAME_RULE_VALUES, // 0x27
-    GAME_EVENT_TEST_HIGHLIGHT_POS, // 0x28
+    GAME_TEST_HIGHLIGHT_POS, // 0x28
     MOUNT_SCREEN_OPEN, // 0x29
     HURT_ANIMATION, // 0x2A
     INITIALIZE_BORDER, // 0x2B

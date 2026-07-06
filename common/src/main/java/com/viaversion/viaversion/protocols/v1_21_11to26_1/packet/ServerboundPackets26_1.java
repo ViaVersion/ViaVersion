@@ -42,7 +42,7 @@ public enum ServerboundPackets26_1 implements ServerboundPacket26_1 {
     CONTAINER_SLOT_STATE_CHANGED, // 0x14
     COOKIE_RESPONSE, // 0x15
     CUSTOM_PAYLOAD, // 0x16
-    DEBUG_SAMPLE_SUBSCRIPTION, // 0x17
+    DEBUG_SUBSCRIPTION_REQUEST, // 0x17
     EDIT_BOOK, // 0x18
     ENTITY_TAG_QUERY, // 0x19
     INTERACT, // 0x1A

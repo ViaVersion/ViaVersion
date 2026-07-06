@@ -269,7 +269,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         cancelServerbound(ServerboundConfigurationPackets1_20_5.COOKIE_RESPONSE);
         cancelServerbound(ServerboundConfigurationPackets1_20_5.SELECT_KNOWN_PACKS);
         cancelServerbound(ServerboundPackets1_20_5.COOKIE_RESPONSE);
-        cancelServerbound(ServerboundPackets1_20_5.DEBUG_SAMPLE_SUBSCRIPTION);
+        cancelServerbound(ServerboundPackets1_20_5.DEBUG_SUBSCRIPTION_REQUEST);
     }
 
     private void fixChatAck(final PacketWrapper wrapper, final AcknowledgedMessagesStorage storage) {
