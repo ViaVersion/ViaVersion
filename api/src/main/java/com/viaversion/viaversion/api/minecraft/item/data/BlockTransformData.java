@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData.MappingType;
 import com.viaversion.viaversion.api.minecraft.Holder;
@@ -33,6 +34,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -89,8 +91,96 @@ public record BlockTransformData(CompoundTag blockStateProvider, Holder<SoundEve
 
     @Override
     public BlockTransformData rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
-        //final CompoundTag blockStateProvider = DebugStickState.rewriteBlockState(this.blockStateProvider, protocol, clientbound); // TODO
-        return new BlockTransformData(blockStateProvider, sound, transformParticle, disallowedFaces, loot, dropStrategy, transformType, consumeOnUse, itemDamagePerUse);
+        CompoundTag updatedTag = blockStateProvider().copy();
+        if (updateBlockStateProvider(protocol, updatedTag)) {
+            // Back it up clientbound so server data doesn't disappear; remove it for newly spawned items serverbound.
+            // Given it's not even encoded properly over the network and would otherwise require keeping full block state mappings
+            // and is not needed on the client, we only do the bare minimum to guarantee compatibility.
+            if (clientbound) {
+                updatedTag.put("backup", this.blockStateProvider);
+            } else {
+                final CompoundTag backupTag = updatedTag.getCompoundTag("backup");
+                updatedTag = backupTag != null ? backupTag : dummyBlockStateProvider();
+            }
+        }
+        return new BlockTransformData(updatedTag, sound, transformParticle, disallowedFaces, loot, dropStrategy, transformType, consumeOnUse, itemDamagePerUse);
+    }
+
+    private CompoundTag dummyBlockStateProvider() {
+        final CompoundTag state = new CompoundTag();
+        state.putString("Name", "dirt");
+
+        final CompoundTag tag = new CompoundTag();
+        tag.putString("type", "simple_state_provider");
+        tag.put("state", state);
+        return tag;
+    }
+
+    private boolean updateBlockStateProvider(final Protocol<?, ?, ?, ?> protocol, final CompoundTag tag) {
+        boolean changed = false;
+        final String type = Key.stripMinecraftNamespace(tag.getString("type"));
+        switch (type) {
+            case "simple_state_provider", "rotated_block_provider" -> {
+                changed |= updateBlockState(protocol, tag.getCompoundTag("state"));
+            }
+            case "weighted_state_provider" -> {
+                for (final CompoundTag entry : tag.getListTag("entries", CompoundTag.class)) {
+                    changed |= updateBlockState(protocol, entry.getCompoundTag("data"));
+                }
+            }
+            case "noise_threshold_provider" -> {
+                changed |= updateBlockState(protocol, tag.getCompoundTag("default_state"));
+                for (final CompoundTag entry : tag.getListTag("low_states", CompoundTag.class)) {
+                    changed |= updateBlockState(protocol, entry);
+                }
+                for (final CompoundTag entry : tag.getListTag("high_states", CompoundTag.class)) {
+                    changed |= updateBlockState(protocol, entry);
+                }
+            }
+            case "noise_provider", "dual_noise_provider" -> {
+                for (final CompoundTag entry : tag.getListTag("states", CompoundTag.class)) {
+                    changed |= updateBlockState(protocol, entry);
+                }
+            }
+            case "randomized_int_state_provider" -> {
+                changed |= updateBlockStateProvider(protocol, tag.getCompoundTag("source"));
+                // "property" field is generic and can be left unchanged. If invalid, it'll be defaulted
+            }
+            case "rule_based_state_provider" -> {
+                final CompoundTag fallback = tag.getCompoundTag("fallback");
+                if (fallback != null) {
+                    changed |= updateBlockStateProvider(protocol, fallback);
+                }
+
+                // Clear rules since parsing block state predicates is quite a lot
+                tag.put("rules", new ListTag<>(CompoundTag.class));
+                changed = true;
+
+                /*
+                for (final CompoundTag entry : tag.getListTag("rules", CompoundTag.class)) {
+                    changed |= updateBlockStateProvider(protocol, entry.getCompoundTag("then"));
+                    // "if_true" block state predicate (different to the advancement block predicate)...
+                }
+                */
+            }
+            case "copy_properties_provider" -> {
+                changed |= updateBlockStateProvider(protocol, tag.getCompoundTag("source_block_state_provider"));
+            }
+        }
+        return changed;
+    }
+
+    private boolean updateBlockState(final Protocol<?, ?, ?, ?> protocol, final CompoundTag blockStateTag) {
+        // {"Name": "minecraft:grass_block", "Properties": {"snowy": "true"}}
+        final String block = blockStateTag.getString("Name");
+        final int blockId = protocol.getMappingData().getFullBlockMappings().id(block);
+        if (blockId == -1 || protocol.getMappingData().changedBlocks().contains(blockId)) {
+            // Return dummy block state
+            blockStateTag.putString("Name", "dirt");
+            blockStateTag.remove("Properties");
+            return true;
+        }
+        return false;
     }
 
     @Override
