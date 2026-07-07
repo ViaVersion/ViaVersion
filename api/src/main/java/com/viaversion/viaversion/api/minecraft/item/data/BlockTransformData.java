@@ -40,7 +40,8 @@ import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record BlockTransformData(CompoundTag blockStateProvider, Holder<SoundEvent> sound, int transformParticle,
-                                 int[] disallowedFaces, @Nullable String loot, int dropStrategy, int transformType,
+                                 int[] disallowedFaces, @Nullable String loot, int dropStrategy,
+                                 boolean updateFromNeighbors, int transformType,
                                  boolean consumeOnUse, int itemDamagePerUse) implements Rewritable, Copyable {
 
     public static final Type<BlockTransformData> TYPE = new Type<>(BlockTransformData.class) {
@@ -52,10 +53,11 @@ public record BlockTransformData(CompoundTag blockStateProvider, Holder<SoundEve
             final int[] disallowedFaces = Types.VAR_INT_ARRAY_PRIMITIVE.read(buffer);
             final String loot = Types.OPTIONAL_STRING.read(buffer);
             final int dropStrategy = Types.VAR_INT.readPrimitive(buffer);
+            final boolean updateFromNeighbors = Types.BOOLEAN.read(buffer);
             final int transformType = Types.VAR_INT.readPrimitive(buffer);
             final boolean consumeOnUse = Types.BOOLEAN.read(buffer);
             final int itemDamagePerUse = Types.VAR_INT.readPrimitive(buffer);
-            return new BlockTransformData(blockStateProvider, sound, transformParticle, disallowedFaces, loot, dropStrategy, transformType, consumeOnUse, itemDamagePerUse);
+            return new BlockTransformData(blockStateProvider, sound, transformParticle, disallowedFaces, loot, dropStrategy, updateFromNeighbors, transformType, consumeOnUse, itemDamagePerUse);
         }
 
         @Override
@@ -66,6 +68,7 @@ public record BlockTransformData(CompoundTag blockStateProvider, Holder<SoundEve
             Types.VAR_INT_ARRAY_PRIMITIVE.write(buffer, value.disallowedFaces);
             Types.OPTIONAL_STRING.write(buffer, value.loot);
             Types.VAR_INT.writePrimitive(buffer, value.dropStrategy);
+            Types.BOOLEAN.write(buffer, value.updateFromNeighbors);
             Types.VAR_INT.writePrimitive(buffer, value.transformType);
             Types.BOOLEAN.write(buffer, value.consumeOnUse);
             Types.VAR_INT.writePrimitive(buffer, value.itemDamagePerUse);
@@ -81,6 +84,7 @@ public record BlockTransformData(CompoundTag blockStateProvider, Holder<SoundEve
                 .writeOptional("disallowed_faces", EnumTypes.DIRECTION.new EnumArrayType(), data.disallowedFaces, new int[0])
                 .writeOptional("loot", Types.STRING, data.loot)
                 .writeOptional("drop_strategy", Types.VAR_INT, data.dropStrategy, 1)
+                .writeOptional("update_from_neighbors", Types.BOOLEAN, data.updateFromNeighbors, true)
                 .writeOptional("transform_type", Types.VAR_INT, data.transformType, 0)
                 .writeOptional("consume_on_use", Types.BOOLEAN, data.consumeOnUse, true)
                 .writeOptional("item_damage_per_use", Types.VAR_INT, data.itemDamagePerUse, 0)
@@ -103,7 +107,7 @@ public record BlockTransformData(CompoundTag blockStateProvider, Holder<SoundEve
                 updatedTag = backupTag != null ? backupTag : dummyBlockStateProvider();
             }
         }
-        return new BlockTransformData(updatedTag, sound, transformParticle, disallowedFaces, loot, dropStrategy, transformType, consumeOnUse, itemDamagePerUse);
+        return new BlockTransformData(updatedTag, sound, transformParticle, disallowedFaces, loot, dropStrategy, updateFromNeighbors, transformType, consumeOnUse, itemDamagePerUse);
     }
 
     private CompoundTag dummyBlockStateProvider() {
@@ -185,6 +189,6 @@ public record BlockTransformData(CompoundTag blockStateProvider, Holder<SoundEve
 
     @Override
     public BlockTransformData copy() {
-        return new BlockTransformData(blockStateProvider.copy(), sound, transformParticle, disallowedFaces, loot, dropStrategy, transformType, consumeOnUse, itemDamagePerUse);
+        return new BlockTransformData(blockStateProvider.copy(), sound, transformParticle, disallowedFaces, loot, dropStrategy, updateFromNeighbors, transformType, consumeOnUse, itemDamagePerUse);
     }
 }

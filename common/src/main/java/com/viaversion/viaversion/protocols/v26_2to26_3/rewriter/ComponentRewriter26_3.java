@@ -37,6 +37,6 @@ public final class ComponentRewriter26_3 extends NBTComponentRewriter<Clientboun
             return;
         }
 
-        removeDataComponents(componentsTag, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, StructuredDataKey.POT_DECORATIONS26_3);
+        removeDataComponents(componentsTag, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, StructuredDataKey.POTION_CONTENTS1_21_2);
     }
 }

@@ -27,7 +27,6 @@ import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
@@ -38,37 +37,42 @@ import static com.viaversion.viaversion.util.Rewritable.rewriteItem;
 public record PotDecorations26_3(@Nullable Item back, @Nullable Item left, @Nullable Item right,
                                  @Nullable Item front) implements Copyable, Rewritable {
 
-    public static final Type<PotDecorations26_3> TYPE = new Type<>(PotDecorations26_3.class) {
+    public static final class PotDecorationsType extends Type<PotDecorations26_3> {
+
+        private final Type<Item> itemTemplateType;
+
+        public PotDecorationsType(final Type<Item> itemTemplateType) {
+            super(PotDecorations26_3.class);
+            this.itemTemplateType = itemTemplateType;
+        }
+
         @Override
         public void write(final ByteBuf buffer, final PotDecorations26_3 value) {
-            final Type<Item> itemType = VersionedTypes.V26_3.itemTemplate(); // TODO
-            itemType.write(buffer, value.back());
-            itemType.write(buffer, value.left());
-            itemType.write(buffer, value.right());
-            itemType.write(buffer, value.front());
+            itemTemplateType.write(buffer, value.back());
+            itemTemplateType.write(buffer, value.left());
+            itemTemplateType.write(buffer, value.right());
+            itemTemplateType.write(buffer, value.front());
         }
 
         @Override
         public PotDecorations26_3 read(final ByteBuf buffer) {
-            final Type<Item> itemType = VersionedTypes.V26_3.itemTemplate(); // TODO
-            final Item back = itemType.read(buffer);
-            final Item left = itemType.read(buffer);
-            final Item right = itemType.read(buffer);
-            final Item front = itemType.read(buffer);
+            final Item back = itemTemplateType.read(buffer);
+            final Item left = itemTemplateType.read(buffer);
+            final Item right = itemTemplateType.read(buffer);
+            final Item front = itemTemplateType.read(buffer);
             return new PotDecorations26_3(back, left, right, front);
         }
 
         @Override
         public void write(final Ops ops, final PotDecorations26_3 value) {
-            final Type<Item> itemType = ops.context().mapped() ? ops.context().protocol().getItemRewriter().mappedItemTemplateType() : ops.context().protocol().getItemRewriter().itemTemplateType();
             ops.writeMap(map -> map
-                .writeOptional("back", itemType, value.back())
-                .writeOptional("left", itemType, value.left())
-                .writeOptional("right", itemType, value.right())
-                .writeOptional("front", itemType, value.front())
+                .writeOptional("back", itemTemplateType, value.back())
+                .writeOptional("left", itemTemplateType, value.left())
+                .writeOptional("right", itemTemplateType, value.right())
+                .writeOptional("front", itemTemplateType, value.front())
             );
         }
-    };
+    }
 
     @Override
     public PotDecorations26_3 rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {

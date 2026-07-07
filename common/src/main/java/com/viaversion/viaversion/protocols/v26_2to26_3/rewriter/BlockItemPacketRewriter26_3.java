@@ -28,7 +28,10 @@ import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial1_20_5
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial26_3;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations26_3;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
 import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
@@ -38,6 +41,13 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
 
     public BlockItemPacketRewriter26_3(final Protocol26_2To26_3 protocol) {
         super(protocol);
+    }
+
+    @Override
+    protected void registerPackets() {
+        protocol.appendClientbound(ClientboundPackets26_1.EXPLODE, wrapper -> {
+            wrapper.write(Types.BOOLEAN, true); // Play sound
+        });
     }
 
     @Override
@@ -67,7 +77,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             final ArmorTrimMaterial1_20_5 trim = holder.value();
             return Holder.of(new ArmorTrimMaterial26_3(trim.assetName(), trim.description()));
         });
-        container.replace(StructuredDataKey.POT_DECORATIONS1_20_5, StructuredDataKey.POT_DECORATIONS26_3, decorations -> {
+        container.replace(StructuredDataKey.POT_DECORATIONS1_20_5, VersionedTypes.V26_3.structuredDataKeys().potDecorations, decorations -> {
             return new PotDecorations26_3(
                 new StructuredItemTemplate(decorations.backItem(), 1),
                 new StructuredItemTemplate(decorations.leftItem(), 1),
@@ -90,7 +100,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             final ArmorTrimMaterial26_3 trim = holder.value();
             return Holder.of(new ArmorTrimMaterial1_20_5(trim.paletteId(), new HashMap<>(), trim.description()));
         });
-        container.replace(StructuredDataKey.POT_DECORATIONS26_3, StructuredDataKey.POT_DECORATIONS1_20_5, decorations -> {
+        container.replace(VersionedTypes.V26_3.structuredDataKeys().potDecorations, StructuredDataKey.POT_DECORATIONS1_20_5, decorations -> {
             return new PotDecorations1_20_5(new int[]{decorations.back().identifier(), decorations.left().identifier(), decorations.right().identifier(), decorations.front().identifier()});
         });
     }

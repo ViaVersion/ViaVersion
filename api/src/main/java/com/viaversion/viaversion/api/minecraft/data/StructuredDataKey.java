@@ -48,6 +48,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.BlockEntityData;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockTransformData;
 import com.viaversion.viaversion.api.minecraft.item.data.BlocksAttacks;
+import com.viaversion.viaversion.api.minecraft.item.data.Compostable;
 import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
 import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant1_21_2;
@@ -75,7 +76,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.LockCode;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.PiercingWeapon;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations1_20_5;
-import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations26_3;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.ProvidesBannerPatterns;
 import com.viaversion.viaversion.api.minecraft.item.data.ProvidesTrimMaterial;
@@ -220,7 +220,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<BannerPatternLayer[]> BANNER_PATTERNS = new StructuredDataKey<>("banner_patterns", BannerPatternLayer.ARRAY_TYPE);
     public static final StructuredDataKey<Integer> BASE_COLOR = new StructuredDataKey<>("base_color", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<PotDecorations1_20_5> POT_DECORATIONS1_20_5 = new StructuredDataKey<>("pot_decorations", PotDecorations1_20_5.TYPE);
-    public static final StructuredDataKey<PotDecorations26_3> POT_DECORATIONS26_3 = new StructuredDataKey<>("pot_decorations", PotDecorations26_3.TYPE);
+    // 26.3+ pot decorations are in their own key classes
     public static final StructuredDataKey<BlockStateProperties> BLOCK_STATE = new StructuredDataKey<>("block_state", BlockStateProperties.TYPE);
     public static final StructuredDataKey<Bee[]> BEES1_20_5 = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE1_20_5);
     public static final StructuredDataKey<Bee[]> BEES1_21_9 = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE1_21_9);
@@ -228,8 +228,8 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<LockCode> LOCK1_21_2 = new StructuredDataKey<>("lock", LockCode.TYPE);
     public static final StructuredDataKey<CompoundTag> CONTAINER_LOOT = new StructuredDataKey<>("container_loot", Types.COMPOUND_TAG);
     public static final StructuredDataKey<Holder<SoundEvent>> BREAK_SOUND = new StructuredDataKey<>("break_sound", Types.SOUND_EVENT);
+    public static final StructuredDataKey<Compostable> COMPOSTABLE = new StructuredDataKey<>("compostable", Compostable.TYPE);
     public static final StructuredDataKey<Integer> PROVIDES_POTTERY_PATTERN = new StructuredDataKey<>("provides_pottery_pattern", new SynchronizedRegistryValueType(RegistryKey.of("decorated_pot_pattern")));
-    //  armor trim
 
     public static final StructuredDataKey<Integer> VILLAGER_VARIANT = new StructuredDataKey<>("villager/variant", EnumTypes.VILLAGER_TYPE);
     public static final StructuredDataKey<Integer> WOLF_VARIANT = new StructuredDataKey<>("wolf/variant", new SynchronizedRegistryValueType(RegistryKey.of("wolf_variant")));

@@ -71,6 +71,7 @@ public final class EntityTypeUtil {
 
             final int id = mappings.mappedId(type.identifier());
             Preconditions.checkArgument(id != -1, "Entity type %s has no id", type.identifier());
+            Preconditions.checkArgument(id < typesToFill.length, "Types array too small (missing enum entry?). Tried setting id %s into array of size %s", id, typesToFill.length);
             idSetter.setId(type, id);
             typesToFill[id] = type;
         }

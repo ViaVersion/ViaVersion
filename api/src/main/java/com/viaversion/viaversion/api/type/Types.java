@@ -105,6 +105,7 @@ import com.viaversion.viaversion.api.type.types.math.EulerAngleType;
 import com.viaversion.viaversion.api.type.types.math.GlobalBlockPositionType;
 import com.viaversion.viaversion.api.type.types.math.LowPrecisionVectorType;
 import com.viaversion.viaversion.api.type.types.math.QuaternionType;
+import com.viaversion.viaversion.api.type.types.math.Vector3dType;
 import com.viaversion.viaversion.api.type.types.math.Vector3fType;
 import com.viaversion.viaversion.api.type.types.math.VectorType;
 import com.viaversion.viaversion.api.type.types.misc.CompoundTagHolderType;
@@ -199,6 +200,7 @@ public final class Types {
     public static final Type<EulerAngle> ROTATIONS = new EulerAngleType();
     public static final Type<Vector> VECTOR = new VectorType();
     public static final Type<Vector3f> VECTOR3F = new Vector3fType();
+    public static final Type<Vector3d> VECTOR3D = new Vector3dType();
     public static final Type<Quaternion> QUATERNION = new QuaternionType();
     public static final Type<Vector3d> LOW_PRECISION_VECTOR = new LowPrecisionVectorType();
     @Deprecated(forRemoval = true)
