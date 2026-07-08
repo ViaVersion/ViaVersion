@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
@@ -69,6 +70,17 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     public static final MappingData MAPPINGS = new MappingDataBase("1.19", "1.19.3");
     private static final UUID ZERO_UUID = new UUID(0, 0);
     private static final byte[] EMPTY_BYTES = new byte[0];
+    private static final int SOUND_SOURCE_BLOCKS = 4;
+    private static final int SOUND_IRON_DOOR_CLOSE = 614;
+    private static final int SOUND_IRON_DOOR_OPEN = 615;
+    private static final int SOUND_IRON_TRAPDOOR_CLOSE = 622;
+    private static final int SOUND_IRON_TRAPDOOR_OPEN = 623;
+    private static final int SOUND_FENCE_GATE_CLOSE = 110;
+    private static final int SOUND_FENCE_GATE_OPEN = 111;
+    private static final int SOUND_WOODEN_DOOR_CLOSE = 1345;
+    private static final int SOUND_WOODEN_DOOR_OPEN = 1346;
+    private static final int SOUND_WOODEN_TRAPDOOR_CLOSE = 1347;
+    private static final int SOUND_WOODEN_TRAPDOOR_OPEN = 1348;
     private final EntityPacketRewriter1_19_3 entityRewriter = new EntityPacketRewriter1_19_3(this);
     private final ItemPacketRewriter1_19_3 itemRewriter = new ItemPacketRewriter1_19_3(this);
     private final ParticleRewriter<ClientboundPackets1_19_1> particleRewriter = new ParticleRewriter<>(this);
@@ -100,6 +112,31 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
         registerClientbound(ClientboundPackets1_19_1.CUSTOM_SOUND, ClientboundPackets1_19_3.SOUND, wrapper -> {
             final String soundIdentifier = wrapper.read(Types.STRING);
             wrapper.write(Types.SOUND_EVENT, Holder.of(new SoundEvent(soundIdentifier, null)));
+        });
+        appendClientbound(ClientboundPackets1_19_1.LEVEL_EVENT, wrapper -> {
+            wrapper.resetReader();
+
+            final int eventId = wrapper.read(Types.INT);
+            final int soundId = levelEventSoundId(eventId);
+            if (soundId == -1) {
+                wrapper.write(Types.INT, eventId);
+                return;
+            }
+
+            final BlockPosition position = wrapper.read(Types.BLOCK_POSITION1_14);
+            wrapper.read(Types.INT); // Data
+            wrapper.read(Types.BOOLEAN); // Global event
+
+            // These level events were removed, instead send them as sounds directly
+            wrapper.setPacketType(ClientboundPackets1_19_3.SOUND);
+            wrapper.write(Types.SOUND_EVENT, Holder.of(soundId));
+            wrapper.write(Types.VAR_INT, SOUND_SOURCE_BLOCKS);
+            wrapper.write(Types.INT, position.x() * 8 + 4);
+            wrapper.write(Types.INT, position.y() * 8 + 4);
+            wrapper.write(Types.INT, position.z() * 8 + 4);
+            wrapper.write(Types.FLOAT, 1F); // Volume
+            wrapper.write(Types.FLOAT, ThreadLocalRandom.current().nextFloat() * 0.1F + 0.9F); // Pitch
+            wrapper.write(Types.LONG, ThreadLocalRandom.current().nextLong()); // Seed
         });
 
         final CommandRewriter<ClientboundPackets1_19_1> commandRewriter = new CommandRewriter<>(this) {
@@ -379,5 +416,21 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     public TagRewriter<ClientboundPackets1_19_1> getTagRewriter() {
         return tagRewriter;
+    }
+
+    private static int levelEventSoundId(final int eventId) {
+        return switch (eventId) {
+            case 1005 -> SOUND_IRON_DOOR_OPEN;
+            case 1006 -> SOUND_WOODEN_DOOR_OPEN;
+            case 1007 -> SOUND_WOODEN_TRAPDOOR_OPEN;
+            case 1008 -> SOUND_FENCE_GATE_OPEN;
+            case 1011 -> SOUND_IRON_DOOR_CLOSE;
+            case 1012 -> SOUND_WOODEN_DOOR_CLOSE;
+            case 1013 -> SOUND_WOODEN_TRAPDOOR_CLOSE;
+            case 1014 -> SOUND_FENCE_GATE_CLOSE;
+            case 1036 -> SOUND_IRON_TRAPDOOR_CLOSE;
+            case 1037 -> SOUND_IRON_TRAPDOOR_OPEN;
+            default -> -1;
+        };
     }
 }
