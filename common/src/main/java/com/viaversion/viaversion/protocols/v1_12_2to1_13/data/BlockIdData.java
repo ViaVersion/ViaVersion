@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.data;
 
-import com.google.common.collect.ObjectArrays;
 import com.google.gson.reflect.TypeToken;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.util.GsonUtil;
@@ -26,12 +25,13 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
 public class BlockIdData {
-    public static final String[] PREVIOUS = new String[0];
     public static final Map<String, String[]> blockIdMapping = new HashMap<>();
     public static final Map<String, String[]> fallbackReverseMapping = new HashMap<>();
     public static final Int2ObjectMap<String> numberIdToString = new Int2ObjectOpenHashMap<>();
@@ -46,13 +46,14 @@ public class BlockIdData {
                 new TypeToken<Map<String, String[]>>() {
                 }.getType());
             blockIdMapping.putAll(map);
+
+            Map<String, List<String>> reverse = new HashMap<>();
             for (Map.Entry<String, String[]> entry : blockIdMapping.entrySet()) {
                 for (String val : entry.getValue()) {
-                    String[] previous = fallbackReverseMapping.get(val);
-                    if (previous == null) previous = PREVIOUS;
-                    fallbackReverseMapping.put(val, ObjectArrays.concat(previous, entry.getKey()));
+                    reverse.computeIfAbsent(val, k -> new ArrayList<>()).add(entry.getKey());
                 }
             }
+            reverse.forEach((val, keys) -> fallbackReverseMapping.put(val, keys.toArray(new String[0])));
         } catch (IOException e) {
             Protocol1_12_2To1_13.LOGGER.log(Level.SEVERE, "Failed to load block id mappings", e);
         }
