@@ -26,11 +26,15 @@ import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.Protocol1_18_2To1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.packet.ServerboundPackets1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.provider.AckSequenceProvider;
+import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.LoomStorage;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import com.viaversion.viaversion.util.Key;
 
 public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPackets1_18, ServerboundPackets1_19, Protocol1_18_2To1_19> {
+
+    private static final int LOOM_MENU_TYPE_ID = 17;
+    private static final int LOOM_SELECTABLE_PATTERNS = 34;
 
     public ItemPacketRewriter1_19(Protocol1_18_2To1_19 protocol) {
         super(protocol, Types.ITEM1_13_2, Types.ITEM1_13_2_ARRAY);
@@ -124,6 +128,43 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
             public void register() {
                 map(Types.VAR_INT); // Hand
                 handler(sequenceHandler());
+            }
+        });
+
+        // The loom's selected pattern changed from the raw pattern id to an index of selectable pattern tags
+        protocol.registerClientbound(ClientboundPackets1_18.CONTAINER_CLOSE, wrapper -> wrapper.user().get(LoomStorage.class).reset());
+        protocol.registerServerbound(ServerboundPackets1_19.CONTAINER_CLOSE, wrapper -> wrapper.user().get(LoomStorage.class).reset());
+        protocol.registerServerbound(ServerboundPackets1_19.CONTAINER_BUTTON_CLICK, wrapper -> {
+            final byte containerId = wrapper.passthrough(Types.BYTE);
+            if (containerId != -1 && containerId == wrapper.user().get(LoomStorage.class).containerId()) {
+                final byte patternIndex = wrapper.read(Types.BYTE);
+                wrapper.write(Types.BYTE, (byte) (patternIndex + 1));
+            }
+        });
+        protocol.registerClientbound(ClientboundPackets1_18.OPEN_SCREEN, wrapper -> {
+            final int containerId = wrapper.passthrough(Types.VAR_INT);
+            final int menuTypeId = wrapper.passthrough(Types.VAR_INT);
+            wrapper.user().get(LoomStorage.class).setContainerId(menuTypeId == LOOM_MENU_TYPE_ID ? containerId : -1);
+        });
+        protocol.appendClientbound(ClientboundPackets1_18.CONTAINER_SET_DATA, wrapper -> {
+            wrapper.resetReader();
+            final short containerId = wrapper.passthrough(Types.UNSIGNED_BYTE);
+            if (containerId == -1 || containerId != wrapper.user().get(LoomStorage.class).containerId()) {
+                return;
+            }
+
+            final short property = wrapper.passthrough(Types.SHORT);
+            if (property == 0) { // Selected pattern
+                final short patternId = wrapper.read(Types.SHORT);
+                final short patternIndex;
+                if (patternId == 0) {
+                    patternIndex = -1; // No pattern selected
+                } else if (patternId <= LOOM_SELECTABLE_PATTERNS) {
+                    patternIndex = (short) (patternId - 1); // Index into the no_item_required tag
+                } else {
+                    patternIndex = 0; // Only entry of its pattern_item tag
+                }
+                wrapper.write(Types.SHORT, patternIndex);
             }
         });
 

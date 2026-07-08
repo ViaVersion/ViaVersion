@@ -45,6 +45,7 @@ import com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter.EntityPacketRe
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter.ItemPacketRewriter1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter.WorldPacketRewriter1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.DimensionRegistryStorage;
+import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.LoomStorage;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.NonceStorage1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.SequenceStorage;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
@@ -341,6 +342,19 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
         tagRewriter.addEmptyTag(RegistryType.ENTITY, "minecraft:frog_food");
         tagRewriter.addEmptyTags(RegistryType.GAME_EVENT, "minecraft:allay_can_listen", "minecraft:shrieker_can_listen", "minecraft:warden_can_listen");
 
+        // Selectable loom patterns. 0 is the base pattern and the last 6 have pattern items
+        final int[] noItemRequiredPatterns = new int[34];
+        for (int i = 0; i < noItemRequiredPatterns.length; i++) {
+            noItemRequiredPatterns[i] = i + 1;
+        }
+        tagRewriter.addTagRaw(RegistryType.BANNER_PATTERN, "minecraft:no_item_required", noItemRequiredPatterns);
+        tagRewriter.addTagRaw(RegistryType.BANNER_PATTERN, "minecraft:pattern_item/globe", 35);
+        tagRewriter.addTagRaw(RegistryType.BANNER_PATTERN, "minecraft:pattern_item/creeper", 36);
+        tagRewriter.addTagRaw(RegistryType.BANNER_PATTERN, "minecraft:pattern_item/skull", 37);
+        tagRewriter.addTagRaw(RegistryType.BANNER_PATTERN, "minecraft:pattern_item/flower", 38);
+        tagRewriter.addTagRaw(RegistryType.BANNER_PATTERN, "minecraft:pattern_item/mojang", 39);
+        tagRewriter.addTagRaw(RegistryType.BANNER_PATTERN, "minecraft:pattern_item/piglin", 40);
+
         super.onMappingDataLoaded();
     }
 
@@ -355,6 +369,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
             user.put(new DimensionRegistryStorage());
         }
         user.put(new SequenceStorage());
+        user.put(new LoomStorage());
         addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19.PLAYER));
     }
 
