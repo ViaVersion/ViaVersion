@@ -88,6 +88,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             case "trim_material" -> updateTrimMaterials(entries);
             case "jukebox_song" -> updateJukeboxSongs(entries);
             case "worldgen/biome" -> updateBiomes(entries);
+            case "dimension_type" -> updateDimensionTypes(entries);
             case "dialog" -> updateDialogs(connection, entries);
         }
 
@@ -367,13 +368,32 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         // can be overridden
     }
 
+    public void updateDimensionTypes(final RegistryEntry[] entries) {
+        for (final RegistryEntry entry : entries) {
+            if (entry.tag() == null) {
+                continue;
+            }
+
+            final CompoundTag attributes = ((CompoundTag) entry.tag()).getCompoundTag("attributes");
+            if (attributes != null) {
+                updateEnvironmentAttributes(attributes);
+            }
+        }
+    }
+
     public void updateBiomes(final RegistryEntry[] entries) {
         for (final RegistryEntry entry : entries) {
             if (entry.tag() == null) {
                 continue;
             }
 
-            final CompoundTag effects = ((CompoundTag) entry.tag()).getCompoundTag("effects");
+            final CompoundTag tag = (CompoundTag) entry.tag();
+            final CompoundTag attributes = tag.getCompoundTag("attributes");
+            if (attributes != null) {
+                updateEnvironmentAttributes(attributes);
+            }
+
+            final CompoundTag effects = tag.getCompoundTag("effects");
             if (effects == null) {
                 continue;
             }
@@ -382,6 +402,18 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             if (particle != null) {
                 handleParticleData(particle.getCompoundTag("options"));
             }
+        }
+    }
+
+    protected void updateEnvironmentAttributes(final CompoundTag tag) {
+        final MappingData mappings = protocol.getMappingData();
+        if (mappings == null || mappings.changedEnvironmentAttributes() == null) {
+            return;
+        }
+
+        // Remove no longer present environment attributes, else the client throws
+        for (final String attribute : mappings.changedEnvironmentAttributes()) {
+            TagUtil.removeNamespaced(tag, attribute);
         }
     }
 

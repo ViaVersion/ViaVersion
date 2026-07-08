@@ -29,6 +29,7 @@ import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface MappingData {
@@ -189,6 +190,8 @@ public interface MappingData {
      * @return set of changed block ids, or null if not tracked/none are present
      */
     @Nullable IntSet changedBlocks();
+
+    @Nullable Set<String> changedEnvironmentAttributes();
 
     /**
      * Type of mappings. Currently only relevant for ops writing of generic holder classes and expanded when needed.
