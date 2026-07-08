@@ -66,6 +66,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.MathUtil;
 import java.util.Map;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
@@ -144,16 +145,19 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
         registryDataRewriter.addHandler("dimension_type", (key, tag) -> {
             tag.putBoolean("has_ender_dragon_fight", Key.equals(key, "the_end"));
 
-            final CompoundTag attributes = tag.getCompoundTag("attributes");
-            if (attributes != null) {
-                final int ambientLightColor = switch (Key.stripMinecraftNamespace(key)) {
-                    case "the_end" -> -12630209;
-                    case "the_nether" -> -13621215;
-                    case "overworld" -> -16119286;
-                    default -> -16777216;
-                };
-                attributes.putInt("visual/ambient_light_color", ambientLightColor);
+            CompoundTag attributes = tag.getCompoundTag("attributes");
+            if (attributes == null) {
+                attributes = new CompoundTag();
+                tag.put("attributes", attributes);
             }
+
+            final int ambientLightColor = switch (Key.stripMinecraftNamespace(key)) {
+                case "the_end" -> -12630209;
+                case "the_nether" -> -13621215;
+                case "overworld" -> -16119286;
+                default -> ambientLightColor(tag.getFloat("ambient_light", 0F));
+            };
+            attributes.putInt("visual/ambient_light_color", ambientLightColor);
         });
         registerClientbound(ClientboundPackets1_21_11.SET_TIME, wrapper -> {
             wrapper.passthrough(Types.LONG); // Game time
@@ -271,6 +275,12 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
         final StringTag assetIdTag = tag.getStringTag("asset_id");
         final String assetId = assetIdTag.getValue();
         assetIdTag.setValue(assetId.replace(key + "/", key + "/" + key + "_"));
+    }
+
+    private int ambientLightColor(final float ambientLight) {
+        // Interpolate between the overworld (ambient_light=0) and full white
+        final int value = MathUtil.clamp(Math.round(10 + ambientLight * 245), 10, 255);
+        return 0xFF000000 | value << 16 | value << 8 | value;
     }
 
     private void swapEntityNameAffix(final String key, final CompoundTag tag) {
