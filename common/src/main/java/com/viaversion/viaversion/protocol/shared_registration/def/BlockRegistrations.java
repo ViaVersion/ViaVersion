@@ -38,7 +38,7 @@ final class BlockRegistrations {
         ctx.clientbound(ClientboundPackets1_13.CHUNK_BLOCKS_UPDATE, br::registerChunkBlocksUpdate);
     }
 
-    private static <CU extends ClientboundPacketType> void common1_13(RegistrationContext<CU, ?> ctx, BlockRewriter<CU> br) {
+    private static <CU extends ClientboundPacketType> void common1_13(final RegistrationContext<CU, ?> ctx, final BlockRewriter<CU> br) {
         ctx.clientbound(ClientboundPackets1_13.BLOCK_EVENT, br::registerBlockEvent);
         ctx.clientbound(ClientboundPackets1_13.BLOCK_UPDATE, br::registerBlockUpdate);
         ctx.clientbound(ClientboundPackets1_13.LEVEL_EVENT, br::registerLevelEvent1_13);
@@ -70,7 +70,7 @@ final class BlockRegistrations {
         ctx.clientbound(ClientboundPackets1_19.SECTION_BLOCKS_UPDATE, br::registerSectionBlocksUpdate);
     }
 
-    private static <CU extends ClientboundPacketType> void common1_19(RegistrationContext<CU, ?> ctx, BlockRewriter<CU> br) {
+    private static <CU extends ClientboundPacketType> void common1_19(final RegistrationContext<CU, ?> ctx, final BlockRewriter<CU> br) {
         ctx.clientbound(ClientboundPackets1_19.BLOCK_EVENT, br::registerBlockEvent);
         ctx.clientbound(ClientboundPackets1_19.BLOCK_UPDATE, br::registerBlockUpdate);
         ctx.clientbound(ClientboundPackets1_19.LEVEL_CHUNK_WITH_LIGHT, br::registerLevelChunk1_18);

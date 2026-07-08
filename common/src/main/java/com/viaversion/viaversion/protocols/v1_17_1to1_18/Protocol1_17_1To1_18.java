@@ -36,6 +36,7 @@ import com.viaversion.viaversion.protocols.v1_17_1to1_18.rewriter.ItemPacketRewr
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.rewriter.WorldPacketRewriter1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ChunkLightStorage;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.ProtocolLogger;
@@ -48,6 +49,7 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
     private final ItemPacketRewriter1_18 itemRewriter = new ItemPacketRewriter1_18(this);
     private final ParticleRewriter<ClientboundPackets1_17_1> particleRewriter = new ParticleRewriter<>(this);
     private final ComponentRewriter1_18 componentRewriter = new ComponentRewriter1_18(this);
+    private final BlockRewriter<ClientboundPackets1_17_1> blockRewriter = BlockRewriter.for1_14(this);
     private final TagRewriter<ClientboundPackets1_17_1> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_17_1To1_18() {
@@ -56,8 +58,7 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        entityRewriter.register();
-        itemRewriter.register();
+        super.registerPackets();
         WorldPacketRewriter1_18.register(this);
 
         registerServerbound(ServerboundPackets1_17.CLIENT_INFORMATION, new PacketHandlers() {
@@ -108,6 +109,11 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
     @Override
     public ItemPacketRewriter1_18 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPackets1_17_1> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override
