@@ -118,6 +118,7 @@ public class MappingDataBase implements MappingData {
             loadTags(RegistryType.ITEM, tagsTag);
             loadTags(RegistryType.BLOCK, tagsTag);
             loadTags(RegistryType.ENTITY, tagsTag);
+            loadTags(RegistryType.FLUID, tagsTag);
         }
 
         final IntArrayTag changedBlocks = data.getIntArrayTag("changed_blocks");
