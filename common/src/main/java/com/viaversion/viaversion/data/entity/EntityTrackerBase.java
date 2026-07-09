@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
-import com.viaversion.viaversion.api.data.entity.StoredEntityData;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.util.Key;
@@ -60,8 +59,10 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     }
 
     @Override
-    public void addEntity(int id, EntityType type) {
-        entities.put(id, new TrackedEntityImpl(type));
+    public TrackedEntity addEntity(int id, EntityType type) {
+        final TrackedEntityImpl entity = new TrackedEntityImpl(type);
+        entities.put(id, entity);
+        return entity;
     }
 
     @Override
@@ -81,20 +82,8 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     }
 
     @Override
-    public @Nullable StoredEntityData entityData(int id) {
-        final TrackedEntity entity = entities.get(id);
-        return entity != null ? entity.data() : null;
-    }
-
-    @Override
-    public @Nullable StoredEntityData entityDataIfPresent(int id) {
-        final TrackedEntity entity = entities.get(id);
-        return entity != null && entity.hasData() ? entity.data() : null;
-    }
-
-    @Override
-    public void removeEntity(int id) {
-        entities.remove(id);
+    public TrackedEntity removeEntity(int id) {
+        return entities.remove(id);
     }
 
     @Override

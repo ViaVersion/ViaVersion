@@ -325,59 +325,34 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void registerTrackerWithData1_19(C packetType) {
-        protocol.registerClientbound(packetType, wrapper -> {
-            final int entityId = wrapper.passthrough(Types.VAR_INT);
-            wrapper.passthrough(Types.UUID); // Entity UUID
-            final int entityTypeId = wrapper.passthrough(Types.VAR_INT);
-            wrapper.passthrough(Types.DOUBLE); // X
-            wrapper.passthrough(Types.DOUBLE); // Y
-            wrapper.passthrough(Types.DOUBLE); // Z
-            wrapper.passthrough(Types.BYTE); // Pitch
-            wrapper.passthrough(Types.BYTE); // Yaw
-            wrapper.passthrough(Types.BYTE); // Head yaw
-            final int data = wrapper.passthrough(Types.VAR_INT);
-
-            final EntityType entityType = trackAndRewrite(wrapper, entityTypeId, entityId);
-            if (protocol.getMappingData() != null && entityType == fallingBlockType()) {
-                final int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(data);
-                wrapper.set(Types.VAR_INT, 2, mappedBlockStateId);
-            }
-        });
+        protocol.registerClientbound(packetType, wrapper -> handleAddEntity(wrapper, false));
     }
 
     public void registerTrackerWithData1_21_9(C packetType) {
-        protocol.registerClientbound(packetType, wrapper -> {
-            final int entityId = wrapper.passthrough(Types.VAR_INT);
-            wrapper.passthrough(Types.UUID); // Entity UUID
-            final int entityTypeId = wrapper.passthrough(Types.VAR_INT);
-            wrapper.passthrough(Types.DOUBLE); // X
-            wrapper.passthrough(Types.DOUBLE); // Y
-            wrapper.passthrough(Types.DOUBLE); // Z
-            wrapper.passthrough(Types.LOW_PRECISION_VECTOR); // Movement
-            wrapper.passthrough(Types.BYTE); // Pitch
-            wrapper.passthrough(Types.BYTE); // Yaw
-            wrapper.passthrough(Types.BYTE); // Head yaw
-            final int data = wrapper.passthrough(Types.VAR_INT);
-            final EntityType entityType = trackAndRewrite(wrapper, entityTypeId, entityId);
-            if (protocol.getMappingData() != null && entityType == fallingBlockType()) {
-                final int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(data);
-                wrapper.set(Types.VAR_INT, 2, mappedBlockStateId);
-            }
-        });
+        protocol.registerClientbound(packetType, wrapper -> handleAddEntity(wrapper, true));
     }
 
-    /**
-     * Registers an entity tracker for the extra spawn packets like player, painting, or xp orb spawns.
-     *
-     * @param packetType packet type
-     * @param entityType entity type
-     * @param intType    int type of the entity id
-     */
-    public void registerTracker(C packetType, EntityType entityType, Type<Integer> intType) {
-        protocol.registerClientbound(packetType, wrapper -> {
-            int entityId = wrapper.passthrough(intType);
-            tracker(wrapper.user()).addEntity(entityId, entityType);
-        });
+    protected TrackedEntity handleAddEntity(final PacketWrapper wrapper, final boolean hasMovement) {
+        final int entityId = wrapper.passthrough(Types.VAR_INT);
+        wrapper.passthrough(Types.UUID); // Entity UUID
+        final int entityTypeId = wrapper.passthrough(Types.VAR_INT);
+        wrapper.passthrough(Types.DOUBLE); // X
+        wrapper.passthrough(Types.DOUBLE); // Y
+        wrapper.passthrough(Types.DOUBLE); // Z
+        if (hasMovement) {
+            wrapper.passthrough(Types.LOW_PRECISION_VECTOR); // Movement
+        }
+        wrapper.passthrough(Types.BYTE); // Pitch
+        wrapper.passthrough(Types.BYTE); // Yaw
+        wrapper.passthrough(Types.BYTE); // Head yaw
+        final int data = wrapper.passthrough(Types.VAR_INT);
+
+        final TrackedEntity entity = trackAndRewrite(wrapper, entityTypeId, entityId);
+        if (protocol.getMappingData() != null && entity.entityType() == fallingBlockType()) {
+            final int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(data);
+            wrapper.set(Types.VAR_INT, 2, mappedBlockStateId);
+        }
+        return entity;
     }
 
     /**
@@ -387,7 +362,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      * @param entityType entity type
      */
     public void registerTracker(C packetType, EntityType entityType) {
-        registerTracker(packetType, entityType, Types.VAR_INT);
+        protocol.registerClientbound(packetType, wrapper -> {
+            int entityId = wrapper.passthrough(Types.VAR_INT);
+            tracker(wrapper.user()).addEntity(entityId, entityType);
+        });
     }
 
     public void registerRemoveEntities(C packetType) {
@@ -609,7 +587,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         tracker(connection).setDimensions(dimensionDataMap);
     }
 
-    public EntityType trackAndRewrite(final PacketWrapper wrapper, final int typeId, final int entityId) {
+    public TrackedEntity trackAndRewrite(final PacketWrapper wrapper, final int typeId, final int entityId) {
         final int mappedTypeId = newEntityId(typeId);
         if (mappedTypeId != typeId) {
             wrapper.set(Types.VAR_INT, 1, mappedTypeId);
@@ -617,11 +595,11 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
         final EntityType entityType = typeFromId(trackMappedType ? mappedTypeId : typeId);
         if (entityType == null) {
+            // Legacy protocols for invalid ids
             return null;
         }
 
-        tracker(wrapper.user()).addEntity(entityId, entityType);
-        return entityType;
+        return tracker(wrapper.user()).addEntity(entityId, entityType);
     }
 
     // ---------------------------------------------------------------------------

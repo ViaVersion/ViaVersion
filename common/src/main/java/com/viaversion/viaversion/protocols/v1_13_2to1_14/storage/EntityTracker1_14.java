@@ -18,10 +18,12 @@
 package com.viaversion.viaversion.protocols.v1_13_2to1_14.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EntityTracker1_14 extends EntityTrackerBase {
     private final Int2ObjectMap<Byte> insentientData = new Int2ObjectOpenHashMap<>();
@@ -38,12 +40,11 @@ public class EntityTracker1_14 extends EntityTrackerBase {
     }
 
     @Override
-    public void removeEntity(int entityId) {
-        super.removeEntity(entityId);
-
+    public @Nullable TrackedEntity removeEntity(int entityId) {
         insentientData.remove(entityId);
         sleepingAndRiptideData.remove(entityId);
         playerEntityFlags.remove(entityId);
+        return super.removeEntity(entityId);
     }
 
     public byte getInsentientData(int entity) {

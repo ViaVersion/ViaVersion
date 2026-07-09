@@ -17,13 +17,16 @@
  */
 package com.viaversion.viaversion.data.entity;
 
-import com.viaversion.viaversion.api.data.entity.StoredEntityData;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class TrackedEntityImpl implements TrackedEntity {
     private final EntityType entityType;
-    private StoredEntityData data;
+    private Map<Class<?>, StorableObject> storedObjects;
     private boolean sentEntityData;
 
     public TrackedEntityImpl(final EntityType entityType) {
@@ -36,16 +39,32 @@ public final class TrackedEntityImpl implements TrackedEntity {
     }
 
     @Override
-    public StoredEntityData data() {
-        if (data == null) {
-            data = new StoredEntityDataImpl(entityType);
-        }
-        return data;
+    public boolean has(final Class<? extends StorableObject> objectClass) {
+        return storedObjects != null && storedObjects.containsKey(objectClass);
     }
 
     @Override
-    public boolean hasData() {
-        return data != null;
+    public @Nullable <T extends StorableObject> T get(final Class<T> objectClass) {
+        //noinspection unchecked
+        return storedObjects != null ? (T) storedObjects.get(objectClass) : null;
+    }
+
+    @Override
+    public void put(final StorableObject object) {
+        storedObjects().put(object.getClass(), object);
+    }
+
+    @Override
+    public <T extends StorableObject> @Nullable T remove(final Class<T> objectClass) {
+        //noinspection unchecked
+        return storedObjects != null ? (T) storedObjects.remove(objectClass) : null;
+    }
+
+    private Map<Class<?>, StorableObject> storedObjects() {
+        if (storedObjects == null) {
+            storedObjects = new Reference2ObjectArrayMap<>(); // Only ever contains 1-2 entries
+        }
+        return storedObjects;
     }
 
     @Override
@@ -62,7 +81,7 @@ public final class TrackedEntityImpl implements TrackedEntity {
     public String toString() {
         return "TrackedEntityImpl{" +
             "entityType=" + entityType +
-            ", data=" + data +
+            ", storedObjects=" + storedObjects +
             ", sentEntityData=" + sentEntityData +
             '}';
     }

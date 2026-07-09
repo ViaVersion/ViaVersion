@@ -17,20 +17,20 @@
  */
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.storage;
 
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_2;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class EntityTracker1_21_2 extends EntityTrackerBase {
 
-    private final Int2ObjectMap<BoatEntity> boats = new Int2ObjectOpenHashMap<>();
     private double playerMaxHealthAttributeValue = 20F;
 
     public EntityTracker1_21_2(final UserConnection connection) {
@@ -39,25 +39,20 @@ public final class EntityTracker1_21_2 extends EntityTrackerBase {
 
     public BoatEntity trackBoatEntity(final int entityId, final UUID uuid, final int data) {
         final BoatEntity entity = new BoatEntity(uuid, data);
-        boats.put(entityId, entity);
+        entity(entityId).put(entity);
         return entity;
     }
 
     public BoatEntity trackedBoatEntity(final int entityId) {
-        return boats.get(entityId);
-    }
-
-    @Override
-    public void removeEntity(final int id) {
-        super.removeEntity(id);
-        boats.remove(id);
+        return entity(entityId).get(BoatEntity.class);
     }
 
     public void updateBoatType(final int entityId, final EntityType type) {
-        final BoatEntity entity = boats.get(entityId);
+        final BoatEntity boatEntity = trackedBoatEntity(entityId);
         removeEntity(entityId);
-        boats.put(entityId, entity);
-        addEntity(entityId, type);
+
+        final TrackedEntity newEntity = addEntity(entityId, type);
+        newEntity.put(boatEntity);
     }
 
     public double playerMaxHealthAttributeValue() {
@@ -68,7 +63,8 @@ public final class EntityTracker1_21_2 extends EntityTrackerBase {
         this.playerMaxHealthAttributeValue = playerMaxHealthAttributeValue;
     }
 
-    public static class BoatEntity {
+    // Track boats to allow boat type changes from the default type -> respawn as new entity
+    public static final class BoatEntity implements StorableObject {
 
         private final List<EntityData> entityData = new ArrayList<>();
 
@@ -136,7 +132,7 @@ public final class EntityTracker1_21_2 extends EntityTrackerBase {
             return entityData;
         }
 
-        public int[] passengers() {
+        public int @Nullable [] passengers() {
             return passengers;
         }
     }

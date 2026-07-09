@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.storage;
 import com.google.common.cache.CacheBuilder;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
 import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
 import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
@@ -52,6 +53,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EntityTracker1_9 extends EntityTrackerBase {
     public static final String WITHER_TRANSLATABLE = "{\"translate\":\"entity.WitherBoss.name\"}";
@@ -135,9 +137,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     }
 
     @Override
-    public void removeEntity(int entityId) {
-        super.removeEntity(entityId);
-
+    public @Nullable TrackedEntity removeEntity(int entityId) {
         vehicleMap.remove(entityId);
         uuidMap.remove(entityId);
         validBlocking.remove(entityId);
@@ -149,6 +149,8 @@ public class EntityTracker1_9 extends EntityTrackerBase {
             // Send to provider
             Via.getManager().getProviders().get(BossBarProvider.class).handleRemove(user(), bar.getId());
         }
+
+        return super.removeEntity(entityId);
     }
 
     public boolean interactedBlockRecently(final int x, final int y, final int z) {

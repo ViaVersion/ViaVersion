@@ -22,7 +22,9 @@
  */
 package com.viaversion.viaversion.api.data.entity;
 
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface TrackedEntity {
 
@@ -34,18 +36,37 @@ public interface TrackedEntity {
     EntityType entityType();
 
     /**
-     * Object to hold arbitrary additional data.
+     * Checks if the storage contains an object of the given type.
      *
-     * @return entity data
+     * @param objectClass object class to check
+     * @return whether an object of the given type is in the storage
      */
-    StoredEntityData data();
+    boolean has(Class<? extends StorableObject> objectClass);
 
     /**
-     * Returns whether the stored entity currently has any additional data.
+     * Returns an object from the storage if present.
      *
-     * @return whether the stored entity currently has additional data
+     * @param objectClass class of the object to get
+     * @param <T>         object type
+     * @return object if present
      */
-    boolean hasData();
+    @Nullable <T extends StorableObject> T get(Class<T> objectClass);
+
+    /**
+     * Removes and returns an object from the storage if present.
+     *
+     * @param objectClass class of the object to remove
+     * @param <T>         object type
+     * @return removed object if present
+     */
+    @Nullable <T extends StorableObject> T remove(Class<T> objectClass);
+
+    /**
+     * Stores an object based on its class.
+     *
+     * @param object object to store
+     */
+    void put(StorableObject object);
 
     /**
      * Returns whether entity data has already been sent at least once for this entity.

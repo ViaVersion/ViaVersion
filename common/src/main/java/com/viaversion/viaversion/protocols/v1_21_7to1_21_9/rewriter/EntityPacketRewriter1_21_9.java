@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
 import com.viaversion.viaversion.api.minecraft.Vector3d;
@@ -56,8 +57,8 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
             wrapper.passthrough(Types.BYTE); // Yaw
             wrapper.passthrough(Types.BYTE); // Head yaw
             final int data = wrapper.passthrough(Types.VAR_INT);
-            final EntityType entityType = trackAndRewrite(wrapper, entityTypeId, entityId);
-            if (protocol.getMappingData() != null && entityType == EntityTypes1_21_9.FALLING_BLOCK) {
+            final TrackedEntity entity = trackAndRewrite(wrapper, entityTypeId, entityId);
+            if (protocol.getMappingData() != null && entity.entityType() == EntityTypes1_21_9.FALLING_BLOCK) {
                 final int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(data);
                 wrapper.set(Types.VAR_INT, 2, mappedBlockStateId);
             }
