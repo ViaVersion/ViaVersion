@@ -53,6 +53,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewriter.RegistryDataRewriter {
     private final Map<String, BiConsumer<String, CompoundTag>> registryEntryHandlers = new Object2ObjectArrayMap<>();
     private final Map<String, Consumer<CompoundTag>> enchantmentEffectHandlers = new Object2ObjectArrayMap<>(); // for nested enchantment data
+    private final Set<String> enchantmentEffectsToRemove = new HashSet<>();
     private final Map<String, List<RegistryEntry>> toAdd = new Object2ObjectArrayMap<>();
     private final Set<String> toRemove = new HashSet<>();
     protected final Protocol<?, ?, ?, ?> protocol;
@@ -169,6 +170,17 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
 
     public void addEnchantmentEffectRewriter(final String key, final Consumer<CompoundTag> rewriter) {
         enchantmentEffectHandlers.put(Key.stripMinecraftNamespace(key), rewriter);
+    }
+
+    /**
+     * Replaces enchantment effects with the given types by an empty all_of effect, as unknown types will result in an error on the client.
+     *
+     * @param types effect types to remove, e.g. entity effect or value effect types
+     */
+    public void removeEnchantmentEffects(final String... types) {
+        for (final String type : types) {
+            enchantmentEffectsToRemove.add(Key.stripMinecraftNamespace(type));
+        }
     }
 
     public void trackDimensionAndBiomes(final UserConnection connection, final String registryKey, final RegistryEntry[] entries) {
@@ -483,6 +495,14 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         }
 
         effect = Key.stripMinecraftNamespace(effect);
+        if (enchantmentEffectsToRemove.contains(effect)) {
+            // Replace with an empty all_of effect as a no-op
+            effectTag.clear();
+            effectTag.putString("type", "minecraft:all_of");
+            effectTag.put("effects", new ListTag<>(CompoundTag.class));
+            return;
+        }
+
         if (effect.equals("attribute")) {
             updateType(effectTag, "attribute", protocol.getMappingData().getAttributeMappings());
         } else if (effect.equals("spawn_particles")) {

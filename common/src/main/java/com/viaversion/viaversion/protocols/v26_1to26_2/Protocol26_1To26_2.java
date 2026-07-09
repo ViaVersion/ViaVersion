@@ -17,8 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v26_1to26_2;
 
-import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
@@ -49,6 +47,7 @@ import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundCon
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v26_1to26_2.rewriter.BlockItemPacketRewriter26_2;
 import com.viaversion.viaversion.protocols.v26_1to26_2.rewriter.EntityPacketRewriter26_2;
+import com.viaversion.viaversion.protocols.v26_1to26_2.rewriter.RegistryDataRewriter26_2;
 import com.viaversion.viaversion.protocols.v26_1to26_2.storage.Encrypted;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
@@ -57,8 +56,6 @@ import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
-import com.viaversion.viaversion.util.Key;
-import com.viaversion.viaversion.util.UUIDUtil;
 import java.util.UUID;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
@@ -72,39 +69,9 @@ public final class Protocol26_1To26_2 extends AbstractProtocol<ClientboundPacket
     private final ParticleRewriter<ClientboundPacket26_1> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket26_1> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket26_1> componentRewriter = new NBTComponentRewriter<>(this);
-    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this) {
-        @Override
-        public void updateEnchantmentTerm(final CompoundTag term) {
-            super.updateEnchantmentTerm(term);
-
-            final String condition = term.getString("condition");
-            if (Key.equals(condition, "entity_properties")) {
-                final CompoundTag predicate = term.getCompoundTag("predicate");
-                final CompoundTag typeSpecific = predicate.removeUnchecked("type_specific");
-                if (typeSpecific != null) {
-                    updateTypeSpecificTerm(predicate, typeSpecific);
-                    return;
-                }
-
-                final Tag typeTag = predicate.remove("type");
-                if (typeTag != null) {
-                    predicate.put("entity_type", typeTag);
-                }
-            }
-        }
-    };
+    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter26_2(this);
     private final RecipeDisplayRewriter1_21_5<ClientboundPacket26_1> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(this);
     private final UUID sessionId = UUID.randomUUID(); // One shared session
-
-    private void updateTypeSpecificTerm(final CompoundTag predicate, final CompoundTag typeSpecific) {
-        final String type = typeSpecific.getString("type");
-        final String strippedType = Key.stripMinecraftNamespace(type);
-        if (strippedType.equals("player") || strippedType.equals("lightning")
-            || strippedType.equals("fishing_hook") || strippedType.equals("raider")) {
-            predicate.put("type_specific/" + strippedType, typeSpecific);
-        }
-    }
-
 
     public Protocol26_1To26_2() {
         super(ClientboundPacket26_1.class, ClientboundPacket26_1.class, ServerboundPacket26_1.class, ServerboundPacket26_1.class);
