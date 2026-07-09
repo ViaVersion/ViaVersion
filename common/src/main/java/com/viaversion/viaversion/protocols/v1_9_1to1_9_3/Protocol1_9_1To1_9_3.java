@@ -98,17 +98,13 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
                 if (section == null) continue;
                 DataPalette blocks = section.palette(PaletteType.BLOCKS);
 
-                for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
-                    int id = blocks.idAt(idx) >> 4;
-                    if (FakeTileEntities1_9_1.isTileEntity(id)) {
-                        tags.add(FakeTileEntities1_9_1.createTileEntity(
-                            ChunkSection.xFromIndex(idx) + (chunk.getX() << 4),
-                            ChunkSection.yFromIndex(idx) + (s << 4),
-                            ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4),
-                            id
-                        ));
-                    }
-                }
+                final int ySection = s;
+                blocks.forEachMatchingCoordinate(id -> FakeTileEntities1_9_1.isTileEntity(id >> 4), idx -> tags.add(FakeTileEntities1_9_1.createTileEntity(
+                    ChunkSection.xFromIndex(idx) + (chunk.getX() << 4),
+                    ChunkSection.yFromIndex(idx) + (ySection << 4),
+                    ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4),
+                    blocks.idAt(idx) >> 4
+                )));
             }
         });
 

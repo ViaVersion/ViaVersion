@@ -23,7 +23,9 @@
 package com.viaversion.viaversion.api.data.entity;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.KeyMappings;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -186,6 +188,24 @@ public interface EntityTracker {
     int biomesSent();
 
     void setBiomesSent(int biomesSent);
+
+    /**
+     * Returns the cached chunk type for the current dimension if set.
+     *
+     * @param mapped whether to return the mapped chunk type
+     * @return cached chunk type
+     */
+    @Nullable Type<Chunk> chunkType(boolean mapped);
+
+    /**
+     * Caches the chunk type for the current dimension.
+     * <p>
+     * Invalidates when the world section height or the number of biomes change.
+     *
+     * @param mapped    whether to set the mapped chunk type
+     * @param chunkType chunk type
+     */
+    void setChunkType(boolean mapped, @Nullable Type<Chunk> chunkType);
 
     EntityType playerType();
 

@@ -287,12 +287,18 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     protected Type<Chunk> createChunkType(ChunkTypeSupplier supplier, EntityTracker tracker, boolean mapped) {
-        final Mappings mappings = protocol.getMappingData().getBlockStateMappings();
-        return supplier.supply(
-            tracker.currentWorldSectionHeight(),
-            MathUtil.ceilLog2(mapped ? mappings.mappedSize() : mappings.size()),
-            MathUtil.ceilLog2(tracker.biomesSent())
-        );
+        // Cached in the tracker and invalidated when the section height or biome count changes
+        Type<Chunk> type = tracker.chunkType(mapped);
+        if (type == null) {
+            final Mappings blockStateMappings = protocol.getMappingData().getBlockStateMappings();
+            type = supplier.supply(
+                tracker.currentWorldSectionHeight(),
+                MathUtil.ceilLog2(mapped ? blockStateMappings.mappedSize() : blockStateMappings.size()),
+                MathUtil.ceilLog2(tracker.biomesSent())
+            );
+            tracker.setChunkType(mapped, type);
+        }
+        return type;
     }
 
     public void registerBlockEntityData1_18(C packetType) {

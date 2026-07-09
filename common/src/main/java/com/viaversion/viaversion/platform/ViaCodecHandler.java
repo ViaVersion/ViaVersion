@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.platform.ViaChannelHandler;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelDecoderException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
+import com.viaversion.viaversion.util.ByteBufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -57,7 +58,7 @@ public class ViaCodecHandler extends ByteToMessageCodec<ByteBuf> implements ViaC
             throw CancelDecoderException.generate(null);
         }
 
-        final ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(in);
+        final ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), in);
         try {
             if (this.connection.shouldTransformPacket()) {
                 this.connection.transformIncoming(transformedBuf, CancelDecoderException::generate);

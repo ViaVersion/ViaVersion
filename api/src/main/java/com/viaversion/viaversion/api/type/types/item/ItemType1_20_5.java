@@ -133,8 +133,7 @@ public class ItemType1_20_5 extends Type<Item> {
             }
 
             map.writeMap("components", components -> {
-                for (final Map.Entry<StructuredDataKey<?>, StructuredData<?>> entry : item.dataContainer().data().entrySet()) {
-                    final StructuredData<?> data = entry.getValue();
+                for (final StructuredData<?> data : item.dataContainer().data().values()) {
                     String key = Key.namespaced(data.key().identifier());
                     if (data.isEmpty()) {
                         key = "!" + key;

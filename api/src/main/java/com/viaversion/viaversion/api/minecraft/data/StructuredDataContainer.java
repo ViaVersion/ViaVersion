@@ -270,7 +270,7 @@ public final class StructuredDataContainer implements Copyable {
 
     @Override
     public StructuredDataContainer copy() {
-        final Reference2ObjectOpenHashMap<StructuredDataKey<?>, StructuredData<?>> map = new Reference2ObjectOpenHashMap<>();
+        final Reference2ObjectOpenHashMap<StructuredDataKey<?>, StructuredData<?>> map = new Reference2ObjectOpenHashMap<>(data.size());
         for (final StructuredData<?> value : data.values()) {
             map.put(value.key(), value.copy());
         }

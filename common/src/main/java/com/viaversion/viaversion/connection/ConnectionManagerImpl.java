@@ -35,6 +35,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
     protected final Map<UUID, UserConnection> serverConnections = new ConcurrentHashMap<>();
     protected final Map<UUID, UserConnection> clientConnections = new ConcurrentHashMap<>();
     protected final Set<UserConnection> connections = ConcurrentHashMap.newKeySet();
+    private final Set<UserConnection> connectionsView = Collections.unmodifiableSet(connections);
 
     @Override
     public void onLoginSuccess(UserConnection connection) {
@@ -120,7 +121,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
 
     @Override
     public Set<UserConnection> getConnections() {
-        return Collections.unmodifiableSet(connections);
+        return connectionsView;
     }
 
 }

@@ -332,8 +332,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     // Casting around Rewritable and especially Holder gets ugly, but the only good alternative is to do everything manually
     @SuppressWarnings("unchecked")
     private void handleRewritables(UserConnection connection, boolean clientbound, StructuredDataContainer container, ItemHandler itemHandler) {
-        for (final Map.Entry<StructuredDataKey<?>, StructuredData<?>> entry : container.data().entrySet()) {
-            final StructuredData<?> data = entry.getValue();
+        for (final StructuredData<?> data : container.data().values()) {
             if (data.isEmpty()) {
                 continue;
             }
