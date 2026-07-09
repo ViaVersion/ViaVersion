@@ -43,8 +43,9 @@ public final class EntityTracker1_21_2 extends EntityTrackerBase {
         return entity;
     }
 
-    public BoatEntity trackedBoatEntity(final int entityId) {
-        return entity(entityId).get(BoatEntity.class);
+    public @Nullable BoatEntity trackedBoatEntity(final int entityId) {
+        final TrackedEntity entity = entity(entityId);
+        return entity != null ? entity.get(BoatEntity.class) : null;
     }
 
     public void updateBoatType(final int entityId, final EntityType type) {
