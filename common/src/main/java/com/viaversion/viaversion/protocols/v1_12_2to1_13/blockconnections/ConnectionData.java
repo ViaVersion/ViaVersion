@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 
-import com.viaversion.nbt.tag.ByteArrayTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.ListTag;
@@ -42,6 +41,7 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.provid
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.PacketBlockConnectionProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.UserBlockData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
+import com.viaversion.viaversion.api.data.IdRanges;
 import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -169,10 +169,33 @@ public final class ConnectionData {
         }
 
         Via.getPlatform().getLogger().info("Loading block connection mappings ...");
-        ListTag<StringTag> blockStates = MappingDataLoader.INSTANCE.loadNBT("blockstates-1.13.nbt").getListTag("blockstates", StringTag.class);
-        for (int id = 0; id < blockStates.size(); id++) {
-            String key = blockStates.get(id).getValue();
-            KEY_TO_ID.put(key, id);
+        CompoundTag blockStatesData = MappingDataLoader.INSTANCE.loadNBT("blockstates-1.13.nbt");
+        ListTag<CompoundTag> propertyTable = blockStatesData.getListTag("properties", CompoundTag.class);
+        int blockStateId = 0;
+        for (CompoundTag blockTag : blockStatesData.getListTag("blockstates", CompoundTag.class)) {
+            String name = blockTag.getString("name");
+            IntArrayTag propertiesTag = blockTag.getIntArrayTag("properties");
+            if (propertiesTag == null) {
+                KEY_TO_ID.put(name, blockStateId++);
+                continue;
+            }
+
+            // The block states are the cartesian product of the block's property values, with the last property varying fastest
+            List<String> states = List.of("");
+            for (int propertyIndex : propertiesTag.getValue()) {
+                CompoundTag property = propertyTable.get(propertyIndex);
+                String propertyName = property.getString("name");
+                List<String> combined = new ArrayList<>();
+                for (String state : states) {
+                    for (StringTag value : property.getListTag("values", StringTag.class)) {
+                        combined.add(state.isEmpty() ? propertyName + "=" + value.getValue() : state + "," + propertyName + "=" + value.getValue());
+                    }
+                }
+                states = combined;
+            }
+            for (String state : states) {
+                KEY_TO_ID.put(name + "[" + state + "]", blockStateId++);
+            }
         }
 
         connectionHandlerMap = new Int2ObjectOpenHashMap<>(3650);
@@ -181,41 +204,28 @@ public final class ConnectionData {
             blockConnectionData = new Int2ObjectOpenHashMap<>(2048);
 
             CompoundTag data = MappingDataLoader.INSTANCE.loadNBT("blockConnections.nbt");
-            ListTag<CompoundTag> blockConnectionMappings = data.getListTag("data", CompoundTag.class);
-            for (CompoundTag blockTag : blockConnectionMappings) {
+            for (CompoundTag profileTag : data.getListTag("profiles", CompoundTag.class)) {
                 BlockData blockData = new BlockData();
-                for (Entry<String, Tag> entry : blockTag.entrySet()) {
+                for (Entry<String, Tag> entry : profileTag.entrySet()) {
                     String key = entry.getKey();
-                    if (key.equals("id") || key.equals("ids")) {
+                    if (key.equals("ids")) {
                         continue;
                     }
 
-
+                    byte connections = ((NumberTag) entry.getValue()).asByte();
                     boolean[] attachingFaces = new boolean[4];
-                    ByteArrayTag connections = (ByteArrayTag) entry.getValue();
-                    for (byte blockFaceId : connections.getValue()) {
-                        attachingFaces[blockFaceId] = true;
+                    for (int i = 0; i < attachingFaces.length; i++) {
+                        attachingFaces[i] = (connections & (1 << i)) != 0;
                     }
 
                     int connectionTypeId = Integer.parseInt(key);
                     blockData.put(connectionTypeId, attachingFaces);
                 }
 
-                NumberTag idTag = blockTag.getNumberTag("id");
-                if (idTag != null) {
-                    blockConnectionData.put(idTag.asInt(), blockData);
-                } else {
-                    IntArrayTag idsTag = blockTag.getIntArrayTag("ids");
-                    for (int id : idsTag.getValue()) {
-                        blockConnectionData.put(id, blockData);
-                    }
-                }
+                IdRanges.forEachId(profileTag.getByteArrayTag("ids"), id -> blockConnectionData.put(id, blockData));
             }
 
-            IntArrayTag occludingStatesArray = data.getIntArrayTag("occluding-states");
-            for (final int blockStateId : occludingStatesArray.getValue()) {
-                OCCLUDING_STATES.add(blockStateId);
-            }
+            IdRanges.forEachId(data.getByteArrayTag("occluding-states"), OCCLUDING_STATES::add);
         }
 
         List<ConnectorInitAction> initActions = new ArrayList<>();

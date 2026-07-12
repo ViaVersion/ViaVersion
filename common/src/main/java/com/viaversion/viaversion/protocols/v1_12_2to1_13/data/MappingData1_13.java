@@ -22,7 +22,6 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.io.CharStreams;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.StringTag;
@@ -33,7 +32,6 @@ import com.viaversion.viaversion.api.data.Int2IntMapBiMappings;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.data.Mappings;
-import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.Int2IntBiHashMap;
 import com.viaversion.viaversion.util.Key;
 import java.io.IOException;
@@ -94,37 +92,46 @@ public class MappingData1_13 extends MappingDataBase {
             }
         }
 
-        Map<String, String> translationMappingData = GsonUtil.getGson().fromJson(
-            new InputStreamReader(MappingData1_13.class.getClassLoader().getResourceAsStream("assets/viaversion/data/mapping-lang-1.12-1.13.json")),
-            new TypeToken<Map<String, String>>() {
-            }.getType());
-
-        String[] unmappedTranslationLines;
+        String[] translationLines;
         try (Reader reader = new InputStreamReader(MappingData1_13.class.getClassLoader()
-            .getResourceAsStream("assets/viaversion/data/en_US.properties"), StandardCharsets.UTF_8)) {
-            unmappedTranslationLines = CharStreams.toString(reader).split("\n");
+            .getResourceAsStream("assets/viaversion/data/mapping-lang-1.12-1.13.txt"), StandardCharsets.UTF_8)) {
+            translationLines = CharStreams.toString(reader).split("\n");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        for (String line : unmappedTranslationLines) {
-            if (line.isEmpty()) {
+        // 1.12 translations with number placeholders already replaced and their mapped 1.13 keys inlined:
+        // key=translation for keys unchanged in 1.13,
+        // old>new=translation for renamed keys with placeholder changes,
+        // -key=translation for keys removed in 1.13 (= translations are inlined into components instead)
+        for (String line : translationLines) {
+            if (line.endsWith("\r")) {
+                line = line.substring(0, line.length() - 1);
+            }
+            if (line.isEmpty() || line.charAt(0) == '#') {
                 continue;
             }
 
-            String[] keyAndTranslation = line.split("=", 2);
-            if (keyAndTranslation.length != 2) {
+            int keySeparator = line.indexOf('=');
+            if (keySeparator == -1) {
                 continue;
             }
 
-            String key = keyAndTranslation[0];
-            String translation = keyAndTranslation[1].replaceAll("%(\\d\\$)?d", "%$1s").trim();
-            mojangTranslation.put(key, translation);
+            String translation = line.substring(keySeparator + 1);
+            if (line.charAt(0) == '-') {
+                mojangTranslation.put(line.substring(1, keySeparator), translation);
+                continue;
+            }
 
-            // Null values in the file mean the key did not change AND the translation has the same amount of placeholders still
-            if (translationMappingData.containsKey(key)) {
-                String mappedKey = translationMappingData.get(key);
-                translateMapping.put(key, mappedKey != null ? mappedKey : key);
+            int renameSeparator = line.indexOf('>');
+            if (renameSeparator == -1 || renameSeparator > keySeparator) {
+                String key = line.substring(0, keySeparator);
+                mojangTranslation.put(key, translation);
+                translateMapping.put(key, key);
+            } else {
+                String key = line.substring(0, renameSeparator);
+                mojangTranslation.put(key, translation);
+                translateMapping.put(key, line.substring(renameSeparator + 1, keySeparator));
             }
         }
     }

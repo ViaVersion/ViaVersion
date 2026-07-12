@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_21_11to26_1.data;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import com.viaversion.viaversion.api.data.IdRanges;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
 public final class MappingData26_1 extends MappingDataBase {
@@ -43,7 +43,7 @@ public final class MappingData26_1 extends MappingDataBase {
         pigSoundVariants = tag.getCompoundTag("pig_sound_variant");
         chickenSoundVariants = tag.getCompoundTag("chicken_sound_variant");
 
-        fluidBlockStates = new IntOpenHashSet(MappingDataLoader.INSTANCE.loadNBTFromFile("fluids-26.1.nbt").getIntArrayTag("fluids").getValue());
+        fluidBlockStates = IdRanges.decode(MappingDataLoader.INSTANCE.loadNBTFromFile("fluids-26.1.nbt").getByteArrayTag("fluids"));
     }
 
     public CompoundTag catSoundVariants() {

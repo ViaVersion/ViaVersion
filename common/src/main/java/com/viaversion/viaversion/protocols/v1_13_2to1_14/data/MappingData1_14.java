@@ -18,11 +18,10 @@
 package com.viaversion.viaversion.protocols.v1_13_2to1_14.data;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import com.viaversion.viaversion.api.data.IdRanges;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
 public class MappingData1_14 extends MappingDataBase {
@@ -36,12 +35,10 @@ public class MappingData1_14 extends MappingDataBase {
     @Override
     public void loadExtras(final CompoundTag data) {
         final CompoundTag heightmap = MappingDataLoader.INSTANCE.loadNBT("heightmap-1.14.nbt");
-        final IntArrayTag motionBlocking = heightmap.getIntArrayTag("motionBlocking");
-        this.motionBlocking = new IntOpenHashSet(motionBlocking.getValue());
+        this.motionBlocking = IdRanges.decode(heightmap.getByteArrayTag("motionBlocking"));
 
         if (Via.getConfig().isNonFullBlockLightFix()) {
-            final IntArrayTag nonFullBlocks = heightmap.getIntArrayTag("nonFullBlocks");
-            this.nonFullBlocks = new IntOpenHashSet(nonFullBlocks.getValue());
+            this.nonFullBlocks = IdRanges.decode(heightmap.getByteArrayTag("nonFullBlocks"));
         }
     }
 
