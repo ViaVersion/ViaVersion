@@ -18,10 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.IntArrayTag;
-import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
-import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -40,6 +37,7 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.BlockConnectionProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.PacketBlockConnectionProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.UserBlockData;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.BlockStates1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.api.data.IdRanges;
 import com.viaversion.viaversion.util.Key;
@@ -170,33 +168,7 @@ public final class ConnectionData {
 
         Via.getPlatform().getLogger().info("Loading block connection mappings ...");
         CompoundTag blockStatesData = MappingDataLoader.INSTANCE.loadNBT("blockstates-1.13.nbt");
-        ListTag<CompoundTag> propertyTable = blockStatesData.getListTag("properties", CompoundTag.class);
-        int blockStateId = 0;
-        for (CompoundTag blockTag : blockStatesData.getListTag("blockstates", CompoundTag.class)) {
-            String name = blockTag.getString("name");
-            IntArrayTag propertiesTag = blockTag.getIntArrayTag("properties");
-            if (propertiesTag == null) {
-                KEY_TO_ID.put(name, blockStateId++);
-                continue;
-            }
-
-            // The block states are the cartesian product of the block's property values, with the last property varying fastest
-            List<String> states = List.of("");
-            for (int propertyIndex : propertiesTag.getValue()) {
-                CompoundTag property = propertyTable.get(propertyIndex);
-                String propertyName = property.getString("name");
-                List<String> combined = new ArrayList<>();
-                for (String state : states) {
-                    for (StringTag value : property.getListTag("values", StringTag.class)) {
-                        combined.add(state.isEmpty() ? propertyName + "=" + value.getValue() : state + "," + propertyName + "=" + value.getValue());
-                    }
-                }
-                states = combined;
-            }
-            for (String state : states) {
-                KEY_TO_ID.put(name + "[" + state + "]", blockStateId++);
-            }
-        }
+        BlockStates1_13.forEach(blockStatesData, KEY_TO_ID::put);
 
         connectionHandlerMap = new Int2ObjectOpenHashMap<>(3650);
 
