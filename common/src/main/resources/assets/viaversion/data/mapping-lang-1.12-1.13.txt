@@ -1,4 +1,3 @@
-# (c) 2017 Mojang AB
 # 1.12 translations merged with their mapped 1.13 keys; %d placeholders are already replaced
 # with %s and values are trimmed. Line formats:
 #   key=translation       the key is unchanged in 1.13
