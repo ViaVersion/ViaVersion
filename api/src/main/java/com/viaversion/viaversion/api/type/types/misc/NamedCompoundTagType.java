@@ -31,6 +31,10 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.io.FastByteBufInputStream;
 import com.viaversion.viaversion.io.FastByteBufOutputStream;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -72,7 +76,8 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
         }
 
         final TagLimiter tagLimiter = TagLimiter.create(maxBytes, TagLimiter.DEFAULT_MAX_NESTING_LEVEL);
-        return CompoundTag.read(new FastByteBufInputStream(buffer), tagLimiter, 0);
+        final DataInput in = TagType.USE_JAVA_DATA_IO ? new ByteBufInputStream(buffer) : new FastByteBufInputStream(buffer);
+        return CompoundTag.read(in, tagLimiter, 0);
     }
 
     public static void write(final ByteBuf buffer, final Tag tag, final @Nullable String name) throws IOException {
@@ -81,7 +86,7 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
             return;
         }
 
-        final FastByteBufOutputStream out = new FastByteBufOutputStream(buffer);
+        final DataOutput out = TagType.USE_JAVA_DATA_IO ? new ByteBufOutputStream(buffer) : new FastByteBufOutputStream(buffer);
         out.writeByte(tag.getTagId());
         if (name != null) {
             out.writeUTF(name);
