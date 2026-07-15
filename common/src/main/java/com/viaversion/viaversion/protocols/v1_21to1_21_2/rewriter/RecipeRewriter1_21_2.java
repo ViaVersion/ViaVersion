@@ -188,17 +188,17 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
     }
 
     public void finalizeRecipes() {
-        // Fix #4242: Vanilla sorts stonecutter recipes by the output item's translation key (description ID), 
-        // not by the recipe key. Since we don't have translation keys on the proxy, we sort by the output's 
-        // registry key instead. Because vanilla stonecutter outputs are blocks ("block.minecraft.<path>"), 
-        // this registry-key sort perfectly matches vanilla's alphabetical translation-key order.
-        //
-        // Note: This only breaks if a recipe outputs a non-block item alongside block outputs for the same 
-        // input (which doesn't exist in Vanilla). A perfect fix would require shipping item translation data.
+        // Now sorted by the output's description translation key (block.minecraft.<block>).
+        // We get the same result by sorting via the item identifier and separating blocks and items,
+        // though Vanilla will always exclusively send blocks for stonecutter recipes
         final FullMappings itemMappings = protocol.getMappingData().getFullItemMappings();
+        final FullMappings blockMappings = protocol.getMappingData().getFullBlockMappings();
         stoneCutterRecipes.sort(Comparator.comparing(recipe -> {
             final String identifier = itemMappings.mappedIdentifier(recipe.result.identifier());
-            return identifier != null ? identifier : "";
+            if (blockMappings.mappedId(identifier) == -1) {
+                return "|" + identifier; // Sort after blocks
+            }
+            return identifier;
         }));
     }
 
