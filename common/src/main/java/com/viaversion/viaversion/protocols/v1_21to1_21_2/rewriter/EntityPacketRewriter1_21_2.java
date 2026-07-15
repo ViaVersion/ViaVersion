@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.Quaternion;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_2;
@@ -95,6 +96,16 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             final EntityTracker1_21_2.BoatEntity entity = tracker.trackBoatEntity(entityId, uuid, data);
             entity.setPosition(x, y, z);
             entity.setRotation(yaw, pitch);
+        });
+
+        // Store spawn pitch for left_rotation baking. No metadata sent yet (packets would be out of order).
+        protocol.appendClientbound(ClientboundPackets1_21.ADD_ENTITY, wrapper -> {
+            final int entityId = wrapper.get(Types.VAR_INT, 0);
+            final EntityTracker1_21_2 tracker = tracker(wrapper.user());
+            final EntityTracker1_21_2.DisplayEntity display = tracker.trackedDisplay(entityId);
+            if (display != null) {
+                display.setPitch(wrapper.get(Types.BYTE, 0) * 360.0F / 256.0F);
+            }
         });
 
         protocol.appendClientbound(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
@@ -358,6 +369,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.write(Types.FLOAT, pitch);
 
             final EntityTracker1_21_2 tracker = tracker(wrapper.user());
+            updateDisplayPitch(wrapper.user(), entityId, pitch);
+
             final EntityTracker1_21_2.BoatEntity trackedEntity = tracker.trackedBoatEntity(entityId);
             if (trackedEntity == null) {
                 return;
@@ -452,25 +465,101 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         tracker.setHorizontalCollision((data & 2) != 0);
     }
 
-    private void storeEntityPositionRotation(final PacketWrapper wrapper, final boolean position, final boolean rotation) {
-        final int entityId = wrapper.passthrough(Types.VAR_INT); // Entity id
+private void storeEntityPositionRotation(final PacketWrapper wrapper, final boolean position, final boolean rotation) {
+        final int entityId = wrapper.passthrough(Types.VAR_INT);
 
         final EntityTracker1_21_2 tracker = tracker(wrapper.user());
         final EntityTracker1_21_2.BoatEntity trackedEntity = tracker.trackedBoatEntity(entityId);
-        if (trackedEntity == null) {
+        final EntityTracker1_21_2.DisplayEntity display = rotation ? tracker.trackedDisplay(entityId) : null;
+        
+        if (trackedEntity == null && display == null) {
             return;
         }
-        if (position) {
-            final double x = wrapper.passthrough(Types.SHORT) / 4096.0; // Delta X
-            final double y = wrapper.passthrough(Types.SHORT) / 4096.0; // Delta Y
-            final double z = wrapper.passthrough(Types.SHORT) / 4096.0; // Delta Z
+        
+        if (position && trackedEntity != null) {
+            final double x = wrapper.passthrough(Types.SHORT) / 4096.0;
+            final double y = wrapper.passthrough(Types.SHORT) / 4096.0;
+            final double z = wrapper.passthrough(Types.SHORT) / 4096.0;
             trackedEntity.setPosition(trackedEntity.x() + x, trackedEntity.y() + y, trackedEntity.z() + z);
+        } else if (position) {
+            // Keep packet reader index aligned even if we don't track display coords
+            wrapper.passthrough(Types.SHORT);
+            wrapper.passthrough(Types.SHORT);
+            wrapper.passthrough(Types.SHORT);
         }
+        
         if (rotation) {
             final float yaw = wrapper.passthrough(Types.BYTE) * 360.0F / 256.0F;
             final float pitch = wrapper.passthrough(Types.BYTE) * 360.0F / 256.0F;
-            trackedEntity.setRotation(yaw, pitch);
+            if (trackedEntity != null) {
+                trackedEntity.setRotation(yaw, pitch);
+            }
+            if (display != null) {
+                updateDisplayPitch(wrapper.user(), entityId, pitch);
+            }
         }
+    }
+
+    private void updateDisplayPitch(final UserConnection connection, final int entityId, final float pitch) {
+        final EntityTracker1_21_2 tracker = tracker(connection);
+        final EntityTracker1_21_2.DisplayEntity display = tracker.trackedDisplay(entityId);
+        if (display == null) {
+            return;
+        }
+        display.setPitch(pitch);
+        sendBakedLeftRotation(connection, entityId, display);
+    }
+
+    private void sendBakedLeftRotation(final UserConnection connection, final int entityId, final EntityTracker1_21_2.DisplayEntity display) {
+        final Quaternion value = bakedLeftRotation(display);
+        
+        // Skip redundant packets to save bandwidth
+        if (value.equals(display.appliedLeftRotation())) {
+            return;
+        }
+        display.setAppliedLeftRotation(value);
+
+        // Update Metadata ID 13 (left_rotation)
+        final PacketWrapper dataPacket = PacketWrapper.create(ClientboundPackets1_21_2.SET_ENTITY_DATA, connection);
+        dataPacket.write(Types.VAR_INT, entityId);
+        final List<EntityData> entityData = new ArrayList<>();
+        entityData.add(new EntityData(13, VersionedTypes.V1_21_2.entityDataTypes.quaternionType, value));
+        dataPacket.write(VersionedTypes.V1_21_2.entityDataList, entityData);
+        dataPacket.send(Protocol1_21To1_21_2.class);
+    }
+
+    private static Quaternion bakedLeftRotation(final EntityTracker1_21_2.DisplayEntity display) {
+        final Quaternion base = display.baseLeftRotation();
+        // Only FIXED billboards inherit rotation from entity pitch
+        return display.fixedBillboard() ? applyExcessPitch(base, display.pitch()) : base;
+    }
+
+    // Workaround: 1.21.2 client clamps entity pitch to [-90, 90].
+    // We fold the overflow into left_rotation (which isn't clamped) to keep correct rendering.
+    static Quaternion applyExcessPitch(final Quaternion base, final float pitch) {
+        final float clamped = pitch < -90.0F ? -90.0F : (pitch > 90.0F ? 90.0F : pitch);
+        final float excess = pitch - clamped;
+        
+        if (excess == 0.0F) {
+            return base;
+        }
+        
+        // Pre-multiply excess X-axis rotation to base
+        return multiplyQuaternions(rotationX((float) Math.toRadians(excess)), base);
+    }
+
+    static Quaternion rotationX(final float radians) {
+        final float half = radians * 0.5F;
+        return new Quaternion((float) Math.sin(half), 0.0F, 0.0F, (float) Math.cos(half));
+    }
+
+    // Hamilton product (a * b)
+    static Quaternion multiplyQuaternions(final Quaternion a, final Quaternion b) {
+        final float x = a.w() * b.x() + a.x() * b.w() + a.y() * b.z() - a.z() * b.y();
+        final float y = a.w() * b.y() - a.x() * b.z() + a.y() * b.w() + a.z() * b.x();
+        final float z = a.w() * b.z() + a.x() * b.y() - a.y() * b.x() + a.z() * b.w();
+        final float w = a.w() * b.w() - a.x() * b.x() - a.y() * b.y() - a.z() * b.z();
+        return new Quaternion(x, y, z, w);
     }
 
     @Override
@@ -571,6 +660,32 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         filter().type(EntityTypes1_21_2.AGEABLE_WATER_CREATURE).addIndex(16); // Baby
 
         filter().type(EntityTypes1_21_2.ABSTRACT_ARROW).addIndex(10); // In ground
+
+        // Bake the 1.21.2 pitch clamp workaround into the display's left_rotation (#4907)
+        filter().type(EntityTypes1_21_2.DISPLAY).index(13).handler((event, data) -> { // Rotation left
+            final EntityTracker1_21_2 tracker = tracker(event.user());
+            final EntityTracker1_21_2.DisplayEntity display = tracker.trackedDisplay(event.entityId());
+            if (display == null) {
+                return;
+            }
+            display.setLeftRotation(data.value());
+            final Quaternion baked = bakedLeftRotation(display);
+            data.setValue(baked);
+            display.setAppliedLeftRotation(baked);
+        });
+        filter().type(EntityTypes1_21_2.DISPLAY).index(15).handler((event, data) -> { // Billboard constraints
+            final EntityTracker1_21_2 tracker = tracker(event.user());
+            final EntityTracker1_21_2.DisplayEntity display = tracker.trackedDisplay(event.entityId());
+            if (display == null) {
+                return;
+            }
+            final boolean wasFixed = display.fixedBillboard();
+            display.setBillboard(((Number) data.getValue()).intValue());
+            if (display.fixedBillboard() != wasFixed) {
+                // Switching in/out of FIXED changes whether the pitch is applied, so the baked value must follow.
+                sendBakedLeftRotation(event.user(), event.entityId(), display);
+            }
+        });
     }
 
     @Override
