@@ -1,6 +1,7 @@
 plugins {
     base
-    id("via.build-logic")
+    id("via.base-conventions") apply false
+    id("via.shadow-conventions") apply false
 }
 
 allprojects {
