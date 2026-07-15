@@ -1,4 +1,5 @@
 version: 2
+# Disabled for the time being, being done manually instead
 updates:
   - package-ecosystem: "github-actions"
     cooldown:
@@ -6,11 +7,11 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 0
   - package-ecosystem: "gradle"
     cooldown:
       default-days: 7
     directory: "/"
     schedule:
       interval: "monthly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 0

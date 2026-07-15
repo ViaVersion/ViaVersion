@@ -9,8 +9,6 @@ dependencies {
     api(projects.viaversionCommon)
     api(projects.viaversionBukkit)
     api(projects.viaversionVelocity)
-    api(projects.viaversionSponge)
-    api(projects.viaversionFabric)
 }
 
 tasks {
@@ -26,19 +24,19 @@ tasks {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         rootProject.subprojects.forEach { subproject ->
             if (subproject == project) return@forEach
-            val platformSourcesJarTask = subproject.tasks.findByName("sourcesJar") as? Jar ?: return@forEach
-            dependsOn(platformSourcesJarTask)
-            from(zipTree(platformSourcesJarTask.archiveFile))
+            val sourceSets = subproject.extensions.findByType(SourceSetContainer::class) ?: return@forEach
+            from(sourceSets.named("main").map { it.allSource })
         }
     }
 }
 
-val branch = rootProject.branchName()
+val runNumber: String? = System.getenv("GITHUB_RUN_NUMBER")
+val branch = if (runNumber != null) rootProject.branchName() else ""
 val baseVersion = project.version as String
 val isRelease = !baseVersion.contains('-')
 val isMainBranch = branch == "master"
-if (!isRelease || isMainBranch) { // Only publish releases from the main branch
-    val suffixedVersion = if (isRelease) baseVersion else baseVersion + "+" + System.getenv("GITHUB_RUN_NUMBER")
+if (runNumber != null && (!isRelease || isMainBranch)) { // Only publish releases from the main branch
+    val suffixedVersion = if (isRelease) baseVersion else "$baseVersion+$runNumber"
     val changelogContent = if (isRelease) {
         "See [GitHub](https://github.com/ViaVersion/ViaVersion) for release notes."
     } else {

@@ -110,7 +110,7 @@ public final class DataPaletteImpl implements DataPalette {
      * Stores palette indexes from a compact long array, replacing all current values.
      * The data is kept packed unless written to; reads extract bits the slow way, since almost all work will use replaceIds or will only have a few reads.
      * <p>
-     * Only valid for local palettes (bitsPerValue <= 8).
+     * Only valid for local palettes (bitsPerValue &lt;= 8).
      *
      * @param data          compact long array
      * @param bitsPerValue  bits per value
