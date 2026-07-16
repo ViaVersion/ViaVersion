@@ -48,6 +48,35 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
             final boolean pressingShift = (flags & 1 << 5) != 0;
             wrapper.user().get(PlayerSneaking.class).setSneaking(pressingShift);
         });
+
+        // fixes chest_minecart rotation on Minecraft 26+
+        protocol.appendClientbound(ClientboundPackets1_21_11.ADD_ENTITY, wrapper -> {
+            final int entityTypeId = wrapper.get(Types.VAR_INT, 1);
+
+            if (entityTypeId == EntityTypes1_21_11.CHEST_MINECART.getId()) {
+                final byte yaw = wrapper.get(Types.BYTE, 1);
+                final byte fixedYaw = (byte) (yaw + 128);
+                wrapper.set(Types.BYTE, 1, fixedYaw);
+            }
+        });
+
+        // fixes chest_minecart rotation on Minecraft 26+ (position update)
+        protocol.registerClientbound(ClientboundPackets1_21_11.ENTITY_POSITION_SYNC, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+
+            for (int i = 0; i < 6; i++) {
+                wrapper.passthrough(Types.DOUBLE);
+            }
+
+            float yaw = wrapper.read(Types.FLOAT);
+            if (tracker(wrapper.user()).entityType(entityId) == EntityTypes1_21_11.CHEST_MINECART) {
+                yaw += 180f;
+            }
+            wrapper.write(Types.FLOAT, yaw);
+            wrapper.passthrough(Types.FLOAT);
+            wrapper.passthrough(Types.BOOLEAN);
+        });
+
         protocol.registerServerbound(ServerboundPackets26_1.INTERACT, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT);
             wrapper.write(Types.VAR_INT, 0); // Interact
