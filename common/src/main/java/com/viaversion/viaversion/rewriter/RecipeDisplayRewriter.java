@@ -43,7 +43,7 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
         slotDisplayHandlers.put("only_with_component", this::handleOnlyWithComponentSlotDisplay);
         slotDisplayHandlers.put("item", this::handleItemId);
         slotDisplayHandlers.put("item_stack", this::handleItem);
-        slotDisplayHandlers.put("tag", wrapper -> wrapper.passthrough(Types.STRING));
+        slotDisplayHandlers.put("tag", this::handleTag);
         slotDisplayHandlers.put("dyed", this::handleDyedSlotDisplay);
         slotDisplayHandlers.put("smithing_trim", this::handleSmithingTrimSlotDisplay);
         slotDisplayHandlers.put("with_remainder", this::handleWithRemainderSlotDisplay);
@@ -90,6 +90,10 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
             wrapper.passthrough(Types.VAR_INT); // Container ID
             handleRecipeDisplay(wrapper);
         });
+    }
+
+    protected void handleTag(final PacketWrapper wrapper) {
+        wrapper.passthrough(Types.STRING); // Tag key
     }
 
     protected void handleShapeless(final PacketWrapper wrapper) {

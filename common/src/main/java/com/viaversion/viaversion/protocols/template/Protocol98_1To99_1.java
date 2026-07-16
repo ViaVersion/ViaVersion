@@ -37,6 +37,7 @@ import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundPacket1_21_9;
+import com.viaversion.viaversion.protocols.v26_2to26_3.rewriter.RecipeDisplayRewriter26_3;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
@@ -62,7 +63,7 @@ final class Protocol98_1To99_1 extends AbstractProtocol<ClientboundPacket26_1, C
     private final ParticleRewriter<ClientboundPacket26_1> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket26_1> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket26_1> componentRewriter = new ComponentRewriter99_1(this);
-    private final RecipeDisplayRewriter<ClientboundPacket26_1> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(this);
+    private final RecipeDisplayRewriter<ClientboundPacket26_1> recipeRewriter = new RecipeDisplayRewriter26_3<>(this);
     private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
 
     public Protocol98_1To99_1() {

@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
 import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import java.util.HashMap;
@@ -47,6 +48,27 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
     protected void registerPackets() {
         protocol.appendClientbound(ClientboundPackets26_1.EXPLODE, wrapper -> {
             wrapper.write(Types.BOOLEAN, true); // Play sound
+        });
+
+        protocol.registerClientbound(ClientboundPackets26_1.OPEN_SIGN_EDITOR, wrapper -> {
+            wrapper.passthrough(Types.BLOCK_POSITION1_14);
+            final int signTextSlot = wrapper.read(Types.BOOLEAN) ? 1 : 0;
+            wrapper.write(Types.VAR_INT, signTextSlot);
+        });
+
+        protocol.registerServerbound(ServerboundPackets26_1.SIGN_UPDATE, wrapper -> {
+            wrapper.passthrough(Types.BLOCK_POSITION1_14);
+
+            wrapper.write(Types.BOOLEAN, true); // Front text - replace below if needed
+
+            for (int i = 0; i < 4; i++) {
+                wrapper.passthrough(Types.STRING); // Line
+            }
+
+            final int signTextSlot = wrapper.read(Types.VAR_INT);
+            if (signTextSlot == 0) {
+                wrapper.set(Types.BOOLEAN, 0, false);
+            }
         });
     }
 
@@ -90,6 +112,14 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
     public static void downgradeData(final StructuredDataContainer container) {
         container.remove(StructuredDataKey.PROVIDES_POTTERY_PATTERN);
         container.remove(StructuredDataKey.BLOCK_TRANSFORMER);
+        container.remove(StructuredDataKey.VILLAGER_FOOD);
+        container.remove(StructuredDataKey.COOKING_FUEL);
+        container.remove(StructuredDataKey.BREWING_FUEL);
+        container.remove(StructuredDataKey.MOB_VISIBILITY);
+        container.remove(StructuredDataKey.SIGN_TEXT_FRONT);
+        container.remove(StructuredDataKey.SIGN_TEXT_BACK);
+        container.remove(StructuredDataKey.WAXED);
+        container.remove(StructuredDataKey.CUSHION_COLOR);
 
         container.replaceKey(StructuredDataKey.INSTRUMENT26_3, StructuredDataKey.INSTRUMENT26_1);
         container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL26_3, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, holder -> {

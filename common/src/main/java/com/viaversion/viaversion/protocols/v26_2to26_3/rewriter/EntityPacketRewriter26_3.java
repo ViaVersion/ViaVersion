@@ -106,9 +106,9 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
         }
 
         final long now = System.nanoTime();
-        final LastMovement timestamp = entity.data().get(LastMovement.class);
+        final LastMovement timestamp = entity.get(LastMovement.class);
         if (timestamp == null) {
-            entity.data().put(new LastMovement(now));
+            entity.put(new LastMovement(now));
             return 1;
         }
 

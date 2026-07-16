@@ -22,6 +22,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_2;
@@ -42,15 +43,16 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPack
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
-import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundConfigurationPackets1_21_9;
+import com.viaversion.viaversion.protocols.v26_1to26_2.rewriter.RegistryDataRewriter26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundConfigurationPackets26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundPacket26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundPackets26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.rewriter.BlockItemPacketRewriter26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.rewriter.ComponentRewriter26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.rewriter.EntityPacketRewriter26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.rewriter.RecipeDisplayRewriter26_3;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
@@ -96,8 +98,14 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
     private final ParticleRewriter<ClientboundPacket26_1> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPacket26_1> tagRewriter = new TagRewriter<>(this);
     private final NBTComponentRewriter<ClientboundPacket26_1> componentRewriter = new ComponentRewriter26_3(this);
-    private final RecipeDisplayRewriter<ClientboundPacket26_1> recipeRewriter = new RecipeDisplayRewriter1_21_5<>(this);
-    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(this);
+    private final RecipeDisplayRewriter<ClientboundPacket26_1> recipeRewriter = new RecipeDisplayRewriter26_3<>(this) {
+        @Override
+        protected void handleTag(final PacketWrapper wrapper) {
+            final String tag = wrapper.read(Types.STRING);
+            wrapper.write(Types.HOLDER_SET, HolderSet.of(tag));
+        }
+    };
+    private final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter26_3(this);
 
     public Protocol26_2To26_3() {
         super(ClientboundPacket26_1.class, ClientboundPacket26_3.class, ServerboundPacket26_1.class, ServerboundPacket26_1.class);
@@ -159,7 +167,9 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
             StructuredDataKey.USE_EFFECTS, StructuredDataKey.MINIMUM_ATTACK_CHARGE, StructuredDataKey.DAMAGE_TYPE26_1, StructuredDataKey.PIERCING_WEAPON,
             StructuredDataKey.KINETIC_WEAPON, StructuredDataKey.SWING_ANIMATION, StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT26_1, StructuredDataKey.ADDITIONAL_TRADE_COST,
             StructuredDataKey.DYE, StructuredDataKey.PIG_SOUND_VARIANT, StructuredDataKey.COW_SOUND_VARIANT, StructuredDataKey.CHICKEN_SOUND_VARIANT, StructuredDataKey.CAT_SOUND_VARIANT,
-            StructuredDataKey.PROVIDES_POTTERY_PATTERN, StructuredDataKey.BLOCK_TRANSFORMER, StructuredDataKey.COMPOSTABLE);
+            StructuredDataKey.PROVIDES_POTTERY_PATTERN, StructuredDataKey.BLOCK_TRANSFORMER, StructuredDataKey.COMPOSTABLE, StructuredDataKey.VILLAGER_FOOD,
+            StructuredDataKey.COOKING_FUEL, StructuredDataKey.BREWING_FUEL, StructuredDataKey.MOB_VISIBILITY, StructuredDataKey.SIGN_TEXT_BACK, StructuredDataKey.SIGN_TEXT_FRONT,
+            StructuredDataKey.WAXED, StructuredDataKey.CUSHION_COLOR);
         super.onMappingDataLoaded();
     }
 

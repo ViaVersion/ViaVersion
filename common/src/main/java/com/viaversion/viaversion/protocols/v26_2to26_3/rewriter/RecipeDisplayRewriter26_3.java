@@ -15,22 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v26_2to26_3.storage;
+package com.viaversion.viaversion.protocols.v26_2to26_3.rewriter;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 
-public final class LastMovement implements StorableObject {
-    private long lastMovementTime;
+public class RecipeDisplayRewriter26_3<C extends ClientboundPacketType> extends RecipeDisplayRewriter1_21_5<C> {
 
-    public LastMovement(final long lastMovementTime) {
-        this.lastMovementTime = lastMovementTime;
+    public RecipeDisplayRewriter26_3(final Protocol<C, ?, ?, ?> protocol) {
+        super(protocol);
     }
 
-    public long lastMovementTime() {
-        return lastMovementTime;
-    }
-
-    public void setLastMovementTime(final long lastMovementTime) {
-        this.lastMovementTime = lastMovementTime;
+    @Override
+    protected void handleTag(final PacketWrapper wrapper) {
+        this.handleIngredient(wrapper); // Now a holder set of item types
     }
 }

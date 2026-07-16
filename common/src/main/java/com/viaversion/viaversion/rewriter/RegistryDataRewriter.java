@@ -449,7 +449,10 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     }
 
     public void updateEnchantmentTerm(final CompoundTag term) {
-        final String condition = term.getString("condition");
+        String condition = term.getString("condition");
+        if (condition == null) {
+            condition = term.getString("type");
+        }
         if (Key.equals(condition, "inverted")) {
             final CompoundTag childTerm = term.getCompoundTag("term");
             if (childTerm != null) {
@@ -463,6 +466,9 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             }
         } else if (Key.equals(condition, "block_state_property")) {
             updateType(term, "block", protocol.getMappingData().getFullBlockMappings());
+        } else if (Key.equals(condition, "match_block")) {
+            // Replace with a dummy value...
+            replaceWithDummyCondition(term);
         } else {
             final ListTag<CompoundTag> terms = term.getListTag("terms", CompoundTag.class);
             if (terms != null) {
@@ -496,10 +502,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
 
         effect = Key.stripMinecraftNamespace(effect);
         if (enchantmentEffectsToRemove.contains(effect)) {
-            // Replace with an empty all_of effect as a no-op
-            effectTag.clear();
-            effectTag.putString("type", "minecraft:all_of");
-            effectTag.put("effects", new ListTag<>(CompoundTag.class));
+            replaceWithDummyCondition(effectTag);
             return;
         }
 
@@ -518,6 +521,13 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         } else if (effect.equals("play_sound")) {
             updateType(effectTag, "sound", protocol.getMappingData().getFullSoundMappings());
         }
+    }
+
+    private void replaceWithDummyCondition(final CompoundTag tag) {
+        // Replace with an empty all_of effect as a no-op
+        tag.clear();
+        tag.putString("type", "minecraft:all_of");
+        tag.put("effects", new ListTag<>(CompoundTag.class));
     }
 
     protected void updateType(final CompoundTag tag, final String key, final FullMappings mappings) {

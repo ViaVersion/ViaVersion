@@ -58,6 +58,7 @@ import com.viaversion.viaversion.api.type.types.ByteType;
 import com.viaversion.viaversion.api.type.types.ComponentType;
 import com.viaversion.viaversion.api.type.types.DoubleType;
 import com.viaversion.viaversion.api.type.types.EmptyType;
+import com.viaversion.viaversion.api.type.types.FixedLengthArrayType;
 import com.viaversion.viaversion.api.type.types.FloatArrayType;
 import com.viaversion.viaversion.api.type.types.FloatType;
 import com.viaversion.viaversion.api.type.types.IntArrayType;
@@ -217,7 +218,10 @@ public final class Types {
     public static final Type<Tag[]> TAG_ARRAY = new ArrayType<>(TAG);
     public static final Type<Tag> OPTIONAL_TAG = TagType.OptionalTagType.type();
     public static final Type<Tag> TEXT_COMPONENT_TAG = new TextComponentTagType(); // only strictly needed for hashing
+
     public static final Type<Tag> CUSTOM_CLICK_ACTION_TAG = new LengthPrefixedTagType(65536);
+    public static final FixedLengthArrayType<Tag> SIGN_TEXT = new FixedLengthArrayType<>(TAG, 4);
+    public static final Type<Tag[]> OPTIONAL_SIGN_TEXT = SIGN_TEXT.new OptionalFixedLengthArrayType();
 
     public static final Type<Tag> TRUSTED_TAG = new TagType(false);
     public static final Type<Tag> TRUSTED_OPTIONAL_TAG = TagType.OptionalTagType.trustedType();
@@ -281,6 +285,7 @@ public final class Types {
     public static final Type<List<EntityData>> ENTITY_DATA_LIST1_8 = new EntityDataListType(ENTITY_DATA1_8);
     public static final Type<List<EntityData>> ENTITY_DATA_LIST1_9 = new EntityDataListType(ENTITY_DATA1_9);
     public static final Type<List<EntityData>> ENTITY_DATA_LIST1_12 = new EntityDataListType(ENTITY_DATA1_12);
+
 
     // No longer used past 1.20.2
     public static final Type<Item> ITEM1_8 = new ItemType1_8();
