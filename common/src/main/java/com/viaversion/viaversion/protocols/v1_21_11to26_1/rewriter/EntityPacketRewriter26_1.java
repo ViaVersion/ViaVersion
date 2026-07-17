@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
@@ -51,13 +52,20 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
 
         // fixes chest_minecart rotation on Minecraft 26+
         protocol.appendClientbound(ClientboundPackets1_21_11.ADD_ENTITY, wrapper -> {
-            final int entityTypeId = wrapper.get(Types.VAR_INT, 1);
-
-            if (entityTypeId == EntityTypes1_21_11.CHEST_MINECART.getId()) {
-                final byte yaw = wrapper.get(Types.BYTE, 1);
-                final byte fixedYaw = (byte) (yaw + 128);
-                wrapper.set(Types.BYTE, 1, fixedYaw);
+            if (!Via.getConfig().isCorrectChestMinecartYaw()) {
+                return;
             }
+
+            final int entityTypeId = wrapper.get(Types.VAR_INT, 1);
+            if (!(entityTypeId == EntityTypes1_21_11.CHEST_MINECART.getId())) {
+                return;
+            }
+
+            final float offsetDegrees = Via.getConfig().getChestMinecartYawOffset();
+            final byte byteOffset = (byte) Math.round(offsetDegrees * 256.0f / 360.0f);
+
+            final byte yaw = wrapper.get(Types.BYTE, 1);
+            wrapper.set(Types.BYTE, 1, (byte) (yaw + byteOffset));
         });
 
         // fixes chest_minecart rotation on Minecraft 26+ (position update)
@@ -69,12 +77,11 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
             }
 
             float yaw = wrapper.read(Types.FLOAT);
-            if (tracker(wrapper.user()).entityType(entityId) == EntityTypes1_21_11.CHEST_MINECART) {
-                yaw += 180f;
+            if (Via.getConfig().isCorrectChestMinecartYaw() &&
+                tracker(wrapper.user()).entityType(entityId) == EntityTypes1_21_11.CHEST_MINECART) {
+                yaw += Via.getConfig().getChestMinecartYawOffset();
             }
             wrapper.write(Types.FLOAT, yaw);
-            wrapper.passthrough(Types.FLOAT);
-            wrapper.passthrough(Types.BOOLEAN);
         });
 
         protocol.registerServerbound(ServerboundPackets26_1.INTERACT, wrapper -> {
