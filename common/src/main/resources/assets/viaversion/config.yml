@@ -250,5 +250,3 @@ cancel-block-sounds: true
 use-1_8-hitbox-margin: true
 # If enabled, chest minecart rotation will be corrected for 26+ clients on older-version servers.
 correct-chest-minecart-yaw: true
-# Rotation offset in degrees applied to chest minecarts when the fix above is enabled (180 matches the vanilla rendering offset)
-chest-minecart-rotation-offset: 180.0

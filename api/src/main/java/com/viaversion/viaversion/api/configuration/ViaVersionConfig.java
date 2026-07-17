@@ -552,13 +552,6 @@ public interface ViaVersionConfig extends Config {
     boolean isCorrectChestMinecartYaw();
 
     /**
-     * Returns the rotation offset applied to chest minecarts for 26+ clients on older-version servers.
-     *
-     * @return yaw offset in degrees
-     */
-    float getChestMinecartYawOffset();
-
-    /**
      * If enabled, ViaVersion will send the native client version to the server on connect via a plugin message.
      *
      * @return true if enabled

@@ -90,10 +90,6 @@ public class ConfigSection {
         return this.values.get(key) instanceof final Number num ? num.doubleValue() : def;
     }
 
-    public float getFloat(final String key, final float def) {
-        return this.values.get(key) instanceof final Number num ? num.floatValue() : def;
-    }
-
     public List<Integer> getIntegerList(final String key) {
         final Object o = this.values.get(key);
         return o != null ? (List<Integer>) o : new ArrayList<>();

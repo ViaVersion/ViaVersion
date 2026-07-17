@@ -57,15 +57,12 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
             }
 
             final int entityTypeId = wrapper.get(Types.VAR_INT, 1);
-            if (!(entityTypeId == EntityTypes1_21_11.CHEST_MINECART.getId())) {
+            if (entityTypeId != EntityTypes1_21_11.CHEST_MINECART.getId()) {
                 return;
             }
 
-            final float offsetDegrees = Via.getConfig().getChestMinecartYawOffset();
-            final byte byteOffset = (byte) Math.round(offsetDegrees * 256.0f / 360.0f);
-
             final byte yaw = wrapper.get(Types.BYTE, 1);
-            wrapper.set(Types.BYTE, 1, (byte) (yaw + byteOffset));
+            wrapper.set(Types.BYTE, 1, (byte) (yaw + 128));
         });
 
         // fixes chest_minecart rotation on Minecraft 26+ (position update)
@@ -79,7 +76,7 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
             float yaw = wrapper.read(Types.FLOAT);
             if (Via.getConfig().isCorrectChestMinecartYaw() &&
                 tracker(wrapper.user()).entityType(entityId) == EntityTypes1_21_11.CHEST_MINECART) {
-                yaw += Via.getConfig().getChestMinecartYawOffset();
+                yaw += 180.0f;
             }
             wrapper.write(Types.FLOAT, yaw);
         });
