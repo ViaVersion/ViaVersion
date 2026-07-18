@@ -545,11 +545,11 @@ public interface ViaVersionConfig extends Config {
     boolean use1_8HitboxMargin();
 
     /**
-     * If enabled, players on 26+ clients will see correct rotation of chest minecarts
+     * If enabled, players on 26+ clients will see correct rotation of chests within chest minecarts
      *
      * @return true if enabled
      */
-    boolean isCorrectChestMinecartYaw();
+    boolean isCorrectChestMinecartOrientation();
 
     /**
      * If enabled, ViaVersion will send the native client version to the server on connect via a plugin message.

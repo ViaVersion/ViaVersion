@@ -101,7 +101,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     private boolean cancelSwingInInventory;
     private int maxErrorLength;
     private boolean use1_8HitboxMargin;
-    private boolean correctChestMinecartYaw;
+    private boolean correctChestMinecartOrientation;
 
     private boolean sendPlayerDetails;
     private boolean sendServerDetails;
@@ -179,7 +179,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
         fix1_21PlacementRotation = getBoolean("fix-1_21-placement-rotation", true);
         cancelSwingInInventory = getBoolean("cancel-swing-in-inventory", true);
         use1_8HitboxMargin = getBoolean("use-1_8-hitbox-margin", true);
-        correctChestMinecartYaw = getBoolean("correct-chest-minecart-yaw", true);
+        correctChestMinecartOrientation = getBoolean("correct-chest-minecart-orientation", true);
 
         sendPlayerDetails = getBoolean("send-player-details", true);
         sendServerDetails = getBoolean("send-server-details", true);
@@ -657,8 +657,8 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     }
 
     @Override
-    public boolean isCorrectChestMinecartYaw() {
-        return correctChestMinecartYaw;
+    public boolean isCorrectChestMinecartOrientation() {
+        return correctChestMinecartOrientation;
     }
 
     @Override

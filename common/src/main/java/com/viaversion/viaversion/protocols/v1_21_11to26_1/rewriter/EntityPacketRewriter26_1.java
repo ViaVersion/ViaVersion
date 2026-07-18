@@ -50,9 +50,9 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
             wrapper.user().get(PlayerSneaking.class).setSneaking(pressingShift);
         });
 
-        // fixes chest_minecart rotation on Minecraft 26+
+        // Chests in minecarts are oriented the opposite direction now, 'fix' this by changing the yaw
         protocol.appendClientbound(ClientboundPackets1_21_11.ADD_ENTITY, wrapper -> {
-            if (!Via.getConfig().isCorrectChestMinecartYaw()) {
+            if (!Via.getConfig().isCorrectChestMinecartOrientation()) {
                 return;
             }
 
@@ -64,20 +64,23 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
             final byte yaw = wrapper.get(Types.BYTE, 1);
             wrapper.set(Types.BYTE, 1, (byte) (yaw + 128));
         });
-
-        // fixes chest_minecart rotation on Minecraft 26+ (position update)
         protocol.registerClientbound(ClientboundPackets1_21_11.ENTITY_POSITION_SYNC, wrapper -> {
-            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            if (!Via.getConfig().isCorrectChestMinecartOrientation()) {
+                return;
+            }
 
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            if (tracker(wrapper.user()).entityType(entityId) != EntityTypes1_21_11.CHEST_MINECART) {
+                return;
+            }
+
+            // Position and delta movement
             for (int i = 0; i < 6; i++) {
                 wrapper.passthrough(Types.DOUBLE);
             }
 
             float yaw = wrapper.read(Types.FLOAT);
-            if (Via.getConfig().isCorrectChestMinecartYaw() &&
-                tracker(wrapper.user()).entityType(entityId) == EntityTypes1_21_11.CHEST_MINECART) {
-                yaw += 180.0f;
-            }
+            yaw += 180.0f;
             wrapper.write(Types.FLOAT, yaw);
         });
 
