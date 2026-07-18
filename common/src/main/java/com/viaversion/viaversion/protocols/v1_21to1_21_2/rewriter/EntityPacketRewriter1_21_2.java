@@ -86,8 +86,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             final double y = wrapper.get(Types.DOUBLE, 1);
             final double z = wrapper.get(Types.DOUBLE, 2);
 
-            final float pitch = wrapper.get(Types.BYTE, 0) * 256.0F / 360.0F;
-            final float yaw = wrapper.get(Types.BYTE, 1) * 256.0F / 360.0F;
+            final float pitch = wrapper.get(Types.BYTE, 0) * 360F / 256F;
+            final float yaw = wrapper.get(Types.BYTE, 1) * 360F / 256F;
 
             final int data = wrapper.get(Types.VAR_INT, 2);
 
