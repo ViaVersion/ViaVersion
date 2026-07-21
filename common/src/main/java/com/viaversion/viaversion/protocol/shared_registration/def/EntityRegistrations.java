@@ -28,6 +28,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
+import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundPackets26_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -82,6 +83,16 @@ final class EntityRegistrations {
         ctx.clientbound(ClientboundPackets1_20_5.RESPAWN, er::registerRespawn1_20_5);
         ctx.clientbound(ClientboundPackets1_20_5.GAME_EVENT, er::registerGameEvent);
         ctx.clientbound(ClientboundPackets1_20_5.PLAYER_ABILITIES, er::registerPlayerAbilities);
+    }
+
+    static <CU extends ClientboundPacketType> void registerEntityPackets26_3(final RegistrationContext<CU, ?> ctx, final EntityRewriter<CU, ?> er) {
+        ctx.clientbound(ClientboundPackets26_3.SET_ENTITY_DATA, er::registerSetEntityData);
+        ctx.clientbound(ClientboundPackets26_3.REMOVE_ENTITIES, er::registerRemoveEntities);
+        ctx.clientbound(ClientboundPackets26_3.LOGIN, er::registerLogin26_3);
+        ctx.clientbound(ClientboundPackets26_3.RESPAWN, er::registerRespawn26_3);
+        ctx.clientbound(ClientboundPackets26_3.GAME_EVENT, er::registerGameEvent);
+        ctx.clientbound(ClientboundPackets26_3.PLAYER_ABILITIES, er::registerPlayerAbilities);
+        ctx.clientbound(ClientboundPackets26_3.ADD_ENTITY, er::registerTrackerWithData1_21_9);
     }
 
 

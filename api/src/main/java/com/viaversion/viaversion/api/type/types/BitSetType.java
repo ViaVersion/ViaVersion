@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.type.types;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -39,17 +40,31 @@ public class BitSetType extends Type<BitSet> {
         this.bytesLength = (int) Math.ceil(length / 8D);
     }
 
+    public BitSetType() {
+        super(BitSet.class);
+        this.length = -1;
+        this.bytesLength = -1;
+    }
+
     @Override
     public BitSet read(ByteBuf buffer) {
-        final byte[] bytes = new byte[bytesLength];
-        buffer.readBytes(bytes);
-        return BitSet.valueOf(bytes);
+        if (this.length != -1) {
+            final byte[] bytes = new byte[bytesLength];
+            buffer.readBytes(bytes);
+            return BitSet.valueOf(bytes);
+        } else {
+            return BitSet.valueOf(Types.BYTE_ARRAY_PRIMITIVE.read(buffer));
+        }
     }
 
     @Override
     public void write(ByteBuf buffer, BitSet object) {
-        Preconditions.checkArgument(object.length() <= length, "BitSet of length %s larger than max length %s", object.length(), length);
-        final byte[] bytes = object.toByteArray();
-        buffer.writeBytes(bytes.length == bytesLength ? bytes : Arrays.copyOf(bytes, bytesLength));
+        if (this.length != -1) {
+            Preconditions.checkArgument(object.length() <= length, "BitSet of length %s larger than max length %s", object.length(), length);
+            final byte[] bytes = object.toByteArray();
+            buffer.writeBytes(bytes.length == bytesLength ? bytes : Arrays.copyOf(bytes, bytesLength));
+        } else {
+            Types.BYTE_ARRAY_PRIMITIVE.write(buffer, object.toByteArray());
+        }
     }
 }

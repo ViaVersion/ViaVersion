@@ -33,7 +33,8 @@ public final class DefaultRegistrations {
                 .to(ProtocolVersion.v1_20_5, EntityRegistrations::registerEntityPackets1_19)
                 .to(ProtocolVersion.v1_21_4, EntityRegistrations::registerEntityPackets1_20_5)
                 .to(ProtocolVersion.v1_21_9, EntityRegistrations::registerEntityPackets1_21_4)
-                .since(EntityRegistrations::registerEntityPackets1_21_9)
+                .to(ProtocolVersion.v26_3, EntityRegistrations::registerEntityPackets1_21_9)
+                .since(EntityRegistrations::registerEntityPackets26_3)
             )
 
             .ranges(ItemRegistrations::item, ProtocolVersion.v1_13, b -> b

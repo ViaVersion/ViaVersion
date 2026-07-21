@@ -401,6 +401,14 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void registerLogin1_20_5(C packetType) {
+        registerLogin1_20_5(packetType, Types.BYTE);
+    }
+
+    public void registerLogin26_3(C packetType) {
+        registerLogin1_20_5(packetType, Types.VAR_INT);
+    }
+
+    public void registerLogin1_20_5(C packetType, Type<? extends Number> gamemodeType) {
         protocol.registerClientbound(packetType, wrapper -> {
             final int entityId = wrapper.passthrough(Types.INT);
             wrapper.passthrough(Types.BOOLEAN); // Hardcore
@@ -417,7 +425,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world);
 
             wrapper.passthrough(Types.LONG); // Seed
-            final byte gamemode = wrapper.passthrough(Types.BYTE);
+            final int gamemode = wrapper.passthrough(gamemodeType).intValue();
             tracker(wrapper.user()).setInstaBuild(gamemode == GameMode.CREATIVE.id());
 
             trackPlayer(wrapper.user(), entityId);
@@ -425,13 +433,21 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void registerRespawn1_20_5(C packetType) {
+        registerRespawn1_20_5(packetType, Types.BYTE);
+    }
+
+    public void registerRespawn26_3(C packetType) {
+        registerRespawn1_20_5(packetType, Types.VAR_INT);
+    }
+
+    public void registerRespawn1_20_5(C packetType, Type<? extends Number> gamemodeType) {
         protocol.registerClientbound(packetType, wrapper -> {
             final int dimensionId = wrapper.passthrough(Types.VAR_INT);
             final String world = wrapper.passthrough(Types.STRING);
             trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world); // Tracks world height and name for chunk data and entity (un)tracking
 
             wrapper.passthrough(Types.LONG); // Seed
-            final byte gamemode = wrapper.passthrough(Types.BYTE);
+            final int gamemode = wrapper.passthrough(gamemodeType).intValue();
             tracker(wrapper.user()).setInstaBuild(gamemode == GameMode.CREATIVE.id());
         });
     }

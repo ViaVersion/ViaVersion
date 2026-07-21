@@ -186,6 +186,8 @@ public final class Types {
     public static final Type<int[]> VAR_INT_ARRAY_PRIMITIVE = new VarIntArrayType();
     public static final VarLongType VAR_LONG = new VarLongType();
 
+    public static final BitSetType BIT_SET = new BitSetType(); // Generic length
+
     /* MC Types */
     public static final Type<byte[]> SERVERBOUND_CUSTOM_PAYLOAD_DATA = new RemainingBytesType(Short.MAX_VALUE);
 

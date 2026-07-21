@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial1_20_5
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial26_3;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations26_3;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
@@ -36,6 +37,7 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPack
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
 import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
+import java.util.BitSet;
 import java.util.HashMap;
 
 public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<ClientboundPacket26_1, ServerboundPacket26_1, Protocol26_2To26_3> {
@@ -70,6 +72,20 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
                 wrapper.set(Types.BOOLEAN, 0, false);
             }
         });
+
+        protocol.registerClientbound(ClientboundPackets26_1.LIGHT_UPDATE, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // X
+            wrapper.passthrough(Types.VAR_INT); // Y
+            handleLightMasks(wrapper);
+        });
+        protocol.appendClientbound(ClientboundPackets26_1.LEVEL_CHUNK_WITH_LIGHT, this::handleLightMasks);
+    }
+
+    private void handleLightMasks(final PacketWrapper wrapper) {
+        for (int i = 0; i < 4; i++) {
+            final long[] mask = wrapper.read(Types.LONG_ARRAY_PRIMITIVE);
+            wrapper.write(Types.BIT_SET, BitSet.valueOf(mask));
+        }
     }
 
     @Override

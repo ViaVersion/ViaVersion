@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes26_3;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_3;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
@@ -94,6 +95,23 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
             wrapper.passthrough(Types.FLOAT); // Y rot
             wrapper.passthrough(Types.FLOAT); // X rot
         });
+
+        protocol.appendClientbound(ClientboundPackets26_1.LOGIN, wrapper -> {
+            wrapper.rewindReader(1);
+            handleGamemodes(wrapper);
+        });
+        protocol.appendClientbound(ClientboundPackets26_1.RESPAWN, wrapper -> {
+            wrapper.rewindReader(1);
+            handleGamemodes(wrapper);
+        });
+    }
+
+    private void handleGamemodes(final PacketWrapper wrapper) {
+        final byte gamemode = wrapper.read(Types.BYTE);
+        wrapper.write(Types.VAR_INT, (int) gamemode);
+
+        final byte previousGamemode = wrapper.read(Types.BYTE);
+        wrapper.write(Types.OPTIONAL_VAR_INT, previousGamemode == -1 ? null : (int) previousGamemode);
     }
 
     // To make the stepped interpolation handler work properly, the offset has to match the server's actual updateInterval (e.g. 2 for players).
