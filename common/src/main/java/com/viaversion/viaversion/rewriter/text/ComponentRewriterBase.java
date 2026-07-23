@@ -387,12 +387,71 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
         handleContainerContents(connection, componentsTag);
         handleItemArrayContents(connection, componentsTag, "bundle_contents");
         handleItemArrayContents(connection, componentsTag, "charged_projectiles");
-        final CompoundTag useRemainder = TagUtil.getNamespacedCompoundTag(componentsTag, "use_remainder");
+        handleNestedItem(connection, componentsTag, "use_remainder");
+        handleNestedItem(connection, componentsTag, "sulfur_cube_content");
+        handleNestedIdentifiers(componentsTag);
+
+        // Things that we either don't store the mappings of or that are unnecessary to convert in a hover event
+        removeDataComponents(componentsTag, "lock", "debug_stick_state");
+        removeDataComponents(componentsTag, "equippable", "consumable", "blocks_attacks", "break_sound", "note_block_sound", "tool", "block_transformer");
+    }
+
+    private void handleNestedItem(final UserConnection connection, final CompoundTag componentsTag, final String componentKey) {
+        final CompoundTag useRemainder = TagUtil.getNamespacedCompoundTag(componentsTag, componentKey);
         if (useRemainder != null) {
             handleShowItem(connection, useRemainder);
         }
+    }
 
-        removeDataComponents(componentsTag, "lock", "debug_stick_state");
+    protected void handleNestedIdentifiers(final CompoundTag componentsTag) {
+        // Sounds
+        final FullMappings soundMappings = protocol.getMappingData().getFullSoundMappings();
+        if (!Mappings.isFullIdentity(soundMappings)) {
+            if (TagUtil.getNamespacedTag(componentsTag, "jukebox_playable") instanceof CompoundTag tag) {
+                handleSoundEventTag(tag.get("sound_event"), soundMappings);
+            }
+            if (TagUtil.getNamespacedTag(componentsTag, "instrument") instanceof CompoundTag tag) {
+                handleSoundEventTag(tag.get("sound_event"), soundMappings);
+            }
+        }
+
+        // Entity / block entity types
+        handleTypedEntityData(componentsTag, "entity_data", protocol.getMappingData().getEntityMappings());
+        handleTypedEntityData(componentsTag, "block_entity_data", protocol.getMappingData().getBlockEntityMappings());
+    }
+
+    private void handleSoundEventTag(@Nullable final Tag soundEventTag, final FullMappings soundMappings) {
+        if (soundEventTag instanceof StringTag stringTag) {
+            final String mapped = soundMappings.mappedIdentifier(stringTag.getValue());
+            if (mapped != null) {
+                stringTag.setValue(mapped);
+            }
+        } else if (soundEventTag instanceof CompoundTag compoundTag) {
+            final StringTag soundId = compoundTag.getStringTag("sound_id");
+            if (soundId != null) {
+                final String mapped = soundMappings.mappedIdentifier(soundId.getValue());
+                if (mapped != null) {
+                    soundId.setValue(mapped);
+                }
+            }
+        }
+    }
+
+    private void handleTypedEntityData(final CompoundTag componentsTag, final String key, final @Nullable FullMappings mappings) {
+        if (Mappings.isFullIdentity(mappings)) {
+            return;
+        }
+
+        final CompoundTag data = TagUtil.getNamespacedCompoundTag(componentsTag, key);
+        if (data != null) {
+            final StringTag idTag = data.getStringTag("id");
+            if (idTag != null) {
+                final String mapped = mappings.mappedIdentifier(idTag.getValue());
+                if (mapped != null) {
+                    idTag.setValue(mapped);
+                }
+            }
+        }
     }
 
     protected void handleAttributeModifiers(final CompoundTag tag) {
