@@ -45,6 +45,7 @@ import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPa
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<ClientboundPacket1_21_11, ServerboundPacket26_1, Protocol1_21_11To26_1> {
@@ -86,8 +87,8 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
         container.replace(StructuredDataKey.CHICKEN_VARIANT1_21_5, StructuredDataKey.CHICKEN_VARIANT26_1, chickenVariant -> upgradeEitherVariant(protocol, connection, chickenVariant, "chicken_variant"));
         container.replace(StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT1_21_11, StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT26_1, nautilusVariant -> upgradeEitherVariant(protocol, connection, nautilusVariant, "zombie_nautilus_variant"));
         container.replace(StructuredDataKey.DAMAGE_TYPE1_21_11, StructuredDataKey.DAMAGE_TYPE26_1, damageType -> upgradeEitherVariant(protocol, connection, damageType.id(), "damage_type"));
-        container.replace(StructuredDataKey.PROVIDES_BANNER_PATTERNS1_21_5, StructuredDataKey.PROVIDES_BANNER_PATTERNS26_1, key -> new ProvidesBannerPatterns(HolderSet.of(key.original())));
-        container.replace(StructuredDataKey.DAMAGE_RESISTANT1_21_2, StructuredDataKey.DAMAGE_RESISTANT26_1, damageResistant -> new DamageResistant26_1(HolderSet.of(damageResistant.typesTagKey().original())));
+        container.replace(StructuredDataKey.PROVIDES_BANNER_PATTERNS1_21_5, StructuredDataKey.PROVIDES_BANNER_PATTERNS26_1, key -> new ProvidesBannerPatterns(tagKeyToHolderSet(protocol, connection, "banner_pattern", key.original())));
+        container.replace(StructuredDataKey.DAMAGE_RESISTANT1_21_2, StructuredDataKey.DAMAGE_RESISTANT26_1, damageResistant -> new DamageResistant26_1(tagKeyToHolderSet(protocol, connection, "damage_type", damageResistant.typesTagKey().original())));
         container.replaceKey(StructuredDataKey.BLOCKS_ATTACKS1_21_5, StructuredDataKey.BLOCKS_ATTACKS26_1);
 
         // Uses null instead of empty items now
@@ -116,6 +117,12 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
     private static @Nullable Integer registryIdOrNull(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection, final String registry, final String key) {
         final int id = protocol.getEntityRewriter().tracker(connection).registryKeys(registry).keyToId(key);
         return id != -1 ? id : null;
+    }
+
+    private static HolderSet tagKeyToHolderSet(final Protocol<?, ?, ?, ?> protocol, final UserConnection connection, final String registry, final String key) {
+        final KeyMappings damageTypes = protocol.getEntityRewriter().tracker(connection).registryKeys(registry);
+        final int damageType = damageTypes.keyToId(key);
+        return damageType != -1 ? HolderSet.of(new int[]{damageType}) : HolderSet.of(key);
     }
 
     @Override
