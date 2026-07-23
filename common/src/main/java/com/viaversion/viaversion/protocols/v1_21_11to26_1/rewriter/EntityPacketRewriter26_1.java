@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_11;
@@ -48,6 +49,41 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
             final boolean pressingShift = (flags & 1 << 5) != 0;
             wrapper.user().get(PlayerSneaking.class).setSneaking(pressingShift);
         });
+
+        // Chests in minecarts are oriented the opposite direction now, 'fix' this by changing the yaw
+        protocol.appendClientbound(ClientboundPackets1_21_11.ADD_ENTITY, wrapper -> {
+            if (!Via.getConfig().isCorrectChestMinecartOrientation()) {
+                return;
+            }
+
+            final int entityTypeId = wrapper.get(Types.VAR_INT, 1);
+            if (entityTypeId != EntityTypes1_21_11.CHEST_MINECART.getId()) {
+                return;
+            }
+
+            final byte yaw = wrapper.get(Types.BYTE, 1);
+            wrapper.set(Types.BYTE, 1, (byte) (yaw + 128));
+        });
+        protocol.registerClientbound(ClientboundPackets1_21_11.ENTITY_POSITION_SYNC, wrapper -> {
+            if (!Via.getConfig().isCorrectChestMinecartOrientation()) {
+                return;
+            }
+
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            if (tracker(wrapper.user()).entityType(entityId) != EntityTypes1_21_11.CHEST_MINECART) {
+                return;
+            }
+
+            // Position and delta movement
+            for (int i = 0; i < 6; i++) {
+                wrapper.passthrough(Types.DOUBLE);
+            }
+
+            float yaw = wrapper.read(Types.FLOAT);
+            yaw += 180.0f;
+            wrapper.write(Types.FLOAT, yaw);
+        });
+
         protocol.registerServerbound(ServerboundPackets26_1.INTERACT, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT);
             wrapper.write(Types.VAR_INT, 0); // Interact
