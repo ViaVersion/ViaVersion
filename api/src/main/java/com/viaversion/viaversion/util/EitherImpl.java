@@ -29,11 +29,11 @@ public class EitherImpl<X, Y> implements Either<X, Y> {
     private final X left;
     private final Y right;
 
-    protected EitherImpl(final X left, final Y value) {
+    protected EitherImpl(final X left, final Y right) {
         this.left = left;
-        this.right = value;
-        Preconditions.checkArgument(left == null || value == null, "Either.left and Either.right are both present");
-        Preconditions.checkArgument(left != null || value != null, "Either.left and Either.right are both null");
+        this.right = right;
+        Preconditions.checkArgument(left == null || right == null, "Either.left and Either.right are both present");
+        Preconditions.checkArgument(left != null || right != null, "Either.left and Either.right are both null");
     }
 
     @Override

@@ -20,35 +20,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item.data;
+package com.viaversion.viaversion.api.type.types.misc;
 
 import com.viaversion.viaversion.api.minecraft.ResolvableNumber;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 
-public record CookingFuel(ResolvableNumber burnTime, ResolvableNumber speedMultiplier) {
+public final class ResolvableNumberType extends Type<ResolvableNumber> {
 
-    public static final Type<CookingFuel> TYPE = new Type<>(CookingFuel.class) {
-        @Override
-        public CookingFuel read(final ByteBuf buffer) {
-            final ResolvableNumber burnTime = Types.RESOLVABLE_NUMBER.read(buffer);
-            final ResolvableNumber speedMultiplier = Types.RESOLVABLE_NUMBER.read(buffer);
-            return new CookingFuel(burnTime, speedMultiplier);
-        }
+    public ResolvableNumberType() {
+        super(ResolvableNumber.class);
+    }
 
-        @Override
-        public void write(final ByteBuf buffer, final CookingFuel value) {
-            Types.RESOLVABLE_NUMBER.write(buffer, value.burnTime);
-            Types.RESOLVABLE_NUMBER.write(buffer, value.speedMultiplier);
+    @Override
+    public ResolvableNumber read(final ByteBuf buffer) {
+        if (buffer.readBoolean()) {
+            return ResolvableNumber.of(Types.FLOAT.readPrimitive(buffer));
+        } else {
+            return ResolvableNumber.of(Types.STRING.read(buffer));
         }
+    }
 
-        @Override
-        public void write(final Ops ops, final CookingFuel value) {
-            ops.writeMap(map -> map
-                .write("burn_time", Types.RESOLVABLE_NUMBER, value.burnTime)
-                .write("speed_multiplier", Types.RESOLVABLE_NUMBER, value.speedMultiplier));
+    @Override
+    public void write(final ByteBuf buffer, final ResolvableNumber value) {
+        if (value.isLeft()) {
+            Types.FLOAT.writePrimitive(buffer, value.left());
+        } else {
+            Types.IDENTIFIER.write(buffer, Key.of(value.right()));
         }
-    };
+    }
+
+    @Override
+    public void write(final Ops ops, final ResolvableNumber value) {
+        if (value.isLeft()) {
+            Types.FLOAT.write(ops, value.left());
+        } else {
+            Types.IDENTIFIER.write(ops, Key.of(value.right()));
+        }
+    }
 }

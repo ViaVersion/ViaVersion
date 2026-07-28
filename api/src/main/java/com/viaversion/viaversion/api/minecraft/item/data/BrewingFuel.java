@@ -22,32 +22,33 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.ResolvableNumber;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
-public record BrewingFuel(String uses, String speedMultiplier) {
+public record BrewingFuel(ResolvableNumber uses, ResolvableNumber speedMultiplier) {
 
     public static final Type<BrewingFuel> TYPE = new Type<>(BrewingFuel.class) {
         @Override
         public BrewingFuel read(final ByteBuf buffer) {
-            final String uses = Types.STRING.read(buffer);
-            final String speedMultiplier = Types.STRING.read(buffer);
+            final ResolvableNumber uses = Types.RESOLVABLE_NUMBER.read(buffer);
+            final ResolvableNumber speedMultiplier = Types.RESOLVABLE_NUMBER.read(buffer);
             return new BrewingFuel(uses, speedMultiplier);
         }
 
         @Override
         public void write(final ByteBuf buffer, final BrewingFuel value) {
-            Types.STRING.write(buffer, value.uses);
-            Types.STRING.write(buffer, value.speedMultiplier);
+            Types.RESOLVABLE_NUMBER.write(buffer, value.uses);
+            Types.RESOLVABLE_NUMBER.write(buffer, value.speedMultiplier);
         }
 
         @Override
         public void write(final Ops ops, final BrewingFuel value) {
             ops.writeMap(map -> map
-                .write("uses", Types.STRING, value.uses)
-                .write("speed_multiplier", Types.STRING, value.speedMultiplier));
+                .write("uses", Types.RESOLVABLE_NUMBER, value.uses)
+                .write("speed_multiplier", Types.RESOLVABLE_NUMBER, value.speedMultiplier));
         }
     };
 }
