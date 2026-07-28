@@ -1,0 +1,11 @@
+# 1.16.2 -> 1.17 translation key mappings
+commands.worldborder.set.failed.small.=commands.worldborder.set.failed.small
+commands.worldborder.set.failed.big.=commands.worldborder.set.failed.big
+commands.replaceitem.slot.inapplicable=commands.item.target.no_such_slot
+commands.replaceitem.block.failed=The target block is not a container
+commands.replaceitem.entity.success.single=commands.item.entity.set.success.single
+commands.replaceitem.block.success=commands.item.block.set.success
+commands.debug.reportSaved=Created debug report in %s
+commands.debug.reportFailed=Failed to create debug report
+commands.locate.success=The nearest %s is at %s (%s blocks away)
+commands.locatebiome.success=The nearest %s is at %s (%s blocks away)

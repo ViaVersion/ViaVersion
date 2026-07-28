@@ -1,0 +1,10 @@
+# 1.18 -> 1.19 translation key mappings
+commands.locate.invalid=commands.locate.structure.invalid
+commands.locatebiome.success=commands.locate.biome.success
+command.placefeature.invalid=commands.place.feature.failed
+commands.locatebiome.invalid=commands.locate.biome.invalid
+commands.placefeature.invalid=commands.place.feature.invalid
+commands.locatebiome.notFound=commands.locate.biome.not_found
+commands.placefeature.success=commands.place.feature.success
+commands.locate.failed=commands.locate.structure.not_found
+commands.locate.success=commands.locate.structure.success

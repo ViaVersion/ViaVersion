@@ -36,7 +36,8 @@ public final class MappingData1_19 extends MappingDataBase {
     }
 
     @Override
-    protected void loadExtras(final CompoundTag daata) {
+    protected void loadExtras(final CompoundTag data) {
+        super.loadExtras(data);
         final ListTag<CompoundTag> chatTypes = MappingDataLoader.INSTANCE.loadNBTFromFile("chat-types-1.19.nbt").getListTag("values", CompoundTag.class);
         for (final CompoundTag chatType : chatTypes) {
             final NumberTag idTag = chatType.getNumberTag("id");

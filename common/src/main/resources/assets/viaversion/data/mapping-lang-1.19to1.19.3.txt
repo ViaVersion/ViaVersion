@@ -1,0 +1,5 @@
+# 1.19 -> 1.19.3 translation key mappings
+commands.locate.poi.invalid=There is no point of interest with type "%s"
+commands.locate.biome.invalid=There is no biome with type "%s"
+multiplayer.disconnect.missing_public_key=Missing profile public key.\nThis server requires secure profiles.
+multiplayer.disconnect.invalid_public_key=Invalid signature for profile public key.\nTry restarting your game.

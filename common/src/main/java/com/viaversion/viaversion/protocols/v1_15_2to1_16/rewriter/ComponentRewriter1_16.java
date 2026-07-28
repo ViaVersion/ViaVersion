@@ -21,52 +21,19 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.Protocol1_15_2To1_16;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ComponentRewriter1_16 extends JsonNBTComponentRewriter<ClientboundPackets1_15> {
-    private final Map<String, String> mappings = new HashMap<>();
+    private final Map<String, String> mappings;
 
     public ComponentRewriter1_16(Protocol1_15_2To1_16 protocol) {
         super(protocol, ReadType.JSON);
-        mappings.put("attribute.name.generic.armorToughness", "attribute.name.generic.armor_toughness");
-        mappings.put("attribute.name.generic.attackDamage", "attribute.name.generic.attack_damage");
-        mappings.put("attribute.name.generic.attackSpeed", "attribute.name.generic.attack_speed");
-        mappings.put("attribute.name.generic.followRange", "attribute.name.generic.follow_range");
-        mappings.put("attribute.name.generic.knockbackResistance", "attribute.name.generic.knockback_resistance");
-        mappings.put("attribute.name.generic.maxHealth", "attribute.name.generic.max_health");
-        mappings.put("attribute.name.generic.movementSpeed", "attribute.name.generic.movement_speed");
-        mappings.put("attribute.name.horse.jumpStrength", "attribute.name.horse.jump_strength");
-        mappings.put("attribute.name.zombie.spawnReinforcements", "attribute.name.zombie.spawn_reinforcements");
-        mappings.put("block.minecraft.banner", "Banner");
-        mappings.put("block.minecraft.wall_banner", "Wall Banner");
-        mappings.put("block.minecraft.bed", "Bed");
-        mappings.put("block.minecraft.bed.not_valid", "block.minecraft.spawn.not_valid");
-        mappings.put("block.minecraft.bed.set_spawn", "block.minecraft.set_spawn");
-        mappings.put("block.minecraft.flowing_water", "Flowing Water");
-        mappings.put("block.minecraft.flowing_lava", "Flowing Lava");
-        mappings.put("block.minecraft.two_turtle_eggs", "Two Turtle Eggs");
-        mappings.put("block.minecraft.three_turtle_eggs", "Three Turtle Eggs");
-        mappings.put("block.minecraft.four_turtle_eggs", "Four Turtle Eggs");
-        mappings.put("item.minecraft.skeleton_skull", "block.minecraft.skeleton_skull");
-        mappings.put("item.minecraft.wither_skeleton_skull", "block.minecraft.skeleton_wall_skull");
-        mappings.put("item.minecraft.zombie_head", "block.minecraft.zombie_head");
-        mappings.put("item.minecraft.creeper_head", "block.minecraft.creeper_head");
-        mappings.put("item.minecraft.dragon_head", "block.minecraft.dragon_head");
-        mappings.put("entity.minecraft.zombie_pigman", "Zombie Pigman");
-        mappings.put("item.minecraft.zombie_pigman_spawn_egg", "Zombie Pigman Spawn Egg");
-        mappings.put("death.fell.accident.water", "%1$s fell out of the water");
-        mappings.put("death.attack.netherBed.message", "death.attack.badRespawnPoint.message");
-        mappings.put("death.attack.netherBed.link", "death.attack.badRespawnPoint.link");
-        mappings.put("advancements.husbandry.break_diamond_hoe.title", "Serious Dedication");
-        mappings.put("advancements.husbandry.break_diamond_hoe.description", "Completely use up a diamond hoe, and then reevaluate your life choices");
-        mappings.put("biome.minecraft.nether", "Nether");
-        mappings.put("key.swapHands", "key.swapOffhand");
-        mappings.put("commands.datapack.enable.success", "commands.datapack.modify.enable");
-        mappings.put("commands.datapack.disable.success", "commands.datapack.modify.disable");
+        final MappingData mappingData = protocol.getMappingData();
+        mappings = mappingData != null ? mappingData.getTranslationMappings() : Map.of();
     }
 
     @Override

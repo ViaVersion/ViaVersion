@@ -37,6 +37,7 @@ public final class MappingData26_1 extends MappingDataBase {
 
     @Override
     protected void loadExtras(final CompoundTag data) {
+        super.loadExtras(data);
         final CompoundTag tag = MappingDataLoader.INSTANCE.loadNBTFromFile("sound-variant-registries-26.1.nbt");
         catSoundVariants = tag.getCompoundTag("cat_sound_variant");
         cowSoundVariants = tag.getCompoundTag("cow_sound_variant");

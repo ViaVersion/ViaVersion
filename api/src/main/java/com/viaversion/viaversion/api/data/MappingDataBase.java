@@ -33,8 +33,14 @@ import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,6 +74,7 @@ public class MappingDataBase implements MappingData {
      */
     protected IntSet changedBlocks;
     protected Set<String> changedEnvironmentAttributes;
+    protected final Map<String, String> translationMappings = new HashMap<>();
 
     public MappingDataBase(final String unmappedVersion, final String mappedVersion) {
         this.unmappedVersion = unmappedVersion;
@@ -392,5 +399,34 @@ public class MappingDataBase implements MappingData {
     }
 
     protected void loadExtras(final CompoundTag data) {
+        loadTranslationMappings("mapping-lang-" + unmappedVersion + "to" + mappedVersion + ".txt");
+    }
+
+    protected void loadTranslationMappings(final String resourcePath) {
+        if (!translationMappings.isEmpty()) {
+            return; // already loaded by a subclass
+        }
+
+        final InputStream stream = MappingDataLoader.INSTANCE.getResource(resourcePath);
+        if (stream == null) {
+            return;
+        }
+
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isEmpty() || line.charAt(0) == '#') continue;
+                final int eq = line.indexOf('=');
+                if (eq == -1) continue;
+                final String value = line.substring(eq + 1);
+                translationMappings.put(line.substring(0, eq), value.replace("\\n", "\n"));
+            }
+        } catch (final IOException e) {
+            getLogger().warning("Failed to load translation mappings: " + resourcePath);
+        }
+    }
+
+    public Map<String, String> getTranslationMappings() {
+        return translationMappings;
     }
 }

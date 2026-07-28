@@ -18,23 +18,27 @@
 package com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter;
 
 import com.google.gson.JsonObject;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
+import java.util.Map;
 
 public final class ComponentRewriter1_19_3 extends JsonNBTComponentRewriter<ClientboundPackets1_19_1> {
 
+    private final Map<String, String> mappings;
+
     public ComponentRewriter1_19_3(final Protocol<ClientboundPackets1_19_1, ?, ?, ?> protocol) {
         super(protocol, ReadType.JSON);
+        final MappingData mappingData = protocol.getMappingData();
+        mappings = mappingData != null ? mappingData.getTranslationMappings() : Map.of();
     }
 
     @Override
     protected void handleTranslate(final JsonObject object, final String translate) {
-        switch (translate) {
-            case "commands.locate.poi.invalid" -> object.addProperty("translate", "There is no point of interest with type \"%s\"");
-            case "commands.locate.biome.invalid" -> object.addProperty("translate", "There is no biome with type \"%s\"");
-            case "multiplayer.disconnect.missing_public_key" -> object.addProperty("translate", "Missing profile public key.\nThis server requires secure profiles.");
-            case "multiplayer.disconnect.invalid_public_key" -> object.addProperty("translate", "Invalid signature for profile public key.\nTry restarting your game.");
+        final String value = mappings.get(translate);
+        if (value != null) {
+            object.addProperty("translate", value);
         }
     }
 }

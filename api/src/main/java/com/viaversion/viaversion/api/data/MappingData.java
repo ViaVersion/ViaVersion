@@ -29,6 +29,7 @@ import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -183,6 +184,14 @@ public interface MappingData {
             case ENTITY_TYPE -> getEntityMappings();
         };
     }
+
+    /**
+     * Returns the mapping of old translation keys to their replacement values.
+     * Values may be new translation keys or inlined English text for removed keys.
+     *
+     * @return translation key mappings, may be empty
+     */
+    Map<String, String> getTranslationMappings();
 
     /**
      * Set of block (not block state) ids that had their base type or properties changed.

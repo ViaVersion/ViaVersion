@@ -24,6 +24,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
@@ -32,11 +33,16 @@ import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 
 public final class ComponentRewriter1_21_2 extends JsonNBTComponentRewriter<ClientboundPacket1_21> {
 
+    private final Map<String, String> mappings;
+
     public ComponentRewriter1_21_2(final Protocol1_21To1_21_2 protocol) {
         super(protocol, ReadType.NBT);
+        final MappingData mappingData = protocol.getMappingData();
+        mappings = mappingData != null ? mappingData.getTranslationMappings() : Map.of();
     }
 
     @Override
@@ -96,15 +102,9 @@ public final class ComponentRewriter1_21_2 extends JsonNBTComponentRewriter<Clie
 
     @Override
     protected void handleTranslate(final UserConnection connection, final CompoundTag parentTag, final StringTag translateTag) {
-        switch (translateTag.getValue()) {
-            case "commands.drop.no_loot_table" -> translateTag.setValue("Entity %s has no loot table");
-            case "commands.advancement.advancementNotFound" -> translateTag.setValue("No advancement was found by the name '%1$s'");
-            case "commands.function.success.single" -> translateTag.setValue("Test Executed %s command(s) from function '%s'");
-            case "commands.function.success.single.result" -> translateTag.setValue("Function '%2$s' returned %1$s");
-            case "commands.function.success.multiple" -> translateTag.setValue("Test Executed %s command(s) from %s functions");
-            case "commands.function.success.multiple.result" -> translateTag.setValue("Executed %s functions");
-            case "commands.fillbiome.success" -> translateTag.setValue("%s biome entry/entries set between %s, %s, %s and %s, %s, %s");
-            case "commands.publish.success" -> translateTag.setValue("Multiplayer game is now hosted on port %s");
+        final String value = mappings.get(translateTag.getValue());
+        if (value != null) {
+            translateTag.setValue(value);
         }
     }
 

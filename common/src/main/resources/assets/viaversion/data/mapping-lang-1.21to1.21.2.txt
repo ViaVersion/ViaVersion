@@ -1,0 +1,9 @@
+# 1.21 -> 1.21.2 translation key mappings
+commands.drop.no_loot_table=Entity %s has no loot table
+commands.advancement.advancementNotFound=No advancement was found by the name '%1$s'
+commands.function.success.single=Test Executed %s command(s) from function '%s'
+commands.function.success.single.result=Function '%2$s' returned %1$s
+commands.function.success.multiple=Test Executed %s command(s) from %s functions
+commands.function.success.multiple.result=Executed %s functions
+commands.fillbiome.success=%s biome entry/entries set between %s, %s, %s and %s, %s, %s
+commands.publish.success=Multiplayer game is now hosted on port %s

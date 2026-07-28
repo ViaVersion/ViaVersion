@@ -1,0 +1,3 @@
+# 1.21.11 -> 26.1 translation key mappings
+commands.time.set=Set the time to %s
+commands.time.query=The time is %s

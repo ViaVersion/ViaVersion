@@ -20,14 +20,20 @@ package com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPacket1_21_11;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
+import java.util.Map;
 
 public final class ComponentRewriter26_1 extends NBTComponentRewriter<ClientboundPacket1_21_11> {
 
+    private final Map<String, String> mappings;
+
     public ComponentRewriter26_1(final Protocol1_21_11To26_1 protocol) {
         super(protocol);
+        final MappingData mappingData = protocol.getMappingData();
+        mappings = mappingData != null ? mappingData.getTranslationMappings() : Map.of();
     }
 
     @Override
@@ -42,9 +48,9 @@ public final class ComponentRewriter26_1 extends NBTComponentRewriter<Clientboun
 
     @Override
     protected void handleTranslate(final UserConnection connection, final CompoundTag parentTag, final StringTag translateTag) {
-        switch (translateTag.getValue()) {
-            case "commands.time.set" -> translateTag.setValue("Set the time to %s");
-            case "commands.time.query" -> translateTag.setValue("The time is %s");
+        final String value = mappings.get(translateTag.getValue());
+        if (value != null) {
+            translateTag.setValue(value);
         }
     }
 }

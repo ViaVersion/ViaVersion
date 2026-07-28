@@ -18,28 +18,20 @@
 package com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter;
 
 import com.google.gson.JsonObject;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
-import java.util.HashMap;
 import java.util.Map;
 
 public final class ComponentRewriter1_17 extends JsonNBTComponentRewriter<ClientboundPackets1_16_2> {
 
-    private final Map<String, String> mappings = new HashMap<>();
+    private final Map<String, String> mappings;
 
     public ComponentRewriter1_17(final Protocol<ClientboundPackets1_16_2, ?, ?, ?> protocol) {
         super(protocol, ReadType.JSON);
-        mappings.put("commands.worldborder.set.failed.small.", "commands.worldborder.set.failed.small");
-        mappings.put("commands.worldborder.set.failed.big.", "commands.worldborder.set.failed.big");
-        mappings.put("commands.replaceitem.slot.inapplicable", "commands.item.target.no_such_slot");
-        mappings.put("commands.replaceitem.block.failed", "The target block is not a container");
-        mappings.put("commands.replaceitem.entity.success.single", "commands.item.entity.set.success.single");
-        mappings.put("commands.replaceitem.block.success", "commands.item.block.set.success");
-        mappings.put("commands.debug.reportSaved", "Created debug report in %s");
-        mappings.put("commands.debug.reportFailed", "Failed to create debug report");
-        mappings.put("commands.locate.success", "The nearest %s is at %s (%s blocks away)");
-        mappings.put("commands.locatebiome.success", "The nearest %s is at %s (%s blocks away)");
+        final MappingData mappingData = protocol.getMappingData();
+        mappings = mappingData != null ? mappingData.getTranslationMappings() : Map.of();
     }
 
     @Override
