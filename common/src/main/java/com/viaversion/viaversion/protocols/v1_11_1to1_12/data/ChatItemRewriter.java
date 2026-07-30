@@ -21,8 +21,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
+import com.viaversion.viaversion.util.StringUtil;
+import java.util.logging.Level;
 
 public final class ChatItemRewriter {
 
@@ -41,7 +44,15 @@ public final class ChatItemRewriter {
                 final JsonElement value = hoverEvent.get("value");
 
                 if (type.equals("show_item")) {
-                    final CompoundTag compound = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_8);
+                    final CompoundTag compound;
+                    try {
+                        compound = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_8);
+                    } catch (final Exception e) {
+                        if (Via.getConfig().logTextComponentConversionErrors()) {
+                            Via.getPlatform().getLogger().log(Level.WARNING, "Error reading NBT in 1.8 show_item: " + StringUtil.forLogging(value), e);
+                        }
+                        return;
+                    }
                     hoverEvent.addProperty("value", SerializerVersion.V1_12.toSNBT(compound));
                 }
             } else if (obj.has("extra")) {
