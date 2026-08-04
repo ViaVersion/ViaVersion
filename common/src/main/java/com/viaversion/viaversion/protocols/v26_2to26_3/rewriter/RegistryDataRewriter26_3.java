@@ -15,11 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v26_1to26_2.rewriter;
+package com.viaversion.viaversion.protocols.v26_2to26_3.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.util.Key;
@@ -48,6 +49,20 @@ public final class RegistryDataRewriter26_3 extends RegistryDataRewriter {
         }
 
         super.updateEnchantmentTerm(term);
+    }
+
+    @Override
+    protected boolean updateBlockState(final Tag blockStateTag) {
+        if (blockStateTag instanceof CompoundTag compoundTag) { // can only be a compound tag pre-26.3
+            final Tag id = compoundTag.remove("Name");
+            compoundTag.put("id", id);
+
+            final Tag properties = compoundTag.remove("Properties");
+            if (properties != null) {
+                compoundTag.put("properties", properties);
+            }
+        }
+        return super.updateBlockState(blockStateTag);
     }
 
     private void updateTagKey(final ListTag<CompoundTag> tags) {

@@ -173,7 +173,9 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<BlocksAttacks> BLOCKS_ATTACKS26_1 = new StructuredDataKey<>("blocks_attacks", BlocksAttacks.TYPE26_1);
     public static final StructuredDataKey<PiercingWeapon> PIERCING_WEAPON = new StructuredDataKey<>("piercing_weapon", PiercingWeapon.TYPE);
     public static final StructuredDataKey<KineticWeapon> KINETIC_WEAPON = new StructuredDataKey<>("kinetic_weapon", KineticWeapon.TYPE);
-    public static final StructuredDataKey<SwingAnimation> SWING_ANIMATION = new StructuredDataKey<>("swing_animation", SwingAnimation.TYPE);
+    public static final StructuredDataKey<SwingAnimation> SWING_ANIMATION = new StructuredDataKey<>("swing_animation", SwingAnimation.TYPE1_21_11);
+    public static final StructuredDataKey<SwingAnimation> ATTACK_ANIMATION = new StructuredDataKey<>("attack_animation", SwingAnimation.TYPE26_3);
+    public static final StructuredDataKey<SwingAnimation> INTERACT_ANIMATION = new StructuredDataKey<>("interact_animation", SwingAnimation.TYPE26_3);
     public static final StructuredDataKey<Integer> ADDITIONAL_TRADE_COST = new StructuredDataKey<>("additional_trade_cost", Types.VAR_INT);
     public static final StructuredDataKey<BlockTransformData[]> BLOCK_TRANSFORMER = new StructuredDataKey<>("block_transformer", BlockTransformData.ARRAY_TYPE);
     public static final StructuredDataKey<VillagerFood> VILLAGER_FOOD = new StructuredDataKey<>("villager_food", VillagerFood.TYPE);

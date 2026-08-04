@@ -36,6 +36,8 @@ public interface RegistryDataRewriter {
 
     void updateDialog(UserConnection connection, CompoundTag tag);
 
+    boolean updateBlockStateProvider(CompoundTag tag);
+
     /**
      * Sends registries that had additional entries configured, but weren't sent by the server at all
      * by the time finish_configuration was sent to the client.

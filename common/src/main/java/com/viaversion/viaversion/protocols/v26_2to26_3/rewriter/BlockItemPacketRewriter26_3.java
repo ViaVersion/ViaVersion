@@ -33,14 +33,14 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
-import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
-import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
 import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ServerboundPacket26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ServerboundPackets26_3;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import java.util.BitSet;
 import java.util.HashMap;
 
-public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<ClientboundPacket26_1, ServerboundPacket26_1, Protocol26_2To26_3> {
+public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<ClientboundPacket26_1, ServerboundPacket26_3, Protocol26_2To26_3> {
 
     public BlockItemPacketRewriter26_3(final Protocol26_2To26_3 protocol) {
         super(protocol);
@@ -58,7 +58,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             wrapper.write(Types.VAR_INT, signTextSlot);
         });
 
-        protocol.registerServerbound(ServerboundPackets26_1.SIGN_UPDATE, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets26_3.SIGN_UPDATE, wrapper -> {
             wrapper.passthrough(Types.BLOCK_POSITION1_14);
 
             wrapper.write(Types.BOOLEAN, true); // Front text - replace below if needed
@@ -106,7 +106,14 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
     }
 
     public static void upgradeData(final StructuredDataContainer container) {
+        container.remove(StructuredDataKey.MAP_COLOR);
+
         container.replaceKey(StructuredDataKey.INSTRUMENT26_1, StructuredDataKey.INSTRUMENT26_3);
+        container.replace(StructuredDataKey.SWING_ANIMATION, animation -> {
+            container.set(StructuredDataKey.ATTACK_ANIMATION, animation);
+            container.set(StructuredDataKey.INTERACT_ANIMATION, animation);
+            return null;
+        });
         container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_3, holder -> {
             if (holder.hasId()) {
                 return Holder.of(holder.id());
@@ -137,6 +144,8 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         container.remove(StructuredDataKey.WAXED);
         container.remove(StructuredDataKey.CUSHION_COLOR);
 
+        container.replaceKey(StructuredDataKey.ATTACK_ANIMATION, StructuredDataKey.SWING_ANIMATION);
+        container.replaceKey(StructuredDataKey.INTERACT_ANIMATION, StructuredDataKey.SWING_ANIMATION);
         container.replaceKey(StructuredDataKey.INSTRUMENT26_3, StructuredDataKey.INSTRUMENT26_1);
         container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL26_3, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, holder -> {
             if (holder.hasId()) {

@@ -283,12 +283,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         return new ProtocolStorablesBase();
     }
 
-    /**
-     * Returns the server protocol version for this protocol,
-     * or null if not set (e.g. for base protocols).
-     *
-     * @return the server protocol version
-     */
+    @Override
     public @Nullable ProtocolVersion getServerVersion() {
         return serverVersion;
     }
@@ -303,12 +298,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         this.serverVersion = serverVersion;
     }
 
-    /**
-     * Returns the client protocol version for this protocol,
-     * or null if not set (e.g. for base protocols).
-     *
-     * @return the client protocol version for this protocol
-     */
+    @Override
     public @Nullable ProtocolVersion getClientVersion() {
         return clientVersion;
     }

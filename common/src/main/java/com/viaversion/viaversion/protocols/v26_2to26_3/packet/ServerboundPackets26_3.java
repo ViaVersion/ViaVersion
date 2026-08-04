@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_21_11to26_1.packet;
+package com.viaversion.viaversion.protocols.v26_2to26_3.packet;
 
-public enum ServerboundPackets26_1 implements ServerboundPacket26_1 {
+public enum ServerboundPackets26_3 implements ServerboundPacket26_3 {
 
     ACCEPT_TELEPORTATION, // 0x00
     ATTACK, // 0x01
@@ -65,24 +65,24 @@ public enum ServerboundPackets26_1 implements ServerboundPacket26_1 {
     PLAYER_INPUT, // 0x2B
     PLAYER_LOADED, // 0x2C
     PONG, // 0x2D
-    RECIPE_BOOK_CHANGE_SETTINGS, // 0x2E
-    RECIPE_BOOK_SEEN_RECIPE, // 0x2F
-    RENAME_ITEM, // 0x30
-    RESOURCE_PACK, // 0x31
-    SEEN_ADVANCEMENTS, // 0x32
-    SELECT_TRADE, // 0x33
-    SET_BEACON, // 0x34
-    SET_CARRIED_ITEM, // 0x35
-    SET_COMMAND_BLOCK, // 0x36
-    SET_COMMAND_MINECART, // 0x37
-    SET_CREATIVE_MODE_SLOT, // 0x38
-    SET_GAME_RULE, // 0x39
-    SET_JIGSAW_BLOCK, // 0x3A
-    SET_STRUCTURE_BLOCK, // 0x3B
-    SET_TEST_BLOCK, // 0x3C
-    SIGN_UPDATE, // 0x3D
-    SPECTATE_ENTITY, // 0x3E
-    SWING, // 0x3F
+    PUNCH, // 0x2E
+    RECIPE_BOOK_CHANGE_SETTINGS, // 0x2F
+    RECIPE_BOOK_SEEN_RECIPE, // 0x30
+    RENAME_ITEM, // 0x31
+    RESOURCE_PACK, // 0x32
+    SEEN_ADVANCEMENTS, // 0x33
+    SELECT_TRADE, // 0x34
+    SET_BEACON, // 0x35
+    SET_CARRIED_ITEM, // 0x36
+    SET_COMMAND_BLOCK, // 0x37
+    SET_COMMAND_MINECART, // 0x38
+    SET_CREATIVE_MODE_SLOT, // 0x39
+    SET_GAME_RULE, // 0x3A
+    SET_JIGSAW_BLOCK, // 0x3B
+    SET_STRUCTURE_BLOCK, // 0x3C
+    SET_TEST_BLOCK, // 0x3D
+    SIGN_UPDATE, // 0x3E
+    SPECTATOR_ACTION, // 0x3F
     TELEPORT_TO_ENTITY, // 0x40
     TEST_INSTANCE_BLOCK_ACTION, // 0x41
     USE_ITEM_ON, // 0x42

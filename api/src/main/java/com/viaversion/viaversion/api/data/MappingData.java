@@ -191,6 +191,10 @@ public interface MappingData {
      */
     @Nullable IntSet changedBlocks();
 
+    default boolean hasBlockChanged(final int blockId) {
+        return changedBlocks() != null && changedBlocks().contains(blockId);
+    }
+
     @Nullable Set<String> changedEnvironmentAttributes();
 
     /**

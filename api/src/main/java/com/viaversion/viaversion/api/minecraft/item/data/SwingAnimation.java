@@ -29,9 +29,18 @@ import io.netty.buffer.ByteBuf;
 
 public record SwingAnimation(int type, int duration) {
 
-    private static final int DEFAULT_TYPE = EnumTypes.SWING_ANIMATION.idFromName("whack");
+    public static final Type<SwingAnimation> TYPE1_21_11 = new SwingAnimationType(EnumTypes.SWING_ANIMATION1_21_11.idFromName("whack"));
+    public static final Type<SwingAnimation> TYPE26_3 = new SwingAnimationType(EnumTypes.SWING_ANIMATION26_3.idFromName("whack"));
 
-    public static final Type<SwingAnimation> TYPE = new Type<>(SwingAnimation.class) {
+    private static class SwingAnimationType extends Type<SwingAnimation> {
+
+        private final int defaultType;
+
+        public SwingAnimationType(final int defaultType) {
+            super(SwingAnimation.class);
+            this.defaultType = defaultType;
+        }
+
         @Override
         public SwingAnimation read(final ByteBuf buffer) {
             final int type = Types.VAR_INT.readPrimitive(buffer);
@@ -48,9 +57,8 @@ public record SwingAnimation(int type, int duration) {
         @Override
         public void write(final Ops ops, final SwingAnimation value) {
             ops.writeMap(map -> map
-                .writeOptional("type", EnumTypes.SWING_ANIMATION, value.type, DEFAULT_TYPE)
-                .writeOptional("duration", Types.INT, value.duration, 6)
-            );
+                .writeOptional("type", EnumTypes.SWING_ANIMATION1_21_11, value.type, this.defaultType)
+                .writeOptional("duration", Types.INT, value.duration, 6));
         }
-    };
+    }
 }

@@ -513,6 +513,8 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             if (particleData != null) {
                 handleParticleData(particleData);
             }
+        } else if (effect.equals("replace_disk") || effect.equals("replace_block")) {
+            updateBlockStateProvider(effectTag.getCompoundTag("block_state"));
         }
 
         final Consumer<CompoundTag> rewriter = enchantmentEffectHandlers.get(effect);
@@ -521,6 +523,88 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         } else if (effect.equals("play_sound")) {
             updateType(effectTag, "sound", protocol.getMappingData().getFullSoundMappings());
         }
+    }
+
+    @Override
+    public boolean updateBlockStateProvider(final CompoundTag tag) {
+        boolean changed = false;
+        final String type = Key.stripMinecraftNamespace(tag.getString("type"));
+        switch (type) {
+            case "simple_state_provider", "rotated_block_provider" -> {
+                changed |= updateBlockState(tag.get("state"));
+            }
+            case "weighted_state_provider" -> {
+                for (final CompoundTag entry : tag.getListTag("entries", CompoundTag.class)) {
+                    changed |= updateBlockState(entry.get("data"));
+                }
+            }
+            case "noise_threshold_provider" -> {
+                changed |= updateBlockState(tag.get("default_state"));
+                for (final CompoundTag entry : tag.getListTag("low_states", CompoundTag.class)) {
+                    changed |= updateBlockState(entry);
+                }
+                for (final CompoundTag entry : tag.getListTag("high_states", CompoundTag.class)) {
+                    changed |= updateBlockState(entry);
+                }
+            }
+            case "noise_provider", "dual_noise_provider" -> {
+                for (final CompoundTag entry : tag.getListTag("states", CompoundTag.class)) {
+                    changed |= updateBlockState(entry);
+                }
+            }
+            case "randomized_int_state_provider" -> {
+                changed |= updateBlockStateProvider(tag.getCompoundTag("source"));
+                // "property" field is generic and can be left unchanged. If invalid, it'll be defaulted
+            }
+            case "rule_based_state_provider" -> {
+                final CompoundTag fallback = tag.getCompoundTag("fallback");
+                if (fallback != null) {
+                    changed |= updateBlockStateProvider(fallback);
+                }
+
+                // Clear rules since parsing block state predicates is quite a lot
+                tag.put("rules", new ListTag<>(CompoundTag.class));
+                changed = true;
+
+                /*
+                for (final CompoundTag entry : tag.getListTag("rules", CompoundTag.class)) {
+                    changed |= updateBlockStateProvider(protocol, entry.getCompoundTag("then"));
+                    // "if_true" block state predicate (different to the advancement block predicate)...
+                }
+                */
+            }
+            case "copy_properties_provider" -> {
+                changed |= updateBlockStateProvider(tag.getCompoundTag("source_block_state_provider"));
+            }
+        }
+        return changed;
+    }
+
+    protected boolean updateBlockState(final Tag blockStateTag) {
+        if (blockStateTag instanceof CompoundTag compoundTag) {
+            // {"id": "minecraft:grass_block", "properties": {"snowy": "true"}}
+            final String block = compoundTag.getString("id");
+            if (block == null) {
+                // pre-26.3
+                return false;
+            }
+
+            final int blockId = protocol.getMappingData().getFullBlockMappings().id(block);
+            if (blockId == -1 || protocol.getMappingData().hasBlockChanged(blockId)) {
+                // Return dummy block state
+                compoundTag.putString("id", "minecraft:dirt");
+                compoundTag.remove("properties");
+                return true;
+            }
+        } else if (blockStateTag instanceof StringTag stringTag) {
+            // Inlined block with default properties
+            final int blockId = protocol.getMappingData().getFullBlockMappings().id(stringTag.getValue());
+            if (blockId == -1 || protocol.getMappingData().hasBlockChanged(blockId)) {
+                stringTag.setValue("minecraft:dirt");
+            }
+        }
+
+        return false;
     }
 
     private void replaceWithDummyCondition(final CompoundTag tag) {

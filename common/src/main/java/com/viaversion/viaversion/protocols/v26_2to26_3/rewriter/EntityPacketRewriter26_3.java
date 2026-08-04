@@ -26,7 +26,9 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
 import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ServerboundPackets26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.storage.LastMovement;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
@@ -104,6 +106,12 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
             wrapper.rewindReader(1);
             handleGamemodes(wrapper);
         });
+
+        protocol.registerServerbound(ServerboundPackets26_3.PUNCH, ServerboundPackets26_1.SWING, wrapper -> {
+            wrapper.write(Types.VAR_INT, 0); // Main hand
+        });
+
+        protocol.registerServerbound(ServerboundPackets26_3.SPECTATOR_ACTION, ServerboundPackets26_1.SPECTATE_ENTITY);
     }
 
     private void handleGamemodes(final PacketWrapper wrapper) {

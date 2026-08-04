@@ -34,6 +34,7 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
@@ -58,6 +59,22 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @see SimpleProtocol for a helper class if you do not need to define any of the types above
  */
 public interface Protocol<CU extends ClientboundPacketType, CM extends ClientboundPacketType, SM extends ServerboundPacketType, SU extends ServerboundPacketType> {
+
+    /**
+     * Returns the server protocol version for this protocol,
+     * or null if not set (e.g. for base protocols).
+     *
+     * @return the server protocol version
+     */
+    @Nullable ProtocolVersion getServerVersion();
+
+    /**
+     * Returns the client protocol version for this protocol,
+     * or null if not set (e.g. for base protocols).
+     *
+     * @return the client protocol version for this protocol
+     */
+    @Nullable ProtocolVersion getClientVersion();
 
     default void registerClientbound(State state, ClientboundPacketType packetType, @Nullable PacketHandler handler) {
         Preconditions.checkArgument(packetType.state() == state);
