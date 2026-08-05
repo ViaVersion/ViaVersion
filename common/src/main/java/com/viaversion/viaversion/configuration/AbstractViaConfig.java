@@ -101,6 +101,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     private boolean cancelSwingInInventory;
     private int maxErrorLength;
     private boolean use1_8HitboxMargin;
+    private boolean convertLegacyComponentNbt;
     private boolean sendPlayerDetails;
     private boolean sendServerDetails;
 
@@ -177,6 +178,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
         fix1_21PlacementRotation = getBoolean("fix-1_21-placement-rotation", true);
         cancelSwingInInventory = getBoolean("cancel-swing-in-inventory", true);
         use1_8HitboxMargin = getBoolean("use-1_8-hitbox-margin", true);
+        convertLegacyComponentNbt = getBoolean("convert-legacy-component-nbt", false);
         sendPlayerDetails = getBoolean("send-player-details", true);
         sendServerDetails = getBoolean("send-server-details", true);
         packetTrackerConfig = loadRateLimitConfig(getSection("packet-limiter"), "%pps", 1);
@@ -650,6 +652,11 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     @Override
     public boolean use1_8HitboxMargin() {
         return use1_8HitboxMargin;
+    }
+
+    @Override
+    public boolean convertLegacyComponentNbt() {
+        return convertLegacyComponentNbt;
     }
 
     @Override

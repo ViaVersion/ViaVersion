@@ -248,3 +248,7 @@ left-handed-handling: true
 cancel-block-sounds: true
 # If enabled, 1.21.11+ clients on 1.8 servers will get wider entity hitboxes when attacking with items
 use-1_8-hitbox-margin: true
+# Lets servers older than 1.21.2 declare data components that have no legacy nbt equivalent, by writing them to a
+# "VV|components" sub-tag of the item's nbt using the vanilla component field names. Only minecraft:equippable is
+# supported so far. The tag is left untouched on its way back to the server.
+convert-legacy-component-nbt: false

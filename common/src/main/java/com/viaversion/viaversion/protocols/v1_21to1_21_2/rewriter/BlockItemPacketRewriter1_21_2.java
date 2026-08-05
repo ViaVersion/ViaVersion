@@ -23,6 +23,7 @@ import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
@@ -471,6 +472,11 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 data.set(StructuredDataKey.CUSTOM_NAME, name);
                 saveTag(createCustomTag(item), new ByteTag(true), "remove_custom_name");
             }
+        }
+
+        // Data components declared as legacy nbt by servers that predate them
+        if (Via.getConfig().convertLegacyComponentNbt()) {
+            LegacyComponentConverter.convertLegacyComponents(item);
         }
         return item;
     }

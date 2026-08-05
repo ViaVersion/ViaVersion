@@ -545,6 +545,14 @@ public interface ViaVersionConfig extends Config {
     boolean use1_8HitboxMargin();
 
     /**
+     * If enabled, data components declared by servers older than the version that added them are read from a
+     * {@code VV|components} sub-tag of the item's legacy nbt and sent to the client.
+     *
+     * @return true if enabled
+     */
+    boolean convertLegacyComponentNbt();
+
+    /**
      * If enabled, ViaVersion will send the native client version to the server on connect via a plugin message.
      *
      * @return true if enabled
