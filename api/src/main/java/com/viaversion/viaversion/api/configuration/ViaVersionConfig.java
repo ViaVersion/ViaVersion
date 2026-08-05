@@ -550,7 +550,7 @@ public interface ViaVersionConfig extends Config {
      *
      * @return true if enabled
      */
-    boolean convertLegacyComponentNbt();
+default boolean convertLegacyComponentNbt() { return false; }
 
     /**
      * If enabled, ViaVersion will send the native client version to the server on connect via a plugin message.
