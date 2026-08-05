@@ -17,9 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_19_3to1_19_4.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
-
-public class PlayerVehicleTracker implements StorableObject {
+public class PlayerVehicleTracker {
 
     private int vehicleId = -1;
 

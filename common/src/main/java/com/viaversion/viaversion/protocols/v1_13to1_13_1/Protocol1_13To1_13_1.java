@@ -135,8 +135,8 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, EntityTypes1_13.EntityType.PLAYER));
-        userConnection.addClientWorld(this.getClass(), new ClientWorld());
+        addEntityTracker(userConnection, new EntityTrackerBase(userConnection, EntityTypes1_13.EntityType.PLAYER));
+        userConnection.storables(this).setClientWorld(new ClientWorld());
     }
 
     @Override

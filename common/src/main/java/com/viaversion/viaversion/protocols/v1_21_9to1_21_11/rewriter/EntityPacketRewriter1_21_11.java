@@ -27,7 +27,7 @@ import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.Protocol1_21_9To1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPackets1_21_11;
-import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.storage.GameTimeStorage;
+import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.storage.ProtocolStorables1_21_11;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
 
@@ -78,7 +78,8 @@ public final class EntityPacketRewriter1_21_11 extends EntityRewriter<Clientboun
     }
 
     private void relativeToAbsoluteTicks(final EntityDataHandlerEvent event, final EntityData data) {
-        final long currentGameTime = event.user().get(GameTimeStorage.class).gameTime();
+        final ProtocolStorables1_21_11 storables = event.user().storables(protocol);
+        final long currentGameTime = storables.gameTimeStorage().gameTime();
         final int remainingAngerTime = data.value();
         data.setTypeAndValue(protocol.mappedTypes().entityDataTypes().longType, currentGameTime + remainingAngerTime);
     }

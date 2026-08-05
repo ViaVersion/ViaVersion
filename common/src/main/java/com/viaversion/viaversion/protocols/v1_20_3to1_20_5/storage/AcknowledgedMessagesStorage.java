@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
@@ -43,7 +42,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *     gap with dummy 'last seen', and it will never be checked.</li>
  * </ul>
  */
-public final class AcknowledgedMessagesStorage implements StorableObject {
+public final class AcknowledgedMessagesStorage {
     private static final int MAX_HISTORY = 20;
     private static final int MINIMUM_DELAYED_ACK_COUNT = MAX_HISTORY;
     private static final BitSet DUMMY_LAST_SEEN_MESSAGES = new BitSet();

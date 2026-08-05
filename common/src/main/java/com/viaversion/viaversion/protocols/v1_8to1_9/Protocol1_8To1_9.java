@@ -103,8 +103,8 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.addEntityTracker(this.getClass(), new EntityTracker1_9(userConnection));
-        userConnection.addClientWorld(this.getClass(), new ClientWorld1_9());
+        addEntityTracker(userConnection, new EntityTracker1_9(userConnection));
+        userConnection.storables(this).setClientWorld(new ClientWorld1_9());
 
         userConnection.put(new MovementTracker());
         userConnection.put(new InventoryTracker());

@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.Protocol1_17_1To1_18;
-import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ChunkLightStorage;
+import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ProtocolStorables1_18;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
@@ -71,7 +71,8 @@ public final class EntityPacketRewriter1_18 extends EntityRewriter<ClientboundPa
                     final String world = wrapper.get(Types.STRING, 0);
                     final EntityTracker tracker = tracker(wrapper.user());
                     if (!world.equals(tracker.currentWorld())) {
-                        wrapper.user().get(ChunkLightStorage.class).clear();
+                        final ProtocolStorables1_18 storables = wrapper.user().storables(protocol);
+                        storables.chunkLightStorage().clear();
                     }
                 });
                 handler(worldDataTrackerHandler(0));

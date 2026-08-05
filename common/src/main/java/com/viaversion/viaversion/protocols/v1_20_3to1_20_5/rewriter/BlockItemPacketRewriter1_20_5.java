@@ -97,7 +97,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.BannerPatternStorage;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.TagKeys;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ProtocolStorables1_20_5;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Either;
@@ -830,7 +830,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             holders = HolderSet.of(new int[]{id});
         } else {
             final String tagKey = identifier.substring(1);
-            if (!connection.get(TagKeys.class).isValidIdentifier(tagKey)) {
+            final ProtocolStorables1_20_5 storables = connection.storables(protocol);
+            if (!storables.tagKeys().isValidIdentifier(tagKey)) {
                 return null;
             }
 
@@ -968,7 +969,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private void updateArmorTrim(final UserConnection connection, final StructuredDataContainer data, final CompoundTag trimTag, final boolean showInTooltip) {
         final Tag materialTag = trimTag.get("material");
         final Holder<ArmorTrimMaterial> materialHolder;
-        final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
+        final ProtocolStorables1_20_5 storables = connection.storables(protocol);
+        final ArmorTrimStorage trimStorage = storables.armorTrims();
         if (materialTag instanceof StringTag materialStringTag) {
             final int id = trimStorage.trimMaterials().keyToId(materialStringTag.getValue());
             if (id == -1) {
@@ -1535,7 +1537,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final ListTag<CompoundTag> patternsTag = tag.getListTag("Patterns", CompoundTag.class);
         if (patternsTag != null) {
-            final BannerPatternStorage patternStorage = connection.get(BannerPatternStorage.class);
+            final ProtocolStorables1_20_5 storables = connection.storables(protocol);
+            final BannerPatternStorage patternStorage = storables.bannerPatterns();
             final BannerPatternLayer[] layers = patternsTag.stream().map(patternTag -> {
                 final String pattern = patternTag.getString("Pattern", "");
                 final int color = patternTag.getInt("Color", -1);

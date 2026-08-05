@@ -17,9 +17,32 @@
  */
 package com.viaversion.viaversion.protocols.v1_20to1_20_2.storage;
 
-import com.google.gson.JsonElement;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public record LastResourcePack(String url, String hash, boolean required, @Nullable JsonElement prompt) {
+public final class ProtocolStorables1_20_2 extends ProtocolStorablesBase {
 
+    private final ConfigurationState configurationState = new ConfigurationState();
+    private LastResourcePack lastResourcePack;
+    private LastTags lastTags;
+
+    public ConfigurationState configurationState() {
+        return configurationState;
+    }
+
+    public @Nullable LastResourcePack lastResourcePack() {
+        return lastResourcePack;
+    }
+
+    public void setLastResourcePack(final LastResourcePack lastResourcePack) {
+        this.lastResourcePack = lastResourcePack;
+    }
+
+    public @Nullable LastTags lastTags() {
+        return lastTags;
+    }
+
+    public void setLastTags(final @Nullable LastTags lastTags) {
+        this.lastTags = lastTags;
+    }
 }

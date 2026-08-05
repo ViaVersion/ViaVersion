@@ -17,9 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_9to1_21_11.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
-
-public final class GameTimeStorage implements StorableObject {
+public final class GameTimeStorage {
 
     private long gameTime;
 

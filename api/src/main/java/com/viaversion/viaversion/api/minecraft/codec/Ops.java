@@ -58,7 +58,9 @@ public interface Ops {
 
     void writeMap(Consumer<MapSerializer> consumer);
 
-    <V> void write(final Type<V> type, final V value);
+    default <V> void write(final Type<V> type, final V value) {
+        type.write(this, value);
+    }
 
     interface ListSerializer {
 

@@ -39,6 +39,7 @@ import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntities1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntityMappings1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ChunkLightStorage;
+import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ProtocolStorables1_18;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.MathUtil;
@@ -67,7 +68,8 @@ public final class WorldPacketRewriter1_18 {
             final int chunkX = wrapper.passthrough(Types.VAR_INT);
             final int chunkZ = wrapper.passthrough(Types.VAR_INT);
 
-            if (wrapper.user().get(ChunkLightStorage.class).isLoaded(chunkX, chunkZ)) {
+            final ProtocolStorables1_18 storables = wrapper.user().storables(protocol);
+            if (storables.chunkLightStorage().isLoaded(chunkX, chunkZ)) {
                 if (!Via.getConfig().cache1_17Light()) {
                     // Light packets updating already sent chunks are the same as before
                     return;
@@ -96,7 +98,7 @@ public final class WorldPacketRewriter1_18 {
                 blockLight[i] = wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
             }
 
-            final ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);
+            final ChunkLightStorage lightStorage = storables.chunkLightStorage();
             lightStorage.storeLight(chunkX, chunkZ,
                 new ChunkLightStorage.ChunkLight(trustEdges, skyLightMask, blockLightMask,
                     emptySkyLightMask, emptyBlockLightMask, skyLight, blockLight));
@@ -160,7 +162,8 @@ public final class WorldPacketRewriter1_18 {
                 MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
                 MathUtil.ceilLog2(tracker.biomesSent())), chunk);
 
-            final ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);
+            final ProtocolStorables1_18 storables = wrapper.user().storables(protocol);
+            final ChunkLightStorage lightStorage = storables.chunkLightStorage();
             final boolean alreadyLoaded = !lightStorage.addLoadedChunk(chunk.getX(), chunk.getZ());
 
             // Append light data to chunk packet
@@ -199,7 +202,8 @@ public final class WorldPacketRewriter1_18 {
         protocol.registerClientbound(ClientboundPackets1_17_1.FORGET_LEVEL_CHUNK, wrapper -> {
             final int chunkX = wrapper.passthrough(Types.INT);
             final int chunkZ = wrapper.passthrough(Types.INT);
-            wrapper.user().get(ChunkLightStorage.class).clear(chunkX, chunkZ);
+            final ProtocolStorables1_18 storables = wrapper.user().storables(protocol);
+            storables.chunkLightStorage().clear(chunkX, chunkZ);
         });
     }
 

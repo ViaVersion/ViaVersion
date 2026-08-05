@@ -31,6 +31,7 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.Connec
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.EntityIdMappings1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ParticleIdMappings1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.ProtocolStorables1_13;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -65,7 +66,7 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                     if (entType == null) return;
 
                     // Register Type ID
-                    wrapper.user().getEntityTracker(Protocol1_12_2To1_13.class).addEntity(entityId, entType);
+                    wrapper.user().getEntityTracker(protocol).addEntity(entityId, entType);
 
                     if (entType.is(EntityTypes1_13.EntityType.FALLING_BLOCK)) {
                         int oldId = wrapper.get(Types.INT, 0);
@@ -133,7 +134,7 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                 map(Types.INT); // 2 - Dimension
 
                 handler(wrapper -> {
-                    ClientWorld clientChunks = wrapper.user().getClientWorld(Protocol1_12_2To1_13.class);
+                    ClientWorld clientChunks = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 1);
                     clientChunks.setEnvironment(dimensionId);
                 });
@@ -147,14 +148,15 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
             public void register() {
                 map(Types.INT); // 0 - Dimension ID
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_12_2To1_13.class);
+                    ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 0);
                     if (clientWorld.setEnvironment(dimensionId)) {
                         if (Via.getConfig().isServersideBlockConnections()) {
                             ConnectionData.clearBlockStorage(wrapper.user());
                         }
                         tracker(wrapper.user()).clearEntities();
-                        wrapper.user().get(BlockStorage.class).clear();
+                        final ProtocolStorables1_13 storables = wrapper.user().storables(protocol);
+                        storables.blockStorage().clear();
                     }
                 });
                 handler(Protocol1_12_2To1_13.SEND_DECLARE_COMMANDS_AND_TAGS);

@@ -46,8 +46,8 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.BlockItemPacketRewriter1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.ComponentRewriter1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.EntityPacketRewriter1_21;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.ProtocolStorables1_21;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -201,8 +201,11 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_5.PLAYER));
-        connection.put(new EfficiencyAttributeStorage());
-        connection.put(new PlayerPositionStorage());
+    }
+
+    @Override
+    public ProtocolStorablesBase createStorables() {
+        return new ProtocolStorables1_21();
     }
 
     @Override

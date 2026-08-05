@@ -15,11 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_20to1_20_2.storage;
+package com.viaversion.viaversion.protocols.v1_19_3to1_19_4.storage;
 
-import com.google.gson.JsonElement;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 
-public record LastResourcePack(String url, String hash, boolean required, @Nullable JsonElement prompt) {
+public final class ProtocolStorables1_19_4 extends ProtocolStorablesBase {
 
+    private PlayerVehicleTracker playerVehicleTracker = new PlayerVehicleTracker();
+
+    public PlayerVehicleTracker playerVehicleTracker() {
+        return playerVehicleTracker;
+    }
+
+    public void setPlayerVehicleTracker(final PlayerVehicleTracker playerVehicleTracker) {
+        this.playerVehicleTracker = playerVehicleTracker;
+    }
 }

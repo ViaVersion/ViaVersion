@@ -603,7 +603,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     protected <T extends ItemHasher> @Nullable T itemHasher(final UserConnection connection) {
-        return connection.getItemHasher(protocol.getClass());
+        return connection.getItemHasher(protocol);
     }
 
     protected void updateHashedItemDataComponentIds(final HashedItem item, final FullMappings mappings) {

@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_5to1_21.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
@@ -26,7 +25,7 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacke
 import java.util.List;
 import java.util.stream.Stream;
 
-public final class EfficiencyAttributeStorage implements StorableObject {
+public final class EfficiencyAttributeStorage {
 
     private static final EnchantAttributeModifier EFFICIENCY = new EnchantAttributeModifier("minecraft:enchantment.efficiency/mainhand", 19, 0, level -> (level * level) + 1);
     private static final EnchantAttributeModifier SOUL_SPEED = new EnchantAttributeModifier("minecraft:enchantment.soul_speed", 21, 0.1, level -> 0.04D + ((level - 1) * 0.01D));

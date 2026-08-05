@@ -15,11 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_20to1_20_2.storage;
+package com.viaversion.viaversion.protocols.v1_20_5to1_21.storage;
 
-import com.google.gson.JsonElement;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 
-public record LastResourcePack(String url, String hash, boolean required, @Nullable JsonElement prompt) {
+public final class ProtocolStorables1_21 extends ProtocolStorablesBase {
 
+    private final EfficiencyAttributeStorage efficiencyAttributes = new EfficiencyAttributeStorage();
+    private final PlayerPositionStorage playerPosition = new PlayerPositionStorage();
+
+    public EfficiencyAttributeStorage efficiencyAttributes() {
+        return efficiencyAttributes;
+    }
+
+    public PlayerPositionStorage playerPosition() {
+        return playerPosition;
+    }
 }

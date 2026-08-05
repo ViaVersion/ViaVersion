@@ -17,12 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.ChunkPosition;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 
-public class ChunkLoadTracker implements StorableObject {
+public class ChunkLoadTracker {
 
     private final LongSet loadedChunks = new LongOpenHashSet();
 

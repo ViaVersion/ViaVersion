@@ -27,8 +27,7 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPack
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
 import com.viaversion.viaversion.protocols.v26_1to26_2.Protocol26_1To26_2;
-import com.viaversion.viaversion.protocols.v26_1to26_2.storage.Encrypted;
-import com.viaversion.viaversion.protocols.v26_1to26_2.storage.FakeEntityId;
+import com.viaversion.viaversion.protocols.v26_1to26_2.storage.ProtocolStorables26_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandler;
 import java.util.concurrent.ThreadLocalRandom;
@@ -55,7 +54,8 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         });
 
         protocol.appendClientbound(ClientboundPackets26_1.LOGIN, wrapper -> {
-            wrapper.user().put(new FakeEntityId(ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE, -1)));
+            final ProtocolStorables26_2 storables = wrapper.user().storables(protocol);
+            storables.setFakeEntityId(ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE, -1));
             final int entityId = wrapper.get(Types.INT, 0);
             wrapper.set(Types.INT, 0, toFakeEntityId(wrapper, entityId));
 
@@ -66,8 +66,7 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
             wrapper.passthrough(Types.OPTIONAL_GLOBAL_POSITION); // Last death location
             wrapper.passthrough(Types.VAR_INT); // Portal cooldown
             wrapper.passthrough(Types.VAR_INT); // Sea level
-            final boolean onlineMode = wrapper.user().has(Encrypted.class);
-            wrapper.write(Types.BOOLEAN, onlineMode);
+            wrapper.write(Types.BOOLEAN, storables.encrypted());
         });
 
         // Iterate through **all** packets containing an entity ID and replace it with a randomized negative value if the ID is zero,
@@ -170,11 +169,13 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
     }
 
     private int toFakeEntityId(final PacketWrapper wrapper, final int entityId) {
-        return entityId == 0 ? wrapper.user().get(FakeEntityId.class).id() : entityId;
+        final ProtocolStorables26_2 storables = wrapper.user().storables(protocol);
+        return entityId == 0 ? storables.fakeEntityId() : entityId;
     }
 
     private int toOriginalEntityId(final PacketWrapper wrapper, final int entityId) {
-        return entityId < -1 && entityId == wrapper.user().get(FakeEntityId.class).id() ? 0 : entityId;
+        final ProtocolStorables26_2 storables = wrapper.user().storables(protocol);
+        return entityId < -1 && entityId == storables.fakeEntityId() ? 0 : entityId;
     }
 
     @Override
@@ -197,7 +198,8 @@ public final class EntityPacketRewriter26_2 extends EntityRewriter<ClientboundPa
         final EntityDataHandler toFakeEntityId = (event, data) -> {
             final Integer target = data.value();
             if (target != null) {
-                data.setValue(target == 0 ? event.user().get(FakeEntityId.class).id() : target);
+                final ProtocolStorables26_2 storables = event.user().storables(protocol);
+                data.setValue(target == 0 ? storables.fakeEntityId() : target);
             }
         };
         filter().type(EntityTypes26_2.FROG).index(19).handler(toFakeEntityId); // Tongue target

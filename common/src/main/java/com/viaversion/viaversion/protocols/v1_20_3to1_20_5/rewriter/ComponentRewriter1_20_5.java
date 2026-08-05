@@ -88,6 +88,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Instruments1_20_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Potions1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ProtocolStorables1_20_5;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
@@ -965,7 +966,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
     protected CompoundTag trimToTag(final UserConnection connection, final ArmorTrim value) {
         final CompoundTag tag = new CompoundTag();
         final Holder<ArmorTrimMaterial> material = value.material();
-        final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
+        final ProtocolStorables1_20_5 storables = connection.storables(protocol);
+        final ArmorTrimStorage trimStorage = storables.armorTrims();
         if (material.hasId()) {
             final String trimMaterial = trimStorage.trimMaterials().idToKey(material.id());
             tag.putString("material", trimMaterial);
@@ -1024,7 +1026,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
 
         final Tag materialTag = value.get("material");
         Holder<ArmorTrimMaterial> material;
-        final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
+        final ProtocolStorables1_20_5 storables = connection.storables(protocol);
+        final ArmorTrimStorage trimStorage = storables.armorTrims();
         if (materialTag instanceof StringTag stringTag) {
             material = Holder.of(trimStorage.trimMaterials().keyToId(stringTag.getValue()));
         } else {

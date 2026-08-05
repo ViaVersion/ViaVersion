@@ -29,7 +29,11 @@ import com.viaversion.viaversion.util.ComponentUtil;
 
 public class CommandBlockHandler implements BlockEntityProvider.BlockEntityHandler {
 
-    private final Protocol1_12_2To1_13 protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_12_2To1_13.class);
+    private final Protocol1_12_2To1_13 protocol;
+
+    public CommandBlockHandler(final Protocol1_12_2To1_13 protocol) {
+        this.protocol = protocol;
+    }
 
     @Override
     public int transform(UserConnection user, CompoundTag tag) {

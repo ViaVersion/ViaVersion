@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_20to1_20_2.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.TagData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -28,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class LastTags implements StorableObject {
+public class LastTags {
 
     private final List<RegistryTags> registryTags = new ArrayList<>();
     private boolean sentDuringConfigPhase;

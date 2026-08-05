@@ -36,8 +36,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.Paintings1_20_5;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.ProtocolStorables1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.WolfVariantRegistryMarker;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
@@ -105,14 +104,17 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         });
 
         protocol.appendClientbound(ClientboundPackets1_20_5.LOGIN, wrapper -> {
-            wrapper.user().get(EfficiencyAttributeStorage.class).onLoginSent(wrapper.get(Types.INT, 0), wrapper.user());
+            final ProtocolStorables1_21 storables = wrapper.user().storables(protocol);
+            storables.efficiencyAttributes().onLoginSent(wrapper.get(Types.INT, 0), wrapper.user());
         });
 
         protocol.appendClientbound(ClientboundPackets1_20_5.RESPAWN, wrapper -> {
+            final ProtocolStorables1_21 storables = wrapper.user().storables(protocol);
             // Resend attribute modifiers from items
-            wrapper.user().get(EfficiencyAttributeStorage.class).onRespawn(wrapper.user());
-
-            wrapper.user().put(new PlayerPositionStorage());
+            storables.efficiencyAttributes().onRespawn(wrapper.user());
+            // Reset stored player position
+            storables.playerPosition().setPosition(0, 0, 0);
+            storables.playerPosition().setOnGround(false);
         });
 
         // Tracking player position and on ground for block interactions, rotations is kept from the interaction packet
@@ -166,12 +168,14 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         final double x = wrapper.passthrough(Types.DOUBLE);
         final double y = wrapper.passthrough(Types.DOUBLE);
         final double z = wrapper.passthrough(Types.DOUBLE);
-        wrapper.user().get(PlayerPositionStorage.class).setPosition(x, y, z);
+        final ProtocolStorables1_21 storables = wrapper.user().storables(protocol);
+        storables.playerPosition().setPosition(x, y, z);
     }
 
     private void storeOnGround(final PacketWrapper wrapper) {
         final boolean onGround = wrapper.passthrough(Types.BOOLEAN);
-        wrapper.user().get(PlayerPositionStorage.class).setOnGround(onGround);
+        final ProtocolStorables1_21 storables = wrapper.user().storables(protocol);
+        storables.playerPosition().setOnGround(onGround);
     }
 
     @Override

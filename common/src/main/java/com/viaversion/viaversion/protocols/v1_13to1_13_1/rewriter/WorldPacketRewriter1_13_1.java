@@ -29,7 +29,7 @@ public class WorldPacketRewriter1_13_1 {
 
     public static void register(Protocol1_13To1_13_1 protocol) {
         protocol.registerClientbound(ClientboundPackets1_13.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13To1_13_1.class);
+            ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
             Chunk chunk = wrapper.passthrough(ChunkType1_13.forEnvironment(clientWorld.getEnvironment()));
 
             protocol.getBlockRewriter().handleChunk(chunk);

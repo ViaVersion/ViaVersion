@@ -29,6 +29,7 @@ import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.Protocol1_20To1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ConfigurationState;
+import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ProtocolStorables1_20_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 public final class EntityPacketRewriter1_20_2 extends EntityRewriter<ClientboundPackets1_19_4, Protocol1_20To1_20_2> {
@@ -96,7 +97,8 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
 
                     // Debug, flat, last death pos, and portal cooldown at the end unchanged
 
-                    final ConfigurationState configurationBridge = wrapper.user().get(ConfigurationState.class);
+                    final ProtocolStorables1_20_2 storables = wrapper.user().storables(protocol);
+                    final ConfigurationState configurationBridge = storables.configurationState();
                     if (!configurationBridge.setLastDimensionRegistry(dimensionRegistry)) {
                         // No change, so no need to re-enter the configuration state - just let this one through
                         final PacketWrapper clientInformationPacket = configurationBridge.clientInformationPacket(wrapper.user());
@@ -123,7 +125,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                     configurationBridge.setJoinGamePacket(wrapper);
                     wrapper.cancel();
 
-                    Protocol1_20To1_20_2.sendConfigurationPackets(wrapper.user(), dimensionRegistry, null);
+                    protocol.sendConfigurationPackets(wrapper.user(), dimensionRegistry, null);
                 });
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
             }

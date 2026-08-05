@@ -87,7 +87,7 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
         });
 
         registerClientbound(ClientboundPackets1_9.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_9_1To1_9_3.class);
+            ClientWorld clientWorld = wrapper.user().storables(Protocol1_9_1To1_9_3.this).clientWorld();
 
             Chunk chunk = wrapper.read(ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment()));
             wrapper.write(ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment()), chunk);
@@ -116,7 +116,7 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
                 map(Types.INT); // 2 - Dimension
 
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_9_1To1_9_3.class);
+                    ClientWorld clientWorld = wrapper.user().storables(Protocol1_9_1To1_9_3.this).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 1);
                     clientWorld.setEnvironment(dimensionId);
                 });
@@ -128,7 +128,7 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
             public void register() {
                 map(Types.INT); // 0 - Dimension ID
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_9_1To1_9_3.class);
+                    ClientWorld clientWorld = wrapper.user().storables(Protocol1_9_1To1_9_3.this).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 0);
                     clientWorld.setEnvironment(dimensionId);
                 });
@@ -152,6 +152,6 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
 
     @Override
     public void init(UserConnection user) {
-        user.addClientWorld(this.getClass(), new ClientWorld());
+        user.storables(this).setClientWorld(new ClientWorld());
     }
 }

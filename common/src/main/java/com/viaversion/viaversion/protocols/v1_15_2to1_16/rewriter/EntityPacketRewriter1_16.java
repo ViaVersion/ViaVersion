@@ -34,7 +34,7 @@ import com.viaversion.viaversion.protocols.v1_15_2to1_16.data.AttributeMappings1
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.data.DimensionRegistries1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ServerboundPackets1_16;
-import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.InventoryTracker1_16;
+import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.ProtocolStorables1_16;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
@@ -92,7 +92,7 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 return;
             }
 
-            wrapper.user().getEntityTracker(Protocol1_15_2To1_16.class).addEntity(entityId, EntityTypes1_16.LIGHTNING_BOLT);
+            wrapper.user().getEntityTracker(protocol).addEntity(entityId, EntityTypes1_16.LIGHTNING_BOLT);
 
             wrapper.write(Types.UUID, UUIDUtil.randomUUID()); // uuid
             wrapper.write(Types.VAR_INT, EntityTypes1_16.LIGHTNING_BOLT.getId()); // entity type
@@ -203,9 +203,9 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 return;
             }
 
-            InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
+            final ProtocolStorables1_16 storables = wrapper.user().storables(protocol);
             // Don't send an arm swing if the player has an inventory opened.
-            if (inventoryTracker.isInventoryOpen()) {
+            if (storables.inventoryTracker().isInventoryOpen()) {
                 wrapper.cancel();
             }
         });

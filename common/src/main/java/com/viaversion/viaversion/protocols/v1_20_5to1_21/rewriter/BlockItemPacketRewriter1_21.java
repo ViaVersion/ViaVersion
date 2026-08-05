@@ -38,6 +38,7 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.AttributeModifierMappings1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.ProtocolStorables1_21;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import java.util.Arrays;
 import java.util.List;
@@ -72,7 +73,8 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
                 return;
             }
 
-            final EfficiencyAttributeStorage storage = wrapper.user().get(EfficiencyAttributeStorage.class);
+            final ProtocolStorables1_21 storables = wrapper.user().storables(protocol);
+            final EfficiencyAttributeStorage storage = storables.efficiencyAttributes();
             Enchantments enchants = item.dataContainer().get(StructuredDataKey.ENCHANTMENTS1_20_5);
             EfficiencyAttributeStorage.ActiveEnchants active = storage.activeEnchants();
             active = switch (slotId) {
@@ -121,7 +123,8 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             if (!Via.getConfig().fix1_21PlacementRotation()) {
                 return;
             }
-            final PlayerPositionStorage storage = wrapper.user().get(PlayerPositionStorage.class);
+            final ProtocolStorables1_21 storables1_21 = wrapper.user().storables(protocol);
+            final PlayerPositionStorage storage = storables1_21.playerPosition();
 
             // Not correct but *enough* for vanilla/normal servers to have block placement synchronized
             final PacketWrapper playerRotation = wrapper.create(ServerboundPackets1_20_5.MOVE_PLAYER_POS_ROT);

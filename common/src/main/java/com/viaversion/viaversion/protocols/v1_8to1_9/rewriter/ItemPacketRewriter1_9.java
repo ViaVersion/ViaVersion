@@ -118,7 +118,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     // Check if it is the inventory of the player
                     if (showShieldWhenSwordInHand) {
                         InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
 
                         short slotID = wrapper.get(Types.SHORT, 0);
                         byte windowId = wrapper.get(Types.BYTE, 0);
@@ -157,7 +157,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
 
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                    EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
 
                     boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
                         && Via.getConfig().isShieldBlocking();
@@ -242,7 +242,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
 
                     if (showShieldWhenSwordInHand) {
                         InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
                         short slotID = wrapper.get(Types.SHORT, 0);
 
                         // Update item in slot
@@ -358,7 +358,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                         boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
                             && Via.getConfig().isShieldBlocking();
 
-                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
                         if (entityTracker.isBlocking()) {
                             entityTracker.setBlocking(false);
 

@@ -33,7 +33,7 @@ import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ClientboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.Protocol1_21_7To1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundPacket1_21_9;
-import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.storage.DimensionScaleStorage;
+import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.storage.ProtocolStorables1_21_9;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 
 public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<ClientboundPacket1_21_6, ServerboundPacket1_21_9, Protocol1_21_7To1_21_9> {
@@ -101,7 +101,8 @@ public final class BlockItemPacketRewriter1_21_9 extends StructuredItemRewriter<
 
         final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
         if (tracker.currentDimensionId() != -1) {
-            final double scale = wrapper.user().get(DimensionScaleStorage.class).getScale(tracker.currentDimensionId());
+            final ProtocolStorables1_21_9 storables = wrapper.user().storables(protocol);
+            final double scale = storables.dimensionScaleStorage().getScale(tracker.currentDimensionId());
             centerX /= scale;
             centerZ /= scale;
         }

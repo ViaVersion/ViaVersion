@@ -17,14 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Key;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class TagKeys implements StorableObject {
+public final class TagKeys {
 
     private final Set<String> identifiers = new HashSet<>();
 

@@ -28,8 +28,10 @@ import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesP
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType26_1;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.storage.ProtocolStorables26_1;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
@@ -107,6 +109,12 @@ final class Protocol98_1To99_1 extends AbstractProtocol<ClientboundPacket26_1, C
         addEntityTracker(connection);
         addItemHasher(connection);
     }
+
+    // If data beyond the tracker and hasher is required
+    //@Override
+    //public ProtocolStorablesBase createStorables() {
+    //    return new ProtocolStorables99_1();
+    //}
 
     // Overriding these methods is important as they are relied on various rewriter classes
     // and have mapping load methods called in AbstractProtocol via the getters

@@ -48,10 +48,12 @@ import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.rewriter.BlockItemPacketRewriter1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.rewriter.BlockRewriter1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.rewriter.EntityPacketRewriter1_20_2;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ConfigurationState;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ConfigurationState.BridgePhase;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.LastResourcePack;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.LastTags;
+import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ProtocolStorables1_20_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -110,13 +112,15 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             final String hash = wrapper.passthrough(Types.STRING);
             final boolean required = wrapper.passthrough(Types.BOOLEAN);
             final JsonElement prompt = wrapper.passthrough(Types.OPTIONAL_COMPONENT);
-            wrapper.user().put(new LastResourcePack(url, hash, required, prompt));
+            final ProtocolStorables1_20_2 storables = wrapper.user().storables(this);
+            storables.setLastResourcePack(new LastResourcePack(url, hash, required, prompt));
         });
 
         replaceClientbound(ClientboundPackets1_19_4.UPDATE_TAGS, wrapper -> {
             tagRewriter.handleGeneric(wrapper);
             wrapper.resetReader();
-            wrapper.user().put(new LastTags(wrapper));
+            final ProtocolStorables1_20_2 storables = wrapper.user().storables(this);
+            storables.setLastTags(new LastTags(wrapper));
         });
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS, this::handleConfigTags);
 
@@ -139,7 +143,8 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         // hence packets are added to a queue. With the data from the login packet, we sent what is needed
         // during the configuration phase before finally transitioning to the play state with the client as well.
         registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
-            wrapper.user().get(ConfigurationState.class).setBridgePhase(BridgePhase.PROFILE_SENT);
+            final ProtocolStorables1_20_2 storables = wrapper.user().storables(this);
+            storables.configurationState().setBridgePhase(BridgePhase.PROFILE_SENT);
             wrapper.user().getProtocolInfo().setServerState(State.PLAY);
         });
 
@@ -149,7 +154,8 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             // Overwrite the state set in the base protocol to what the server actually keeps sending
             wrapper.user().getProtocolInfo().setServerState(State.PLAY);
 
-            final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
+            final ProtocolStorables1_20_2 storables = wrapper.user().storables(this);
+            final ConfigurationState configurationState = storables.configurationState();
             configurationState.setBridgePhase(BridgePhase.CONFIGURATION);
             configurationState.sendQueuedPackets(wrapper.user());
         });
@@ -159,7 +165,8 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
 
             wrapper.user().getProtocolInfo().setClientState(State.PLAY);
 
-            final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
+            final ProtocolStorables1_20_2 storables = wrapper.user().storables(this);
+            final ConfigurationState configurationState = storables.configurationState();
             configurationState.setBridgePhase(BridgePhase.NONE);
             configurationState.sendQueuedPackets(wrapper.user());
             configurationState.clear();
@@ -178,8 +185,8 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
 
             // Store it to re-send it when another ClientboundLoginPacket is sent, since the client will only send it
             // once per connection right after the handshake
-            final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
-            configurationState.setClientInformation(clientInformation);
+            final ProtocolStorables1_20_2 storables = wrapper.user().storables(this);
+            storables.configurationState().setClientInformation(clientInformation);
             wrapper.cancel();
         });
 
@@ -191,11 +198,12 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         // Cancel this, as it will always just be the response to a re-sent pack from us
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), -1, PacketWrapper::cancel);
 
-        cancelClientbound(ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES); // TODO Sad emoji
+        cancelClientbound(ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES);
         registerServerbound(ServerboundPackets1_20_2.CONFIGURATION_ACKNOWLEDGED, null, wrapper -> {
             wrapper.cancel();
 
-            final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
+            final ProtocolStorables1_20_2 storables = wrapper.user().storables(this);
+            final ConfigurationState configurationState = storables.configurationState();
             if (configurationState.bridgePhase() != BridgePhase.REENTERING_CONFIGURATION) {
                 return;
             }
@@ -204,8 +212,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             wrapper.user().getProtocolInfo().setClientState(State.CONFIGURATION);
             configurationState.setBridgePhase(BridgePhase.CONFIGURATION);
 
-            final LastResourcePack lastResourcePack = wrapper.user().get(LastResourcePack.class);
-            sendConfigurationPackets(wrapper.user(), configurationState.lastDimensionRegistry(), lastResourcePack);
+            sendConfigurationPackets(wrapper.user(), configurationState.lastDimensionRegistry(), storables.lastResourcePack());
         });
         cancelServerbound(ServerboundPackets1_20_2.CHUNK_BATCH_RECEIVED);
 
@@ -225,7 +232,8 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
 
         final LastTags lastTags = new LastTags(wrapper);
         lastTags.setSentDuringConfigPhase(true);
-        wrapper.user().put(lastTags);
+        final ProtocolStorables1_20_2 storables = wrapper.user().storables(this);
+        storables.setLastTags(lastTags);
     }
 
     private static void sanitizeCustomPayload(final PacketWrapper wrapper) {
@@ -252,12 +260,13 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             return;
         }
 
-        final ConfigurationState configurationBridge = packetWrapper.user().get(ConfigurationState.class);
-        if (configurationBridge == null) {
-            // Bad state during an unexpected disconnect
+        final UserConnection connection = packetWrapper.user();
+        if (!connection.isActive()) {
             return;
         }
 
+        final ProtocolStorables1_20_2 storables = connection.storables(this);
+        final ConfigurationState configurationBridge = storables.configurationState();
         final BridgePhase phase = configurationBridge.bridgePhase();
         if (phase == BridgePhase.NONE) {
             super.transform(direction, state, packetWrapper);
@@ -268,7 +277,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         if (phase == BridgePhase.PROFILE_SENT || phase == BridgePhase.REENTERING_CONFIGURATION) {
             if (unmappedId == ClientboundPackets1_19_4.UPDATE_TAGS.getId()) {
                 // Don't re-send old tags during config phase
-                packetWrapper.user().remove(LastTags.class);
+                storables.setLastTags(null);
             }
 
             // Queue packets sent by the server while we wait for the client to transition to the configuration state
@@ -287,7 +296,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
                 final ProtocolVersion serverProtocolVersion = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
 
                 if (serverProtocolVersion.newerThanOrEqualTo(ProtocolVersion.v1_13)) {
-                    if (!packetWrapper.user().isClientSide() && !Via.getPlatform().isProxy() && unmappedId == ClientboundPackets1_19_4.SYSTEM_CHAT.getId()) {
+                    if (!connection.isClientSide() && !Via.getPlatform().isProxy() && unmappedId == ClientboundPackets1_19_4.SYSTEM_CHAT.getId()) {
                         // Cancelling this on a 1.13+ Vanilla server will cause it to exceptionally resend a message
                         // Assume that we have already sent the login packet and just let it through
                         super.transform(direction, State.PLAY, packetWrapper);
@@ -326,7 +335,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         super.transform(direction, State.CONFIGURATION, packetWrapper);
     }
 
-    public static void sendConfigurationPackets(final UserConnection connection, final CompoundTag dimensionRegistry, @Nullable final LastResourcePack lastResourcePack) {
+    public void sendConfigurationPackets(final UserConnection connection, final CompoundTag dimensionRegistry, @Nullable final LastResourcePack lastResourcePack) {
         final ProtocolInfo protocolInfo = connection.getProtocolInfo();
         protocolInfo.setServerState(State.CONFIGURATION);
 
@@ -337,7 +346,8 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         // If we tracked enables features, they'd be sent here
         // The client includes vanilla as the default feature when initially leaving the login phase
 
-        final LastTags lastTags = connection.get(LastTags.class);
+        final ProtocolStorables1_20_2 storables = connection.storables(this);
+        final LastTags lastTags = storables.lastTags();
         boolean sentTags = false;
         if (lastTags != null) {
             if (lastTags.sentDuringConfigPhase()) {
@@ -372,10 +382,11 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         protocolInfo.setServerState(State.PLAY);
     }
 
-    private PacketHandler queueServerboundPacket(final ServerboundPackets1_20_2 packetType) {
+    private static PacketHandler queueServerboundPacket(final ServerboundPackets1_20_2 packetType) {
         return wrapper -> {
             wrapper.setPacketType(packetType);
-            wrapper.user().get(ConfigurationState.class).addServerboundPacketToQueue(wrapper);
+            final ProtocolStorables1_20_2 storables = wrapper.user().storables(Protocol1_20To1_20_2.class);
+            storables.configurationState().addServerboundPacketToQueue(wrapper);
             wrapper.cancel();
         };
     }
@@ -387,8 +398,15 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
 
     @Override
     public void init(final UserConnection user) {
-        user.put(new ConfigurationState());
         addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19_4.PLAYER));
+        // ConfigurationState has onRemove() for ByteBuf cleanup, keep in storedObjects for lifecycle
+        final ProtocolStorables1_20_2 storables = user.storables(this);
+        user.put(storables.configurationState());
+    }
+
+    @Override
+    public ProtocolStorablesBase createStorables() {
+        return new ProtocolStorables1_20_2();
     }
 
     @Override

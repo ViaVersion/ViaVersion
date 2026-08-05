@@ -17,9 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
-
-public final class LastExplosionPowerStorage implements StorableObject {
+public final class LastExplosionPowerStorage {
 
     private float power;
     private int affectedBlocks;

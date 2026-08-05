@@ -30,7 +30,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class HashOps extends OpsBase implements Hasher {
+/**
+ * Re-usable (but not thread-safe) ops for writing hashes.
+ */
+public final class HashOps extends OpsBase implements Hasher {
 
     private static final byte TAG_MAP_START = 2;
     private static final byte TAG_MAP_END = 3;
@@ -156,11 +159,6 @@ public class HashOps extends OpsBase implements Hasher {
         final MapHashBuilder mapHasher = new MapHashBuilder();
         consumer.accept(mapHasher);
         mapHasher.applyHashToParent();
-    }
-
-    @Override
-    public <V> void write(final Type<V> type, final V value) {
-        type.write(this, value);
     }
 
     @Override

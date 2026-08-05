@@ -74,7 +74,7 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
             int[] entityIds = wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE);
             wrapper.cancel();
 
-            EntityTracker entityTracker = wrapper.user().getEntityTracker(Protocol1_16_4To1_17.class);
+            EntityTracker entityTracker = wrapper.user().getEntityTracker(protocol);
             for (int entityId : entityIds) {
                 entityTracker.removeEntity(entityId);
 

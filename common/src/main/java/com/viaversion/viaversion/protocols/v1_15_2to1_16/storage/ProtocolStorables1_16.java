@@ -15,9 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_21_11to26_1.storage;
+package com.viaversion.viaversion.protocols.v1_15_2to1_16.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 
-public final class TagsSent implements StorableObject {
+public final class ProtocolStorables1_16 extends ProtocolStorablesBase {
+
+    private final InventoryTracker1_16 inventoryTracker = new InventoryTracker1_16();
+
+    public InventoryTracker1_16 inventoryTracker() {
+        return inventoryTracker;
+    }
 }

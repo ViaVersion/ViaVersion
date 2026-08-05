@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
@@ -52,7 +53,10 @@ import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter.EntityPacket
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter.ParticleRewriter1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.rewriter.RegistryDataRewriter1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.storage.DimensionScaleStorage;
+import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.storage.ProtocolStorables1_21_9;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.LastExplosionPowerStorage;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ProtocolStorables1_21_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
@@ -91,13 +95,18 @@ public final class Protocol1_21_7To1_21_9 extends AbstractProtocol<ClientboundPa
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
 
-            final LastExplosionPowerStorage lastExplosionPowerStorage = wrapper.user().get(LastExplosionPowerStorage.class);
+            // Get power and affected blocks from 1.21.2 protocol
             float radius = 0;
             int affectedBlocks = 0;
-            if (lastExplosionPowerStorage != null) {
-                radius = lastExplosionPowerStorage.power();
-                affectedBlocks = lastExplosionPowerStorage.affectedBlocks();
+            if (wrapper.user().getProtocolInfo().serverProtocolVersion().olderThan(ProtocolVersion.v1_21_2)) {
+                final ProtocolStorables1_21_2 storables1_21_2 = wrapper.user().storables(Protocol1_21To1_21_2.class);
+                final LastExplosionPowerStorage lastExplosionPowerStorage = storables1_21_2.lastExplosionPowerStorage();
+                if (lastExplosionPowerStorage != null) {
+                    radius = lastExplosionPowerStorage.power();
+                    affectedBlocks = lastExplosionPowerStorage.affectedBlocks();
+                }
             }
+
             wrapper.write(Types.FLOAT, radius);
             wrapper.write(Types.INT, affectedBlocks); // For some reason a plain int
 
@@ -164,7 +173,11 @@ public final class Protocol1_21_7To1_21_9 extends AbstractProtocol<ClientboundPa
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_9.PLAYER));
         addItemHasher(connection);
-        connection.put(new DimensionScaleStorage());
+    }
+
+    @Override
+    public ProtocolStorables1_21_9 createStorables() {
+        return new ProtocolStorables1_21_9();
     }
 
     @Override

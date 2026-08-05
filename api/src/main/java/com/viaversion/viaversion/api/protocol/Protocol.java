@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.connection.ProtocolStorables;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -459,6 +460,15 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
     default boolean isBaseProtocol() {
         return false;
     }
+
+    /**
+     * Returns the index assigned to this protocol during registration.
+     *
+     * @return protocol index, or -1 if not yet registered
+     */
+    int index();
+
+    ProtocolStorables createStorables();
 
     /**
      * Marks this protocol as dependent on another. Before being initialized, it will wait for the dependency's completion.

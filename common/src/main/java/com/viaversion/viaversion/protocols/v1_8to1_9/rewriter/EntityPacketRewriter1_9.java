@@ -73,7 +73,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
 
                 handler(wrapper -> {
                     final short leashState = wrapper.read(Types.UNSIGNED_BYTE);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     if (leashState == 0) {
                         int passenger = wrapper.get(Types.INT, 0);
                         int vehicle = wrapper.get(Types.INT, 1);
@@ -115,7 +115,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 handler(wrapper -> {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     if (Via.getConfig().isHologramPatch()) {
-                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                         if (tracker.getKnownHolograms().contains(entityID)) {
                             Double newValue = wrapper.get(Types.DOUBLE, 1);
                             newValue += (Via.getConfig().getHologramYOffset());
@@ -164,7 +164,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                     @Override
                     public Integer transform(PacketWrapper wrapper, Short slot) {
                         int entityId = wrapper.get(Types.VAR_INT, 0);
-                        int receiverId = wrapper.user().getEntityTracker(Protocol1_8To1_9.class).clientEntityId();
+                        int receiverId = wrapper.user().getEntityTracker(protocol).clientEntityId();
 
                         // Cancel invalid slots as they would cause a packet read error in 1.9
                         // 1.8 handled invalid slots gracefully, but 1.9 does not
@@ -190,7 +190,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 });
                 // Blocking
                 handler(wrapper -> {
-                    EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     Item stack = wrapper.get(Types.ITEM1_8, 0);
 
@@ -212,7 +212,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 handler(wrapper -> {
                     List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_9, 0);
                     int entityId = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     if (tracker.hasEntity(entityId)) {
                         handleEntityData(entityId, entityDataList, wrapper.user());
                     } else {
@@ -224,7 +224,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 handler(wrapper -> {
                     List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_9, 0);
                     int entityID = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.handleEntityData(entityID, entityDataList);
                 });
 
@@ -276,7 +276,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
             public void register() {
                 map(Types.VAR_INT);
                 handler(wrapper -> {
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     if (wrapper.get(Types.VAR_INT, 0) != tracker.getProvidedEntityId()) {
                         return;
                     }

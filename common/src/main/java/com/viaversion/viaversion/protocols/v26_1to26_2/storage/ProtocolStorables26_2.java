@@ -15,11 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_20to1_20_2.storage;
+package com.viaversion.viaversion.protocols.v26_1to26_2.storage;
 
-import com.google.gson.JsonElement;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 
-public record LastResourcePack(String url, String hash, boolean required, @Nullable JsonElement prompt) {
+public final class ProtocolStorables26_2 extends ProtocolStorablesBase {
 
+    private int fakeEntityId;
+    private boolean encrypted;
+
+    public int fakeEntityId() {
+        return fakeEntityId;
+    }
+
+    public void setFakeEntityId(final int fakeEntityId) {
+        this.fakeEntityId = fakeEntityId;
+    }
+
+    public boolean encrypted() {
+        return encrypted;
+    }
+
+    public void setEncrypted(final boolean encrypted) {
+        this.encrypted = encrypted;
+    }
 }

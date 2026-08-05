@@ -318,4 +318,12 @@ public interface ProtocolManager {
      * @return whether the mappings have been loaded
      */
     boolean hasLoadedMappings();
+
+    /**
+     * Returns the number of registered protocols.
+     * Used to size per-connection protocol data arrays.
+     *
+     * @return number of registered protocols
+     */
+    int registeredProtocolCount();
 }

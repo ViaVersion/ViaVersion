@@ -46,7 +46,7 @@ import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.ComponentRewri
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.EntityPacketRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.ItemPacketRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.WorldPacketRewriter1_16;
-import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.InventoryTracker1_16;
+import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.ProtocolStorables1_16;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -224,8 +224,12 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, EntityTypes1_16.PLAYER));
-        userConnection.put(new InventoryTracker1_16());
+        addEntityTracker(userConnection, new EntityTrackerBase(userConnection, EntityTypes1_16.PLAYER));
+    }
+
+    @Override
+    public ProtocolStorables1_16 createStorables() {
+        return new ProtocolStorables1_16();
     }
 
     @Override

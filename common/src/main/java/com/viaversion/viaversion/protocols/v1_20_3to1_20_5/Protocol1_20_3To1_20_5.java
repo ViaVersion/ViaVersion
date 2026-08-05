@@ -50,8 +50,9 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.BlockItemPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.ComponentRewriter1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.EntityPacketRewriter1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.ParticleRewriter1_20_5;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ProtocolStorables1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ScoreboardTeamStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.TagKeys;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
@@ -82,7 +83,8 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         public void handleGeneric(final PacketWrapper wrapper) {
             super.handleGeneric(wrapper);
             wrapper.resetReader();
-            wrapper.user().put(new TagKeys(wrapper));
+            final ProtocolStorables1_20_5 storables = wrapper.user().storables(Protocol1_20_3To1_20_5.this);
+            storables.setTagKeys(new TagKeys(wrapper));
         }
     };
     private final ComponentRewriter1_20_5<ClientboundPacket1_20_3> componentRewriter = new ComponentRewriter1_20_5<>(this, VersionedTypes.V1_20_5.structuredData);
@@ -109,7 +111,8 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
 
             // Moved to join game
             final boolean enforcesSecureChat = wrapper.read(Types.BOOLEAN);
-            final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+            final ProtocolStorables1_20_5 storables = wrapper.user().storables(this);
+            final AcknowledgedMessagesStorage storage = storables.acknowledgedMessages();
             storage.setSecureChatEnforced(enforcesSecureChat);
             if (enforcesSecureChat) {
                 // Only send the chat session to the server if we know that it is required
@@ -121,7 +124,8 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             wrapper.passthrough(Types.STRING); // Message
             wrapper.passthrough(Types.LONG); // Timestamp
 
-            final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+            final ProtocolStorables1_20_5 storables = wrapper.user().storables(this);
+            final AcknowledgedMessagesStorage storage = storables.acknowledgedMessages();
             final long salt = wrapper.read(Types.LONG);
             final byte[] signature = wrapper.read(Types.OPTIONAL_SIGNATURE_BYTES);
             if (storage.isSecureChatEnforced()) {
@@ -141,7 +145,8 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             wrapper.passthrough(Types.LONG); // Timestamp
 
             // See above, strip signatures if we can to prevent verification of possibly bad signatures
-            final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+            final ProtocolStorables1_20_5 storables = wrapper.user().storables(this);
+            final AcknowledgedMessagesStorage storage = storables.acknowledgedMessages();
             final long salt = wrapper.read(Types.LONG);
             final int signatures = wrapper.read(Types.VAR_INT);
             if (storage.isSecureChatEnforced()) {
@@ -165,7 +170,8 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         });
         registerServerbound(ServerboundPackets1_20_5.CHAT_ACK, wrapper -> {
             final int offset = wrapper.read(Types.VAR_INT);
-            final int fixedOffset = wrapper.user().get(AcknowledgedMessagesStorage.class).accumulateAckCount(offset);
+            final ProtocolStorables1_20_5 storables = wrapper.user().storables(this);
+            final int fixedOffset = storables.acknowledgedMessages().accumulateAckCount(offset);
             if (fixedOffset > 0) {
                 wrapper.write(Types.VAR_INT, fixedOffset);
             } else {
@@ -179,12 +185,14 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             wrapper.write(Types.LONG, 0L); // Salt
             wrapper.write(Types.VAR_INT, 0); // No signatures
 
-            writeSpoofedChatAck(wrapper, wrapper.user().get(AcknowledgedMessagesStorage.class));
+            final ProtocolStorables1_20_5 storables = wrapper.user().storables(this);
+            writeSpoofedChatAck(wrapper, storables.acknowledgedMessages());
         });
         registerServerbound(ServerboundPackets1_20_5.CHAT_SESSION_UPDATE, wrapper -> {
             // Delay this until we know whether the server enforces secure chat
             // The server sends this info in SERVER_DATA, but the client already sends this after receiving the game login
-            final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+            final ProtocolStorables1_20_5 storables = wrapper.user().storables(this);
+            final AcknowledgedMessagesStorage storage = storables.acknowledgedMessages();
             if (storage.secureChatEnforced() != null && storage.secureChatEnforced()) {
                 // We already know that secure chat is enforced, let it through
                 return;
@@ -197,7 +205,10 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             wrapper.cancel();
         });
 
-        appendClientbound(ClientboundPackets1_20_3.START_CONFIGURATION, wrapper -> wrapper.user().put(new AcknowledgedMessagesStorage()));
+        appendClientbound(ClientboundPackets1_20_3.START_CONFIGURATION, wrapper -> {
+            final ProtocolStorables1_20_5 storables = wrapper.user().storables(this);
+            storables.setAcknowledgedMessages(new AcknowledgedMessagesStorage());
+        });
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
             wrapper.passthrough(Types.UUID); // UUID
@@ -207,7 +218,8 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         });
 
         replaceClientbound(ClientboundPackets1_20_3.SET_PLAYER_TEAM, wrapper -> {
-            final ScoreboardTeamStorage storage = wrapper.user().get(ScoreboardTeamStorage.class);
+            final ProtocolStorables1_20_5 storables = wrapper.user().storables(this);
+            final ScoreboardTeamStorage storage = storables.scoreboardTeams();
 
             final String teamName = wrapper.passthrough(Types.STRING);
             final byte action = wrapper.passthrough(Types.BYTE);
@@ -312,9 +324,13 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_5.PLAYER));
-        connection.put(new AcknowledgedMessagesStorage());
-        connection.put(new ArmorTrimStorage());
-        connection.put(new ScoreboardTeamStorage());
+        final ProtocolStorables1_20_5 storables = connection.storables(this);
+        connection.put(storables.armorTrims());
+    }
+
+    @Override
+    public ProtocolStorablesBase createStorables() {
+        return new ProtocolStorables1_20_5();
     }
 
     @Override

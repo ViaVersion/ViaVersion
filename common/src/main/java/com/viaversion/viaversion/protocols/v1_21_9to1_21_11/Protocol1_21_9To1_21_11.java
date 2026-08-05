@@ -57,7 +57,7 @@ import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPa
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.rewriter.BlockItemPacketRewriter1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.rewriter.ComponentRewriter1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.rewriter.EntityPacketRewriter1_21_11;
-import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.storage.GameTimeStorage;
+import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.storage.ProtocolStorables1_21_11;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
@@ -323,7 +323,11 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_11.PLAYER));
         addItemHasher(connection);
-        connection.put(new GameTimeStorage());
+    }
+
+    @Override
+    public ProtocolStorables1_21_11 createStorables() {
+        return new ProtocolStorables1_21_11();
     }
 
     @Override

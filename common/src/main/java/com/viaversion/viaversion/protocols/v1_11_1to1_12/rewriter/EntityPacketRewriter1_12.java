@@ -45,7 +45,7 @@ public class EntityPacketRewriter1_12 extends EntityRewriter<ClientboundPackets1
                 map(Types.UNSIGNED_BYTE);
                 map(Types.INT);
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_11_1To1_12.class);
+                    ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 1);
                     clientWorld.setEnvironment(dimensionId);
 
@@ -63,7 +63,7 @@ public class EntityPacketRewriter1_12 extends EntityRewriter<ClientboundPackets1
             public void register() {
                 map(Types.INT);
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_11_1To1_12.class);
+                    ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 0);
                     if (clientWorld.setEnvironment(dimensionId)) {
                         tracker(wrapper.user()).clearEntities();

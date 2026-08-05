@@ -25,7 +25,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
-import com.viaversion.viaversion.protocols.v1_21_11to26_1.storage.PlayerSneaking;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.storage.ProtocolStorables26_1;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPacket1_21_11;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.packet.ClientboundPackets1_21_11;
@@ -40,13 +40,16 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
     @Override
     public void registerPackets() {
         protocol.appendClientbound(ClientboundPackets1_21_11.RESPAWN, wrapper -> {
-            wrapper.user().get(PlayerSneaking.class).setSneaking(false);
+            final ProtocolStorables26_1 storables = wrapper.user().storables(protocol);
+            storables.setSneaking(false);
         });
 
         protocol.registerServerbound(ServerboundPackets26_1.PLAYER_INPUT, wrapper -> {
             final byte flags = wrapper.passthrough(Types.BYTE);
             final boolean pressingShift = (flags & 1 << 5) != 0;
-            wrapper.user().get(PlayerSneaking.class).setSneaking(pressingShift);
+
+            final ProtocolStorables26_1 storables = wrapper.user().storables(protocol);
+            storables.setSneaking(pressingShift);
         });
         protocol.registerServerbound(ServerboundPackets26_1.INTERACT, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT);
@@ -54,7 +57,9 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
             final int hand = wrapper.passthrough(Types.VAR_INT);
             final Vector3d location = wrapper.read(Types.LOW_PRECISION_VECTOR);
             final boolean secondaryAction = wrapper.passthrough(Types.BOOLEAN);
-            wrapper.user().get(PlayerSneaking.class).setSneaking(secondaryAction);
+
+            final ProtocolStorables26_1 storables = wrapper.user().storables(protocol);
+            storables.setSneaking(secondaryAction);
 
             // Send interact at as well
             final PacketWrapper interactAtPacket = wrapper.create(ServerboundPackets1_21_6.INTERACT);
@@ -74,7 +79,9 @@ public final class EntityPacketRewriter26_1 extends EntityRewriter<ClientboundPa
     private void writeInteract(final PacketWrapper wrapper) {
         wrapper.passthrough(Types.VAR_INT); // Entity ID
         wrapper.write(Types.VAR_INT, 1); // Attack
-        wrapper.write(Types.BOOLEAN, wrapper.user().get(PlayerSneaking.class).sneaking()); // Secondary action
+
+        final ProtocolStorables26_1 storables = wrapper.user().storables(protocol);
+        wrapper.write(Types.BOOLEAN, storables.sneaking()); // Secondary action
     }
 
     @Override

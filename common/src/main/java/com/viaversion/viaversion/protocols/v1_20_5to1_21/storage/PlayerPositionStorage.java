@@ -17,9 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_5to1_21.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
-
-public final class PlayerPositionStorage implements StorableObject {
+public final class PlayerPositionStorage {
 
     private double x;
     private double y;

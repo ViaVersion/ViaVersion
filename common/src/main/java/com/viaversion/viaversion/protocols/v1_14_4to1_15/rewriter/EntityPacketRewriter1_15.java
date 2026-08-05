@@ -74,7 +74,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
 
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
-                    wrapper.user().getEntityTracker(Protocol1_14_4To1_15.class).addEntity(entityId, EntityTypes1_15.PLAYER);
+                    wrapper.user().getEntityTracker(protocol).addEntity(entityId, EntityTypes1_15.PLAYER);
 
                     sendEntityDataPacket(wrapper, entityId);
                 });
@@ -86,7 +86,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
             public void register() {
                 map(Types.INT);
                 handler(wrapper -> {
-                    final ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_14_4To1_15.class);
+                    final ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 0);
                     if (clientWorld.setEnvironment(dimensionId)) {
                         tracker(wrapper.user()).clearEntities();
@@ -113,7 +113,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
                 handler(wrapper -> wrapper.write(Types.BOOLEAN, !Via.getConfig().is1_15InstantRespawn())); // Show Death Screen
                 handler(wrapper -> {
                     final int dimension = wrapper.get(Types.INT, 1);
-                    final ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_14_4To1_15.class);
+                    final ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
 
                     clientWorld.setEnvironment(dimension);
                 });

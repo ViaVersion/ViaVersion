@@ -34,7 +34,8 @@ import com.viaversion.viaversion.protocols.v1_17_1to1_18.rewriter.ComponentRewri
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.rewriter.EntityPacketRewriter1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.rewriter.ItemPacketRewriter1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.rewriter.WorldPacketRewriter1_18;
-import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ChunkLightStorage;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
+import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ProtocolStorables1_18;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
@@ -98,7 +99,11 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_17.PLAYER));
-        connection.put(new ChunkLightStorage());
+    }
+
+    @Override
+    public ProtocolStorablesBase createStorables() {
+        return new ProtocolStorables1_18();
     }
 
     @Override

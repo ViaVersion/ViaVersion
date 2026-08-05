@@ -49,6 +49,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundCon
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ProtocolStorables1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ScoreboardTeamStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
@@ -198,10 +199,11 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 }
 
                 // Track custom armor trims
+                final ProtocolStorables1_20_5 storables = wrapper.user().storables(protocol);
                 if (strippedKey.equals("trim_pattern")) {
-                    wrapper.user().get(ArmorTrimStorage.class).setTrimPatterns(toMappings(registryEntries));
+                    storables.armorTrims().setTrimPatterns(toMappings(registryEntries));
                 } else if (strippedKey.equals("trim_material")) {
-                    wrapper.user().get(ArmorTrimStorage.class).setTrimMaterials(toMappings(registryEntries));
+                    storables.armorTrims().setTrimMaterials(toMappings(registryEntries));
                 }
 
                 final PacketWrapper registryPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
@@ -267,7 +269,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 handler(playerTrackerHandler());
                 handler(wrapper -> {
                     // Enforces secure chat - moved from server data (which is unfortunately sent a while after this)
-                    final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+                    final ProtocolStorables1_20_5 storables = wrapper.user().storables(protocol);
+                    final AcknowledgedMessagesStorage storage = storables.acknowledgedMessages();
                     if (storage.secureChatEnforced() != null) {
                         // Just put in what we know if this is sent multiple times
                         wrapper.write(Types.BOOLEAN, storage.isSecureChatEnforced());
@@ -299,7 +302,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             sendRangeAttributes(wrapper.user(), creativeMode);
             tracker(wrapper.user()).setInstaBuild(creativeMode);
 
-            wrapper.user().put(new ScoreboardTeamStorage());
+            final ProtocolStorables1_20_5 storables = wrapper.user().storables(protocol);
+            storables.setScoreboardTeams(new ScoreboardTeamStorage());
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_MOB_EFFECT, wrapper -> {

@@ -121,7 +121,7 @@ import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ProtocolManagerImpl implements ProtocolManager {
-    private static final Protocol BASE_PROTOCOL = new InitialBaseProtocol();
+    private static final InitialBaseProtocol BASE_PROTOCOL = new InitialBaseProtocol();
 
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private final Object2ObjectMap<ProtocolVersion, Object2ObjectMap<ProtocolVersion, Protocol>> registryMap = new Object2ObjectOpenHashMap<>(32);
@@ -130,6 +130,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     private final Set<ProtocolVersion> supportedVersions = new HashSet<>();
     private final List<Pair<Range<ProtocolVersion>, Protocol>> serverboundBaseProtocols = Lists.newCopyOnWriteArrayList();
     private final List<Pair<Range<ProtocolVersion>, Protocol>> clientboundBaseProtocols = Lists.newCopyOnWriteArrayList();
+    private final AtomicInteger protocolIndex = new AtomicInteger();
 
     private final ReadWriteLock mappingLoaderLock = new ReentrantReadWriteLock();
     private Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new Reference2ObjectOpenHashMap<>();
@@ -154,6 +155,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     public void registerProtocols() {
         // Base Protocol
+        BASE_PROTOCOL.setIndex(protocolIndex.getAndIncrement());
         BASE_PROTOCOL.initialize();
         BASE_PROTOCOL.register(Via.getManager().getProviders());
         registerBaseProtocol(Direction.CLIENTBOUND, new ClientboundBaseProtocol1_7(), Range.closedOpen(ProtocolVersion.v1_7_2, ProtocolVersion.v1_16));
@@ -230,8 +232,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void registerProtocol(Protocol protocol, List<ProtocolVersion> supportedClientVersion, ProtocolVersion serverVersion) {
-        // Set the server version on AbstractProtocol instances before initialization
+        // Set the server version and index on AbstractProtocol instances before initialization
         if (protocol instanceof AbstractProtocol<?, ?, ?, ?> abstractProtocol) {
+            abstractProtocol.setIndex(protocolIndex.getAndIncrement());
             abstractProtocol.setServerVersion(serverVersion);
             abstractProtocol.setClientVersion(supportedClientVersion.stream().max(ProtocolVersion::compareTo).orElseThrow());
         }
@@ -282,6 +285,10 @@ public class ProtocolManagerImpl implements ProtocolManager {
         final ProtocolVersion upper = supportedProtocols.hasUpperBound() ? supportedProtocols.upperEndpoint() : null;
         Preconditions.checkArgument(lower == null || lower.getVersionType() != VersionType.SPECIAL, "Base protocol versions cannot contain a special version");
         Preconditions.checkArgument(upper == null || upper.getVersionType() != VersionType.SPECIAL, "Base protocol versions cannot contain a special version");
+
+        if (baseProtocol instanceof AbstractProtocol<?, ?, ?, ?> abstractProtocol) {
+            abstractProtocol.setIndex(protocolIndex.getAndIncrement());
+        }
 
         baseProtocol.initialize();
 
@@ -584,6 +591,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public boolean hasLoadedMappings() {
         return mappingsLoaded;
+    }
+
+    @Override
+    public int registeredProtocolCount() {
+        return protocolIndex.get();
     }
 
     public void shutdownLoaderExecutor() {

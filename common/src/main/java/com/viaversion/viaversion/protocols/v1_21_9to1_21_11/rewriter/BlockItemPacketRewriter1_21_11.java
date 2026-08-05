@@ -30,7 +30,7 @@ import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundPacket1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.Protocol1_21_9To1_21_11;
-import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.storage.GameTimeStorage;
+import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.storage.ProtocolStorables1_21_11;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 
 public final class BlockItemPacketRewriter1_21_11 extends StructuredItemRewriter<ClientboundPacket1_21_9, ServerboundPacket1_21_9, Protocol1_21_9To1_21_11> {
@@ -55,10 +55,12 @@ public final class BlockItemPacketRewriter1_21_11 extends StructuredItemRewriter
         });
         protocol.registerClientbound(ClientboundPackets1_21_9.SET_TIME, wrapper -> {
             final long gameTime = wrapper.passthrough(Types.LONG);
-            wrapper.user().get(GameTimeStorage.class).setGameTime(gameTime);
+            final ProtocolStorables1_21_11 storables = wrapper.user().storables(protocol);
+            storables.gameTimeStorage().setGameTime(gameTime);
         });
         protocol.registerServerbound(ServerboundPackets1_21_6.CLIENT_TICK_END, wrapper -> {
-            wrapper.user().get(GameTimeStorage.class).incrementGameTime();
+            final ProtocolStorables1_21_11 storables = wrapper.user().storables(protocol);
+            storables.gameTimeStorage().incrementGameTime();
         });
     }
 

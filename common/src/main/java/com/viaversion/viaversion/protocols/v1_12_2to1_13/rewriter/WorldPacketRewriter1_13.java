@@ -44,6 +44,7 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PaintingProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.ProtocolStorables1_13;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Key;
@@ -113,7 +114,8 @@ public class WorldPacketRewriter1_13 {
                     int newId = provider.transform(wrapper.user(), position, tag, true);
 
                     if (newId != -1) {
-                        BlockStorage storage = wrapper.user().get(BlockStorage.class);
+                        final ProtocolStorables1_13 storables = wrapper.user().storables(protocol);
+                        final BlockStorage storage = storables.blockStorage();
                         BlockStorage.ReplacementData replacementData = storage.get(position);
                         if (replacementData != null) {
                             replacementData.setReplacement(newId);
@@ -307,7 +309,8 @@ public class WorldPacketRewriter1_13 {
                     int x = wrapper.passthrough(Types.INT);
                     int z = wrapper.passthrough(Types.INT);
 
-                    wrapper.user().get(BlockStorage.class).removeChunk(x, z);
+                    final ProtocolStorables1_13 storables = wrapper.user().storables(protocol);
+                    storables.blockStorage().removeChunk(x, z);
                     if (Via.getConfig().isServersideBlockConnections()) {
                         ConnectionData.blockConnectionProvider.unloadChunk(wrapper.user(), x, z);
                     }
@@ -328,8 +331,9 @@ public class WorldPacketRewriter1_13 {
         });
 
         protocol.registerClientbound(ClientboundPackets1_12_1.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_12_2To1_13.class);
-            BlockStorage storage = wrapper.user().get(BlockStorage.class);
+            final ProtocolStorables1_13 storables = wrapper.user().storables(protocol);
+            ClientWorld clientWorld = storables.clientWorld();
+            BlockStorage storage = storables.blockStorage();
 
             ChunkType1_9_3 type = ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment());
             ChunkType1_13 type1_13 = ChunkType1_13.forEnvironment(clientWorld.getEnvironment());

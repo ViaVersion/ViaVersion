@@ -121,7 +121,7 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
                         wrapper.read(Types.STRING); // Remove channel
 
                         int windowId = wrapper.read(Types.INT);
-                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
+                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(protocol);
                         tracker.setLatestTradeWindowId(windowId);
                         wrapper.write(Types.VAR_INT, windowId);
 
@@ -183,7 +183,7 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
         protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, wrapper -> {
             // Selecting trade now moves the items, we need to resync the inventory
             PacketWrapper resyncPacket = wrapper.create(ServerboundPackets1_13.CONTAINER_CLICK);
-            EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
+            EntityTracker1_14 tracker = wrapper.user().getEntityTracker(protocol);
             resyncPacket.write(Types.BYTE, ((byte) tracker.getLatestTradeWindowId())); // 0 - Window ID
             resyncPacket.write(Types.SHORT, ((short) -999)); // 1 - Slot
             resyncPacket.write(Types.BYTE, (byte) 2); // 2 - Button - End left click

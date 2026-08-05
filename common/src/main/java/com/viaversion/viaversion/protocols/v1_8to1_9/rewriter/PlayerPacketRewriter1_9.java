@@ -52,7 +52,7 @@ public class PlayerPacketRewriter1_9 {
                 handler(wrapper -> {
                     JsonObject obj = (JsonObject) wrapper.get(Types.COMPONENT, 0);
                     if (obj.get("translate") != null && obj.get("translate").getAsString().equals("gameMode.changed")) {
-                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                         String gameMode = tracker.getGameMode().text();
 
                         JsonObject gameModeObject = new JsonObject();
@@ -138,7 +138,7 @@ public class PlayerPacketRewriter1_9 {
 
                     if (mode == 0 || mode == 3 || mode == 4) {
                         String[] players = wrapper.passthrough(Types.STRING_ARRAY); // Players
-                        final EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        final EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
                         String myName = wrapper.user().getProtocolInfo().getUsername();
                         String teamName = wrapper.get(Types.STRING, 0);
                         for (String player : players) {
@@ -160,7 +160,7 @@ public class PlayerPacketRewriter1_9 {
                     }
 
                     if (mode == 1) { // Remove team
-                        final EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        final EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
                         String teamName = wrapper.get(Types.STRING, 0);
                         if (entityTracker.isAutoTeam()
                             && teamName.equals(entityTracker.getCurrentTeam())) {
@@ -183,7 +183,7 @@ public class PlayerPacketRewriter1_9 {
                 // Parse this info
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.addEntity(entityId, EntityTypes1_9.EntityType.PLAYER);
                     tracker.setClientEntityId(entityId);
                 });
@@ -195,7 +195,7 @@ public class PlayerPacketRewriter1_9 {
                 map(Types.BOOLEAN); // 6 - Reduced Debug info
 
                 handler(wrapper -> {
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     short gamemodeId = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     gamemodeId &= -9; // remove the hardcore mode flag
                     tracker.setGameMode(GameMode.getById(gamemodeId)); //Set player gamemode
@@ -203,7 +203,7 @@ public class PlayerPacketRewriter1_9 {
 
                 // Track player's dimension
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_8To1_9.class);
+                    ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.BYTE, 0);
                     clientWorld.setEnvironment(dimensionId);
                 });
@@ -216,7 +216,7 @@ public class PlayerPacketRewriter1_9 {
 
                 // Scoreboard will be cleared when join game is received
                 handler(wrapper -> {
-                    EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
                     if (Via.getConfig().isAutoTeam()) {
                         entityTracker.setAutoTeam(true);
                         // Workaround for packet order issue
@@ -291,11 +291,11 @@ public class PlayerPacketRewriter1_9 {
                     // Fake permissions to get Commandblocks working
                     provider.sendPermission(wrapper.user());
 
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     int gamemode = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     tracker.setGameMode(GameMode.getById(gamemode));
 
-                    ClientWorld1_9 clientWorld = wrapper.user().getClientWorld(Protocol1_8To1_9.class);
+                    ClientWorld1_9 clientWorld = (ClientWorld1_9) wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 0);
 
                     // Track player's dimension
@@ -319,7 +319,7 @@ public class PlayerPacketRewriter1_9 {
                     short reason = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     if (reason == 3) { //Change gamemode
                         int gamemode = wrapper.get(Types.FLOAT, 0).intValue();
-                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                         tracker.setGameMode(GameMode.getById(gamemode));
                     } else if (reason == 4) { //Open credits screen
                         wrapper.set(Types.FLOAT, 0, 1F);
@@ -432,7 +432,7 @@ public class PlayerPacketRewriter1_9 {
                     int action = wrapper.get(Types.VAR_INT, 0);
                     if (action == 2) {
                         // cancel any blocking >.>
-                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                         if (tracker.isBlocking()) {
                             if (!Via.getConfig().isShowShieldWhenSwordInHand()) {
                                 tracker.setSecondHand(null);

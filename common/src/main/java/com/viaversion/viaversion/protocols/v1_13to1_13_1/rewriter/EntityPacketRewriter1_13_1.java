@@ -44,7 +44,7 @@ public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPacket
 
                 handler(wrapper -> {
                     // Store the player
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13To1_13_1.class);
+                    ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 1);
                     clientWorld.setEnvironment(dimensionId);
                 });
@@ -56,7 +56,7 @@ public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPacket
             public void register() {
                 map(Types.INT); // 0 - Dimension ID
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13To1_13_1.class);
+                    ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 0);
                     if (clientWorld.setEnvironment(dimensionId)) {
                         tracker(wrapper.user()).clearEntities();
@@ -90,7 +90,7 @@ public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPacket
                             wrapper.set(Types.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                         }
                         // Register Type ID
-                        wrapper.user().getEntityTracker(Protocol1_13To1_13_1.class).addEntity(entityId, entType);
+                        wrapper.user().getEntityTracker(protocol).addEntity(entityId, entType);
                     }
                 });
             }

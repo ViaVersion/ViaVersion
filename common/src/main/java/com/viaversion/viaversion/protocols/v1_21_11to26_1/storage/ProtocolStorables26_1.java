@@ -15,11 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_20to1_20_2.storage;
+package com.viaversion.viaversion.protocols.v1_21_11to26_1.storage;
 
-import com.google.gson.JsonElement;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 
-public record LastResourcePack(String url, String hash, boolean required, @Nullable JsonElement prompt) {
+public final class ProtocolStorables26_1 extends ProtocolStorablesBase {
 
+    private boolean sneaking;
+    private boolean tagsSent;
+
+    public boolean sneaking() {
+        return sneaking;
+    }
+
+    public void setSneaking(final boolean sneaking) {
+        this.sneaking = sneaking;
+    }
+
+    public boolean tagsSent() {
+        return tagsSent;
+    }
+
+    public void setTagsSent(final boolean tagsSent) {
+        this.tagsSent = tagsSent;
+    }
 }

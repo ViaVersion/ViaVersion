@@ -22,6 +22,8 @@
  */
 package com.viaversion.viaversion.api.connection;
 
+import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.data.item.ItemHasher;
@@ -36,18 +38,18 @@ import io.netty.channel.ChannelFuture;
 import io.netty.handler.codec.CodecException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface UserConnection {
 
     /**
-     * Get an object from the storage.
+     * Get an object from the storage. Useful where protocol instances aren't readily available.
      *
      * @param objectClass The class of the object to get
      * @param <T>         The type of the class you want to get.
      * @return The requested object
+     * @see #storables(Protocol)
      */
     @Nullable <T extends StorableObject> T get(Class<T> objectClass);
 
@@ -69,27 +71,56 @@ public interface UserConnection {
     @Nullable <T extends StorableObject> T remove(Class<T> objectClass);
 
     /**
-     * Put an object into the stored objects based on class.
+     * Put an object into the stored objects based on class. Useful where protocol instances aren't readily available.
      *
      * @param object The object to store.
+     * @see #storables(Protocol)
      */
     void put(StorableObject object);
+
+    /**
+     * Holds protocol-specific data. Where protocol instances aren't readily available, use {@link #put(StorableObject)}.
+     *
+     * @param protocol protocol
+     * @param <T>      protocol-specific storables type
+     * @return protocol storables
+     * @throws IllegalArgumentException if the protocol does not have a valid return value for {@link Protocol#index()}
+     */
+    <T extends ProtocolStorables> T storables(Protocol<?, ?, ?, ?> protocol);
+
+    /**
+     * Holds protocol-specific data. Prefer using {@link #storables(Protocol)} where possible.
+     *
+     * @param protocolClass protocol class
+     * @param <T>           protocol-specific storables type
+     * @return protocol storables
+     * @throws IllegalArgumentException if the protocol does not have a valid return value for {@link Protocol#index()}
+     * @see #storables(Protocol)
+     */
+    default <T extends ProtocolStorables> T storables(final Class<? extends Protocol> protocolClass) {
+        return storables(Via.getManager().getProtocolManager().getProtocol(protocolClass));
+    }
 
     /**
      * Returns a collection of entity trackers currently registered.
      *
      * @return collection of entity trackers currently registered
      */
+    @Deprecated(forRemoval = true)
     Collection<EntityTracker> getEntityTrackers();
+
+    @Deprecated(forRemoval = true)
+    @Nullable <T extends EntityTracker> T getEntityTracker(Class<? extends Protocol> protocolClass);
 
     /**
      * Returns the entity tracker by the given protocol class if present.
      *
-     * @param protocolClass protocol class
-     * @param <T>           entity tracker type
+     * @param protocol protocol
+     * @param <T>      entity tracker type
      * @return entity tracker if present
+     * @see com.viaversion.viaversion.api.rewriter.EntityRewriter#tracker(UserConnection)
      */
-    @Nullable <T extends EntityTracker> T getEntityTracker(Class<? extends Protocol> protocolClass);
+    @Nullable <T extends EntityTracker> T getEntityTracker(Protocol<?, ?, ?, ?> protocol);
 
     /**
      * Adds an entity tracker to the user connection.
@@ -97,34 +128,43 @@ public interface UserConnection {
      *
      * @param protocolClass protocol class
      * @param tracker       entity tracker
+     * @deprecated use {@link #storables(Protocol)}
      */
+    @Deprecated(forRemoval = true)
     void addEntityTracker(Class<? extends Protocol> protocolClass, EntityTracker tracker);
+
+    /**
+     * Returns the item hasher by the given class if present.
+     *
+     * @param protocol protocol
+     * @param <T>      item hasher type
+     * @return item hasher if present
+     */
+    @Nullable <T extends ItemHasher> T getItemHasher(Protocol<?, ?, ?, ?> protocol);
 
     /**
      * Adds an item hasher to the user connection.
      *
      * @param protocolClass protocol class
      * @param itemHasher   item hasher
+     * @deprecated use {@link #storables(Protocol)}
      */
+    @Deprecated(forRemoval = true)
     void addItemHasher(Class<? extends Protocol> protocolClass, ItemHasher itemHasher);
 
-    /**
-     * Returns the item hasher by the given protocol class if present.
-     *
-     * @param protocolClass protocol class
-     * @param <T>           item hasher type
-     * @return item hasher if present
-     */
+    @Deprecated(forRemoval = true)
     @Nullable <T extends ItemHasher> T getItemHasher(Class<? extends Protocol> protocolClass);
 
     /**
-     * Returns the client world by the given protocol class if present.
+     * Returns the client world by the given class if present.
      *
      * @param protocolClass protocol class
      * @param <T>           client world type
      * @return client world if present
+     * @deprecated use {@link #storables(Protocol)}
      */
     @Nullable
+    @Deprecated(forRemoval = true)
     <T extends ClientWorld> T getClientWorld(Class<? extends Protocol> protocolClass);
 
     /**
@@ -134,6 +174,7 @@ public interface UserConnection {
      * @param protocolClass protocol class
      * @param clientWorld   client world
      */
+    @Deprecated(forRemoval = true)
     void addClientWorld(Class<? extends Protocol> protocolClass, ClientWorld clientWorld);
 
     /**

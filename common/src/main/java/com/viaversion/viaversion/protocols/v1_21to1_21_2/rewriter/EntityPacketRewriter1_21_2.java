@@ -36,13 +36,11 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ClientVehicleStorage;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.EntityTracker1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.GroundFlagTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.TeleportAckCancelStorage;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ProtocolStorables1_21_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -155,22 +153,23 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
             final EntityTracker1_21_2 entityTracker = tracker(wrapper.user());
             if (entityTracker.currentWorld() != null && !entityTracker.currentWorld().equals(world)) {
-                final ChunkLoadTracker chunkLoadTracker = wrapper.user().get(ChunkLoadTracker.class);
-                if (chunkLoadTracker != null) {
-                    chunkLoadTracker.clear();
+                final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+                if (storables.chunkLoadTracker() != null) {
+                    storables.chunkLoadTracker().clear();
                 }
             }
 
             trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world);
 
-            wrapper.user().put(new GroundFlagTracker());
-            wrapper.user().remove(ClientVehicleStorage.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            storables.setGroundFlagTracker(new GroundFlagTracker());
+            storables.setClientVehicleStorage(null);
 
             if ((keepDataMask & 1) == 0) { // If don't keep entity attributes
                 entityTracker.setPlayerMaxHealthAttributeValue(20F);
             }
             if ((keepDataMask & 2) != 0) { // <= 1.21.1 resets some player data even when keep entity data is set
-                final boolean isBundling = wrapper.user().get(BundleStateTracker.class).isBundling();
+                final boolean isBundling = storables.bundleStateTracker().isBundling();
                 if (!isBundling) {
                     final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
                     bundleStart.send(Protocol1_21To1_21_2.class);
@@ -188,9 +187,9 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
                 entityDataPacket.send(Protocol1_21To1_21_2.class);
 
                 final int teleportId = ThreadLocalRandom.current().nextInt();
-                wrapper.user().get(TeleportAckCancelStorage.class).cancelTeleportId(teleportId);
+                storables.teleportAckCancelStorage().cancelTeleportId(teleportId);
 
-                final PlayerPositionStorage positionStorage = wrapper.user().get(PlayerPositionStorage.class);
+                final PlayerPositionStorage positionStorage = storables.playerPositionStorage();
                 if (positionStorage != null) {
                     positionStorage.sendPing(wrapper.user(), ThreadLocalRandom.current().nextInt());
                 }
@@ -244,14 +243,15 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             final int teleportId = wrapper.read(Types.VAR_INT);
             wrapper.set(Types.VAR_INT, 0, teleportId);
 
-            final PlayerPositionStorage positionStorage = wrapper.user().get(PlayerPositionStorage.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            final PlayerPositionStorage positionStorage = storables.playerPositionStorage();
             if (positionStorage == null) {
                 return;
             }
 
             // Accept teleportation and player position were swapped.
             // Send a ping first to then capture and send the player position the accept teleportation
-            final boolean isBundling = wrapper.user().get(BundleStateTracker.class).isBundling();
+            final boolean isBundling = storables.bundleStateTracker().isBundling();
             if (!isBundling) {
                 final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
                 bundleStart.send(Protocol1_21To1_21_2.class);
@@ -270,9 +270,10 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         protocol.registerClientbound(ClientboundPackets1_21.SET_PASSENGERS, wrapper -> {
             final int vehicleId = wrapper.passthrough(Types.VAR_INT);
             final int[] passengerIds = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
-            final ClientVehicleStorage storage = wrapper.user().get(ClientVehicleStorage.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            final ClientVehicleStorage storage = storables.clientVehicleStorage();
             if (storage != null && vehicleId == storage.vehicleId()) {
-                wrapper.user().remove(ClientVehicleStorage.class);
+                storables.setClientVehicleStorage(null);
             }
 
             final EntityTracker1_21_2 tracker = tracker(wrapper.user());
@@ -284,13 +285,14 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             final int clientEntityId = tracker(wrapper.user()).clientEntityId();
             for (final int passenger : passengerIds) {
                 if (passenger == clientEntityId) {
-                    wrapper.user().put(new ClientVehicleStorage(vehicleId));
+                    storables.setClientVehicleStorage(new ClientVehicleStorage(vehicleId));
                     break;
                 }
             }
         });
         protocol.appendClientbound(ClientboundPackets1_21.REMOVE_ENTITIES, wrapper -> {
-            final ClientVehicleStorage vehicleStorage = wrapper.user().get(ClientVehicleStorage.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            final ClientVehicleStorage vehicleStorage = storables.clientVehicleStorage();
             if (vehicleStorage == null) {
                 return;
             }
@@ -298,7 +300,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             final int[] entityIds = wrapper.get(Types.VAR_INT_ARRAY_PRIMITIVE, 0);
             for (final int entityId : entityIds) {
                 if (entityId == vehicleStorage.vehicleId()) {
-                    wrapper.user().remove(ClientVehicleStorage.class);
+                    storables.setClientVehicleStorage(null);
                     break;
                 }
             }
@@ -307,7 +309,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             // Previously only used while in a vehicle, now always sent
             // Filter them appropriately and always send them when in a vehicle
             wrapper.cancel();
-            final ClientVehicleStorage vehicleStorage = wrapper.user().get(ClientVehicleStorage.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            final ClientVehicleStorage vehicleStorage = storables.clientVehicleStorage();
             if (vehicleStorage == null) {
                 return;
             }
@@ -383,13 +386,14 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             final float pitch = wrapper.passthrough(Types.FLOAT); // Pitch
             handleOnGround(wrapper);
 
-            final PlayerPositionStorage playerPositionStorage = wrapper.user().get(PlayerPositionStorage.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            final PlayerPositionStorage playerPositionStorage = storables.playerPositionStorage();
             if (playerPositionStorage != null && playerPositionStorage.checkCaptureNextPlayerPositionPacket()) {
                 // Capture this packet and send it after accept teleportation
                 final boolean onGround = wrapper.get(Types.BOOLEAN, 0);
                 playerPositionStorage.setPlayerPosition(new PlayerPositionStorage.PlayerPosition(x, y, z, yaw, pitch, onGround));
                 wrapper.cancel();
-            } else if (wrapper.user().get(TeleportAckCancelStorage.class).checkShouldCancelPlayerPositionPacket()) {
+            } else if (storables.teleportAckCancelStorage().checkShouldCancelPlayerPositionPacket()) {
                 // Cancel the position packet after a "fake" teleport
                 wrapper.cancel();
             }
@@ -399,7 +403,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.passthrough(Types.FLOAT); // Pitch
             handleOnGround(wrapper);
 
-            final ClientVehicleStorage vehicleStorage = wrapper.user().get(ClientVehicleStorage.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            final ClientVehicleStorage vehicleStorage = storables.clientVehicleStorage();
             if (vehicleStorage == null || (wrapper.user().isServerSide() && isVF)) {
                 return;
             }
@@ -413,7 +418,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             playerInput.sendToServer(Protocol1_21To1_21_2.class);
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_STATUS_ONLY, wrapper -> {
-            final GroundFlagTracker tracker = wrapper.user().get(GroundFlagTracker.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            final GroundFlagTracker tracker = storables.groundFlagTracker();
             final boolean prevOnGround = tracker.onGround();
             final boolean prevHorizontalCollision = tracker.horizontalCollision();
 
@@ -424,14 +430,14 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             }
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.ACCEPT_TELEPORTATION, wrapper -> {
-            final TeleportAckCancelStorage teleportAckCancelStorage = wrapper.user().get(TeleportAckCancelStorage.class);
-            final PlayerPositionStorage playerPositionStorage = wrapper.user().get(PlayerPositionStorage.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            final PlayerPositionStorage playerPositionStorage = storables.playerPositionStorage();
             final int teleportId = wrapper.passthrough(Types.VAR_INT); // Teleport id
-            if (teleportAckCancelStorage.checkShouldCancelTeleportAck(teleportId)) {
+            if (storables.teleportAckCancelStorage().checkShouldCancelTeleportAck(teleportId)) {
                 wrapper.cancel();
                 if (playerPositionStorage != null && playerPositionStorage.checkHasPlayerPosition()) {
                     playerPositionStorage.reset(); // No longer need to send the player position packet, because this was a "fake" teleport
-                    teleportAckCancelStorage.checkShouldCancelPlayerPositionPacket(); // Clear the flag
+                    storables.teleportAckCancelStorage().checkShouldCancelPlayerPositionPacket(); // Clear the flag
                 }
                 return;
             }
@@ -445,7 +451,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
     }
 
     private void handleOnGround(final PacketWrapper wrapper) {
-        final GroundFlagTracker tracker = wrapper.user().get(GroundFlagTracker.class);
+        final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+        final GroundFlagTracker tracker = storables.groundFlagTracker();
 
         final short data = wrapper.read(Types.UNSIGNED_BYTE);
         wrapper.write(Types.BOOLEAN, tracker.setOnGround((data & 1) != 0)); // Ignoring horizontal collision data
@@ -507,7 +514,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
                 return;
             }
 
-            final boolean isBundling = event.user().get(BundleStateTracker.class).isBundling();
+            final ProtocolStorables1_21_2 storables = event.user().storables(protocol);
+            final boolean isBundling = storables.bundleStateTracker().isBundling();
             if (!isBundling) {
                 final PacketWrapper bundleStart = PacketWrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER, event.user());
                 bundleStart.send(Protocol1_21To1_21_2.class);

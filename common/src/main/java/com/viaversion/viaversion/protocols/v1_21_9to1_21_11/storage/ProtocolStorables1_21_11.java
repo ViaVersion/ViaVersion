@@ -15,9 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v26_1to26_2.storage;
+package com.viaversion.viaversion.protocols.v1_21_9to1_21_11.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 
-public record FakeEntityId(int id) implements StorableObject {
+public final class ProtocolStorables1_21_11 extends ProtocolStorablesBase {
+
+    private final GameTimeStorage gameTimeStorage = new GameTimeStorage();
+
+    public GameTimeStorage gameTimeStorage() {
+        return gameTimeStorage;
+    }
 }

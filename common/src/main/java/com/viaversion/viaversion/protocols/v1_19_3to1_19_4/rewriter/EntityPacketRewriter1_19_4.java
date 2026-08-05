@@ -32,6 +32,7 @@ import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.Protocol1_19_3To1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.storage.PlayerVehicleTracker;
+import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.storage.ProtocolStorables1_19_4;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.TagUtil;
 
@@ -91,7 +92,8 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
                 map(Types.VAR_INT); // Id
                 handler(wrapper -> {
                     if (wrapper.read(Types.BOOLEAN)) { // Dismount vehicle
-                        final PlayerVehicleTracker playerVehicleTracker = wrapper.user().get(PlayerVehicleTracker.class);
+                        final ProtocolStorables1_19_4 storables = wrapper.user().storables(protocol);
+                        final PlayerVehicleTracker playerVehicleTracker = storables.playerVehicleTracker();
                         if (playerVehicleTracker.getVehicleId() != -1) {
                             final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_19_4.BUNDLE_DELIMITER);
                             bundleStart.send(Protocol1_19_3To1_19_4.class);
@@ -117,8 +119,9 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
                 map(Types.VAR_INT); // vehicle id
                 map(Types.VAR_INT_ARRAY_PRIMITIVE); // passenger ids
                 handler(wrapper -> {
-                    final PlayerVehicleTracker playerVehicleTracker = wrapper.user().get(PlayerVehicleTracker.class);
-                    final int clientEntityId = wrapper.user().getEntityTracker(Protocol1_19_3To1_19_4.class).clientEntityId();
+                    final ProtocolStorables1_19_4 storables = wrapper.user().storables(protocol);
+                    final PlayerVehicleTracker playerVehicleTracker = storables.playerVehicleTracker();
+                    final int clientEntityId = wrapper.user().getEntityTracker(protocol).clientEntityId();
                     final int vehicleId = wrapper.get(Types.VAR_INT, 0);
 
                     if (playerVehicleTracker.getVehicleId() == vehicleId) {
@@ -141,7 +144,7 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
             protected void register() {
                 handler(wrapper -> {
                     final int entityId = wrapper.read(Types.VAR_INT); // entity id
-                    final int clientEntityId = wrapper.user().getEntityTracker(Protocol1_19_3To1_19_4.class).clientEntityId();
+                    final int clientEntityId = wrapper.user().getEntityTracker(protocol).clientEntityId();
                     if (entityId != clientEntityId) {
                         wrapper.write(Types.VAR_INT, entityId); // entity id
                         return;
@@ -183,7 +186,7 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
                 map(Types.STRING); // Dimension
                 map(Types.STRING); // World
                 handler(worldDataTrackerHandlerByKey());
-                handler(wrapper -> wrapper.user().put(new PlayerVehicleTracker()));
+                handler(wrapper -> wrapper.user().<ProtocolStorables1_19_4>storables(protocol).setPlayerVehicleTracker(new PlayerVehicleTracker()));
             }
         });
 

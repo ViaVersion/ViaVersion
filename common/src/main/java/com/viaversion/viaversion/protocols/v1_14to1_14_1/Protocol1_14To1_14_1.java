@@ -40,7 +40,7 @@ public class Protocol1_14To1_14_1 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, EntityTypes1_14.PLAYER));
+        addEntityTracker(userConnection, new EntityTrackerBase(userConnection, EntityTypes1_14.PLAYER));
     }
 
     @Override

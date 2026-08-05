@@ -87,6 +87,6 @@ public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter
      * @return entity tracker
      */
     default <E extends EntityTracker> E tracker(UserConnection connection) {
-        return connection.getEntityTracker(protocol().getClass());
+        return connection.getEntityTracker(protocol());
     }
 }

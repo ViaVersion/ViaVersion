@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_17_1to1_18.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.ChunkPosition;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -25,7 +24,7 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class ChunkLightStorage implements StorableObject {
+public final class ChunkLightStorage {
 
     private final Long2ObjectMap<ChunkLight> lightPackets = new Long2ObjectOpenHashMap<>();
     private final LongSet loadedChunks = new LongOpenHashSet();

@@ -39,6 +39,7 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType26_1;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.data.MappingData26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
@@ -49,8 +50,7 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.BlockItemPack
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.ComponentRewriter26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.EntityPacketRewriter26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.rewriter.RegistryDataRewriter26_1;
-import com.viaversion.viaversion.protocols.v1_21_11to26_1.storage.PlayerSneaking;
-import com.viaversion.viaversion.protocols.v1_21_11to26_1.storage.TagsSent;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.storage.ProtocolStorables26_1;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.RecipeDisplayRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.packet.ServerboundPackets1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
@@ -106,7 +106,8 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
             sendSoundVariants(wrapper, "chicken_sound_variant", MAPPINGS.chickenSoundVariants());
 
             // Make sure the client gets damage types and banner patterns, even if the server doesn't send tags
-            if (!wrapper.user().has(TagsSent.class)) {
+            final ProtocolStorables26_1 storables = wrapper.user().storables(this);
+            if (!storables.tagsSent()) {
                 final PacketWrapper tagsPacket = wrapper.create(ClientboundConfigurationPackets1_21_9.UPDATE_TAGS);
                 tagsPacket.write(Types.VAR_INT, 0);
                 tagsPacket.send(Protocol1_21_11To26_1.class, false);
@@ -186,7 +187,9 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
 
     private void handleTags(final PacketWrapper wrapper) {
         tagRewriter.handleGeneric(wrapper);
-        wrapper.user().put(new TagsSent());
+
+        final ProtocolStorables26_1 storables = wrapper.user().storables(this);
+        storables.setTagsSent(true);
     }
 
     private void sendSoundVariants(final PacketWrapper wrapper, final String key, final CompoundTag tag) {
@@ -298,7 +301,11 @@ public final class Protocol1_21_11To26_1 extends AbstractProtocol<ClientboundPac
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_11.PLAYER));
         addItemHasher(connection);
-        connection.put(new PlayerSneaking());
+    }
+
+    @Override
+    public ProtocolStorablesBase createStorables() {
+        return new ProtocolStorables26_1();
     }
 
     @Override

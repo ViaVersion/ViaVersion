@@ -117,7 +117,7 @@ public class WorldPacketRewriter1_9 {
                         return;
                     }
                     if (effect != null && effect.isBreakSound()) {
-                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                         int x = wrapper.passthrough(Types.INT); //Position X
                         int y = wrapper.passthrough(Types.INT); //Position Y
                         int z = wrapper.passthrough(Types.INT); //Position Z
@@ -130,7 +130,7 @@ public class WorldPacketRewriter1_9 {
         });
 
         protocol.registerClientbound(ClientboundPackets1_8.LEVEL_CHUNK, wrapper -> {
-            ClientWorld1_9 clientWorld = wrapper.user().getClientWorld(Protocol1_8To1_9.class);
+            ClientWorld1_9 clientWorld = (ClientWorld1_9) wrapper.user().storables(protocol).clientWorld();
             Chunk chunk = wrapper.read(ChunkType1_8.forEnvironment(clientWorld.getEnvironment()));
 
             long chunkHash = ChunkPosition.chunkKey(chunk.getX(), chunk.getZ());
@@ -196,7 +196,7 @@ public class WorldPacketRewriter1_9 {
 
         protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, null, wrapper -> {
             wrapper.cancel(); // Cancel the packet from being sent
-            ClientWorld1_9 clientWorld = wrapper.user().getClientWorld(Protocol1_8To1_9.class);
+            ClientWorld1_9 clientWorld = (ClientWorld1_9) wrapper.user().storables(protocol).clientWorld();
             Chunk[] chunks = wrapper.read(BulkChunkType1_8.TYPE);
 
             Type<Chunk> chunkType = ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment());
@@ -299,7 +299,7 @@ public class WorldPacketRewriter1_9 {
                 handler(wrapper -> {
                     int status = wrapper.get(Types.VAR_INT, 0);
                     if (status == 5 || status == 4 || status == 3) {
-                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
                         if (entityTracker.isBlocking()) {
                             entityTracker.setBlocking(false);
                             if (!Via.getConfig().isShowShieldWhenSwordInHand()) {
@@ -323,7 +323,7 @@ public class WorldPacketRewriter1_9 {
             // Blocking patch for 1.9-1.21.3 clients
             if (Via.getConfig().isShieldBlocking() &&
                 wrapper.user().getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_21_4)) {
-                EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
 
                 // Check if the shield is already there or if we have to give it here
                 boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand();
@@ -421,7 +421,7 @@ public class WorldPacketRewriter1_9 {
                         case 4 -> x--;
                         case 5 -> x++;
                     }
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.addBlockInteraction(new BlockPosition(x, y, z));
                 });
             }

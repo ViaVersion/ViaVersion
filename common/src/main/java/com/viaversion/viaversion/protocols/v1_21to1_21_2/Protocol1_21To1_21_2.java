@@ -50,13 +50,11 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.BlockItemPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.ComponentRewriter1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.EntityPacketRewriter1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.ParticleRewriter1_21_2;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.EntityTracker1_21_2;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.GroundFlagTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.LastExplosionPowerStorage;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.TeleportAckCancelStorage;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ProtocolStorables1_21_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -148,7 +146,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         appendClientbound(ClientboundPackets1_21.UPDATE_ATTRIBUTES, wrapper -> {
             wrapper.resetReader();
             final int entityId = wrapper.passthrough(Types.VAR_INT);
-            final EntityTracker1_21_2 entityTracker = wrapper.user().getEntityTracker(Protocol1_21To1_21_2.class);
+            final EntityTracker1_21_2 entityTracker = wrapper.user().getEntityTracker(this);
             if (entityId != entityTracker.clientEntityId()) {
                 return;
             }
@@ -191,10 +189,14 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_21.BUNDLE_DELIMITER, wrapper -> wrapper.user().get(BundleStateTracker.class).toggleBundling());
+        registerClientbound(ClientboundPackets1_21.BUNDLE_DELIMITER, wrapper -> {
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(this);
+            storables.bundleStateTracker().toggleBundling();
+        });
         registerServerbound(ServerboundPackets1_21_2.PONG, wrapper -> {
             final int id = wrapper.passthrough(Types.INT); // id
-            final PlayerPositionStorage playerPositionStorage = wrapper.user().get(PlayerPositionStorage.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(this);
+            final PlayerPositionStorage playerPositionStorage = storables.playerPositionStorage();
             if (playerPositionStorage != null && playerPositionStorage.checkPong(id)) {
                 wrapper.cancel();
             }
@@ -241,24 +243,27 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTracker1_21_2(connection));
-        connection.put(new BundleStateTracker());
-        connection.put(new GroundFlagTracker());
-        connection.put(new TeleportAckCancelStorage());
+        final ProtocolStorables1_21_2 storables = connection.storables(this);
         if (connection.getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_21_9)) {
-            connection.put(new LastExplosionPowerStorage());
+            storables.setLastExplosionPowerStorage(new LastExplosionPowerStorage());
         }
 
         final ProtocolVersion protocolVersion = connection.getProtocolInfo().protocolVersion();
         if (protocolVersion.olderThan(ProtocolVersion.v1_21_4)) { // Only needed for 1.21.2/1.21.3
-            connection.put(new PlayerPositionStorage());
+            storables.setPlayerPositionStorage(new PlayerPositionStorage());
         }
 
         // <= 1.21.1 clients allowed loaded chunks to get replaced with new data without unloading them first.
         // 1.21.2 introduced a graphical bug where it doesn't properly render the new data unless the chunk is unloaded beforehand.
         // 1.21.4 fixed this bug, so the workaround is no longer needed.
         if (protocolVersion.equals(ProtocolVersion.v1_21_2)) {
-            connection.put(new ChunkLoadTracker());
+            storables.setChunkLoadTracker(new ChunkLoadTracker());
         }
+    }
+
+    @Override
+    public ProtocolStorables1_21_2 createStorables() {
+        return new ProtocolStorables1_21_2();
     }
 
     @Override

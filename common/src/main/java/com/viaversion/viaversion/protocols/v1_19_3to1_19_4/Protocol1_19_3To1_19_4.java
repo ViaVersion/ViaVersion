@@ -35,6 +35,7 @@ import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.EntityPacketRewriter1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.ItemPacketRewriter1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.storage.PlayerVehicleTracker;
+import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.storage.ProtocolStorables1_19_4;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
@@ -115,8 +116,11 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
     @Override
     public void init(final UserConnection user) {
         addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19_4.PLAYER));
+    }
 
-        user.put(new PlayerVehicleTracker());
+    @Override
+    public ProtocolStorables1_19_4 createStorables() {
+        return new ProtocolStorables1_19_4();
     }
 
     @Override

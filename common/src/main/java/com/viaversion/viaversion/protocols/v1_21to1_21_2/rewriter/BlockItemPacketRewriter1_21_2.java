@@ -56,9 +56,9 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.LastExplosionPowerStorage;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ProtocolStorables1_21_2;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
@@ -195,7 +195,8 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 affectedBlocks.add(new BlockPosition(x, y, z));
             }
 
-            final LastExplosionPowerStorage lastExplosionPowerStorage = wrapper.user().get(LastExplosionPowerStorage.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            final LastExplosionPowerStorage lastExplosionPowerStorage = storables.lastExplosionPowerStorage();
             if (lastExplosionPowerStorage != null) {
                 lastExplosionPowerStorage.setPower(power);
                 lastExplosionPowerStorage.setAffectedBlocks(affectedBlocks.size());
@@ -369,7 +370,8 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 }
             }
 
-            final ChunkLoadTracker chunkLoadTracker = wrapper.user().get(ChunkLoadTracker.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            final ChunkLoadTracker chunkLoadTracker = storables.chunkLoadTracker();
             if (chunkLoadTracker == null) {
                 return;
             }
@@ -377,7 +379,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             if (chunkLoadTracker.isChunkLoaded(chunk.getX(), chunk.getZ())) {
                 // Unload the old chunk, so the new one can be loaded without graphical glitches
                 // Bundling it prevents the client from falling through the world during the chunk swap
-                final boolean isBundling = wrapper.user().get(BundleStateTracker.class).isBundling();
+                final boolean isBundling = storables.bundleStateTracker().isBundling();
                 if (!isBundling) {
                     final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
                     bundleStart.send(Protocol1_21To1_21_2.class);
@@ -400,7 +402,8 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         protocol.registerClientbound(ClientboundPackets1_21.FORGET_LEVEL_CHUNK, wrapper -> {
             final ChunkPosition chunkPosition = wrapper.passthrough(Types.CHUNK_POSITION);
 
-            final ChunkLoadTracker chunkLoadTracker = wrapper.user().get(ChunkLoadTracker.class);
+            final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            final ChunkLoadTracker chunkLoadTracker = storables.chunkLoadTracker();
             if (chunkLoadTracker != null) {
                 chunkLoadTracker.removeChunk(chunkPosition.chunkX(), chunkPosition.chunkZ());
             }

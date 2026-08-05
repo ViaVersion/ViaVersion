@@ -15,19 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_21_11to26_1.storage;
+package com.viaversion.viaversion.protocols.v1_21_7to1_21_9.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 
-public final class PlayerSneaking implements StorableObject {
+public final class ProtocolStorables1_21_9 extends ProtocolStorablesBase {
 
-    private boolean sneaking;
+    private final DimensionScaleStorage dimensionScaleStorage = new DimensionScaleStorage();
 
-    public boolean sneaking() {
-        return sneaking;
-    }
-
-    public void setSneaking(final boolean sneaking) {
-        this.sneaking = sneaking;
+    public DimensionScaleStorage dimensionScaleStorage() {
+        return dimensionScaleStorage;
     }
 }

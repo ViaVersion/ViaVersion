@@ -106,7 +106,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                     }
 
                     // Register Type ID
-                    wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class).addEntity(entityId, type1_14);
+                    wrapper.user().getEntityTracker(protocol).addEntity(entityId, type1_14);
 
                     wrapper.set(Types.VAR_INT, 1, typeId);
                 });
@@ -178,7 +178,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 handler(wrapper -> {
                     short animation = wrapper.passthrough(Types.UNSIGNED_BYTE);
                     if (animation == 2) {  //Leave bed
-                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
+                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(protocol);
                         int entityId = wrapper.get(Types.VAR_INT, 0);
                         tracker.setSleeping(entityId, false);
 
@@ -204,7 +204,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 map(Types.INT); // 2 - Dimension
                 handler(wrapper -> {
                     // Store the player
-                    ClientWorld clientChunks = wrapper.user().getClientWorld(Protocol1_13_2To1_14.class);
+                    ClientWorld clientChunks = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 1);
                     clientChunks.setEnvironment(dimensionId);
                 });
@@ -237,7 +237,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
             public void register() {
                 map(Types.VAR_INT);
                 handler(wrapper -> {
-                    EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
+                    EntityTracker1_14 tracker = wrapper.user().getEntityTracker(protocol);
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     tracker.setSleeping(entityId, true);
 
