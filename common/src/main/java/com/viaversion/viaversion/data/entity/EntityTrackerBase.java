@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.KeyMappings;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,7 +38,8 @@ import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeListener {
-    protected final Int2ObjectMap<TrackedEntity> entities = new Int2ObjectOpenHashMap<>();
+    // Synchronized as the tracker may be accessed concurrently from multiple threads
+    protected final Int2ObjectMap<TrackedEntity> entities = Int2ObjectMaps.synchronize(new Int2ObjectOpenHashMap<>());
     private final Map<String, KeyMappings> registryKeyMappings = new HashMap<>();
     private final UserConnection connection;
     private final EntityType playerType;
