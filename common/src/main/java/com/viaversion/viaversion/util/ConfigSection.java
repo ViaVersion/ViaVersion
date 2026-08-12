@@ -117,12 +117,10 @@ public class ConfigSection {
     }
 
     public @Nullable JsonElement getSerializedComponent(final String key) {
-        final Object o = this.values.get(key);
-        if (o != null && !((String) o).isEmpty()) {
-            return ComponentUtil.legacyToJson((String) o);
-        } else {
-            return null;
+        if (this.values.get(key) instanceof final String s && !s.isEmpty()) {
+            return ComponentUtil.legacyToJson(s);
         }
+        return null;
     }
 
     public @Nullable ConfigSection getSection(final String key) {
