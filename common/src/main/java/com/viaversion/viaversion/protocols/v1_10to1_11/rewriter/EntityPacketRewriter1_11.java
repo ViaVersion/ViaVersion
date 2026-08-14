@@ -98,10 +98,10 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                         tryFixFishingHookVelocity(wrapper);
                     } else if (type == EntityTypes1_10.ObjectType.ITEM.getId()) {
                         // Older clients used stone as fallback as long as the entity data was not set
+                        final int entityId = wrapper.get(Types.VAR_INT, 0);
+
                         wrapper.send(Protocol1_10To1_11.class);
                         wrapper.cancel();
-
-                        final int entityId = wrapper.get(Types.VAR_INT, 0);
 
                         final List<EntityData> entityDataList = new ArrayList<>();
                         entityDataList.add(new EntityData(6, EntityDataTypes1_9.ITEM, new DataItem(1, (byte) 1, null)));
