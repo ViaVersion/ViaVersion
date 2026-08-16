@@ -30,6 +30,8 @@ import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.util.ProtocolUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -43,8 +45,11 @@ public class ProtocolPipelineImpl implements ProtocolPipeline {
     private final List<Protocol> protocolList = new ArrayList<>();
     private final Set<Class<? extends Protocol>> protocolSet = new HashSet<>();
     private final UserConnection userConnection;
+    private final BitSet[] clientboundRegistered = new BitSet[State.values().length];
+    private final BitSet[] serverboundRegistered = new BitSet[State.values().length];
     private List<Protocol> reversedProtocolList = new ArrayList<>();
     private int baseProtocols;
+    private boolean mayPassthroughUnregisteredPackets;
 
     public ProtocolPipelineImpl(UserConnection userConnection) {
         this.userConnection = userConnection;
@@ -65,6 +70,7 @@ public class ProtocolPipelineImpl implements ProtocolPipeline {
 
         protocolSet.add(protocol.getClass());
         protocol.init(userConnection);
+        rebuildPassthroughIndex();
     }
 
     @Override
@@ -80,6 +86,37 @@ public class ProtocolPipelineImpl implements ProtocolPipeline {
         protocolList.addAll(protocols);
 
         refreshReversedList();
+        rebuildPassthroughIndex();
+    }
+
+    private void rebuildPassthroughIndex() {
+        Arrays.fill(clientboundRegistered, null);
+        Arrays.fill(serverboundRegistered, null);
+        mayPassthroughUnregisteredPackets = true;
+        for (int i = 0, size = protocolList.size(); i < size; i++) {
+            if (!protocolList.get(i).maySkipUnregisteredPackets()) {
+                mayPassthroughUnregisteredPackets = false;
+                return;
+            }
+        }
+        for (int i = 0, size = protocolList.size(); i < size; i++) {
+            final Protocol protocol = protocolList.get(i);
+            collectRegistered(protocol, Direction.CLIENTBOUND, clientboundRegistered);
+            collectRegistered(protocol, Direction.SERVERBOUND, serverboundRegistered);
+        }
+    }
+
+    private static void collectRegistered(final Protocol protocol, final Direction direction, final BitSet[] registered) {
+        for (final State state : State.values()) {
+            protocol.forEachRegisteredPacket(direction, state, id -> {
+                BitSet set = registered[state.ordinal()];
+                if (set == null) {
+                    set = new BitSet();
+                    registered[state.ordinal()] = set;
+                }
+                set.set(id);
+            });
+        }
     }
 
     private void refreshReversedList() {
@@ -94,6 +131,20 @@ public class ProtocolPipelineImpl implements ProtocolPipeline {
             reversedProtocols.add(protocolList.get(i));
         }
         reversedProtocolList = reversedProtocols;
+    }
+
+    @Override
+    public boolean mayPassthroughUnregisteredPackets() {
+        return mayPassthroughUnregisteredPackets;
+    }
+
+    @Override
+    public boolean canPassthroughPacket(final Direction direction, final State state, final int packetId) {
+        if (!mayPassthroughUnregisteredPackets) {
+            return false;
+        }
+        final BitSet registered = (direction == Direction.CLIENTBOUND ? clientboundRegistered : serverboundRegistered)[state.ordinal()];
+        return registered == null || !registered.get(packetId);
     }
 
     @Override

@@ -164,6 +164,12 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
     }
 
     @Override
+    public boolean maySkipUnregisteredPackets() {
+        // Extra logic in transform() only applies to the handshake state, which the encoder never passthroughs.
+        return true;
+    }
+
+    @Override
     public void register(ViaProviders providers) {
         providers.register(VersionProvider.class, new BaseVersionProvider());
     }

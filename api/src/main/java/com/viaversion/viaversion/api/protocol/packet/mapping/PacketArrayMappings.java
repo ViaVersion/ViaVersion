@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.protocol.packet.mapping;
 
 import com.viaversion.viaversion.api.protocol.packet.State;
 import java.util.Arrays;
+import java.util.function.IntConsumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class PacketArrayMappings implements PacketMappings {
@@ -51,5 +52,18 @@ final class PacketArrayMappings implements PacketMappings {
         }
 
         packets[unmappedId] = mapping;
+    }
+
+    @Override
+    public void forEachId(final State state, final IntConsumer consumer) {
+        final PacketMapping[] packets = this.packets[state.ordinal()];
+        if (packets == null) {
+            return;
+        }
+        for (int id = 0; id < packets.length; id++) {
+            if (packets[id] != null) {
+                consumer.accept(id);
+            }
+        }
     }
 }

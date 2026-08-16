@@ -30,8 +30,10 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.VarIntType;
+import com.viaversion.viaversion.platform.ViaPassthroughHandler;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
@@ -42,6 +44,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
+import io.netty.util.AttributeKey;
 import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -57,6 +60,7 @@ import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class UserConnectionImpl implements UserConnection {
+    public static final AttributeKey<UserConnection> CHANNEL_ATTRIBUTE = AttributeKey.valueOf("viaversion-user-connection");
     private static final int PASSTHROUGH_DATA_BYTES = Long.BYTES + 2;
     private static final AtomicLong IDS = new AtomicLong();
     private final long id = IDS.incrementAndGet();
@@ -377,6 +381,72 @@ public class UserConnectionImpl implements UserConnection {
     @Override
     public boolean shouldTransformPacket() {
         return active;
+    }
+
+    @Override
+    public boolean shouldTransformPacket(final ByteBuf buf, final Direction direction) {
+        if (!active) {
+            return false;
+        }
+        if (protocolInfo.getPipeline() == null) {
+            return true;
+        }
+        // Transform overrides disable passthrough for the whole pipeline; don't peek the id.
+        if (!protocolInfo.getPipeline().mayPassthroughUnregisteredPackets()) {
+            return true;
+        }
+        if (!buf.isReadable()) {
+            return false;
+        }
+
+        final State state = protocolInfo.getState(direction);
+        // InitialBaseProtocol.disable-on-bad-handshake lives in transform(); never skip that state.
+        if (state == State.HANDSHAKE) {
+            return true;
+        }
+
+        final int readerIndex = buf.readerIndex();
+        final int packetId;
+        try {
+            packetId = Types.VAR_INT.readPrimitive(buf);
+        } catch (final Exception e) {
+            return true;
+        } finally {
+            buf.readerIndex(readerIndex);
+        }
+        return !protocolInfo.getPipeline().canPassthroughPacket(direction, state, packetId);
+    }
+
+    /**
+     * Replaces encode/decode codecs with a named passthrough after native-protocol login.
+     * Must not run inside the current encode; it is queued on the event loop.
+     */
+    public void scheduleIdentityPassthrough() {
+        if (channel == null) {
+            return;
+        }
+        channel.eventLoop().execute(this::installIdentityPassthrough);
+    }
+
+    private void installIdentityPassthrough() {
+        if (channel == null || !channel.isOpen() || active) {
+            return;
+        }
+        if (protocolInfo.getPipeline().hasNonBaseProtocols()) {
+            return;
+        }
+
+        final ViaInjector injector = Via.getManager().getInjector();
+        final ChannelPipeline pipeline = channel.pipeline();
+        replaceWithPassthrough(pipeline, injector.getEncoderName());
+        replaceWithPassthrough(pipeline, injector.getDecoderName());
+    }
+
+    private void replaceWithPassthrough(final ChannelPipeline pipeline, final String name) {
+        if (pipeline.get(name) == null || pipeline.get(name) instanceof ViaPassthroughHandler) {
+            return;
+        }
+        pipeline.replace(name, name, new ViaPassthroughHandler(this));
     }
 
     @Override

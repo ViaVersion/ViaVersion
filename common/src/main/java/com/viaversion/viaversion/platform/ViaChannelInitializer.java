@@ -59,6 +59,7 @@ public abstract class ViaChannelInitializer extends ChannelInitializer<Channel> 
     public static UserConnection createUserConnection(final Channel channel, final boolean clientSide) {
         final UserConnection connection = new UserConnectionImpl(channel, clientSide);
         new ProtocolPipelineImpl(connection);
+        channel.attr(UserConnectionImpl.CHANNEL_ATTRIBUTE).set(connection);
         return connection;
     }
 
