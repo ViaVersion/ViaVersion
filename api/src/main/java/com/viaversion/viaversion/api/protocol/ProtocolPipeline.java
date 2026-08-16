@@ -89,6 +89,14 @@ public interface ProtocolPipeline {
         return false;
     }
 
+    /**
+     * Returns whether unregistered packets may skip transform for this pipeline.
+     * False if any protocol overrides {@link Protocol#transform} / {@link Protocol#maySkipUnregisteredPackets()}.
+     */
+    default boolean mayPassthroughUnregisteredPackets() {
+        return false;
+    }
+
     List<Protocol> pipes(@Nullable Class<? extends Protocol> protocolClass, boolean skipCurrentPipeline, Direction direction);
 
     /**

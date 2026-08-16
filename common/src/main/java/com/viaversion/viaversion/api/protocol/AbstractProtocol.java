@@ -49,6 +49,7 @@ import com.viaversion.viaversion.util.ProtocolUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -470,6 +471,12 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     @Override
     public boolean maySkipUnregisteredPackets() {
         return maySkipUnregisteredPackets;
+    }
+
+    @Override
+    public void forEachRegisteredPacket(final Direction direction, final State state, final IntConsumer consumer) {
+        final PacketMappings mappings = direction == Direction.CLIENTBOUND ? clientboundMappings : serverboundMappings;
+        mappings.forEachId(state, consumer);
     }
 
     @Override

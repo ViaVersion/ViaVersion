@@ -388,12 +388,15 @@ public class UserConnectionImpl implements UserConnection {
         if (!active) {
             return false;
         }
-        if (!buf.isReadable()) {
-            return false;
-        }
-
         if (protocolInfo.getPipeline() == null) {
             return true;
+        }
+        // Transform overrides disable passthrough for the whole pipeline; don't peek the id.
+        if (!protocolInfo.getPipeline().mayPassthroughUnregisteredPackets()) {
+            return true;
+        }
+        if (!buf.isReadable()) {
+            return false;
         }
 
         final State state = protocolInfo.getState(direction);

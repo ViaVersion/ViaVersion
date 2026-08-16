@@ -45,6 +45,7 @@ import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.util.ProtocolLogger;
+import java.util.function.IntConsumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -296,6 +297,12 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      */
     default boolean maySkipUnregisteredPackets() {
         return false;
+    }
+
+    /**
+     * Visits packet ids this protocol has registered for the given direction and state.
+     */
+    default void forEachRegisteredPacket(Direction direction, State state, IntConsumer consumer) {
     }
 
     /**

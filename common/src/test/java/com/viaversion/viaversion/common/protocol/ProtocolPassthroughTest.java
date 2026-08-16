@@ -60,9 +60,29 @@ class ProtocolPassthroughTest extends PlatformTestBase {
         });
         pipeline.add(protocol);
 
+        Assertions.assertTrue(pipeline.mayPassthroughUnregisteredPackets());
         Assertions.assertFalse(pipeline.canPassthroughPacket(Direction.CLIENTBOUND, State.PLAY, 5));
         Assertions.assertTrue(pipeline.canPassthroughPacket(Direction.CLIENTBOUND, State.PLAY, 42));
         Assertions.assertFalse(pipeline.canPassthroughPacket(Direction.SERVERBOUND, State.HANDSHAKE, 0));
+    }
+
+    @Test
+    void pipelineIndexTracksLaterProtocols() {
+        final UserConnection connection = new UserConnectionImpl(null);
+        new ProtocolPipelineImpl(connection);
+        final ProtocolPipelineImpl pipeline = (ProtocolPipelineImpl) connection.getProtocolInfo().getPipeline();
+        final MappingOnlyProtocol first = new MappingOnlyProtocol();
+        first.registerClientbound(State.PLAY, 5, 5, wrapper -> {
+        });
+        pipeline.add(first);
+        Assertions.assertTrue(pipeline.canPassthroughPacket(Direction.CLIENTBOUND, State.PLAY, 9));
+
+        final MappingOnlyProtocol second = new MappingOnlyProtocol();
+        second.registerClientbound(State.PLAY, 9, 9, wrapper -> {
+        });
+        pipeline.add(second);
+        Assertions.assertFalse(pipeline.canPassthroughPacket(Direction.CLIENTBOUND, State.PLAY, 9));
+        Assertions.assertTrue(pipeline.canPassthroughPacket(Direction.CLIENTBOUND, State.PLAY, 42));
     }
 
     @Test
@@ -72,6 +92,7 @@ class ProtocolPassthroughTest extends PlatformTestBase {
         final ProtocolPipelineImpl pipeline = (ProtocolPipelineImpl) connection.getProtocolInfo().getPipeline();
         pipeline.add(new CatchAllProtocol());
 
+        Assertions.assertFalse(pipeline.mayPassthroughUnregisteredPackets());
         Assertions.assertFalse(pipeline.canPassthroughPacket(Direction.CLIENTBOUND, State.PLAY, 42));
     }
 

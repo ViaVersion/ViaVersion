@@ -22,7 +22,6 @@
  */
 package com.viaversion.viaversion.api.minecraft.entities;
 
-import com.viaversion.viaversion.util.EntityTypeUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface EntityType {
@@ -75,6 +74,16 @@ public interface EntityType {
      * @return true if the current type is equal to the given type, or has it as a parent type
      */
     default boolean isOrHasParent(EntityType type) {
-        return EntityTypeUtil.isOrHasParent(this, type);
+        EntityType parent = this;
+
+        do {
+            if (parent == type) {
+                return true;
+            }
+
+            parent = parent.getParent();
+        } while (parent != null);
+
+        return false;
     }
 }

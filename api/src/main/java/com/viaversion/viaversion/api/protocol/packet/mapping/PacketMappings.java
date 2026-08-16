@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.protocol.packet.mapping;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import java.util.function.IntConsumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -79,6 +80,15 @@ public interface PacketMappings {
      * @param mapping    packet mapping
      */
     void addMapping(State state, int unmappedId, PacketMapping mapping);
+
+    /**
+     * Visits every packet id that has a mapping in the given state.
+     *
+     * @param state    protocol state
+     * @param consumer id consumer
+     */
+    default void forEachId(State state, IntConsumer consumer) {
+    }
 
     static PacketMappings arrayMappings() {
         return new PacketArrayMappings();
