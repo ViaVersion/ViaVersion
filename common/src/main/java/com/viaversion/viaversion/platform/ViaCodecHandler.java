@@ -19,6 +19,7 @@ package com.viaversion.viaversion.platform;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.ViaChannelHandler;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelDecoderException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
@@ -47,7 +48,7 @@ public class ViaCodecHandler extends ByteToMessageCodec<ByteBuf> implements ViaC
         }
 
         out.writeBytes(in);
-        if (this.connection.shouldTransformPacket()) {
+        if (this.connection.shouldTransformPacket(out, this.connection.isClientSide() ? Direction.SERVERBOUND : Direction.CLIENTBOUND)) {
             this.connection.transformOutgoing(out, CancelEncoderException::generate);
         }
     }
@@ -58,11 +59,14 @@ public class ViaCodecHandler extends ByteToMessageCodec<ByteBuf> implements ViaC
             throw CancelDecoderException.generate(null);
         }
 
+        if (!this.connection.shouldTransformPacket(in, this.connection.isClientSide() ? Direction.CLIENTBOUND : Direction.SERVERBOUND)) {
+            out.add(in.retain());
+            return;
+        }
+
         final ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), in);
         try {
-            if (this.connection.shouldTransformPacket()) {
-                this.connection.transformIncoming(transformedBuf, CancelDecoderException::generate);
-            }
+            this.connection.transformIncoming(transformedBuf, CancelDecoderException::generate);
             out.add(transformedBuf.retain());
         } finally {
             transformedBuf.release();

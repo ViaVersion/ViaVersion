@@ -20,6 +20,7 @@ package com.viaversion.viaversion.bukkit.handlers;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.ViaInjector;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
@@ -49,7 +50,7 @@ public final class BukkitEncodeHandler extends ViaEncodeHandler {
         if (!connection.checkClientboundPacket() || !ctx.channel().isOpen()) {
             throw CancelEncoderException.generate(null);
         }
-        if (!connection.shouldTransformPacket()) {
+        if (!connection.shouldTransformPacket(bytebuf, Direction.CLIENTBOUND)) {
             out.add(bytebuf.retain());
             return;
         }

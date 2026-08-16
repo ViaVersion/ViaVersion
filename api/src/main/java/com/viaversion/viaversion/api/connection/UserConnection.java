@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.exception.InformativeException;
@@ -279,6 +280,18 @@ public interface UserConnection {
      * @return whether packets should be passed through
      */
     boolean shouldTransformPacket();
+
+    /**
+     * Checks if this specific buffer needs copying and transforming.
+     * Native connections and identity packets (no pipeline mapping) return {@code false}.
+     *
+     * @param buf       packet buffer starting at the packet id
+     * @param direction packet direction
+     * @return whether the buffer must be copied and transformed
+     */
+    default boolean shouldTransformPacket(ByteBuf buf, Direction direction) {
+        return shouldTransformPacket();
+    }
 
     /**
      * Transforms the clientbound packet contained in ByteBuf.

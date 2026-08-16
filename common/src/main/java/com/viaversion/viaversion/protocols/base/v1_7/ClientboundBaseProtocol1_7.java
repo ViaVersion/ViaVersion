@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
@@ -182,6 +183,9 @@ public class ClientboundBaseProtocol1_7 extends AbstractProtocol<BaseClientbound
 
         if (!info.getPipeline().hasNonBaseProtocols()) { // Only base protocol
             connection.setActive(false);
+            if (connection instanceof UserConnectionImpl impl) {
+                impl.scheduleIdentityPassthrough();
+            }
         }
 
         if (Via.getManager().isDebug()) {

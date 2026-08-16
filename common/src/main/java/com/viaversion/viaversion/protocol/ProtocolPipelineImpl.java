@@ -97,6 +97,25 @@ public class ProtocolPipelineImpl implements ProtocolPipeline {
     }
 
     @Override
+    public boolean canPassthroughPacket(final Direction direction, final State state, final int packetId) {
+        final List<Protocol> protocols = protocolListFor(direction);
+        boolean skipAllowed = true;
+        for (int i = 0, size = protocols.size(); i < size; i++) {
+            final Protocol protocol = protocols.get(i);
+            final boolean registered = direction == Direction.CLIENTBOUND
+                ? protocol.hasRegisteredClientbound(state, packetId)
+                : protocol.hasRegisteredServerbound(state, packetId);
+            if (registered) {
+                return false;
+            }
+            if (skipAllowed && !protocol.maySkipUnregisteredPackets()) {
+                skipAllowed = false;
+            }
+        }
+        return skipAllowed;
+    }
+
+    @Override
     public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws InformativeException, CancelException {
         int originalID = packetWrapper.getId();
 

@@ -80,6 +80,15 @@ public interface ProtocolPipeline {
      */
     void transform(Direction direction, State state, PacketWrapper packetWrapper) throws InformativeException, CancelException;
 
+    /**
+     * Returns whether no protocol in this pipeline needs to see this packet.
+     * <p>
+     * Safe only when every protocol either has no mapping for the id or {@link Protocol#maySkipUnregisteredPackets()}.
+     */
+    default boolean canPassthroughPacket(Direction direction, State state, int packetId) {
+        return false;
+    }
+
     List<Protocol> pipes(@Nullable Class<? extends Protocol> protocolClass, boolean skipCurrentPipeline, Direction direction);
 
     /**

@@ -289,6 +289,16 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
     void transform(Direction direction, State state, PacketWrapper packetWrapper) throws InformativeException, CancelException;
 
     /**
+     * Whether unregistered packets can skip {@link #transform} for this protocol.
+     * <p>
+     * Protocols that handle packets without registering them (for example by overriding {@link #transform})
+     * must return {@code false}. The default is conservative so ViaBackwards/ViaRewind stay correct.
+     */
+    default boolean maySkipUnregisteredPackets() {
+        return false;
+    }
+
+    /**
      * Returns a packet type provider for this protocol to get packet types by id.
      * Depending on the Protocol, not every state may be populated.
      *

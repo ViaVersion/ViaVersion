@@ -20,10 +20,12 @@ package com.viaversion.viaversion.bukkit.listeners;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
+import com.viaversion.viaversion.api.platform.ViaChannelHandler;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.connection.ConnectionDetails;
+import com.viaversion.viaversion.connection.UserConnectionImpl;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -134,8 +136,12 @@ public class JoinListener implements Listener {
     }
 
     private @Nullable UserConnection getUserConnection(Channel channel) {
-        BukkitEncodeHandler encoder = channel.pipeline().get(BukkitEncodeHandler.class);
-        return encoder != null ? encoder.connection() : null;
+        UserConnection connection = channel.attr(UserConnectionImpl.CHANNEL_ATTRIBUTE).get();
+        if (connection != null) {
+            return connection;
+        }
+        ChannelHandler handler = channel.pipeline().get("via-encoder");
+        return handler instanceof ViaChannelHandler viaHandler ? viaHandler.connection() : null;
     }
 
     private Channel getChannel(Player player) throws Exception {

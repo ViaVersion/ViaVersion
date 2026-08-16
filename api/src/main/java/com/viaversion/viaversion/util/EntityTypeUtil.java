@@ -34,6 +34,76 @@ import java.util.List;
 public final class EntityTypeUtil {
 
     private static final EntityType[] EMPTY_ARRAY = new EntityType[0];
+    private static final ClassValue<ParentRelationCache> PARENT_CACHES = new ClassValue<>() {
+        @Override
+        protected ParentRelationCache computeValue(final Class<?> type) {
+            return ParentRelationCache.create(type);
+        }
+    };
+
+    /**
+     * Returns whether {@code self} is {@code type} or has it as a parent.
+     * Enum entity types use a precomputed identity table so metadata filters stay O(1).
+     */
+    public static boolean isOrHasParent(final EntityType self, final EntityType type) {
+        if (self == type) {
+            return true;
+        }
+        if (self == null || type == null) {
+            return false;
+        }
+        if (self.getClass().isEnum() && self.getClass() == type.getClass()) {
+            return PARENT_CACHES.get(self.getClass()).isOrHasParent(self, type);
+        }
+        return walkParentChain(self, type);
+    }
+
+    static boolean walkParentChain(final EntityType self, final EntityType type) {
+        EntityType parent = self;
+        do {
+            if (parent == type) {
+                return true;
+            }
+            parent = parent.getParent();
+        } while (parent != null);
+        return false;
+    }
+
+    private static final class ParentRelationCache {
+        private final boolean[][] table;
+
+        private ParentRelationCache(final boolean[][] table) {
+            this.table = table;
+        }
+
+        static ParentRelationCache create(final Class<?> type) {
+            final Object[] constants = type.getEnumConstants();
+            if (constants == null || constants.length == 0) {
+                return new ParentRelationCache(new boolean[0][0]);
+            }
+
+            final int size = constants.length;
+            final boolean[][] table = new boolean[size][size];
+            for (final Object constant : constants) {
+                if (!(constant instanceof EntityType entityType) || !(constant instanceof Enum<?> from)) {
+                    continue;
+                }
+                final int fromOrdinal = from.ordinal();
+                EntityType parent = entityType;
+                while (parent != null) {
+                    if (parent.getClass() == type && parent instanceof Enum<?> to) {
+                        table[fromOrdinal][to.ordinal()] = true;
+                    }
+                    parent = parent.getParent();
+                }
+            }
+            return new ParentRelationCache(table);
+        }
+
+        boolean isOrHasParent(final EntityType self, final EntityType type) {
+            return table[((Enum<?>) self).ordinal()][((Enum<?>) type).ordinal()];
+        }
+    }
 
     /**
      * Returns an ordered array with each index representing the actual entity id.

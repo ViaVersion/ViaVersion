@@ -19,6 +19,7 @@ package com.viaversion.viaversion.platform;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.ViaChannelHandler;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
 import com.viaversion.viaversion.util.ByteBufUtil;
@@ -44,7 +45,7 @@ public class ViaEncodeHandler extends MessageToMessageEncoder<ByteBuf> implement
         if (!connection.checkOutgoingPacket()) {
             throw CancelEncoderException.generate(null);
         }
-        if (!connection.shouldTransformPacket()) {
+        if (!connection.shouldTransformPacket(buf, connection.isClientSide() ? Direction.SERVERBOUND : Direction.CLIENTBOUND)) {
             out.add(buf.retain());
             return;
         }
