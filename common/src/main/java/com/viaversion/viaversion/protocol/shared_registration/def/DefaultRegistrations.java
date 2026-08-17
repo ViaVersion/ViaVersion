@@ -51,7 +51,8 @@ public final class DefaultRegistrations {
             )
             .ranges(ItemRegistrations::structuredItem, ProtocolVersion.v1_21_5, b -> b
                 .to(ProtocolVersion.v1_21_6, ItemRegistrations::registerItemPackets1_21_5)
-                .since(ItemRegistrations::registerItemPackets1_21_6)
+                .to(ProtocolVersion.v26_3, ItemRegistrations::registerItemPackets1_21_6)
+                .since(ItemRegistrations::registerItemPackets26_3)
             )
 
             .ranges(BlockRegistrations::block, ProtocolVersion.v1_13, steps -> steps

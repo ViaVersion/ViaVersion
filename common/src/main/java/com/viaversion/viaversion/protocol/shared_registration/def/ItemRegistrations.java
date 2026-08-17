@@ -175,6 +175,22 @@ final class ItemRegistrations {
         ctx.clientbound(ClientboundConfigurationPackets1_21_6.SHOW_DIALOG, ir::registerShowDialogDirect, PacketBound.ADDED_AT_MIN);
     }
 
+    static <CU extends ClientboundPacketType, SU extends ServerboundPacketType> void registerItemPackets26_3(final RegistrationContext<CU, SU> ctx, final StructuredItemRewriter<CU, SU, ?> ir) {
+        ctx.clientbound(ClientboundPackets1_21_5.CONTAINER_SET_SLOT, ir::registerSetSlot1_21_2);
+        ctx.clientbound(ClientboundPackets1_21_5.CONTAINER_SET_CONTENT, ir::registerSetContent1_21_2);
+        ctx.clientbound(ClientboundPackets1_21_5.COOLDOWN, ir::registerCooldown1_21_2);
+        ctx.serverbound(ServerboundPackets1_21_5.CONTAINER_CLICK, ir::registerContainerClick1_21_5);
+        ctx.serverbound(ServerboundPackets1_21_5.SET_CREATIVE_MODE_SLOT, ir::registerSetCreativeModeSlot1_21_5);
+        ctx.clientbound(ClientboundPackets1_21_5.SET_EQUIPMENT, ir::registerSetEquipment);
+        ctx.clientbound(ClientboundPackets1_21_5.OPEN_SCREEN, ir::registerOpenScreen);
+        ctx.clientbound(ClientboundPackets1_21_5.MERCHANT_OFFERS, ir::registerMerchantOffers1_20_5);
+        ctx.clientbound(ClientboundPackets1_21_5.SET_PLAYER_INVENTORY, ir::registerSetPlayerInventory);
+        ctx.clientbound(ClientboundPackets1_21_5.SET_CURSOR_ITEM, ir::registerSetCursorItem);
+        ctx.clientbound(ClientboundPackets1_21_6.SHOW_DIALOG, ir::registerShowDialog);
+        ctx.clientbound(ClientboundConfigurationPackets1_21_6.SHOW_DIALOG, ir::registerShowDialogDirect);
+        ctx.clientbound(ClientboundPackets1_21_5.UPDATE_ADVANCEMENTS, ir::registerAdvancements26_3);
+    }
+
     static @Nullable <CU extends ClientboundPacketType, SU extends ServerboundPacketType> ItemRewriter<CU, SU, ?> item(final RegistrationContext<CU, SU> ctx) {
         return (ItemRewriter<CU, SU, ?>) ctx.protocol().getItemRewriter();
     }

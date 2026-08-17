@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v26_2to26_3.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
@@ -37,6 +38,7 @@ import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ServerboundPacket26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ServerboundPackets26_3;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
+import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 import java.util.BitSet;
 import java.util.HashMap;
 
@@ -79,6 +81,47 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             handleLightMasks(wrapper);
         });
         protocol.appendClientbound(ClientboundPackets26_1.LEVEL_CHUNK_WITH_LIGHT, this::handleLightMasks);
+
+        protocol.replaceClientbound(ClientboundPackets26_1.UPDATE_ADVANCEMENTS, wrapper -> {
+            float x = 0;
+            float y = 0;
+
+            wrapper.passthrough(Types.BOOLEAN); // Reset/clear
+            final int size = wrapper.passthrough(Types.VAR_INT); // Mapping size
+            for (int i = 0; i < size; i++) {
+                wrapper.passthrough(Types.STRING); // Identifier
+                wrapper.passthrough(Types.OPTIONAL_STRING); // Parent
+
+                // Display data
+                if (wrapper.passthrough(Types.BOOLEAN)) {
+                    final Tag title = wrapper.passthrough(Types.TRUSTED_TAG);
+                    final Tag description = wrapper.passthrough(Types.TRUSTED_TAG);
+                    final NBTComponentRewriter<ClientboundPacket26_1> componentRewriter = protocol.getComponentRewriter();
+                    componentRewriter.processTag(wrapper.user(), title);
+                    componentRewriter.processTag(wrapper.user(), description);
+
+                    passthroughClientboundItemTemplate(wrapper); // Icon
+                    wrapper.passthrough(Types.VAR_INT); // Frame type
+                    final int flags = wrapper.passthrough(Types.INT); // Flags
+                    if ((flags & 1) != 0) {
+                        wrapper.passthrough(Types.STRING); // Background texture
+                    }
+
+                    // Moved outside display data
+                    x = wrapper.read(Types.FLOAT);
+                    y = wrapper.read(Types.FLOAT);
+                }
+
+                final int requirements = wrapper.passthrough(Types.VAR_INT);
+                for (int array = 0; array < requirements; array++) {
+                    wrapper.passthrough(Types.STRING_ARRAY);
+                }
+
+                wrapper.passthrough(Types.BOOLEAN); // Send telemetry
+                wrapper.write(Types.FLOAT, x);
+                wrapper.write(Types.FLOAT, y);
+            }
+        });
     }
 
     private void handleLightMasks(final PacketWrapper wrapper) {

@@ -509,20 +509,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
                 // Display data
                 if (wrapper.passthrough(Types.BOOLEAN)) {
-                    final Tag title = wrapper.passthrough(Types.TRUSTED_TAG);
-                    final Tag description = wrapper.passthrough(Types.TRUSTED_TAG);
-                    final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
-                    if (componentRewriter != null) {
-                        componentRewriter.processTag(wrapper.user(), title);
-                        componentRewriter.processTag(wrapper.user(), description);
-                    }
-
-                    passthroughClientboundItemTemplate(wrapper); // Icon
-                    wrapper.passthrough(Types.VAR_INT); // Frame type
-                    int flags = wrapper.passthrough(Types.INT); // Flags
-                    if ((flags & 1) != 0) {
-                        wrapper.passthrough(Types.STRING); // Background texture
-                    }
+                    passthroughAdvancementDisplayData(wrapper);
                     wrapper.passthrough(Types.FLOAT); // X
                     wrapper.passthrough(Types.FLOAT); // Y
                 }
@@ -535,6 +522,49 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 wrapper.passthrough(Types.BOOLEAN); // Send telemetry
             }
         });
+    }
+
+    public void registerAdvancements26_3(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.BOOLEAN); // Reset/clear
+            final int size = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                wrapper.passthrough(Types.STRING); // Identifier
+                wrapper.passthrough(Types.OPTIONAL_STRING); // Parent
+
+                // Display data
+                if (wrapper.passthrough(Types.BOOLEAN)) {
+                    passthroughAdvancementDisplayData(wrapper);
+                }
+
+                final int requirements = wrapper.passthrough(Types.VAR_INT);
+                for (int array = 0; array < requirements; array++) {
+                    wrapper.passthrough(Types.STRING_ARRAY);
+                }
+
+                wrapper.passthrough(Types.BOOLEAN); // Send telemetry
+            }
+
+            wrapper.passthrough(Types.FLOAT); // X
+            wrapper.passthrough(Types.FLOAT); // Y
+        });
+    }
+
+    private void passthroughAdvancementDisplayData(final PacketWrapper wrapper) {
+        final Tag title = wrapper.passthrough(Types.TRUSTED_TAG);
+        final Tag description = wrapper.passthrough(Types.TRUSTED_TAG);
+        final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
+        if (componentRewriter != null) {
+            componentRewriter.processTag(wrapper.user(), title);
+            componentRewriter.processTag(wrapper.user(), description);
+        }
+
+        passthroughClientboundItemTemplate(wrapper); // Icon
+        wrapper.passthrough(Types.VAR_INT); // Frame type
+        final int flags = wrapper.passthrough(Types.INT); // Flags
+        if ((flags & 1) != 0) {
+            wrapper.passthrough(Types.STRING); // Background texture
+        }
     }
 
     public void registerSetCursorItem(C packetType) {
