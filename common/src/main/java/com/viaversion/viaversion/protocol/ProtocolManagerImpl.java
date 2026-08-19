@@ -121,6 +121,7 @@ import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ProtocolManagerImpl implements ProtocolManager {
+    public static final AtomicInteger PROTOCOL_INDEX = new AtomicInteger();
     private static final InitialBaseProtocol BASE_PROTOCOL = new InitialBaseProtocol();
 
     // Input Version -> Output Version & Protocol (Allows fast lookup)
@@ -588,7 +589,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public int registeredProtocolCount() {
-        return protocolIndex.get();
+        return PROTOCOL_INDEX.get();
     }
 
     public void shutdownLoaderExecutor() {

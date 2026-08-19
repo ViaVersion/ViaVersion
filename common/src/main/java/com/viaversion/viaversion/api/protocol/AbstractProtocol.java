@@ -42,6 +42,7 @@ import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.shared_registration.SharedRegistrations;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.util.ProtocolLogger;
@@ -66,7 +67,6 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
  */
 public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM extends ClientboundPacketType,
     SM extends ServerboundPacketType, SU extends ServerboundPacketType> implements Protocol<CU, CM, SM, SU> {
-    private static final AtomicInteger INDEX = new AtomicInteger();
     protected final Class<CU> unmappedClientboundPacketType;
     protected final Class<CM> mappedClientboundPacketType;
     protected final Class<SM> mappedServerboundPacketType;
@@ -75,7 +75,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     protected final PacketMappings clientboundMappings;
     protected final PacketMappings serverboundMappings;
     private final Map<Class<?>, Object> storedObjects = new HashMap<>();
-    private final int index = INDEX.getAndIncrement();
+    private final int index = ProtocolManagerImpl.PROTOCOL_INDEX.getAndIncrement();
     private boolean initialized;
     private ProtocolLogger logger;
     private ProtocolVersion serverVersion;
