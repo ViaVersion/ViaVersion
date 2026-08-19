@@ -48,6 +48,7 @@ import com.viaversion.viaversion.util.ProtocolLogger;
 import com.viaversion.viaversion.util.ProtocolUtil;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -65,6 +66,7 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
  */
 public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM extends ClientboundPacketType,
     SM extends ServerboundPacketType, SU extends ServerboundPacketType> implements Protocol<CU, CM, SM, SU> {
+    private static final AtomicInteger INDEX = new AtomicInteger();
     protected final Class<CU> unmappedClientboundPacketType;
     protected final Class<CM> mappedClientboundPacketType;
     protected final Class<SM> mappedServerboundPacketType;
@@ -73,11 +75,11 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     protected final PacketMappings clientboundMappings;
     protected final PacketMappings serverboundMappings;
     private final Map<Class<?>, Object> storedObjects = new HashMap<>();
+    private final int index = INDEX.getAndIncrement();
     private boolean initialized;
     private ProtocolLogger logger;
     private ProtocolVersion serverVersion;
     private ProtocolVersion clientVersion;
-    private int index = -1;
 
     @Deprecated
     protected AbstractProtocol() {
@@ -324,16 +326,6 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     @Override
     public int index() {
         return index;
-    }
-
-    /**
-     * Sets the protocol index for array-based lookups of per-connection data.
-     * Called by the protocol manager during registration.
-     *
-     * @param index the protocol index
-     */
-    public void setIndex(final int index) {
-        this.index = index;
     }
 
     // ---------------------------------------------------------------------------------
