@@ -198,7 +198,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     protected boolean isFirstServerbound(final UserConnection connection) {
         // Only actually cache the original item once in the final clientbound/first serverbound protocol
         for (final Protocol<?, ?, ?, ?> protocol : connection.getProtocolInfo().getPipeline().pipes()) {
-            if (connection.getItemHasher(protocol) instanceof ItemHasherBase) {
+            if (!protocol.isBaseProtocol() && connection.getItemHasher(protocol) instanceof ItemHasherBase) {
                 return protocol.getClass() == this.protocol.getClass();
             }
         }
