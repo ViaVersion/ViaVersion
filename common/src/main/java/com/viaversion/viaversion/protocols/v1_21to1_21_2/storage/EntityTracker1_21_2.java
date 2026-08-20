@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_21to1_21_2.storage;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
+import com.viaversion.viaversion.api.minecraft.Quaternion;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_2;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -54,6 +55,24 @@ public final class EntityTracker1_21_2 extends EntityTrackerBase {
 
         final TrackedEntity newEntity = addEntity(entityId, type);
         newEntity.put(boatEntity);
+    }
+
+    // Returns the display state (lazy-loaded), or null if not a display.
+    public @Nullable DisplayEntity trackedDisplay(final int entityId) {
+        final TrackedEntity entity = entity(entityId);
+        if (entity == null) {
+            return null;
+        }
+        final EntityType type = entity.entityType();
+        if (type == null || !type.isOrHasParent(EntityTypes1_21_2.DISPLAY)) {
+            return null;
+        }
+        DisplayEntity display = entity.get(DisplayEntity.class);
+        if (display == null) {
+            display = new DisplayEntity();
+            entity.put(display);
+        }
+        return display;
     }
 
     public double playerMaxHealthAttributeValue() {
@@ -135,6 +154,53 @@ public final class EntityTracker1_21_2 extends EntityTrackerBase {
 
         public int @Nullable [] passengers() {
             return passengers;
+        }
+    }
+
+    // Tracks the state needed to work around the 1.21.2 pitch clamp for a single display entity.
+    public static final class DisplayEntity implements StorableObject {
+
+        private static final Quaternion IDENTITY = new Quaternion(0, 0, 0, 1);
+
+        private @Nullable Quaternion leftRotation; // base left_rotation as sent by the server, null = identity
+        private Quaternion appliedLeftRotation = IDENTITY; // value last delivered to the client
+        private float pitch; // real, unclamped xRot in degrees
+        private int billboard; // 0 = FIXED (default)
+
+        public @Nullable Quaternion leftRotation() {
+            return leftRotation;
+        }
+
+        public Quaternion baseLeftRotation() {
+            return leftRotation != null ? leftRotation : IDENTITY;
+        }
+
+        public void setLeftRotation(final @Nullable Quaternion leftRotation) {
+            this.leftRotation = leftRotation;
+        }
+
+        public Quaternion appliedLeftRotation() {
+            return appliedLeftRotation;
+        }
+
+        public void setAppliedLeftRotation(final Quaternion appliedLeftRotation) {
+            this.appliedLeftRotation = appliedLeftRotation;
+        }
+
+        public float pitch() {
+            return pitch;
+        }
+
+        public void setPitch(final float pitch) {
+            this.pitch = pitch;
+        }
+
+        public void setBillboard(final int billboard) {
+            this.billboard = billboard;
+        }
+
+        public boolean fixedBillboard() {
+            return billboard == 0;
         }
     }
 
