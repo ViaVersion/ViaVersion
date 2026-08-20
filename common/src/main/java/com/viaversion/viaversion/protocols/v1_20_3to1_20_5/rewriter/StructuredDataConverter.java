@@ -798,6 +798,9 @@ public final class StructuredDataConverter {
         final ListTag<CompoundTag> itemsTag = new ListTag<>(CompoundTag.class);
         for (int i = 0; i < items.length; i++) {
             final Item item = items[i];
+            if (item == null || item.isEmpty()) {
+                continue;
+            }
             final CompoundTag savedItem = itemToTag(connection, item);
             // 1.20.4 clients need the Slot to display the item correctly
             if (backupInconvertibleData) {
