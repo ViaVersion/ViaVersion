@@ -17,7 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.v1_17_1to1_18.rewriter;
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.StringTag;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.ParticleMappings;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
@@ -75,5 +80,50 @@ public final class ItemPacketRewriter1_18 extends ItemRewriter<ClientboundPacket
         });
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_17_1.UPDATE_RECIPES);
+    }
+
+    @Override
+    public Item handleItemToClient(final UserConnection connection, final Item item) {
+        if (item == null) {
+            return null;
+        }
+
+        final CompoundTag tag = item.tag();
+        if (tag != null) {
+            normalizeProfileTextures(tag.getCompoundTag("SkullOwner"));
+        }
+        return super.handleItemToClient(connection, item);
+    }
+
+    static void normalizeProfileTextures(final CompoundTag ownerTag) {
+        if (ownerTag == null) {
+            return;
+        }
+
+        final CompoundTag propertiesTag = ownerTag.getCompoundTag("Properties");
+        if (propertiesTag == null) {
+            return;
+        }
+
+        final ListTag<CompoundTag> texturesTag = propertiesTag.getListTag("textures", CompoundTag.class);
+        if (texturesTag == null) {
+            return;
+        }
+
+        for (final CompoundTag textureTag : texturesTag) {
+            final StringTag valueTag = textureTag.getStringTag("Value");
+            if (valueTag != null) {
+                valueTag.setValue(normalizeBase64(valueTag.getValue()));
+            }
+        }
+    }
+
+    private static String normalizeBase64(final String value) {
+        final String compactValue = value.replaceAll("\\s+", "");
+        return switch (compactValue.length() & 3) {
+            case 2 -> compactValue + "==";
+            case 3 -> compactValue + "=";
+            default -> compactValue;
+        };
     }
 }
