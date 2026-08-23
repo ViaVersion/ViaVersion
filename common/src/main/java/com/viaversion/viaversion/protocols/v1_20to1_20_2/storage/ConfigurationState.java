@@ -82,6 +82,7 @@ public class ConfigurationState implements StorableObject {
         final QueuedPacket queued = toQueuedPacket(wrapper, false, false);
         final int bytes = queued.buf().readableBytes();
         if (queuedServerboundPackets >= MAX_SERVERBOUND_QUEUED_PACKETS || queuedServerboundBytes + bytes > MAX_SERVERBOUND_QUEUED_BYTES) {
+            queued.buf().release();
             wrapper.user().disconnect("Sent too many packets during config phase");
             return;
         }
