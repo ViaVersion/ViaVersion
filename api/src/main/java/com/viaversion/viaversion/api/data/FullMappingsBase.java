@@ -36,6 +36,7 @@ public class FullMappingsBase implements FullMappings {
     protected final Key[] idToKey;
     protected final Key[] mappedIdToKey;
     protected final Mappings mappings;
+    private volatile FullMappings inverse;
 
     public FullMappingsBase(final IdentifiersPair identifiersPair, final Mappings mappings) {
         Preconditions.checkNotNull(mappings, "Mappings cannot be null");
@@ -144,6 +145,17 @@ public class FullMappingsBase implements FullMappings {
 
     @Override
     public FullMappings inverse() {
-        return new FullMappingsBase(mappedStringToId, stringToId, mappedIdToKey, idToKey, mappings.inverse());
+        FullMappings result = this.inverse;
+        if (result == null) {
+            synchronized (this) {
+                result = this.inverse;
+                if (result == null) {
+                    final FullMappingsBase inv = new FullMappingsBase(mappedStringToId, stringToId, mappedIdToKey, idToKey, mappings.inverse());
+                    inv.inverse = this;
+                    this.inverse = result = inv;
+                }
+            }
+        }
+        return result;
     }
 }
