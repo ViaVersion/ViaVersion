@@ -107,6 +107,15 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
             handleGamemodes(wrapper);
         });
 
+        protocol.registerServerbound(ServerboundPackets26_3.ACCEPT_TELEPORTATION, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // ID
+            wrapper.read(Types.DOUBLE); // X
+            wrapper.read(Types.DOUBLE); // Y
+            wrapper.read(Types.DOUBLE); // Z
+            wrapper.read(Types.FLOAT); // Y rot
+            wrapper.read(Types.FLOAT); // X rot
+        });
+
         protocol.registerServerbound(ServerboundPackets26_3.PUNCH, ServerboundPackets26_1.SWING, wrapper -> {
             wrapper.write(Types.VAR_INT, 0); // Main hand
         });

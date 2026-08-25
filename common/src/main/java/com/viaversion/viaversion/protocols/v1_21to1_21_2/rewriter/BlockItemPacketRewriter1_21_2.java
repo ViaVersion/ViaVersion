@@ -38,7 +38,8 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
+import com.viaversion.viaversion.api.minecraft.item.data.consumable.ApplyStatusEffects;
+import com.viaversion.viaversion.api.minecraft.item.data.consumable.Consumable1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
@@ -47,6 +48,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.LockCode;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.consumable.ConsumeEffect;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
@@ -80,7 +82,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         StructuredDataKey.REPAIRABLE, StructuredDataKey.ENCHANTABLE, StructuredDataKey.CONSUMABLE1_21_2,
         StructuredDataKey.V1_21_2.useRemainder, StructuredDataKey.USE_COOLDOWN, StructuredDataKey.ITEM_MODEL,
         StructuredDataKey.EQUIPPABLE1_21_2, StructuredDataKey.GLIDER, StructuredDataKey.TOOLTIP_STYLE,
-        StructuredDataKey.DEATH_PROTECTION
+        StructuredDataKey.DEATH_PROTECTION1_21_2
     );
     private static final int RECIPE_NOTIFICATION_FLAG = 1 << 0;
     private static final int RECIPE_HIGHLIGHT_FLAG = 1 << 1;
@@ -544,11 +546,11 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         });
         dataContainer.replace(StructuredDataKey.FOOD1_21, StructuredDataKey.FOOD1_21_2, food -> {
             final Holder<SoundEvent> sound = Holder.of(new SoundEvent("minecraft:entity.generic.eat", null));
-            final Consumable1_21_2.ConsumeEffect<?>[] consumeEffects = new Consumable1_21_2.ConsumeEffect[food.possibleEffects().length];
+            final ConsumeEffect<?>[] consumeEffects = new ConsumeEffect[food.possibleEffects().length];
             for (int i = 0; i < consumeEffects.length; i++) {
                 final FoodProperties1_20_5.FoodEffect effect = food.possibleEffects()[i];
-                final Consumable1_21_2.ApplyStatusEffects applyStatusEffects = new Consumable1_21_2.ApplyStatusEffects(new PotionEffect[]{effect.effect()}, effect.probability());
-                consumeEffects[i] = new Consumable1_21_2.ConsumeEffect<>(0 /* add status effect */, Consumable1_21_2.ApplyStatusEffects.TYPE, applyStatusEffects);
+                final ApplyStatusEffects applyStatusEffects = new ApplyStatusEffects(new PotionEffect[]{effect.effect()}, effect.probability());
+                consumeEffects[i] = new ConsumeEffect<>(0 /* add status effect */, ApplyStatusEffects.TYPE, applyStatusEffects);
             }
 
             dataContainer.set(StructuredDataKey.CONSUMABLE1_21_2, new Consumable1_21_2(food.eatSeconds(), 1 /* eat */, sound, true, consumeEffects));
@@ -610,8 +612,8 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             final float eatSeconds = consumableData != null ? consumableData.consumeSeconds() : 1.6F;
             final List<FoodProperties1_20_5.FoodEffect> foodEffects = new ArrayList<>();
             if (consumableData != null) {
-                for (Consumable1_21_2.ConsumeEffect<?> consumeEffect : consumableData.consumeEffects()) {
-                    if (consumeEffect.value() instanceof Consumable1_21_2.ApplyStatusEffects applyStatusEffects) {
+                for (ConsumeEffect<?> consumeEffect : consumableData.consumeEffects()) {
+                    if (consumeEffect.value() instanceof ApplyStatusEffects applyStatusEffects) {
                         for (PotionEffect effect : applyStatusEffects.effects()) {
                             foodEffects.add(new FoodProperties1_20_5.FoodEffect(effect, applyStatusEffects.probability()));
                         }

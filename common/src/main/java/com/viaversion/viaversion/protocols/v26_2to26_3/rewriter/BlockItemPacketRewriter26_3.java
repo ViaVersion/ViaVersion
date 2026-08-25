@@ -29,6 +29,8 @@ import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial1_20_5
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial26_3;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations26_3;
+import com.viaversion.viaversion.api.minecraft.item.data.consumable.ConsumeEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.consumable.TeleportRandomlyConsumeEffect;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
@@ -187,6 +189,16 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         container.remove(StructuredDataKey.WAXED);
         container.remove(StructuredDataKey.CUSHION_COLOR);
 
+        container.replace(StructuredDataKey.CONSUMABLE1_21_2, StructuredDataKey.CONSUMABLE26_3, consumable -> {
+            final ConsumeEffect<?>[] effects = consumable.consumeEffects();
+            for (int i = 0; i < effects.length; i++) {
+                if (effects[i].value() instanceof Float diameter) {
+                    effects[i] = new ConsumeEffect<>(3, ConsumeEffect.TELEPORT_RANDOMLY_TYPE26_3, new TeleportRandomlyConsumeEffect(diameter, false));
+                }
+            }
+            return consumable;
+        });
+        container.replaceKey(StructuredDataKey.DEATH_PROTECTION1_21_2, StructuredDataKey.DEATH_PROTECTION26_3);
         container.replaceKey(StructuredDataKey.ATTACK_ANIMATION, StructuredDataKey.SWING_ANIMATION);
         container.replaceKey(StructuredDataKey.INTERACT_ANIMATION, StructuredDataKey.SWING_ANIMATION);
         container.replaceKey(StructuredDataKey.INSTRUMENT26_3, StructuredDataKey.INSTRUMENT26_1);

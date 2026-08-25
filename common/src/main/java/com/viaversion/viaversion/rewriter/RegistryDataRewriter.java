@@ -51,7 +51,7 @@ import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewriter.RegistryDataRewriter {
-    private final Map<String, BiConsumer<String, CompoundTag>> registryEntryHandlers = new Object2ObjectArrayMap<>();
+    private final Map<String, TagHandler<?>> registryEntryHandlers = new Object2ObjectArrayMap<>();
     private final Map<String, Consumer<CompoundTag>> enchantmentEffectHandlers = new Object2ObjectArrayMap<>(); // for nested enchantment data
     private final Set<String> enchantmentEffectsToRemove = new HashSet<>();
     private final Map<String, List<RegistryEntry>> toAdd = new Object2ObjectArrayMap<>();
@@ -93,15 +93,14 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             case "dialog" -> updateDialogs(connection, entries);
         }
 
-        final BiConsumer<String, CompoundTag> registryEntryHandler = this.registryEntryHandlers.get(key);
+        final TagHandler<?> registryEntryHandler = this.registryEntryHandlers.get(key);
         if (registryEntryHandler != null) {
             for (final RegistryEntry entry : entries) {
                 if (entry.tag() == null) {
                     continue;
                 }
 
-                final CompoundTag tag = (CompoundTag) entry.tag();
-                registryEntryHandler.accept(entry.key(), tag);
+                callTagHandler(registryEntryHandler, entry.key(), entry.tag());
             }
         }
 
@@ -142,8 +141,16 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         toRemove.add(Key.stripMinecraftNamespace(registryKey));
     }
 
-    public void addHandler(String registryKey, final BiConsumer<String, CompoundTag> handler) {
+    public void addHandler(final String registryKey, final TagHandler<CompoundTag> handler) {
         registryEntryHandlers.put(Key.stripMinecraftNamespace(registryKey), handler);
+    }
+
+    public <T extends Tag> void addTagHandler(final String registryKey, final TagHandler<T> handler) {
+        registryEntryHandlers.put(Key.stripMinecraftNamespace(registryKey), handler);
+    }
+
+    private <T extends Tag> void callTagHandler(final TagHandler<T> handler, final String key, final Tag tag) {
+        handler.accept(key, (T) tag);
     }
 
     @Override
@@ -676,5 +683,9 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     @Override
     public boolean hasRegistriesToRemove() {
         return !this.toRemove.isEmpty();
+    }
+
+    @FunctionalInterface
+    public interface TagHandler<T extends Tag> extends BiConsumer<String, T> {
     }
 }

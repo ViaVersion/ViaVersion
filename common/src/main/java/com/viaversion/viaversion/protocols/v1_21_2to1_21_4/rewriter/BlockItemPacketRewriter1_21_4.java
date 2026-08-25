@@ -27,8 +27,9 @@ import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
+import com.viaversion.viaversion.api.minecraft.item.data.consumable.Consumable1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
+import com.viaversion.viaversion.api.minecraft.item.data.consumable.ConsumeEffect;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.Protocol1_21_2To1_21_4;
@@ -118,7 +119,7 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
                         3,
                         Holder.of(new SoundEvent("minecraft:intentionally_empty", null)),
                         false,
-                        new Consumable1_21_2.ConsumeEffect[0])
+                        new ConsumeEffect[0])
                 );
             }
         }

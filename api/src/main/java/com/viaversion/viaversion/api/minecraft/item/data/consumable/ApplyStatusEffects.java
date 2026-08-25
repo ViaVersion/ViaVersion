@@ -20,31 +20,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item.data;
+package com.viaversion.viaversion.api.minecraft.item.data.consumable;
 
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
-import com.viaversion.viaversion.api.minecraft.item.data.consumable.ConsumeEffect;
-import com.viaversion.viaversion.api.type.TransformingType;
+import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.api.type.Types;
+import io.netty.buffer.ByteBuf;
 
-public record DeathProtection(ConsumeEffect<?>[] deathEffects) implements Copyable {
+public record ApplyStatusEffects(PotionEffect[] effects, float probability) {
 
-    public static final Type<DeathProtection> TYPE1_21_2 = new TransformingType<>(ConsumeEffect.ARRAY_TYPE1_21_2, DeathProtection.class, DeathProtection::new, DeathProtection::deathEffects) {
+    public static final Type<ApplyStatusEffects> TYPE = new Type<>(ApplyStatusEffects.class) {
         @Override
-        public void write(final Ops ops, final DeathProtection value) {
-            ops.writeMap(map -> map.write("death_effects", ConsumeEffect.ARRAY_TYPE1_21_2, value.deathEffects));
+        public ApplyStatusEffects read(final ByteBuf buffer) {
+            final PotionEffect[] effects = PotionEffect.ARRAY_TYPE.read(buffer);
+            final float probability = buffer.readFloat();
+            return new ApplyStatusEffects(effects, probability);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final ApplyStatusEffects value) {
+            PotionEffect.ARRAY_TYPE.write(buffer, value.effects);
+            buffer.writeFloat(value.probability);
+        }
+
+        @Override
+        public void write(final Ops ops, final ApplyStatusEffects value) {
+            ops.writeMap(map -> map
+                .write("effects", PotionEffect.ARRAY_TYPE, value.effects)
+                .writeOptional("probability", Types.FLOAT, value.probability, 1F));
         }
     };
-    public static final Type<DeathProtection> TYPE26_3 = new TransformingType<>(ConsumeEffect.ARRAY_TYPE26_3, DeathProtection.class, DeathProtection::new, DeathProtection::deathEffects) {
-        @Override
-        public void write(final Ops ops, final DeathProtection value) {
-            ops.writeMap(map -> map.write("death_effects", ConsumeEffect.ARRAY_TYPE26_3, value.deathEffects));
-        }
-    };
-
-    @Override
-    public DeathProtection copy() {
-        return new DeathProtection(Copyable.copy(deathEffects));
-    }
 }

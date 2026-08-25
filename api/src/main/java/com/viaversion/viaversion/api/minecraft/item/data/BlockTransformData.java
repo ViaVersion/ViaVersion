@@ -23,7 +23,6 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData.MappingType;
 import com.viaversion.viaversion.api.minecraft.Holder;
@@ -34,11 +33,11 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.util.Copyable;
-import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+// TODO move block state provider rewriting to registry data rewriter
 public record BlockTransformData(CompoundTag blockStateProvider, Holder<SoundEvent> sound, int transformParticle,
                                  int[] disallowedFaces, @Nullable String loot, int dropStrategy,
                                  boolean updateFromNeighbors, int transformType,
