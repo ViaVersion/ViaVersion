@@ -22,8 +22,6 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_11to1_11_1.rewriter.ItemPacketRewriter1_11_1;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPackets1_9_3;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public class Protocol1_11To1_11_1 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
 
@@ -38,26 +36,23 @@ public class Protocol1_11To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
         itemRewriter.register();
 
         registerClientbound(ClientboundPackets1_9_3.AWARD_STATS, wrapper -> {
-            Object2IntMap<String> filteredStats = new Object2IntOpenHashMap<>();
-            int size = wrapper.read(Types.VAR_INT);
+            int size = wrapper.passthrough(Types.VAR_INT);
+            int removed = 0;
 
             for (int i = 0; i < size; i++) {
                 String name = wrapper.read(Types.STRING);
                 int value = wrapper.read(Types.VAR_INT);
 
-                if (name.equals("stat.treasureFished") || name.equals("stat.junkFished")) {
-                    continue; // removed in 1.11.1
+                if (name.equals("stat.treasureFished") || name.equals("stat.junkFished")) { // removed in 1.11.1
+                    removed++;
+                    continue;
                 }
 
-                filteredStats.put(name, value);
+                wrapper.write(Types.STRING, name); // name
+                wrapper.write(Types.VAR_INT, value); // value
             }
 
-            wrapper.write(Types.VAR_INT, filteredStats.size()); // size
-
-            for (final Object2IntMap.Entry<String> entry : filteredStats.object2IntEntrySet()) {
-                wrapper.write(Types.STRING, entry.getKey()); // name
-                wrapper.write(Types.VAR_INT, entry.getIntValue()); // value
-            }
+            wrapper.set(Types.VAR_INT, 0, size - removed); // size
         });
     }
 
