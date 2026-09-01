@@ -24,17 +24,17 @@ package com.viaversion.viaversion.api.minecraft;
 
 import com.viaversion.viaversion.util.EitherImpl;
 
-public final class ResolvableNumber extends EitherImpl<Float, String> {
+public final class ResolvableFloat extends EitherImpl<Float, String> {
 
-    private ResolvableNumber(final Float left, final String right) {
+    private ResolvableFloat(final Float left, final String right) {
         super(left, right);
     }
 
-    public static ResolvableNumber of(final String value) {
-        return new ResolvableNumber(null, value);
+    public static ResolvableFloat of(final String value) {
+        return new ResolvableFloat(null, value);
     }
 
-    public static ResolvableNumber of(final Float value) {
-        return new ResolvableNumber(value, null);
+    public static ResolvableFloat of(final Float value) {
+        return new ResolvableFloat(value, null);
     }
 }

@@ -22,30 +22,30 @@
  */
 package com.viaversion.viaversion.api.type.types.misc;
 
-import com.viaversion.viaversion.api.minecraft.ResolvableNumber;
+import com.viaversion.viaversion.api.minecraft.ResolvableFloat;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 
-public final class ResolvableNumberType extends Type<ResolvableNumber> {
+public final class ResolvableFloatType extends Type<ResolvableFloat> {
 
-    public ResolvableNumberType() {
-        super(ResolvableNumber.class);
+    public ResolvableFloatType() {
+        super(ResolvableFloat.class);
     }
 
     @Override
-    public ResolvableNumber read(final ByteBuf buffer) {
+    public ResolvableFloat read(final ByteBuf buffer) {
         if (buffer.readBoolean()) {
-            return ResolvableNumber.of(Types.FLOAT.readPrimitive(buffer));
+            return ResolvableFloat.of(Types.FLOAT.readPrimitive(buffer));
         } else {
-            return ResolvableNumber.of(Types.STRING.read(buffer));
+            return ResolvableFloat.of(Types.STRING.read(buffer));
         }
     }
 
     @Override
-    public void write(final ByteBuf buffer, final ResolvableNumber value) {
+    public void write(final ByteBuf buffer, final ResolvableFloat value) {
         if (value.isLeft()) {
             Types.FLOAT.writePrimitive(buffer, value.left());
         } else {
@@ -54,7 +54,7 @@ public final class ResolvableNumberType extends Type<ResolvableNumber> {
     }
 
     @Override
-    public void write(final Ops ops, final ResolvableNumber value) {
+    public void write(final Ops ops, final ResolvableFloat value) {
         if (value.isLeft()) {
             Types.FLOAT.write(ops, value.left());
         } else {

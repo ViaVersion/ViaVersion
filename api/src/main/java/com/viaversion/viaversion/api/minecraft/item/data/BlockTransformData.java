@@ -114,7 +114,7 @@ public record BlockTransformData(CompoundTag blockStateProvider, Holder<SoundEve
         state.putString("Name", "dirt");
 
         final CompoundTag tag = new CompoundTag();
-        tag.putString("type", "simple_state_provider");
+        tag.putString("type", "simple");
         tag.put("state", state);
         return tag;
     }

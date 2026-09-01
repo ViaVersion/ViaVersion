@@ -52,6 +52,21 @@ public final class RegistryDataRewriter26_3 extends RegistryDataRewriter {
     }
 
     @Override
+    public boolean updateBlockStateProvider(final CompoundTag tag) {
+        final StringTag typeTag = tag.getStringTag("type");
+        final String strippedName = Key.stripMinecraftNamespace(typeTag.getValue());
+        typeTag.setValue(switch (strippedName) {
+            case "randomized_int_state_provider" -> "randomized_int";
+            case "rotated_block_provider" -> "rotated";
+            case "rule_based_state_provider" -> "rule_based";
+            case "simple_state_provider" -> "simple";
+            case "weighted_state_provider" -> "weighted";
+            default -> strippedName.replace("_provider", "");
+        });
+        return super.updateBlockStateProvider(tag);
+    }
+
+    @Override
     protected boolean updateBlockState(final Tag blockStateTag) {
         if (blockStateTag instanceof CompoundTag compoundTag) { // can only be a compound tag pre-26.3
             final Tag id = compoundTag.remove("Name");

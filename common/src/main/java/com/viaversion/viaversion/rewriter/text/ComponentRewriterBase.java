@@ -171,7 +171,7 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
                 passthroughAndProcess(wrapper); // Suffix
                 wrapper.passthrough(Types.VAR_INT); // Nametag visibility
                 wrapper.passthrough(Types.VAR_INT); // Collision rule
-                wrapper.passthrough(Types.OPTIONAL_VAR_INT); // Color
+                wrapper.passthrough(Types.BOOL_OPTIONAL_VAR_INT); // Color
                 wrapper.passthrough(Types.BYTE); // Flags
             }
         });

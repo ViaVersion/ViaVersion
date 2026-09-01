@@ -36,7 +36,8 @@ import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.Quaternion;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
-import com.viaversion.viaversion.api.minecraft.ResolvableNumber;
+import com.viaversion.viaversion.api.minecraft.ResolvableFloat;
+import com.viaversion.viaversion.api.minecraft.ResolvableInt;
 import com.viaversion.viaversion.api.minecraft.ResolvableProfile;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.Vector;
@@ -121,7 +122,8 @@ import com.viaversion.viaversion.api.type.types.misc.NamedCompoundTagType;
 import com.viaversion.viaversion.api.type.types.misc.PlayerMessageSignatureType;
 import com.viaversion.viaversion.api.type.types.misc.ProfileKeyType;
 import com.viaversion.viaversion.api.type.types.misc.ProfilePropertyType;
-import com.viaversion.viaversion.api.type.types.misc.ResolvableNumberType;
+import com.viaversion.viaversion.api.type.types.misc.ResolvableFloatType;
+import com.viaversion.viaversion.api.type.types.misc.ResolvableIntType;
 import com.viaversion.viaversion.api.type.types.misc.ResolvableProfileType;
 import com.viaversion.viaversion.api.type.types.misc.SoundEventType;
 import com.viaversion.viaversion.api.type.types.misc.TagKeyType;
@@ -198,7 +200,8 @@ public final class Types {
     public static final Type<Key[]> IDENTIFIER_ARRAY = new ArrayType<>(IDENTIFIER);
     public static final Type<Key> TAG_KEY = new TagKeyType();
 
-    public static final Type<ResolvableNumber> RESOLVABLE_NUMBER = new ResolvableNumberType();
+    public static final Type<ResolvableFloat> RESOLVABLE_FLOAT = new ResolvableFloatType();
+    public static final Type<ResolvableInt> RESOLVABLE_INT = new ResolvableIntType();
 
     public static final Type<BlockPosition> BLOCK_POSITION1_8 = new BlockPositionType1_8();
     public static final Type<BlockPosition> OPTIONAL_POSITION1_8 = new BlockPositionType1_8.OptionalBlockPositionType();

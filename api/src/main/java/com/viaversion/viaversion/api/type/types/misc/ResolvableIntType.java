@@ -20,36 +20,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item.data;
+package com.viaversion.viaversion.api.type.types.misc;
 
 import com.viaversion.viaversion.api.minecraft.ResolvableFloat;
 import com.viaversion.viaversion.api.minecraft.ResolvableInt;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 
-public record BrewingFuel(ResolvableInt uses, ResolvableFloat speedMultiplier) {
+public final class ResolvableIntType extends Type<ResolvableInt> {
 
-    public static final Type<BrewingFuel> TYPE = new Type<>(BrewingFuel.class) {
-        @Override
-        public BrewingFuel read(final ByteBuf buffer) {
-            final ResolvableInt uses = Types.RESOLVABLE_INT.read(buffer);
-            final ResolvableFloat speedMultiplier = Types.RESOLVABLE_FLOAT.read(buffer);
-            return new BrewingFuel(uses, speedMultiplier);
-        }
+    public ResolvableIntType() {
+        super(ResolvableInt.class);
+    }
 
-        @Override
-        public void write(final ByteBuf buffer, final BrewingFuel value) {
-            Types.RESOLVABLE_INT.write(buffer, value.uses);
-            Types.RESOLVABLE_FLOAT.write(buffer, value.speedMultiplier);
+    @Override
+    public ResolvableInt read(final ByteBuf buffer) {
+        if (buffer.readBoolean()) {
+            return ResolvableInt.of(Types.INT.readPrimitive(buffer));
+        } else {
+            return ResolvableInt.of(Types.STRING.read(buffer));
         }
+    }
 
-        @Override
-        public void write(final Ops ops, final BrewingFuel value) {
-            ops.writeMap(map -> map
-                .write("uses", Types.RESOLVABLE_INT, value.uses)
-                .write("speed_multiplier", Types.RESOLVABLE_FLOAT, value.speedMultiplier));
+    @Override
+    public void write(final ByteBuf buffer, final ResolvableInt value) {
+        if (value.isLeft()) {
+            Types.INT.writePrimitive(buffer, value.left());
+        } else {
+            Types.IDENTIFIER.write(buffer, Key.of(value.right()));
         }
-    };
+    }
+
+    @Override
+    public void write(final Ops ops, final ResolvableInt value) {
+        if (value.isLeft()) {
+            Types.INT.write(ops, value.left());
+        } else {
+            Types.IDENTIFIER.write(ops, Key.of(value.right()));
+        }
+    }
 }

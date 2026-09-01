@@ -22,33 +22,34 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
-import com.viaversion.viaversion.api.minecraft.ResolvableNumber;
+import com.viaversion.viaversion.api.minecraft.ResolvableFloat;
+import com.viaversion.viaversion.api.minecraft.ResolvableInt;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
-public record CookingFuel(ResolvableNumber burnTime, ResolvableNumber speedMultiplier) {
+public record CookingFuel(ResolvableInt burnTime, ResolvableFloat speedMultiplier) {
 
     public static final Type<CookingFuel> TYPE = new Type<>(CookingFuel.class) {
         @Override
         public CookingFuel read(final ByteBuf buffer) {
-            final ResolvableNumber burnTime = Types.RESOLVABLE_NUMBER.read(buffer);
-            final ResolvableNumber speedMultiplier = Types.RESOLVABLE_NUMBER.read(buffer);
+            final ResolvableInt burnTime = Types.RESOLVABLE_INT.read(buffer);
+            final ResolvableFloat speedMultiplier = Types.RESOLVABLE_FLOAT.read(buffer);
             return new CookingFuel(burnTime, speedMultiplier);
         }
 
         @Override
         public void write(final ByteBuf buffer, final CookingFuel value) {
-            Types.RESOLVABLE_NUMBER.write(buffer, value.burnTime);
-            Types.RESOLVABLE_NUMBER.write(buffer, value.speedMultiplier);
+            Types.RESOLVABLE_INT.write(buffer, value.burnTime);
+            Types.RESOLVABLE_FLOAT.write(buffer, value.speedMultiplier);
         }
 
         @Override
         public void write(final Ops ops, final CookingFuel value) {
             ops.writeMap(map -> map
-                .write("burn_time", Types.RESOLVABLE_NUMBER, value.burnTime)
-                .write("speed_multiplier", Types.RESOLVABLE_NUMBER, value.speedMultiplier));
+                .write("burn_time", Types.RESOLVABLE_INT, value.burnTime)
+                .write("speed_multiplier", Types.RESOLVABLE_FLOAT, value.speedMultiplier));
         }
     };
 }

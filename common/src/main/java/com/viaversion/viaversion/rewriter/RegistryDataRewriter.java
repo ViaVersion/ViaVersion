@@ -535,17 +535,23 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     @Override
     public boolean updateBlockStateProvider(final CompoundTag tag) {
         boolean changed = false;
-        final String type = Key.stripMinecraftNamespace(tag.getString("type"));
+        String type = tag.getString("type");
+        if (type == null) {
+            // Direct block state
+            return updateBlockState(tag);
+        }
+
+        type = Key.stripMinecraftNamespace(type);
         switch (type) {
-            case "simple_state_provider", "rotated_block_provider" -> {
+            case "simple", "rotated" -> {
                 changed |= updateBlockState(tag.get("state"));
             }
-            case "weighted_state_provider" -> {
+            case "weighted" -> {
                 for (final CompoundTag entry : tag.getListTag("entries", CompoundTag.class)) {
                     changed |= updateBlockState(entry.get("data"));
                 }
             }
-            case "noise_threshold_provider" -> {
+            case "noise_threshold" -> {
                 changed |= updateBlockState(tag.get("default_state"));
                 for (final CompoundTag entry : tag.getListTag("low_states", CompoundTag.class)) {
                     changed |= updateBlockState(entry);
@@ -554,16 +560,16 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
                     changed |= updateBlockState(entry);
                 }
             }
-            case "noise_provider", "dual_noise_provider" -> {
+            case "noise", "dual_noise" -> {
                 for (final CompoundTag entry : tag.getListTag("states", CompoundTag.class)) {
                     changed |= updateBlockState(entry);
                 }
             }
-            case "randomized_int_state_provider" -> {
+            case "randomized_int_state" -> {
                 changed |= updateBlockStateProvider(tag.getCompoundTag("source"));
                 // "property" field is generic and can be left unchanged. If invalid, it'll be defaulted
             }
-            case "rule_based_state_provider" -> {
+            case "rule_based_state" -> {
                 final CompoundTag fallback = tag.getCompoundTag("fallback");
                 if (fallback != null) {
                     changed |= updateBlockStateProvider(fallback);
@@ -580,7 +586,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
                 }
                 */
             }
-            case "copy_properties_provider" -> {
+            case "copy_properties" -> {
                 changed |= updateBlockStateProvider(tag.getCompoundTag("source_block_state_provider"));
             }
         }

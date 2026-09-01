@@ -20,21 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item.data;
+package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.api.minecraft.ResolvableInt;
-import com.viaversion.viaversion.api.minecraft.codec.Ops;
-import com.viaversion.viaversion.api.type.TransformingType;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.EitherImpl;
 
-public record Compostable(ResolvableInt layers) {
+public final class ResolvableInt extends EitherImpl<Integer, String> {
 
-    public static final Type<Compostable> TYPE = new TransformingType<>(Types.RESOLVABLE_INT, Compostable.class, Compostable::new, Compostable::layers) {
+    private ResolvableInt(final Integer left, final String right) {
+        super(left, right);
+    }
 
-        @Override
-        public void write(final Ops ops, final Compostable value) {
-            ops.writeMap(map -> map.write("layers", Types.RESOLVABLE_INT, value.layers));
-        }
-    };
+    public static ResolvableInt of(final String value) {
+        return new ResolvableInt(null, value);
+    }
+
+    public static ResolvableInt of(final Integer value) {
+        return new ResolvableInt(value, null);
+    }
 }
