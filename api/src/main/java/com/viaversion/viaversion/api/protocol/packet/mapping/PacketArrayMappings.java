@@ -27,7 +27,7 @@ import java.util.Arrays;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class PacketArrayMappings implements PacketMappings {
-    private final PacketMapping[][] packets = new PacketMapping[State.values().length][];
+    private final PacketMapping[][] packets = new PacketMapping[State.statesCount()][];
 
     @Override
     public @Nullable PacketMapping mappedPacket(final State state, final int unmappedId) {

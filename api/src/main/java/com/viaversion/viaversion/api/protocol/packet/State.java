@@ -28,5 +28,11 @@ public enum State {
     STATUS,
     LOGIN,
     CONFIGURATION,
-    PLAY
+    PLAY;
+
+    private static final int STATES_COUNT = values().length;
+
+    public static int statesCount() {
+        return STATES_COUNT;
+    }
 }
