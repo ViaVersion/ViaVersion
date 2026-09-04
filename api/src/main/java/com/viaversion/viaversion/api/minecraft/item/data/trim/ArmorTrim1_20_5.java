@@ -84,6 +84,11 @@ public record ArmorTrim1_20_5(Holder<ArmorTrimMaterial1_20_5> material, Holder<A
             ArmorTrimPattern.TYPE1_20_5.write(buffer, value.pattern);
             buffer.writeBoolean(value.showInTooltip);
         }
+
+        @Override
+        public void write(final Ops ops, final ArmorTrim1_20_5 value) {
+            TYPE1_21_5.write(ops, value);
+        }
     };
     public static final Type<ArmorTrim1_20_5> TYPE1_21_5 = new Type<>(ArmorTrim1_20_5.class) {
         @Override

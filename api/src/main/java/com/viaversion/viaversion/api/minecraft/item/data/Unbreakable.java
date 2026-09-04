@@ -22,7 +22,10 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Unit;
 import io.netty.buffer.ByteBuf;
 
 public record Unbreakable(boolean showInTooltip) {
@@ -36,6 +39,11 @@ public record Unbreakable(boolean showInTooltip) {
         @Override
         public void write(final ByteBuf buffer, final Unbreakable value) {
             buffer.writeBoolean(value.showInTooltip());
+        }
+
+        @Override
+        public void write(final Ops ops, final Unbreakable value) {
+            Types.EMPTY.write(ops, Unit.INSTANCE);
         }
     };
 

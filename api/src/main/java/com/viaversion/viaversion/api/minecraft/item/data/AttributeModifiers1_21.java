@@ -58,6 +58,11 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
             AttributeModifier.ARRAY_TYPE1_21.write(buffer, value.modifiers());
             buffer.writeBoolean(value.showInTooltip());
         }
+
+        @Override
+        public void write(final Ops ops, final AttributeModifiers1_21 value) {
+            TYPE1_21_5.write(ops, value);
+        }
     };
     public static final Type<AttributeModifiers1_21> TYPE1_21_5 = new Type<>(AttributeModifiers1_21.class) {
         @Override

@@ -61,6 +61,11 @@ public record JukeboxPlayable(EitherHolder<JukeboxSong> song, boolean showInTool
             EitherHolderType.write(buffer, value.song, JukeboxSong.TYPE);
             buffer.writeBoolean(value.showInTooltip);
         }
+
+        @Override
+        public void write(final Ops ops, final JukeboxPlayable value) {
+            TYPE1_21_5.write(ops, value);
+        }
     };
     public static final Type<JukeboxPlayable> TYPE1_21_5 = TransformingType.of(
         new EitherHolderType<>(JukeboxSong.TYPE), JukeboxPlayable.class,

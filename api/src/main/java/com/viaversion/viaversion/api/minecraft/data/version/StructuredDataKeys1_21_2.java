@@ -39,5 +39,7 @@ public class StructuredDataKeys1_21_2 extends VersionedStructuredDataKeys {
         this.chargedProjectiles = add("charged_projectiles", types.itemTemplateArray().withMaxLength(1024));
         this.bundleContents = add("bundle_contents", types.itemTemplateArray().withMaxLength(1024));
         this.useRemainder = add("use_remainder", types.itemTemplate());
+        this.unsupportedForOps.add(StructuredDataKey.CAN_PLACE_ON1_20_5);
+        this.unsupportedForOps.add(StructuredDataKey.CAN_BREAK1_20_5);
     }
 }

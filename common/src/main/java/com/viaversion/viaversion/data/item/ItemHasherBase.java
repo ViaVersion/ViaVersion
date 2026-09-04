@@ -132,7 +132,12 @@ public class ItemHasherBase implements ItemHasher {
 
     private static <T> int hash(final Hasher hasher, final StructuredData<T> data) {
         hasher.reset();
-        hasher.write(data.key().type(), data.value());
+        try {
+            hasher.write(data.key().type(), data.value());
+        } catch (final UnsupportedOperationException e) {
+            // No ops writer for a nested type, treat the component as changed instead of failing the packet
+            return UNKNOWN_HASH;
+        }
         return hasher.hash();
     }
 

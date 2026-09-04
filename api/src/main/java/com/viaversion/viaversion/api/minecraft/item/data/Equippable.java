@@ -77,6 +77,11 @@ public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Null
             buffer.writeBoolean(value.swappable());
             buffer.writeBoolean(value.damageOnHurt());
         }
+
+        @Override
+        public void write(final Ops ops, final Equippable value) {
+            TYPE1_21_5.write(ops, value);
+        }
     };
     public static final Type<Equippable> TYPE1_21_5 = new Type<>(Equippable.class) {
         @Override

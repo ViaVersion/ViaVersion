@@ -52,6 +52,11 @@ public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int dam
             buffer.writeFloat(value.defaultMiningSpeed());
             Types.VAR_INT.writePrimitive(buffer, value.damagePerBlock());
         }
+
+        @Override
+        public void write(final Ops ops, final ToolProperties value) {
+            TYPE1_21_5.write(ops, value);
+        }
     };
     public static final Type<ToolProperties> TYPE1_21_5 = new Type<>(ToolProperties.class) {
         @Override

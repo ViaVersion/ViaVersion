@@ -46,6 +46,11 @@ public record DyedColor(int rgb, boolean showInTooltip) {
             buffer.writeInt(value.rgb);
             buffer.writeBoolean(value.showInTooltip);
         }
+
+        @Override
+        public void write(final Ops ops, final DyedColor value) {
+            TYPE1_21_5.write(ops, value);
+        }
     };
     public static final Type<DyedColor> TYPE1_21_5 = new Type<>(DyedColor.class) {
         @Override

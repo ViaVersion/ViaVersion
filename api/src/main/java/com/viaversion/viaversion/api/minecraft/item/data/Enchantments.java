@@ -60,6 +60,11 @@ public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) imple
             }
             buffer.writeBoolean(value.showInTooltip());
         }
+
+        @Override
+        public void write(final Ops ops, final Enchantments value) {
+            TYPE1_21_5.write(ops, value);
+        }
     };
     public static final Type<Enchantments> TYPE1_21_5 = new Type<>(Enchantments.class) {
         @Override
