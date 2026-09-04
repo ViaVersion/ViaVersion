@@ -29,8 +29,7 @@ import io.netty.buffer.ByteBuf;
 
 public record SwingAnimation(int type, int duration) {
 
-    public static final Type<SwingAnimation> TYPE1_21_11 = new SwingAnimationType(EnumTypes.SWING_ANIMATION1_21_11.idFromName("whack"));
-    public static final Type<SwingAnimation> TYPE26_3 = new SwingAnimationType(EnumTypes.SWING_ANIMATION26_3.idFromName("whack"));
+    public static final Type<SwingAnimation> TYPE = new SwingAnimationType(EnumTypes.SWING_ANIMATION1_21_11.idFromName("whack"));
 
     private static class SwingAnimationType extends Type<SwingAnimation> {
 

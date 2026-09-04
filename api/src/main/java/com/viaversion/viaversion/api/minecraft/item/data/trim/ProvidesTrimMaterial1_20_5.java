@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item.data;
+package com.viaversion.viaversion.api.minecraft.item.data.trim;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.EitherHolder;
@@ -32,34 +32,34 @@ import com.viaversion.viaversion.api.type.types.misc.EitherHolderType;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 
-public record ProvidesTrimMaterial(EitherHolder<ArmorTrimMaterial1_20_5> material) implements Rewritable {
+public record ProvidesTrimMaterial1_20_5(EitherHolder<ArmorTrimMaterial1_20_5> material) implements Rewritable {
 
-    public static final Type<ProvidesTrimMaterial> TYPE = new Type<>(ProvidesTrimMaterial.class) {
+    public static final Type<ProvidesTrimMaterial1_20_5> TYPE = new Type<>(ProvidesTrimMaterial1_20_5.class) {
 
         @Override
-        public ProvidesTrimMaterial read(final ByteBuf buffer) {
+        public ProvidesTrimMaterial1_20_5 read(final ByteBuf buffer) {
             final EitherHolder<ArmorTrimMaterial1_20_5> position = EitherHolderType.read(buffer, ArmorTrimMaterial1_20_5.TYPE1_21_5);
-            return new ProvidesTrimMaterial(position);
+            return new ProvidesTrimMaterial1_20_5(position);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final ProvidesTrimMaterial value) {
+        public void write(final ByteBuf buffer, final ProvidesTrimMaterial1_20_5 value) {
             EitherHolderType.write(buffer, value.material, ArmorTrimMaterial1_20_5.TYPE1_21_5);
         }
 
         @Override
-        public void write(final Ops ops, final ProvidesTrimMaterial value) {
+        public void write(final Ops ops, final ProvidesTrimMaterial1_20_5 value) {
             EitherHolderType.write(ops, value.material, ArmorTrimMaterial1_20_5.TYPE1_21_5);
         }
     };
 
     @Override
-    public ProvidesTrimMaterial rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+    public ProvidesTrimMaterial1_20_5 rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         if (material.hasKey() || material.holder().hasId()) {
             return this;
         }
 
         final ArmorTrimMaterial1_20_5 trimMaterial = material.holder().value();
-        return new ProvidesTrimMaterial(EitherHolder.of(Holder.of(trimMaterial.rewrite(connection, protocol, clientbound))));
+        return new ProvidesTrimMaterial1_20_5(EitherHolder.of(Holder.of(trimMaterial.rewrite(connection, protocol, clientbound))));
     }
 }

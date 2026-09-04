@@ -68,6 +68,11 @@ final class ParticleRegistrations {
         ctx.clientbound(ClientboundPackets1_21_9.EXPLODE, pr::registerExplode1_21_9);
     }
 
+    static <CU extends ClientboundPacketType> void registerParticlePackets26_3(final RegistrationContext<CU, ?> ctx, final ParticleRewriter<CU> pr) {
+        ctx.clientbound(ClientboundPackets1_21_9.LEVEL_PARTICLES, pr::registerLevelParticles26_3);
+        ctx.clientbound(ClientboundPackets1_21_9.EXPLODE, pr::registerExplode1_21_9);
+    }
+
     static @Nullable <CU extends ClientboundPacketType, SU extends ServerboundPacketType> ParticleRewriter<CU> particle(final RegistrationContext<CU, SU> ctx) {
         return (ParticleRewriter<CU>) ctx.protocol().getParticleRewriter();
     }

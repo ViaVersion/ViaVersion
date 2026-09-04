@@ -41,9 +41,9 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial1_20_5;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrim1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimMaterial1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.AttributeModifier;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.ModifierData;
@@ -963,7 +963,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         return new WrittenBook(title, author, generation, pages.toArray(FilterableComponent[]::new), resolved);
     }
 
-    protected CompoundTag trimToTag(final UserConnection connection, final ArmorTrim value) {
+    protected CompoundTag trimToTag(final UserConnection connection, final ArmorTrim1_20_5 value) {
         final CompoundTag tag = new CompoundTag();
         final Holder<ArmorTrimMaterial1_20_5> material = value.material();
         final ProtocolStorables1_20_5 storables = connection.storables(protocol);
@@ -1021,7 +1021,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         return tag;
     }
 
-    protected ArmorTrim trimFromTag(final UserConnection connection, final Tag tag) {
+    protected ArmorTrim1_20_5 trimFromTag(final UserConnection connection, final Tag tag) {
         final CompoundTag value = (CompoundTag) tag;
 
         final Tag materialTag = value.get("material");
@@ -1060,7 +1060,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         }
 
         final boolean showInTooltip = value.getBoolean("show_in_tooltip", true);
-        return new ArmorTrim(material, pattern, showInTooltip);
+        return new ArmorTrim1_20_5(material, pattern, showInTooltip);
     }
 
     protected CompoundTag debugStickStateToTag(final DebugStickState value) {

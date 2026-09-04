@@ -139,6 +139,13 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
         });
     }
 
+    public void registerLevelParticles26_3(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            final Particle particle = wrapper.passthroughAndMap(particleType, mappedParticleType);
+            rewriteParticle(wrapper.user(), particle);
+        });
+    }
+
     public void registerExplode1_20_5(final C packetType) {
         final SoundRewriter<C> soundRewriter = new SoundRewriter<>(protocol);
         protocol.registerClientbound(packetType, wrapper -> {

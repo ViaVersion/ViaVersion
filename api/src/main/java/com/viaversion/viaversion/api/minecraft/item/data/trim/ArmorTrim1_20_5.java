@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item.data;
+package com.viaversion.viaversion.api.minecraft.item.data.trim;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
@@ -30,77 +30,77 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 
-public record ArmorTrim(Holder<ArmorTrimMaterial1_20_5> material, Holder<ArmorTrimPattern> pattern,
-                        boolean showInTooltip) implements Rewritable {
+public record ArmorTrim1_20_5(Holder<ArmorTrimMaterial1_20_5> material, Holder<ArmorTrimPattern> pattern,
+                              boolean showInTooltip) implements Rewritable {
 
-    public ArmorTrim(Holder<ArmorTrimMaterial1_20_5> material, Holder<ArmorTrimPattern> pattern) {
+    public ArmorTrim1_20_5(Holder<ArmorTrimMaterial1_20_5> material, Holder<ArmorTrimPattern> pattern) {
         this(material, pattern, true);
     }
 
-    public static final Type<ArmorTrim> TYPE1_20_5 = new Type<>(ArmorTrim.class) {
+    public static final Type<ArmorTrim1_20_5> TYPE1_20_5 = new Type<>(ArmorTrim1_20_5.class) {
         @Override
-        public ArmorTrim read(final ByteBuf buffer) {
+        public ArmorTrim1_20_5 read(final ByteBuf buffer) {
             final Holder<ArmorTrimMaterial1_20_5> material = ArmorTrimMaterial1_20_5.TYPE1_20_5.read(buffer);
             final Holder<ArmorTrimPattern> pattern = ArmorTrimPattern.TYPE1_20_5.read(buffer);
             final boolean showInTooltip = buffer.readBoolean();
-            return new ArmorTrim(material, pattern, showInTooltip);
+            return new ArmorTrim1_20_5(material, pattern, showInTooltip);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final ArmorTrim value) {
+        public void write(final ByteBuf buffer, final ArmorTrim1_20_5 value) {
             ArmorTrimMaterial1_20_5.TYPE1_20_5.write(buffer, value.material);
             ArmorTrimPattern.TYPE1_20_5.write(buffer, value.pattern);
             buffer.writeBoolean(value.showInTooltip);
         }
     };
-    public static final Type<ArmorTrim> TYPE1_21_2 = new Type<>(ArmorTrim.class) {
+    public static final Type<ArmorTrim1_20_5> TYPE1_21_2 = new Type<>(ArmorTrim1_20_5.class) {
         @Override
-        public ArmorTrim read(final ByteBuf buffer) {
+        public ArmorTrim1_20_5 read(final ByteBuf buffer) {
             final Holder<ArmorTrimMaterial1_20_5> material = ArmorTrimMaterial1_20_5.TYPE1_21_2.read(buffer);
             final Holder<ArmorTrimPattern> pattern = ArmorTrimPattern.TYPE1_20_5.read(buffer);
             final boolean showInTooltip = buffer.readBoolean();
-            return new ArmorTrim(material, pattern, showInTooltip);
+            return new ArmorTrim1_20_5(material, pattern, showInTooltip);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final ArmorTrim value) {
+        public void write(final ByteBuf buffer, final ArmorTrim1_20_5 value) {
             ArmorTrimMaterial1_20_5.TYPE1_21_2.write(buffer, value.material);
             ArmorTrimPattern.TYPE1_20_5.write(buffer, value.pattern);
             buffer.writeBoolean(value.showInTooltip);
         }
     };
-    public static final Type<ArmorTrim> TYPE1_21_4 = new Type<>(ArmorTrim.class) {
+    public static final Type<ArmorTrim1_20_5> TYPE1_21_4 = new Type<>(ArmorTrim1_20_5.class) {
         @Override
-        public ArmorTrim read(final ByteBuf buffer) {
+        public ArmorTrim1_20_5 read(final ByteBuf buffer) {
             final Holder<ArmorTrimMaterial1_20_5> material = ArmorTrimMaterial1_20_5.TYPE1_21_4.read(buffer);
             final Holder<ArmorTrimPattern> pattern = ArmorTrimPattern.TYPE1_20_5.read(buffer);
             final boolean showInTooltip = buffer.readBoolean();
-            return new ArmorTrim(material, pattern, showInTooltip);
+            return new ArmorTrim1_20_5(material, pattern, showInTooltip);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final ArmorTrim value) {
+        public void write(final ByteBuf buffer, final ArmorTrim1_20_5 value) {
             ArmorTrimMaterial1_20_5.TYPE1_21_4.write(buffer, value.material);
             ArmorTrimPattern.TYPE1_20_5.write(buffer, value.pattern);
             buffer.writeBoolean(value.showInTooltip);
         }
     };
-    public static final Type<ArmorTrim> TYPE1_21_5 = new Type<>(ArmorTrim.class) {
+    public static final Type<ArmorTrim1_20_5> TYPE1_21_5 = new Type<>(ArmorTrim1_20_5.class) {
         @Override
-        public ArmorTrim read(final ByteBuf buffer) {
+        public ArmorTrim1_20_5 read(final ByteBuf buffer) {
             final Holder<ArmorTrimMaterial1_20_5> material = ArmorTrimMaterial1_20_5.TYPE1_21_5.read(buffer);
             final Holder<ArmorTrimPattern> pattern = ArmorTrimPattern.TYPE1_21_5.read(buffer);
-            return new ArmorTrim(material, pattern);
+            return new ArmorTrim1_20_5(material, pattern);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final ArmorTrim value) {
+        public void write(final ByteBuf buffer, final ArmorTrim1_20_5 value) {
             ArmorTrimMaterial1_20_5.TYPE1_21_5.write(buffer, value.material);
             ArmorTrimPattern.TYPE1_21_5.write(buffer, value.pattern);
         }
 
         @Override
-        public void write(final Ops ops, final ArmorTrim value) {
+        public void write(final Ops ops, final ArmorTrim1_20_5 value) {
             ops.writeMap(map -> map
                 .write("material", ArmorTrimMaterial1_20_5.TYPE1_21_5, value.material)
                 .write("pattern", ArmorTrimPattern.TYPE1_21_5, value.pattern));
@@ -108,7 +108,7 @@ public record ArmorTrim(Holder<ArmorTrimMaterial1_20_5> material, Holder<ArmorTr
     };
 
     @Override
-    public ArmorTrim rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+    public ArmorTrim1_20_5 rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         Holder<ArmorTrimMaterial1_20_5> material = this.material;
         if (material.isDirect()) {
             material = Holder.of(material.value().rewrite(connection, protocol, clientbound));
@@ -118,6 +118,6 @@ public record ArmorTrim(Holder<ArmorTrimMaterial1_20_5> material, Holder<ArmorTr
         if (pattern.isDirect()) {
             pattern = Holder.of(pattern.value().rewrite(connection, protocol, clientbound));
         }
-        return new ArmorTrim(material, pattern, showInTooltip);
+        return new ArmorTrim1_20_5(material, pattern, showInTooltip);
     }
 }

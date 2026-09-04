@@ -73,7 +73,8 @@ public final class DefaultRegistrations {
                 .to(ProtocolVersion.v1_21_2, ParticleRegistrations::registerParticlePackets1_20_5)
                 .to(ProtocolVersion.v1_21_4, ParticleRegistrations::registerParticlePackets1_21_2)
                 .to(ProtocolVersion.v1_21_9, ParticleRegistrations::registerParticlePackets1_21_4)
-                .since(ParticleRegistrations::registerParticlePackets1_21_9)
+                .to(ProtocolVersion.v26_3, ParticleRegistrations::registerParticlePackets1_21_9)
+                .since(ParticleRegistrations::registerParticlePackets26_3)
             )
 
             .ranges(TextComponentRegistrations::text, ProtocolVersion.v1_12_2, b -> b

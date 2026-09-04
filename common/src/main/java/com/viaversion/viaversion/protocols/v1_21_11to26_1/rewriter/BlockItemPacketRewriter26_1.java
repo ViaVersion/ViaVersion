@@ -36,7 +36,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant26_1;
 import com.viaversion.viaversion.api.minecraft.item.data.DamageType;
 import com.viaversion.viaversion.api.minecraft.item.data.JukeboxPlayable;
 import com.viaversion.viaversion.api.minecraft.item.data.ProvidesBannerPatterns;
-import com.viaversion.viaversion.api.minecraft.item.data.ProvidesTrimMaterial;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ProvidesTrimMaterial1_20_5;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
@@ -134,7 +134,7 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
     public static void downgradeData(final StructuredDataKeys1_21_11 dataKeys, final StructuredDataContainer container) {
         container.replace(StructuredDataKey.JUKEBOX_PLAYABLE26_1, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, jukeboxPlayable -> new JukeboxPlayable(jukeboxPlayable, true));
         container.replace(StructuredDataKey.INSTRUMENT26_1, StructuredDataKey.INSTRUMENT1_21_5, EitherHolder::of);
-        container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, StructuredDataKey.PROVIDES_TRIM_MATERIAL1_21_5, providesTrimMaterial -> new ProvidesTrimMaterial(EitherHolder.of(providesTrimMaterial)));
+        container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, StructuredDataKey.PROVIDES_TRIM_MATERIAL1_21_5, providesTrimMaterial -> new ProvidesTrimMaterial1_20_5(EitherHolder.of(providesTrimMaterial)));
         container.replace(StructuredDataKey.CHICKEN_VARIANT26_1, StructuredDataKey.CHICKEN_VARIANT1_21_5, Either::left);
         container.replace(StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT26_1, StructuredDataKey.ZOMBIE_NAUTILUS_VARIANT1_21_11, Either::left);
         container.replace(StructuredDataKey.DAMAGE_TYPE26_1, StructuredDataKey.DAMAGE_TYPE1_21_11, damageType -> new DamageType(Either.left(damageType)));

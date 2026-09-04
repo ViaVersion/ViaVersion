@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item.data;
+package com.viaversion.viaversion.api.minecraft.item.data.trim;
 
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;

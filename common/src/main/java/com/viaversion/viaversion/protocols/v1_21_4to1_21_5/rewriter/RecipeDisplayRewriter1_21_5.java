@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter;
 
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimPattern;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;

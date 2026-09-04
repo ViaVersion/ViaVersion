@@ -47,7 +47,6 @@ public final class EnumTypes {
     public static final EnumType AXOLOTL_VARIANT = new EnumType("lucy", "wild", "gold", "cyan", "blue");
     public static final EnumType EQUIPMENT_SLOT = new EnumType("mainhand", "feet", "legs", "chest", "head", "offhand", "body", "saddle");
     public static final EnumType SWING_ANIMATION1_21_11 = new EnumType("none", "whack", "stab");
-    public static final EnumType SWING_ANIMATION26_3 = new EnumType("whack", "stab");
     public static final EnumType ITEM_USE_ANIMATION = new EnumType("none", "eat", "drink", "block", "bow", "trident", "crossbow", "spyglass", "toot_horn", "brush", "bundle", "spear");
     public static final EnumType DIRECTION = new EnumType("down", "up", "north", "south", "west", "east");
     public static final EnumType TRANSFORM_PARTICLE = new EnumType("none", "scrape", "wax_on", "wax_off");

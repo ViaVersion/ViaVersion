@@ -397,11 +397,11 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     /**
      * Stores inconvertible data in a backup tag. Called before data component modification to the item.
      *
-     * @param connection    user connection
-     * @param item          item to save data for
-     * @param dataContainer item data container
+     * @param connection user connection
+     * @param item       item to save data for
+     * @param container  item data container
      */
-    protected void backupInconvertibleData(final UserConnection connection, final Item item, final StructuredDataContainer dataContainer, final CompoundTag backupTag) {
+    protected void backupInconvertibleData(final UserConnection connection, final Item item, final StructuredDataContainer container, final CompoundTag backupTag) {
     }
 
     /**

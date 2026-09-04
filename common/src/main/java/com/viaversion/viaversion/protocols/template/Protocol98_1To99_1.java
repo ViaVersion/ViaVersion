@@ -99,7 +99,7 @@ final class Protocol98_1To99_1 extends AbstractProtocol<ClientboundPacket26_1, C
         // EntityTypes1_21_11.initialize(this);
 
         // Uncomment if versioned types changed
-        // ParticleType.Fillers.fill1_21_9(this);
+        // ParticleType.Fillers.fill26_2(this);
 
         super.onMappingDataLoaded(); // Calls load methods on rewriters. Last in case the rewriters access the above filled data
     }

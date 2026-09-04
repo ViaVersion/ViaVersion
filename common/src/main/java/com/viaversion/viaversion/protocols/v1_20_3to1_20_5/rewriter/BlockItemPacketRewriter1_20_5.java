@@ -43,9 +43,9 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial1_20_5;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrim1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimMaterial1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.AttributeModifier;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.ModifierData;
@@ -1045,7 +1045,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             ));
         } else return;
 
-        data.set(StructuredDataKey.TRIM1_20_5, new ArmorTrim(materialHolder, patternHolder, showInTooltip));
+        data.set(StructuredDataKey.TRIM1_20_5, new ArmorTrim1_20_5(materialHolder, patternHolder, showInTooltip));
     }
 
     private void updateMobTags(final StructuredDataContainer data, final CompoundTag tag) {

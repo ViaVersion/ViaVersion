@@ -38,8 +38,8 @@ final class BlockItemPacketRewriter99_1 extends StructuredItemRewriter<Clientbou
     }
 
     @Override
-    protected void backupInconvertibleData(final UserConnection connection, final Item item, final StructuredDataContainer dataContainer, final CompoundTag backupTag) {
-        super.backupInconvertibleData(connection, item, dataContainer, backupTag);
+    protected void backupInconvertibleData(final UserConnection connection, final Item item, final StructuredDataContainer container, final CompoundTag backupTag) {
+        super.backupInconvertibleData(connection, item, container, backupTag);
         // back up any data if needed here, called before the method below
     }
 
