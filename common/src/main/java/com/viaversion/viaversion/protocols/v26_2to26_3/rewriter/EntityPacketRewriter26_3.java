@@ -22,12 +22,15 @@ import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes26_3;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_3;
+import com.viaversion.viaversion.api.minecraft.item.data.EnumTypes;
+import com.viaversion.viaversion.api.minecraft.item.data.SwingAnimation;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
 import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundPackets26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ServerboundPackets26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.storage.LastMovement;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
@@ -36,6 +39,9 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
 
     private static final int SINGLE_STEP = 1 << 1;
     private static final int MAX_TICK_OFFSET = 5;
+    private static final int MAIN_HAND = 0;
+    private static final int OFF_HAND = 1;
+    private static final SwingAnimation DEFAULT_SWING_ANIMATION = new SwingAnimation(EnumTypes.SWING_ANIMATION1_21_11.idFromName("whack"), 6);
 
     public EntityPacketRewriter26_3(final Protocol26_2To26_3 protocol) {
         super(protocol);
@@ -122,18 +128,18 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
 
         protocol.registerClientbound(ClientboundPackets26_1.ANIMATE, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Entity ID
-            int action = wrapper.read(Types.VAR_INT);
-            action = switch (action) {
-                case 2 -> 0; // wake up
-                case 4 -> 1; // crit
-                case 5 -> 2; // magic crit
-                default -> -1; // arm swings
-            };
-
-            if (action == -1) {
-                wrapper.cancel();
-            } else {
-                wrapper.write(Types.VAR_INT, action);
+            final short action = wrapper.read(Types.UNSIGNED_BYTE);
+            switch (action) {
+                case 0, 3 -> {
+                    // Arm swings
+                    wrapper.setPacketType(ClientboundPackets26_3.SWING_ANIMATION);
+                    wrapper.write(Types.VAR_INT, action == 0 ? MAIN_HAND : OFF_HAND);
+                    wrapper.write(SwingAnimation.TYPE, DEFAULT_SWING_ANIMATION);
+                }
+                case 2 -> wrapper.write(Types.UNSIGNED_BYTE, (short) 0); // Wake up
+                case 4 -> wrapper.write(Types.UNSIGNED_BYTE, (short) 1); // Crit
+                case 5 -> wrapper.write(Types.UNSIGNED_BYTE, (short) 2); // Magic crit
+                default -> wrapper.cancel();
             }
         });
 
