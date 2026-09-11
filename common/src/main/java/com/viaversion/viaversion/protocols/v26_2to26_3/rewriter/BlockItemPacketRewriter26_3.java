@@ -53,6 +53,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<ClientboundPacket26_1, ServerboundPacket26_3, Protocol26_2To26_3> {
 
+    private static final int TELEPORT_RANDOMLY_EFFECT = 3;
+
     public BlockItemPacketRewriter26_3(final Protocol26_2To26_3 protocol) {
         super(protocol);
     }
@@ -211,6 +213,14 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
                 new StructuredItemTemplate(decorations.frontItem(), 1)
             );
         });
+        container.replace(StructuredDataKey.CONSUMABLE1_21_2, StructuredDataKey.CONSUMABLE26_3, consumable -> {
+            upgradeConsumeEffects(consumable.consumeEffects());
+            return consumable;
+        });
+        container.replace(StructuredDataKey.DEATH_PROTECTION1_21_2, StructuredDataKey.DEATH_PROTECTION26_3, deathProtection -> {
+            upgradeConsumeEffects(deathProtection.deathEffects());
+            return deathProtection;
+        });
     }
 
     public static void downgradeData(final StructuredDataContainer container) {
@@ -226,16 +236,14 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         container.remove(StructuredDataKey.WAXED);
         container.remove(StructuredDataKey.CUSHION_COLOR);
 
-        container.replace(StructuredDataKey.CONSUMABLE1_21_2, StructuredDataKey.CONSUMABLE26_3, consumable -> {
-            final ConsumeEffect<?>[] effects = consumable.consumeEffects();
-            for (int i = 0; i < effects.length; i++) {
-                if (effects[i].value() instanceof final Float diameter) {
-                    effects[i] = new ConsumeEffect<>(3, ConsumeEffect.TELEPORT_RANDOMLY_TYPE26_3, new TeleportRandomlyConsumeEffect(diameter, false));
-                }
-            }
+        container.replace(StructuredDataKey.CONSUMABLE26_3, StructuredDataKey.CONSUMABLE1_21_2, consumable -> {
+            downgradeConsumeEffects(consumable.consumeEffects());
             return consumable;
         });
-        container.replaceKey(StructuredDataKey.DEATH_PROTECTION1_21_2, StructuredDataKey.DEATH_PROTECTION26_3);
+        container.replace(StructuredDataKey.DEATH_PROTECTION26_3, StructuredDataKey.DEATH_PROTECTION1_21_2, deathProtection -> {
+            downgradeConsumeEffects(deathProtection.deathEffects());
+            return deathProtection;
+        });
         container.replaceKey(StructuredDataKey.ATTACK_ANIMATION, StructuredDataKey.SWING_ANIMATION);
         container.replaceKey(StructuredDataKey.INTERACT_ANIMATION, StructuredDataKey.SWING_ANIMATION);
         container.replaceKey(StructuredDataKey.INSTRUMENT26_3, StructuredDataKey.INSTRUMENT26_1);
@@ -258,6 +266,22 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         container.replace(VersionedTypes.V26_3.structuredDataKeys().potDecorations, StructuredDataKey.POT_DECORATIONS1_20_5, decorations -> {
             return new PotDecorations1_20_5(new int[]{potDecorationId(decorations.back()), potDecorationId(decorations.left()), potDecorationId(decorations.right()), potDecorationId(decorations.front())});
         });
+    }
+
+    private static void upgradeConsumeEffects(final ConsumeEffect<?>[] effects) {
+        for (int i = 0; i < effects.length; i++) {
+            if (effects[i].value() instanceof final Float diameter) {
+                effects[i] = new ConsumeEffect<>(TELEPORT_RANDOMLY_EFFECT, ConsumeEffect.TELEPORT_RANDOMLY_TYPE26_3, new TeleportRandomlyConsumeEffect(diameter, false));
+            }
+        }
+    }
+
+    private static void downgradeConsumeEffects(final ConsumeEffect<?>[] effects) {
+        for (int i = 0; i < effects.length; i++) {
+            if (effects[i].value() instanceof final TeleportRandomlyConsumeEffect effect) {
+                effects[i] = new ConsumeEffect<>(TELEPORT_RANDOMLY_EFFECT, ConsumeEffect.TELEPORT_RANDOMLY_TYPE1_21_2, effect.diameter());
+            }
+        }
     }
 
     private static int potDecorationId(final @Nullable Item decoration) {

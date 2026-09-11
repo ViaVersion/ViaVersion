@@ -43,7 +43,7 @@ public record ConsumeEffect<T>(int id, Type<T> type, T value) {
             ops.writeMap(map -> map.write("effects", new HolderSetType(EnumTypes.MOB_EFFECT), value));
         }
     };
-    private static final Type<Float> TELEPORT_RANDOMLY_TYPE1_21_2 = new Type<>(Float.class) {
+    public static final Type<Float> TELEPORT_RANDOMLY_TYPE1_21_2 = new Type<>(Float.class) {
         @Override
         public void write(final ByteBuf buffer, final Float value) {
             Types.FLOAT.writePrimitive(buffer, value);
