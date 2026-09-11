@@ -216,6 +216,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
     public static void downgradeData(final StructuredDataContainer container) {
         container.remove(StructuredDataKey.PROVIDES_POTTERY_PATTERN);
         container.remove(StructuredDataKey.BLOCK_TRANSFORMER);
+        container.remove(StructuredDataKey.COMPOSTABLE);
         container.remove(StructuredDataKey.VILLAGER_FOOD);
         container.remove(StructuredDataKey.COOKING_FUEL);
         container.remove(StructuredDataKey.BREWING_FUEL);
