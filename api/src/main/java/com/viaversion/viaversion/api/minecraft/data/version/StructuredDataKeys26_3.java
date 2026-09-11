@@ -23,7 +23,6 @@
 package com.viaversion.viaversion.api.minecraft.data.version;
 
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations26_3;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 
@@ -33,6 +32,6 @@ public class StructuredDataKeys26_3 extends StructuredDataKeys26_2 {
 
     public StructuredDataKeys26_3(final VersionedTypesHolder types) {
         super(types);
-        this.potDecorations = add("pot_decorations", new PotDecorations26_3.PotDecorationsType(types.itemTemplate()));
+        this.potDecorations = add("pot_decorations", new PotDecorations26_3.PotDecorationsType(types.optionalItemTemplate()));
     }
 }

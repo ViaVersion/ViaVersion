@@ -86,6 +86,11 @@ public record PotDecorations26_3(@Nullable Item back, @Nullable Item left, @Null
 
     @Override
     public PotDecorations26_3 copy() {
-        return new PotDecorations26_3(back.copy(), left.copy(), right.copy(), front.copy());
+        return new PotDecorations26_3(
+            back == null ? null : back.copy(),
+            left == null ? null : left.copy(),
+            right == null ? null : right.copy(),
+            front == null ? null : front.copy()
+        );
     }
 }

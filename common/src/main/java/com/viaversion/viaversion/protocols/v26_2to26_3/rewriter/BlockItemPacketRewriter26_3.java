@@ -255,8 +255,12 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             return new ArmorTrim1_20_5(Holder.of(new ArmorTrimMaterial1_20_5(material.paletteId(), new HashMap<>(), material.description())), trim.pattern());
         });
         container.replace(VersionedTypes.V26_3.structuredDataKeys().potDecorations, StructuredDataKey.POT_DECORATIONS1_20_5, decorations -> {
-            return new PotDecorations1_20_5(new int[]{decorations.back().identifier(), decorations.left().identifier(), decorations.right().identifier(), decorations.front().identifier()});
+            return new PotDecorations1_20_5(new int[]{potDecorationId(decorations.back()), potDecorationId(decorations.left()), potDecorationId(decorations.right()), potDecorationId(decorations.front())});
         });
+    }
+
+    private static int potDecorationId(final @Nullable Item decoration) {
+        return decoration != null ? decoration.identifier() : Protocol26_2To26_3.MAPPINGS.getFullItemMappings().id("brick");
     }
 
     @Override
