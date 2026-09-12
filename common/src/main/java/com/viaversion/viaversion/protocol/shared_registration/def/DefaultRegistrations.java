@@ -90,7 +90,8 @@ public final class DefaultRegistrations {
             )
             .ranges(TextComponentRegistrations::nbtText, ProtocolVersion.v1_21_5, b -> b
                 .to(ProtocolVersion.v26_2, TextComponentRegistrations::registerComponents1_21_5)
-                .since(TextComponentRegistrations::registerComponents26_2)
+                .to(ProtocolVersion.v26_3, TextComponentRegistrations::registerComponents26_2)
+                .since(TextComponentRegistrations::registerComponents26_3)
             )
 
             .ranges(ProtocolVersion.v1_17_1, sbeps -> sbeps
