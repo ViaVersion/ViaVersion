@@ -116,11 +116,23 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
 
         protocol.registerServerbound(ServerboundPackets26_3.ACCEPT_TELEPORTATION, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // ID
-            wrapper.read(Types.DOUBLE); // X
-            wrapper.read(Types.DOUBLE); // Y
-            wrapper.read(Types.DOUBLE); // Z
-            wrapper.read(Types.FLOAT); // Y rot
-            wrapper.read(Types.FLOAT); // X rot
+            final double x = wrapper.read(Types.DOUBLE);
+            final double y = wrapper.read(Types.DOUBLE);
+            final double z = wrapper.read(Types.DOUBLE);
+            final float yRot = wrapper.read(Types.FLOAT);
+            final float xRot = wrapper.read(Types.FLOAT);
+            wrapper.sendToServer(Protocol26_2To26_3.class);
+            wrapper.cancel();
+
+            // Older clients send a position packet right after accepting a teleport, make sure anticheats don't explode
+            final PacketWrapper movePlayer = wrapper.create(ServerboundPackets26_1.MOVE_PLAYER_POS_ROT);
+            movePlayer.write(Types.DOUBLE, x);
+            movePlayer.write(Types.DOUBLE, y);
+            movePlayer.write(Types.DOUBLE, z);
+            movePlayer.write(Types.FLOAT, yRot);
+            movePlayer.write(Types.FLOAT, xRot);
+            movePlayer.write(Types.UNSIGNED_BYTE, (short) 0); // Not on ground, no horizontal collision
+            movePlayer.sendToServer(Protocol26_2To26_3.class);
         });
 
         protocol.registerServerbound(ServerboundPackets26_3.PUNCH, ServerboundPackets26_1.SWING, wrapper -> {
