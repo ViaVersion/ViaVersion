@@ -89,6 +89,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             case "trim_material" -> updateTrimMaterials(entries);
             case "jukebox_song" -> updateJukeboxSongs(entries);
             case "worldgen/biome" -> updateBiomes(entries);
+            case "worldgen/block_state_provider" -> updateBlockStateProviders(entries);
             case "dimension_type" -> updateDimensionTypes(entries);
             case "dialog" -> updateDialogs(connection, entries);
         }
@@ -529,6 +530,16 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             rewriter.accept(effectTag);
         } else if (effect.equals("play_sound")) {
             updateType(effectTag, "sound", protocol.getMappingData().getFullSoundMappings());
+        }
+    }
+
+    public void updateBlockStateProviders(final RegistryEntry[] entries) {
+        for (final RegistryEntry entry : entries) {
+            if (entry.tag() == null) {
+                continue;
+            }
+
+            updateBlockStateProvider((CompoundTag) entry.tag());
         }
     }
 
