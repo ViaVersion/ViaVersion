@@ -49,6 +49,17 @@ public final class RegistryDataRewriter26_3 extends RegistryDataRewriter {
         }
 
         super.updateEnchantmentTerm(term);
+
+        // has to run after super, which maps the block id under the old key
+        if (Key.equals(condition.getValue(), "block_state_property")) {
+            condition.setValue("minecraft:match_block");
+            term.put("blocks", term.remove("block"));
+
+            final Tag properties = term.remove("properties");
+            if (properties != null) {
+                term.put("state", properties);
+            }
+        }
     }
 
     @Override
