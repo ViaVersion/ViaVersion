@@ -47,8 +47,10 @@ public final class ResolvableFloatType extends Type<ResolvableFloat> {
     @Override
     public void write(final ByteBuf buffer, final ResolvableFloat value) {
         if (value.isLeft()) {
+            buffer.writeBoolean(true);
             Types.FLOAT.writePrimitive(buffer, value.left());
         } else {
+            buffer.writeBoolean(false);
             Types.IDENTIFIER.write(buffer, Key.of(value.right()));
         }
     }

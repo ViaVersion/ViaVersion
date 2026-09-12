@@ -22,7 +22,6 @@
  */
 package com.viaversion.viaversion.api.type.types.misc;
 
-import com.viaversion.viaversion.api.minecraft.ResolvableFloat;
 import com.viaversion.viaversion.api.minecraft.ResolvableInt;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
@@ -48,8 +47,10 @@ public final class ResolvableIntType extends Type<ResolvableInt> {
     @Override
     public void write(final ByteBuf buffer, final ResolvableInt value) {
         if (value.isLeft()) {
+            buffer.writeBoolean(true);
             Types.INT.writePrimitive(buffer, value.left());
         } else {
+            buffer.writeBoolean(false);
             Types.IDENTIFIER.write(buffer, Key.of(value.right()));
         }
     }
