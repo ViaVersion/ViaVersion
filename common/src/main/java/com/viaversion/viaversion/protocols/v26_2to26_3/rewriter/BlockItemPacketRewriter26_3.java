@@ -253,7 +253,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             }
 
             final ArmorTrimMaterial26_3 trim = holder.value();
-            return Holder.of(new ArmorTrimMaterial1_20_5(trim.paletteId(), new HashMap<>(), trim.description()));
+            return Holder.of(new ArmorTrimMaterial1_20_5(Key.stripNamespace(trim.paletteId()), new HashMap<>(), trim.description()));
         });
         container.replace(StructuredDataKey.TRIM26_3, StructuredDataKey.TRIM1_21_5, trim -> {
             if (trim.material().hasId()) {
@@ -261,7 +261,11 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             }
 
             final ArmorTrimMaterial26_3 material = trim.material().value();
-            return new ArmorTrim1_20_5(Holder.of(new ArmorTrimMaterial1_20_5(material.paletteId(), new HashMap<>(), material.description())), trim.pattern());
+            return new ArmorTrim1_20_5(Holder.of(new ArmorTrimMaterial1_20_5(
+                Key.stripNamespace(material.paletteId()),
+                new HashMap<>(),
+                material.description()
+            )), trim.pattern());
         });
         container.replace(VersionedTypes.V26_3.structuredDataKeys().potDecorations, StructuredDataKey.POT_DECORATIONS1_20_5, decorations -> {
             return new PotDecorations1_20_5(new int[]{potDecorationId(decorations.back()), potDecorationId(decorations.left()), potDecorationId(decorations.right()), potDecorationId(decorations.front())});
