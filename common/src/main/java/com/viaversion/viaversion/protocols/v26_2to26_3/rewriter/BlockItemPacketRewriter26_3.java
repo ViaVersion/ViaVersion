@@ -54,6 +54,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<ClientboundPacket26_1, ServerboundPacket26_3, Protocol26_2To26_3> {
 
     private static final int TELEPORT_RANDOMLY_EFFECT = 3;
+    private static final String TRIM_PALETTE_PREFIX = "trim/";
 
     public BlockItemPacketRewriter26_3(final Protocol26_2To26_3 protocol) {
         super(protocol);
@@ -195,7 +196,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             }
 
             final ArmorTrimMaterial1_20_5 material = holder.value();
-            return Holder.of(new ArmorTrimMaterial26_3(material.assetName(), material.description()));
+            return Holder.of(new ArmorTrimMaterial26_3(trimPaletteId(material.assetName()), material.description()));
         });
         container.replace(StructuredDataKey.TRIM1_21_5, StructuredDataKey.TRIM26_3, trim -> {
             if (trim.material().hasId()) {
@@ -203,7 +204,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             }
 
             final ArmorTrimMaterial1_20_5 material = trim.material().value();
-            return new ArmorTrim26_3(Holder.of(new ArmorTrimMaterial26_3(material.assetName(), material.description())), trim.pattern());
+            return new ArmorTrim26_3(Holder.of(new ArmorTrimMaterial26_3(trimPaletteId(material.assetName()), material.description())), trim.pattern());
         });
         container.replace(StructuredDataKey.POT_DECORATIONS1_20_5, VersionedTypes.V26_3.structuredDataKeys().potDecorations, decorations -> {
             return new PotDecorations26_3(
@@ -253,7 +254,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             }
 
             final ArmorTrimMaterial26_3 trim = holder.value();
-            return Holder.of(new ArmorTrimMaterial1_20_5(Key.stripNamespace(trim.paletteId()), new HashMap<>(), trim.description()));
+            return Holder.of(new ArmorTrimMaterial1_20_5(trimAssetName(trim.paletteId()), new HashMap<>(), trim.description()));
         });
         container.replace(StructuredDataKey.TRIM26_3, StructuredDataKey.TRIM1_21_5, trim -> {
             if (trim.material().hasId()) {
@@ -262,7 +263,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
 
             final ArmorTrimMaterial26_3 material = trim.material().value();
             return new ArmorTrim1_20_5(Holder.of(new ArmorTrimMaterial1_20_5(
-                Key.stripNamespace(material.paletteId()),
+                trimAssetName(material.paletteId()),
                 new HashMap<>(),
                 material.description()
             )), trim.pattern());
@@ -270,6 +271,15 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         container.replace(VersionedTypes.V26_3.structuredDataKeys().potDecorations, StructuredDataKey.POT_DECORATIONS1_20_5, decorations -> {
             return new PotDecorations1_20_5(new int[]{potDecorationId(decorations.back()), potDecorationId(decorations.left()), potDecorationId(decorations.right()), potDecorationId(decorations.front())});
         });
+    }
+
+    public static String trimPaletteId(final String assetName) {
+        return Key.namespaced(TRIM_PALETTE_PREFIX + assetName);
+    }
+
+    public static String trimAssetName(final String paletteId) {
+        final String path = Key.stripNamespace(paletteId);
+        return path.startsWith(TRIM_PALETTE_PREFIX) ? path.substring(TRIM_PALETTE_PREFIX.length()) : path;
     }
 
     private static void upgradeConsumeEffects(final ConsumeEffect<?>[] effects) {
@@ -354,7 +364,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             }
         }
         return Holder.of(new ArmorTrimMaterial1_20_5(
-            Key.stripNamespace(material.paletteId()),
+            trimAssetName(material.paletteId()),
             tag.getInt("item"),
             overrides,
             material.description()

@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.v26_2to26_3;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.Tag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
@@ -117,8 +117,8 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
         super.registerPackets();
 
         registryDataRewriter.addHandler("trim_material", (key, tag) -> {
-            final Tag assetName = tag.remove("asset_name");
-            tag.put("palette_id", assetName);
+            final StringTag assetName = tag.removeUnchecked("asset_name");
+            tag.putString("palette_id", BlockItemPacketRewriter26_3.trimPaletteId(assetName.getValue()));
         });
 
         appendClientbound(ClientboundConfigurationPackets1_21_9.FINISH_CONFIGURATION, wrapper -> {
