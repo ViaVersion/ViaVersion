@@ -553,17 +553,11 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             }
             case "noise_threshold" -> {
                 changed |= updateBlockState(tag.get("default_state"));
-                for (final CompoundTag entry : tag.getListTag("low_states", CompoundTag.class)) {
-                    changed |= updateBlockState(entry);
-                }
-                for (final CompoundTag entry : tag.getListTag("high_states", CompoundTag.class)) {
-                    changed |= updateBlockState(entry);
-                }
+                changed |= updateBlockStates(tag.getListTag("low_states"));
+                changed |= updateBlockStates(tag.getListTag("high_states"));
             }
             case "noise", "dual_noise" -> {
-                for (final CompoundTag entry : tag.getListTag("states", CompoundTag.class)) {
-                    changed |= updateBlockState(entry);
-                }
+                changed |= updateBlockStates(tag.getListTag("states"));
             }
             case "randomized_int_state" -> {
                 changed |= updateBlockStateProvider(tag.getCompoundTag("source"));
@@ -593,6 +587,18 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         return changed;
     }
 
+    private boolean updateBlockStates(@Nullable final ListTag<?> statesTag) {
+        if (statesTag == null) {
+            return false;
+        }
+
+        boolean changed = false;
+        for (final Tag stateTag : statesTag) {
+            changed |= updateBlockState(stateTag);
+        }
+        return changed;
+    }
+
     protected boolean updateBlockState(final Tag blockStateTag) {
         if (blockStateTag instanceof CompoundTag compoundTag) {
             // {"id": "minecraft:grass_block", "properties": {"snowy": "true"}}
@@ -614,6 +620,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             final int blockId = protocol.getMappingData().getFullBlockMappings().id(stringTag.getValue());
             if (blockId == -1 || protocol.getMappingData().hasBlockChanged(blockId)) {
                 stringTag.setValue("minecraft:dirt");
+                return true;
             }
         }
 
