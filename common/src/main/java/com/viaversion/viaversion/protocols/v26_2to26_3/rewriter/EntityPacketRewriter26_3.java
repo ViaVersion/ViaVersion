@@ -41,6 +41,7 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
     private static final int MAX_TICK_OFFSET = 5;
     private static final int MAIN_HAND = 0;
     private static final int OFF_HAND = 1;
+    private static final int CHANGE_DESTROY_DIRECTION_ACTION = 1;
     private static final SwingAnimation DEFAULT_SWING_ANIMATION = new SwingAnimation(EnumTypes.SWING_ANIMATION1_21_11.idFromName("whack"), 6);
 
     public EntityPacketRewriter26_3(final Protocol26_2To26_3 protocol) {
@@ -124,6 +125,16 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
 
         protocol.registerServerbound(ServerboundPackets26_3.PUNCH, ServerboundPackets26_1.SWING, wrapper -> {
             wrapper.write(Types.VAR_INT, 0); // Main hand
+        });
+
+        protocol.registerServerbound(ServerboundPackets26_3.PLAYER_ACTION, wrapper -> {
+            final int action = wrapper.read(Types.VAR_INT);
+            if (action == CHANGE_DESTROY_DIRECTION_ACTION) {
+                wrapper.cancel(); // 26.2 has no equivalent and never sends anything here
+                return;
+            }
+
+            wrapper.write(Types.VAR_INT, action > CHANGE_DESTROY_DIRECTION_ACTION ? action - 1 : action);
         });
 
         protocol.registerClientbound(ClientboundPackets26_1.ANIMATE, wrapper -> {
