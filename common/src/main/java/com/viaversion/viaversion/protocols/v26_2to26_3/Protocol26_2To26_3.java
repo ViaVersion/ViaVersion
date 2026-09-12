@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes26_3;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_3;
+import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
@@ -61,6 +62,8 @@ import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
+
+import java.util.BitSet;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
@@ -138,6 +141,36 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
             blockTransformersPacket.write(Types.STRING, "block_transformer");
             blockTransformersPacket.write(Types.REGISTRY_ENTRY_ARRAY, registryDataRewriter.entriesFromTag(MAPPINGS.blockTransformerRegistry()));
             blockTransformersPacket.send(Protocol26_2To26_3.class);
+        });
+
+        replaceClientbound(ClientboundPackets26_1.PLAYER_CHAT, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Index
+            wrapper.passthrough(Types.UUID); // Sender
+            wrapper.passthrough(Types.VAR_INT); // Index
+            wrapper.passthrough(Types.OPTIONAL_SIGNATURE_BYTES); // Signature
+            wrapper.passthrough(Types.STRING); // Plain content
+            wrapper.passthrough(Types.LONG); // Timestamp
+            wrapper.passthrough(Types.LONG); // Salt
+
+            final int lastSeen = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < lastSeen; i++) {
+                final int index = wrapper.passthrough(Types.VAR_INT);
+                if (index == 0) {
+                    wrapper.passthrough(Types.SIGNATURE_BYTES);
+                }
+            }
+
+            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Unsigned content
+
+            final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
+            if (filterMaskType == 2) { // Partially filtered
+                final long[] mask = wrapper.read(Types.LONG_ARRAY_PRIMITIVE);
+                wrapper.write(Types.BIT_SET, BitSet.valueOf(mask));
+            }
+
+            wrapper.passthrough(ChatType.TYPE); // Chat Type
+            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_TAG)); // Name
+            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Target Name
         });
     }
 
