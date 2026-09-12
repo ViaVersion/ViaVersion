@@ -78,7 +78,7 @@ public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<S
                 .writeOptional("animation", EnumTypes.ITEM_USE_ANIMATION, value.animationType, 1)
                 .writeOptional("sound", Types.SOUND_EVENT, value.sound, defaultSound)
                 .writeOptional("has_consume_particles", Types.BOOLEAN, value.hasConsumeParticles, true)
-                .writeOptional("consume_effects", consumeEffectType, value.consumeEffects, new ConsumeEffect<?>[0]));
+                .writeOptional("on_consume_effects", consumeEffectType, value.consumeEffects, new ConsumeEffect<?>[0]));
         }
     }
 
