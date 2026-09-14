@@ -30,11 +30,13 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_18;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Limit;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class ChunkType1_20_2 extends Type<Chunk> {
+    private static final int MAX_BLOCK_ENTITIES_HINT = 256;
     private final ChunkSectionType1_18 sectionType;
     private final int ySectionCount;
 
@@ -59,7 +61,8 @@ public final class ChunkType1_20_2 extends Type<Chunk> {
         }
 
         final int blockEntitiesLength = Types.VAR_INT.readPrimitive(buffer);
-        final List<BlockEntity> blockEntities = new ArrayList<>(blockEntitiesLength);
+        // Only used as an allocation hint, the list grows as needed while reading
+        final List<BlockEntity> blockEntities = new ArrayList<>(Limit.initialCapacity(blockEntitiesLength, MAX_BLOCK_ENTITIES_HINT));
         for (int i = 0; i < blockEntitiesLength; i++) {
             blockEntities.add(Types.BLOCK_ENTITY1_20_2.read(buffer));
         }

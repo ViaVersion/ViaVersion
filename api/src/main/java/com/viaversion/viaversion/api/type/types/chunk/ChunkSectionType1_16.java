@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.CompactArrayUtil;
+import com.viaversion.viaversion.util.Limit;
 import io.netty.buffer.ByteBuf;
 
 public class ChunkSectionType1_16 extends Type<ChunkSection> {
@@ -52,7 +53,9 @@ public class ChunkSectionType1_16 extends Type<ChunkSection> {
         ChunkSection chunkSection;
         if (bitsPerBlock != GLOBAL_PALETTE) {
             int paletteLength = Types.VAR_INT.readPrimitive(buffer);
-            chunkSection = new ChunkSectionImpl(false, paletteLength);
+            // Palette indexes are bitsPerBlock wide, so a well-formed palette never holds more entries than that.
+            // The length is only used as an allocation hint here; reading past the buffer fails on its own below.
+            chunkSection = new ChunkSectionImpl(false, Limit.initialCapacity(paletteLength, 1 << bitsPerBlock));
             DataPalette blockPalette = chunkSection.palette(PaletteType.BLOCKS);
             for (int i = 0; i < paletteLength; i++) {
                 blockPalette.addId(Types.VAR_INT.readPrimitive(buffer));

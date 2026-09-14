@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.VarIntType;
 import com.viaversion.viaversion.util.CompactArrayUtil;
+import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.MathUtil;
 import io.netty.buffer.ByteBuf;
 
@@ -61,7 +62,9 @@ public class PaletteType1_18 extends PaletteTypeBase {
         // Read palette
         if (bitsPerValue != globalPaletteBits) {
             final int paletteLength = Types.VAR_INT.readPrimitive(buffer);
-            palette = new DataPaletteImpl(type.size(), paletteLength);
+            // Palette indexes are bitsPerValue wide, so a well-formed palette never holds more entries than that.
+            // The length is only used as an allocation hint here; reading past the buffer fails on its own below.
+            palette = new DataPaletteImpl(type.size(), Limit.initialCapacity(paletteLength, 1 << bitsPerValue));
             for (int i = 0; i < paletteLength; i++) {
                 palette.addId(Types.VAR_INT.readPrimitive(buffer));
             }

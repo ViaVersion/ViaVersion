@@ -43,7 +43,9 @@ public class VarIntArrayType extends Type<int[]> {
     @Override
     public int[] read(ByteBuf buffer) {
         int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
-        Preconditions.checkArgument(buffer.isReadable(length)); // Sanity check, at least 1 byte will be used for each varint
+        // Sanity check, at least 1 byte will be used for each varint
+        final int readableBytes = buffer.readableBytes();
+        Preconditions.checkArgument(length >= 0 && length <= readableBytes, "Invalid length %s for %s readable bytes", length, readableBytes);
         int[] array = new int[length];
         for (int i = 0; i < array.length; i++) {
             array[i] = Types.VAR_INT.readPrimitive(buffer);

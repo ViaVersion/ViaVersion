@@ -59,6 +59,9 @@ public class ArrayType<T> extends Type<T[]> {
     @Override
     public T[] read(ByteBuf buffer) {
         int amount = Types.VAR_INT.readPrimitive(buffer);
+        if (amount < 0) {
+            throw new IllegalArgumentException("Array length cannot be negative: " + amount);
+        }
         if (maxLength != -1 && amount > maxLength) {
             throw new IllegalArgumentException("Array length " + amount + " is longer than maximum " + maxLength);
         }

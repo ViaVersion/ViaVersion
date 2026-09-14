@@ -54,12 +54,13 @@ public class VarIntType extends Type<Integer> implements TypeConverter<Integer> 
         int bytes = 0;
         byte in;
         do {
-            in = buffer.readByte();
-            value |= (in & VALUE_BITS) << (bytes++ * 7);
-            if (bytes > MAX_BYTES) {
+            if (bytes == MAX_BYTES) {
+                // Checked before reading, as the shift of a sixth byte would silently wrap around
                 throw new RuntimeException("VarInt too big");
             }
 
+            in = buffer.readByte();
+            value |= (in & VALUE_BITS) << (bytes++ * 7);
         } while ((in & CONTINUE_BIT) == CONTINUE_BIT);
         return value;
     }

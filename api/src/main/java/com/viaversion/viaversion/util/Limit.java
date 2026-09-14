@@ -30,4 +30,19 @@ public final class Limit {
         }
         return value;
     }
+
+    /**
+     * Limits a length read from a buffer to be used as the initial capacity of a collection or array.
+     * <p>
+     * Unlike {@link #max(int, int)}, this does not throw on larger values: the full length is still read and is
+     * bound by the readable bytes of the buffer. It only stops a malformed length from causing an arbitrarily
+     * large allocation before a single element has been read.
+     *
+     * @param length length read from a buffer
+     * @param max    highest capacity to pre-allocate
+     * @return the length clamped to the range [0, max]
+     */
+    public static int initialCapacity(final int length, final int max) {
+        return MathUtil.clamp(length, 0, max);
+    }
 }
