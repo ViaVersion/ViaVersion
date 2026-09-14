@@ -49,10 +49,12 @@ import com.viaversion.viaversion.util.Key;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<ClientboundPacket26_1, ServerboundPacket26_3, Protocol26_2To26_3> {
 
+    private static final Set<String> NEW_MAP_DECORATION_TYPES = Set.of("abandoned_camp", "ancient_city", "desert_pyramid", "mineshaft", "ocean_ruin_warm");
     private static final int TELEPORT_RANDOMLY_EFFECT = 3;
     private static final String TRIM_PALETTE_PREFIX = "trim/";
 
@@ -236,6 +238,17 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         container.remove(StructuredDataKey.SIGN_TEXT_BACK);
         container.remove(StructuredDataKey.WAXED);
         container.remove(StructuredDataKey.CUSHION_COLOR);
+
+
+        final CompoundTag mapDecorations = container.get(StructuredDataKey.MAP_DECORATIONS);
+        if (mapDecorations != null) {
+            for (final Map.Entry<String, Tag> entry : mapDecorations.entrySet()) {
+                final StringTag typeTag = ((CompoundTag) entry.getValue()).getStringTag("type");
+                if (NEW_MAP_DECORATION_TYPES.contains(Key.stripMinecraftNamespace(typeTag.getValue()))) {
+                    typeTag.setValue("village_plains");
+                }
+            }
+        }
 
         container.replace(StructuredDataKey.CONSUMABLE26_3, StructuredDataKey.CONSUMABLE1_21_2, consumable -> {
             downgradeConsumeEffects(consumable.consumeEffects());
