@@ -427,13 +427,32 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
 
     protected void updateEnvironmentAttributes(final CompoundTag tag) {
         final MappingData mappings = protocol.getMappingData();
-        if (mappings == null || mappings.changedEnvironmentAttributes() == null) {
+        if (mappings == null) {
             return;
         }
 
-        // Remove no longer present environment attributes, else the client throws
-        for (final String attribute : mappings.changedEnvironmentAttributes()) {
-            TagUtil.removeNamespaced(tag, attribute);
+        if (mappings.changedEnvironmentAttributes() != null) {
+            // Remove no longer present environment attributes, else the client throws
+            for (final String attribute : mappings.changedEnvironmentAttributes()) {
+                TagUtil.removeNamespaced(tag, attribute);
+            }
+        }
+
+        Tag ambientParticles = TagUtil.getNamespacedTag(tag, "visual/ambient_particles");
+        if (ambientParticles instanceof CompoundTag modifierTag) {
+            ambientParticles = modifierTag.get("argument");
+        }
+        if (ambientParticles instanceof ListTag<?> ambientParticlesList) {
+            for (final Tag ambientParticle : ambientParticlesList) {
+                if (!(ambientParticle instanceof CompoundTag ambientParticleTag)) {
+                    continue;
+                }
+
+                final CompoundTag particle = ambientParticleTag.getCompoundTag("particle");
+                if (particle != null) {
+                    handleParticleData(particle);
+                }
+            }
         }
     }
 
@@ -500,6 +519,11 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
 
     protected void handleParticleData(final CompoundTag particleData) {
         updateType(particleData, "type", protocol.getMappingData().getParticleMappings());
+
+        final Tag blockState = particleData.get("block_state");
+        if (blockState != null) {
+            updateBlockState(blockState);
+        }
     }
 
     private void runEffectRewriters(final CompoundTag effectTag) {
@@ -611,6 +635,11 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
     }
 
     protected boolean updateBlockState(final Tag blockStateTag) {
+        final FullMappings blockMappings = protocol.getMappingData().getFullBlockMappings();
+        if (blockMappings == null) {
+            return false;
+        }
+
         if (blockStateTag instanceof CompoundTag compoundTag) {
             // {"id": "minecraft:grass_block", "properties": {"snowy": "true"}}
             final String block = compoundTag.getString("id");
@@ -619,7 +648,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
                 return false;
             }
 
-            final int blockId = protocol.getMappingData().getFullBlockMappings().id(block);
+            final int blockId = blockMappings.id(block);
             if (blockId == -1 || protocol.getMappingData().hasBlockChanged(blockId)) {
                 // Return dummy block state
                 compoundTag.putString("id", "minecraft:dirt");
@@ -628,7 +657,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             }
         } else if (blockStateTag instanceof StringTag stringTag) {
             // Inlined block with default properties
-            final int blockId = protocol.getMappingData().getFullBlockMappings().id(stringTag.getValue());
+            final int blockId = blockMappings.id(stringTag.getValue());
             if (blockId == -1 || protocol.getMappingData().hasBlockChanged(blockId)) {
                 stringTag.setValue("minecraft:dirt");
                 return true;
