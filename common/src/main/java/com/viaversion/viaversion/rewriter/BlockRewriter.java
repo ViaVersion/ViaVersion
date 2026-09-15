@@ -60,7 +60,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         this.positionType = positionType;
         this.compoundTagType = compoundTagType;
         this.chunkTypeSupplier = chunkTypeSupplier;
-        this.mappedChunkTypeSupplier = mappedChunkTypeSupplier;
+        this.mappedChunkTypeSupplier = mappedChunkTypeSupplier != null ? mappedChunkTypeSupplier : chunkTypeSupplier;
     }
 
     public static <C extends ClientboundPacketType> BlockRewriter<C> legacy(final Protocol<C, ?, ?, ?> protocol) {
@@ -271,9 +271,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
         Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
         final Type<Chunk> chunkType = createChunkType(chunkTypeSupplier, tracker, false);
-        final Type<Chunk> mappedChunkType = mappedChunkTypeSupplier != null
-            ? createChunkType(mappedChunkTypeSupplier, tracker, true)
-            : chunkType;
+        final Type<Chunk> mappedChunkType = createChunkType(mappedChunkTypeSupplier, tracker, true);
         final Chunk chunk = wrapper.passthroughAndMap(chunkType, mappedChunkType);
         if (Mappings.isIntIdIdentity(protocol.getMappingData().getBlockStateMappings())) {
             return chunk;

@@ -35,7 +35,7 @@ public class BlockRewriter1_21_5<C extends ClientboundPacketType> extends BlockR
     }
 
     public BlockRewriter1_21_5(final Protocol<C, ?, ?, ?> protocol, final ChunkTypeSupplier chunkTypeSupplier) {
-        this(protocol, chunkTypeSupplier, null);
+        this(protocol, chunkTypeSupplier, chunkTypeSupplier);
     }
 
     @Override
