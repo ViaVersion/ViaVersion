@@ -27,6 +27,7 @@ import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.Protocol1_16_4To1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,9 +37,15 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import java.util.Set;
 
 public final class DeathSmokeListener extends ViaBukkitListener {
+    private boolean trackerMethodExists;
 
     public DeathSmokeListener(ViaVersionPlugin plugin) {
         super(plugin, Protocol1_16_4To1_17.class);
+
+        try {
+            Entity.class.getMethod("getTrackedPlayers");
+            this.trackerMethodExists = true;
+        } catch (NoSuchMethodException ignored) {}
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -46,10 +53,16 @@ public final class DeathSmokeListener extends ViaBukkitListener {
         LivingEntity entity = event.getEntity();
 
         Via.getPlatform().runSync(() -> {
-            Set<Player> trackedByAndSelf = Sets.newHashSet(entity.getTrackedPlayers());
+            Set<Player> trackedByAndSelf;
 
-            if (entity instanceof Player player) {
-                trackedByAndSelf.add(player); // vanilla also sends it to themselves
+            if (trackerMethodExists) {
+                trackedByAndSelf = Sets.newHashSet(entity.getTrackedPlayers());
+
+                if (entity instanceof Player player) {
+                    trackedByAndSelf.add(player); // vanilla also sends it to themselves
+                }
+            } else {
+                trackedByAndSelf = Sets.newHashSet(entity.getWorld().getPlayers());
             }
 
             for (Player viewer : trackedByAndSelf) {
