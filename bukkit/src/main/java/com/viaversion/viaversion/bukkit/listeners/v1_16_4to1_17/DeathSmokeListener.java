@@ -35,17 +35,16 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 import java.util.Collection;
-import java.util.Set;
 
 public final class DeathSmokeListener extends ViaBukkitListener {
-    private boolean trackerMethodExists;
+    private boolean trackedMethodExists;
 
     public DeathSmokeListener(ViaVersionPlugin plugin) {
         super(plugin, Protocol1_16_4To1_17.class);
 
         try {
             Entity.class.getMethod("getTrackedPlayers");
-            this.trackerMethodExists = true;
+            this.trackedMethodExists = true;
         } catch (NoSuchMethodException ignored) {}
     }
 
@@ -56,7 +55,7 @@ public final class DeathSmokeListener extends ViaBukkitListener {
         Via.getPlatform().runSync(() -> {
             Collection<Player> trackedByAndSelf;
 
-            if (trackerMethodExists) {
+            if (trackedMethodExists) {
                 trackedByAndSelf = Sets.newHashSet(entity.getTrackedPlayers());
 
                 if (entity instanceof Player player) {
