@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.listeners.UpdateListener;
 import com.viaversion.viaversion.bukkit.listeners.multiversion.PlayerSneakListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_14_4to1_15.EntityToggleGlideListener;
+import com.viaversion.viaversion.bukkit.listeners.v1_16_4to1_17.DeathSmokeListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_18_2to1_19.BlockBreakListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_19_3to1_19_4.ArmorToggleListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_20_5to1_21.LegacyChangeItemListener;
@@ -117,6 +118,10 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                 new EntityToggleGlideListener(plugin).register();
             } catch (ClassNotFoundException ignored) {
             }
+        }
+
+        if (serverProtocolVersion.olderThan(ProtocolVersion.v1_17)) {
+            new DeathSmokeListener(plugin).register();
         }
 
         if (serverProtocolVersion.olderThan(ProtocolVersion.v1_12) && !Boolean.getBoolean("com.viaversion.ignorePaperBlockPlacePatch")) {
