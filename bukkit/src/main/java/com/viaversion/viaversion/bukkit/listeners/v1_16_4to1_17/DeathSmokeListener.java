@@ -34,6 +34,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDeathEvent;
 
+import java.util.Collection;
 import java.util.Set;
 
 public final class DeathSmokeListener extends ViaBukkitListener {
@@ -53,7 +54,7 @@ public final class DeathSmokeListener extends ViaBukkitListener {
         LivingEntity entity = event.getEntity();
 
         Via.getPlatform().runSync(() -> {
-            Set<Player> trackedByAndSelf;
+            Collection<Player> trackedByAndSelf;
 
             if (trackerMethodExists) {
                 trackedByAndSelf = Sets.newHashSet(entity.getTrackedPlayers());
@@ -62,7 +63,7 @@ public final class DeathSmokeListener extends ViaBukkitListener {
                     trackedByAndSelf.add(player); // vanilla also sends it to themselves
                 }
             } else {
-                trackedByAndSelf = Sets.newHashSet(entity.getWorld().getPlayers());
+                trackedByAndSelf = entity.getWorld().getPlayers();
             }
 
             for (Player viewer : trackedByAndSelf) {
