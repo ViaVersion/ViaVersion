@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.api.type.Types;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -134,12 +135,16 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
 
             final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
             if (filterMaskType == 2) { // Partially filtered
-                wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE); // Mask
+                handleFilterMask(wrapper);
             }
 
             wrapper.passthrough(ChatType.TYPE); // Chat Type
             processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_TAG)); // Name
             processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Target Name
         });
+    }
+
+    protected void handleFilterMask(final PacketWrapper wrapper) {
+        wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE); // Mask
     }
 }

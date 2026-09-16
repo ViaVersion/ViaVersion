@@ -31,7 +31,13 @@ public record CodecRegistryContext(Protocol<?, ?, ?, ?> protocol, RegistryAccess
 
     // Generally from hardcoded, but highly variable client data
     private static final Set<StructuredDataKey<?>> NOT_IMPLEMENTED = new ReferenceOpenHashSet<>(List.of(
-        StructuredDataKey.DAMAGE_TYPE1_21_11
+        StructuredDataKey.DAMAGE_TYPE1_21_11,
+        StructuredDataKey.COMPOSTABLE,
+        StructuredDataKey.COOKING_FUEL,
+        StructuredDataKey.BREWING_FUEL,
+        StructuredDataKey.MOB_VISIBILITY,
+        StructuredDataKey.SIGN_TEXT_FRONT,
+        StructuredDataKey.SIGN_TEXT_BACK
     ));
 
     public CodecRegistryContext(final Protocol<?, ?, ?, ?> protocol, final RegistryAccess registryAccess, final boolean mapped) {

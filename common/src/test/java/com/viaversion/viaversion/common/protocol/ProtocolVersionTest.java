@@ -44,6 +44,8 @@ class ProtocolVersionTest {
     @Test
     void testGet() {
         Assertions.assertEquals(ProtocolVersion.v1_16_3, ProtocolVersion.getProtocol(753));
+        Assertions.assertEquals(ProtocolVersion.v26_3, ProtocolVersion.getProtocol(777));
+        Assertions.assertEquals(ProtocolVersion.v26_3, ProtocolVersion.getClosest("26.3"));
     }
 
     @Test

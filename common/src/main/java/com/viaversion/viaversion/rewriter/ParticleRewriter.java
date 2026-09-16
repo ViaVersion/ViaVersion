@@ -139,6 +139,39 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
         });
     }
 
+    public void registerLevelParticles26_3(final C packetType) {
+        protocol.replaceClientbound(packetType, wrapper -> {
+            final boolean overrideLimiter = wrapper.read(Types.BOOLEAN);
+            final boolean alwaysShow = wrapper.read(Types.BOOLEAN);
+            final double x = wrapper.read(Types.DOUBLE);
+            final double y = wrapper.read(Types.DOUBLE);
+            final double z = wrapper.read(Types.DOUBLE);
+            final float offsetX = wrapper.read(Types.FLOAT);
+            final float offsetY = wrapper.read(Types.FLOAT);
+            final float offsetZ = wrapper.read(Types.FLOAT);
+            final float maxSpeed = wrapper.read(Types.FLOAT);
+            final int count = wrapper.read(Types.INT);
+            final Particle particle = wrapper.read(particleType);
+
+            wrapper.write(mappedParticleType, particle); // Moved to the front
+            wrapper.write(Types.BOOLEAN, overrideLimiter);
+            wrapper.write(Types.BOOLEAN, alwaysShow);
+            wrapper.write(Types.DOUBLE, x);
+            wrapper.write(Types.DOUBLE, y);
+            wrapper.write(Types.DOUBLE, z);
+            wrapper.write(Types.FLOAT, offsetX);
+            wrapper.write(Types.FLOAT, offsetY);
+            wrapper.write(Types.FLOAT, offsetZ);
+            wrapper.write(Types.FLOAT, maxSpeed); // Split into one value per axis
+            wrapper.write(Types.FLOAT, maxSpeed);
+            wrapper.write(Types.FLOAT, maxSpeed);
+            wrapper.write(Types.VAR_INT, count);
+            wrapper.write(Types.VAR_INT, 0); // Randomization type, 0 = default
+
+            rewriteParticle(wrapper.user(), particle);
+        });
+    }
+
     public void registerExplode1_20_5(final C packetType) {
         final SoundRewriter<C> soundRewriter = new SoundRewriter<>(protocol);
         protocol.registerClientbound(packetType, wrapper -> {
