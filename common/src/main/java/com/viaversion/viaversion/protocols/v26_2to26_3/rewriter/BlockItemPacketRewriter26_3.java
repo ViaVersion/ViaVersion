@@ -41,6 +41,7 @@ import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundPackets26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ServerboundPacket26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ServerboundPackets26_3;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
@@ -57,6 +58,9 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
     private static final Set<String> NEW_MAP_DECORATION_TYPES = Set.of("abandoned_camp", "ancient_city", "desert_pyramid", "mineshaft", "ocean_ruin_warm");
     private static final int TELEPORT_RANDOMLY_EFFECT = 3;
     private static final String TRIM_PALETTE_PREFIX = "trim/";
+    private static final int BREWING_STAND_MENU_TYPE = 11;
+    private static final int BREWING_STAND_TOTAL_BREW_TIME_SLOT = 2;
+    private static final int BREWING_STAND_TOTAL_FUEL_SLOT = 3;
 
     public BlockItemPacketRewriter26_3(final Protocol26_2To26_3 protocol) {
         super(protocol);
@@ -98,6 +102,21 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             wrapper.passthrough(Types.BLOCK_POSITION1_14);
             final int signTextSlot = wrapper.read(Types.BOOLEAN) ? 1 : 0;
             wrapper.write(Types.VAR_INT, signTextSlot);
+        });
+
+        protocol.appendClientbound(ClientboundPackets26_1.OPEN_SCREEN, wrapper -> {
+            wrapper.resetReader();
+
+            final int containerId = wrapper.passthrough(Types.VAR_INT);
+            final int menuType = wrapper.passthrough(Types.VAR_INT);
+            if (menuType == BREWING_STAND_MENU_TYPE) {
+                wrapper.send(Protocol26_2To26_3.class);
+                wrapper.cancel();
+
+                // Send default total brew time and total fuel data
+                sendContainerData(wrapper, containerId, BREWING_STAND_TOTAL_BREW_TIME_SLOT, 400);
+                sendContainerData(wrapper, containerId, BREWING_STAND_TOTAL_FUEL_SLOT, 20);
+            }
         });
 
         protocol.registerServerbound(ServerboundPackets26_3.SIGN_UPDATE, wrapper -> {
@@ -162,6 +181,14 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
                 wrapper.write(Types.FLOAT, y);
             }
         });
+    }
+
+    private void sendContainerData(final PacketWrapper wrapper, final int containerId, final int slot, final int value) {
+        final PacketWrapper containerData = wrapper.create(ClientboundPackets26_3.CONTAINER_SET_DATA);
+        containerData.write(Types.VAR_INT, containerId);
+        containerData.write(Types.SHORT, (short) slot);
+        containerData.write(Types.SHORT, (short) value);
+        containerData.send(Protocol26_2To26_3.class);
     }
 
     private void handleLightMasks(final PacketWrapper wrapper) {
