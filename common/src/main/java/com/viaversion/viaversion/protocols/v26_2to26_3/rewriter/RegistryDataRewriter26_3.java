@@ -81,11 +81,13 @@ public final class RegistryDataRewriter26_3 extends RegistryDataRewriter {
     protected boolean updateBlockState(final Tag blockStateTag) {
         if (blockStateTag instanceof CompoundTag compoundTag) { // can only be a compound tag pre-26.3
             final Tag id = compoundTag.remove("Name");
-            compoundTag.put("id", id);
+            if (id != null) {
+                compoundTag.put("id", id);
 
-            final Tag properties = compoundTag.remove("Properties");
-            if (properties != null) {
-                compoundTag.put("properties", properties);
+                final Tag properties = compoundTag.remove("Properties");
+                if (properties != null) {
+                    compoundTag.put("properties", properties);
+                }
             }
         }
         return super.updateBlockState(blockStateTag);
