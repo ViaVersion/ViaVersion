@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v26_2to26_3.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
+import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes26_3;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_3;
@@ -33,6 +34,7 @@ import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundPackets26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ServerboundPackets26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.storage.LastMovement;
+import com.viaversion.viaversion.protocols.v26_2to26_3.storage.MotionTracker;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPacket26_1, Protocol26_2To26_3> {
@@ -50,6 +52,14 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
 
     @Override
     public void registerPackets() {
+        protocol.appendClientbound(ClientboundPackets26_1.ADD_ENTITY, wrapper -> {
+            final int entityId = wrapper.get(Types.VAR_INT, 0);
+            final Vector3d velocity = wrapper.get(Types.LOW_PRECISION_VECTOR, 0);
+
+            final boolean isZero = velocity.x() == 0.0 && velocity.y() == 0.0 && velocity.z() == 0.0;
+            updateMotionAndCheckSkip(wrapper.user(), entityId, isZero);
+        });
+
         protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT);
             final short xa = wrapper.read(Types.SHORT);
@@ -89,20 +99,42 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
             wrapper.write(Types.BYTE, xRot);
         });
 
+        protocol.registerClientbound(ClientboundPackets26_1.SET_ENTITY_MOTION, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            final Vector3d velocity = wrapper.passthrough(Types.LOW_PRECISION_VECTOR);
+
+            final boolean isZero = velocity.x() == 0.0 && velocity.y() == 0.0 && velocity.z() == 0.0;
+            updateMotionAndCheckSkip(wrapper.user(), entityId, isZero);
+        });
+
         protocol.registerClientbound(ClientboundPackets26_1.ENTITY_POSITION_SYNC, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Entity ID
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
 
             wrapper.write(Types.VAR_INT, 0); // Linear
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
 
-            wrapper.read(Types.DOUBLE); // Delta x
-            wrapper.read(Types.DOUBLE); // Delta y
-            wrapper.read(Types.DOUBLE); // Delta z
+            final double deltaX = wrapper.read(Types.DOUBLE);
+            final double deltaY = wrapper.read(Types.DOUBLE);
+            final double deltaZ = wrapper.read(Types.DOUBLE);
 
             wrapper.passthrough(Types.FLOAT); // Y rot
             wrapper.passthrough(Types.FLOAT); // X rot
+
+            updateMovementTime(wrapper.user(), entityId);
+
+            final boolean isZero = deltaX == 0.0 && deltaY == 0.0 && deltaZ == 0.0;
+            final boolean skipMotion = updateMotionAndCheckSkip(wrapper.user(), entityId, isZero);
+
+            if (!skipMotion) {
+                wrapper.send(Protocol26_2To26_3.class);
+                final PacketWrapper motionPacket = wrapper.create(ClientboundPackets26_3.SET_ENTITY_MOTION);
+                motionPacket.write(Types.VAR_INT, entityId);
+                motionPacket.write(Types.LOW_PRECISION_VECTOR, new Vector3d(deltaX, deltaY, deltaZ));
+                motionPacket.send(Protocol26_2To26_3.class);
+                wrapper.cancel();
+            }
         });
 
         protocol.appendClientbound(ClientboundPackets26_1.LOGIN, wrapper -> {
@@ -199,6 +231,41 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
             return 1; // No recent movement. Don't stretch the first step of a new movement burst
         }
         return (int) Math.max(1, (deltaMillis + 25) / 50); // Round to the nearest tick count
+    }
+
+    private void updateMovementTime(final UserConnection connection, final int entityId) {
+        final TrackedEntity entity = tracker(connection).entity(entityId);
+        if (entity == null) {
+            return;
+        }
+
+        final long now = System.nanoTime();
+        final LastMovement timestamp = entity.get(LastMovement.class);
+        if (timestamp == null) {
+            entity.put(new LastMovement(now));
+        } else {
+            timestamp.setLastMovementTime(now);
+        }
+    }
+
+    private boolean updateMotionAndCheckSkip(final UserConnection connection, final int entityId, final boolean isZero) {
+        final TrackedEntity entity = tracker(connection).entity(entityId);
+        if (entity == null) {
+            return isZero;
+        }
+
+        MotionTracker motionTracker = entity.get(MotionTracker.class);
+        if (motionTracker == null) {
+            if (isZero) {
+                return true;
+            }
+            entity.put(new MotionTracker(false));
+            return false;
+        }
+
+        final boolean skip = motionTracker.isZeroMotion() && isZero;
+        motionTracker.setZeroMotion(isZero);
+        return skip;
     }
 
     @Override
