@@ -178,10 +178,11 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
             final int size = wrapper.read(Types.VAR_INT);
             wrapper.write(Types.VAR_INT, size + 2);
 
+            // Copies, as later protocols rewrite the ids in place
             wrapper.write(Types.STRING, "minecraft:brewing_input");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, MAPPINGS.brewingInputIds());
+            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, MAPPINGS.brewingInputIds().clone());
             wrapper.write(Types.STRING, "minecraft:brewing_reagent");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, MAPPINGS.brewingReagentIds());
+            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, MAPPINGS.brewingReagentIds().clone());
         });
     }
 
