@@ -17,6 +17,8 @@
  */
 package com.viaversion.viaversion.velocity.listeners;
 
+import java.util.UUID;
+
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
@@ -24,6 +26,7 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.viaversion.viaversion.VelocityPlugin;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.ConnectionManager;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.connection.ConnectionDetails;
 
@@ -32,9 +35,17 @@ public class ConnectionDetailsListener {
 
     @Subscribe
     public void onPostServerJoin(final ServerPostConnectEvent event) {
-        final UserConnection connection = Via.getManager().getConnectionManager().getClientConnection(event.getPlayer().getUniqueId());
-        if (connection != null) {
-            ConnectionDetails.sendConnectionDetails(connection, ConnectionDetails.PROXY_CHANNEL);
+        ConnectionManager manager = Via.getManager().getConnectionManager();
+        UUID uuid = event.getPlayer().getUniqueId();
+
+        UserConnection frontend = manager.getServerConnection(uuid);
+        if (frontend != null) {
+            ConnectionDetails.sendPlayerDetails(frontend, ConnectionDetails.PROXY_CHANNEL);
+        }
+
+        UserConnection backend = manager.getClientConnection(uuid);
+        if (backend != null) {
+            ConnectionDetails.sendServerDetails(backend, ConnectionDetails.PROXY_CHANNEL);
         }
     }
 
