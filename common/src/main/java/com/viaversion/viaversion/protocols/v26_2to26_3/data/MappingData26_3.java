@@ -20,10 +20,43 @@ package com.viaversion.viaversion.protocols.v26_2to26_3.data;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 public final class MappingData26_3 extends MappingDataBase {
 
+    private static final String[] BREWING_INPUTS = {
+        "potion",
+        "splash_potion",
+        "lingering_potion"
+    };
+    private static final String[] BREWING_REAGENTS = {
+        "blaze_powder",
+        "breeze_rod",
+        "cobweb",
+        "dragon_breath",
+        "fermented_spider_eye",
+        "ghast_tear",
+        "glistering_melon_slice",
+        "glowstone_dust",
+        "golden_carrot",
+        "gunpowder",
+        "magma_cream",
+        "nether_wart",
+        "phantom_membrane",
+        "pufferfish",
+        "rabbit_foot",
+        "redstone",
+        "slime_block",
+        "spider_eye",
+        "stone",
+        "sugar",
+        "turtle_helmet"
+    };
+
     private CompoundTag blockTransformerRegistry;
+    private int[] brewingInputIds;
+    private int[] brewingReagentIds;
 
     public MappingData26_3() {
         super("26.2", "26.3");
@@ -32,9 +65,31 @@ public final class MappingData26_3 extends MappingDataBase {
     @Override
     protected void loadExtras(final CompoundTag data) {
         blockTransformerRegistry = MappingDataLoader.INSTANCE.loadNBTFromFile("block-transformer-registry-26.3.nbt");
+
+        brewingInputIds = itemIds(BREWING_INPUTS);
+        brewingReagentIds = itemIds(BREWING_REAGENTS);
+    }
+
+    private int[] itemIds(final String[] identifiers) {
+        final IntList ids = new IntArrayList(identifiers.length);
+        for (final String identifier : identifiers) {
+            final int id = getFullItemMappings().mappedId(identifier);
+            if (id != -1) {
+                ids.add(id);
+            }
+        }
+        return ids.toIntArray();
     }
 
     public CompoundTag blockTransformerRegistry() {
         return blockTransformerRegistry;
+    }
+
+    public int[] brewingInputIds() {
+        return brewingInputIds;
+    }
+
+    public int[] brewingReagentIds() {
+        return brewingReagentIds;
     }
 }
