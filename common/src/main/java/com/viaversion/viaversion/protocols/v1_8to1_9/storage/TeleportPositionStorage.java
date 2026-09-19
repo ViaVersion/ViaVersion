@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Vector3d;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Positions of the teleports most recently sent to the client.
@@ -44,7 +45,7 @@ public class TeleportPositionStorage implements StorableObject {
     /**
      * Returns and removes the oldest pending teleport position, or null if none is pending.
      */
-    public Vector3d pollPendingPosition() {
+    public @Nullable Vector3d pollPendingPosition() {
         return this.pendingPositions.poll();
     }
 }
