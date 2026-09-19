@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.type.Types;
@@ -138,6 +139,29 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
             final double zPower = wrapper.read(Types.DOUBLE);
             final double accelerationPower = Math.sqrt(xPower * xPower + yPower * yPower + zPower * zPower);
             wrapper.write(Types.DOUBLE, accelerationPower);
+        });
+
+        // Servers up to 1.20.6 resend the win game event with a value of 0 to players that already saw the credits,
+        // telling the client to skip the end poem and to confirm the credits right away.
+        // 1.21+ clients ignore the value and always open the full end poem screen instead
+        appendClientbound(ClientboundPackets1_20_5.GAME_EVENT, wrapper -> {
+            wrapper.resetReader();
+            final short event = wrapper.passthrough(Types.UNSIGNED_BYTE);
+            if (event != 4) { // Win game
+                return;
+            }
+
+            final float value = wrapper.passthrough(Types.FLOAT);
+            if (value >= 0.5F) { // Rounded by clients, meaning the end poem is being shown for the first time
+                return;
+            }
+
+            wrapper.cancel();
+
+            // The server only teleports the player out of the end once the client confirms the credits being over
+            final PacketWrapper clientCommandPacket = wrapper.create(ServerboundPackets1_20_5.CLIENT_COMMAND);
+            clientCommandPacket.write(Types.VAR_INT, 0); // Perform respawn
+            clientCommandPacket.sendToServer(Protocol1_20_5To1_21.class);
         });
     }
 
