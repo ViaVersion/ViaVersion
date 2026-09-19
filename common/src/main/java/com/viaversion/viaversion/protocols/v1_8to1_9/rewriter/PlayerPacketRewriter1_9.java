@@ -306,7 +306,10 @@ public class PlayerPacketRewriter1_9 {
                         clientWorld.getLoadedChunks().clear();
                         provider.unloadChunks(wrapper.user());
                     }
-                    wrapper.user().get(ArmorTracker.class).sendArmorUpdate(wrapper.user());
+                    ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
+                    // Respawn resets the client's attributes even when its armor is unchanged.
+                    armorTracker.markDirty();
+                    armorTracker.sendArmorUpdate(wrapper.user());
                 });
             }
         });

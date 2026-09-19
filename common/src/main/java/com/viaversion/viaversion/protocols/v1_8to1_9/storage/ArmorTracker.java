@@ -32,12 +32,25 @@ public final class ArmorTracker implements StorableObject {
 
     // Helmet through boots, matching player container slots 5 through 8.
     private final int[] armorPoints = new int[4];
+    private boolean dirty = true;
 
     public void setArmor(int slot, int itemId) {
-        armorPoints[slot] = ArmorTypes1_8.findById(itemId).getArmorPoints();
+        int points = ArmorTypes1_8.findById(itemId).getArmorPoints();
+        if (armorPoints[slot] != points) {
+            armorPoints[slot] = points;
+            dirty = true;
+        }
+    }
+
+    public void markDirty() {
+        dirty = true;
     }
 
     public void sendArmorUpdate(UserConnection connection) {
+        if (!dirty) {
+            return;
+        }
+
         EntityTracker1_9 entityTracker = connection.getEntityTracker(Protocol1_8To1_9.class);
         if (!entityTracker.hasClientEntityId()) {
             return;
@@ -58,5 +71,6 @@ public final class ArmorTracker implements StorableObject {
         wrapper.write(Types.DOUBLE, (double) armor);
         wrapper.write(Types.BYTE, (byte) 0);
         wrapper.scheduleSend(Protocol1_8To1_9.class);
+        dirty = false;
     }
 }

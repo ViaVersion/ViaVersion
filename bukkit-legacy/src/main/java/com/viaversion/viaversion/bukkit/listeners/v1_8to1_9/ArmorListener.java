@@ -30,11 +30,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -94,21 +91,6 @@ public class ArmorListener extends ViaBukkitListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onItemBreak(PlayerItemBreakEvent e) {
         sendDelayedArmorUpdate(e.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onJoin(PlayerJoinEvent e) {
-        sendDelayedArmorUpdate(e.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onRespawn(PlayerRespawnEvent e) {
-        sendDelayedArmorUpdate(e.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onWorldChange(PlayerChangedWorldEvent e) {
-        sendArmorUpdate(e.getPlayer());
     }
 
     public void sendDelayedArmorUpdate(final Player player) {
