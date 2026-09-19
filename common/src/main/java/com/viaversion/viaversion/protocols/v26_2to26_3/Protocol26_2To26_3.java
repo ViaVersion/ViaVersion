@@ -17,12 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.v26_2to26_3;
 
-import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
-import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_2;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_3;
@@ -69,32 +67,6 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket26_1, ClientboundPacket26_3, ServerboundPacket26_1, ServerboundPacket26_3> {
 
     public static final MappingData26_3 MAPPINGS = new MappingData26_3();
-    private static final String[] POT_PATTERNS = {
-        "angler",
-        "archer",
-        "arms_up",
-        "blade",
-        "brewer",
-        "burn",
-        "danger",
-        "explorer",
-        "flow",
-        "friend",
-        "guster",
-        "heart",
-        "heartbreak",
-        "howl",
-        "miner",
-        "mourner",
-        "plenty",
-        "prize",
-        "scrape",
-        "sheaf",
-        "shelter",
-        "skull",
-        "snort"
-
-    };
     private final EntityPacketRewriter26_3 entityRewriter = new EntityPacketRewriter26_3(this);
     private final BlockItemPacketRewriter26_3 itemRewriter = new BlockItemPacketRewriter26_3(this);
     private final BlockRewriter<ClientboundPacket26_1> blockRewriter = new BlockPacketRewriter26_3(this);
@@ -126,14 +98,7 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
         appendClientbound(ClientboundConfigurationPackets1_21_9.FINISH_CONFIGURATION, wrapper -> {
             final PacketWrapper clocksPacket = wrapper.create(ClientboundConfigurationPackets26_3.REGISTRY_DATA);
             clocksPacket.write(Types.STRING, "decorated_pot_pattern");
-            final RegistryEntry[] entries = new RegistryEntry[POT_PATTERNS.length];
-            for (int i = 0; i < POT_PATTERNS.length; i++) {
-                final String key = POT_PATTERNS[i];
-                final CompoundTag tag = new CompoundTag();
-                tag.putString("asset_id", key + "_pottery_pattern");
-                entries[i] = new RegistryEntry(key, tag);
-            }
-            clocksPacket.write(Types.REGISTRY_ENTRY_ARRAY, entries);
+            clocksPacket.write(Types.REGISTRY_ENTRY_ARRAY, MAPPINGS.potPatterns());
             clocksPacket.send(Protocol26_2To26_3.class);
 
             final PacketWrapper blockTransformersPacket = wrapper.create(ClientboundConfigurationPackets26_3.REGISTRY_DATA);

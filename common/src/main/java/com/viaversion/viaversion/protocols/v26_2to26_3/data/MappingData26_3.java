@@ -20,8 +20,8 @@ package com.viaversion.viaversion.protocols.v26_2to26_3.data;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
+import com.viaversion.viaversion.api.minecraft.RegistryEntry;
+import java.util.Arrays;
 
 public final class MappingData26_3 extends MappingDataBase {
 
@@ -53,6 +53,31 @@ public final class MappingData26_3 extends MappingDataBase {
         "sugar",
         "turtle_helmet"
     };
+    private static final String[] POT_PATTERNS = {
+        "angler",
+        "archer",
+        "arms_up",
+        "blade",
+        "brewer",
+        "burn",
+        "danger",
+        "explorer",
+        "flow",
+        "friend",
+        "guster",
+        "heart",
+        "heartbreak",
+        "howl",
+        "miner",
+        "mourner",
+        "plenty",
+        "prize",
+        "scrape",
+        "sheaf",
+        "shelter",
+        "skull",
+        "snort"
+    };
 
     private CompoundTag blockTransformerRegistry;
     private int[] brewingInputIds;
@@ -66,23 +91,23 @@ public final class MappingData26_3 extends MappingDataBase {
     protected void loadExtras(final CompoundTag data) {
         blockTransformerRegistry = MappingDataLoader.INSTANCE.loadNBTFromFile("block-transformer-registry-26.3.nbt");
 
-        brewingInputIds = itemIds(BREWING_INPUTS);
-        brewingReagentIds = itemIds(BREWING_REAGENTS);
-    }
-
-    private int[] itemIds(final String[] identifiers) {
-        final IntList ids = new IntArrayList(identifiers.length);
-        for (final String identifier : identifiers) {
-            final int id = getFullItemMappings().mappedId(identifier);
-            if (id != -1) {
-                ids.add(id);
-            }
-        }
-        return ids.toIntArray();
+        brewingInputIds = Arrays.stream(BREWING_INPUTS).mapToInt(identifier -> this.getFullItemMappings().mappedId(identifier)).toArray();
+        brewingReagentIds = Arrays.stream(BREWING_REAGENTS).mapToInt(identifier -> this.getFullItemMappings().mappedId(identifier)).toArray();
     }
 
     public CompoundTag blockTransformerRegistry() {
         return blockTransformerRegistry;
+    }
+
+    public RegistryEntry[] potPatterns() {
+        final RegistryEntry[] entries = new RegistryEntry[POT_PATTERNS.length];
+        for (int i = 0; i < POT_PATTERNS.length; i++) {
+            final String key = POT_PATTERNS[i];
+            final CompoundTag tag = new CompoundTag();
+            tag.putString("asset_id", key + "_pottery_pattern");
+            entries[i] = new RegistryEntry(key, tag);
+        }
+        return entries;
     }
 
     public int[] brewingInputIds() {
