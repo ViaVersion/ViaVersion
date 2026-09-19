@@ -36,6 +36,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CommandBlockProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CompressionProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MainHandProvider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ArmorTracker;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientWorld1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
@@ -305,6 +306,10 @@ public class PlayerPacketRewriter1_9 {
                         clientWorld.getLoadedChunks().clear();
                         provider.unloadChunks(wrapper.user());
                     }
+                    ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
+                    // Respawn resets the client's attributes even when its armor is unchanged.
+                    armorTracker.markDirty();
+                    armorTracker.sendArmorUpdate(wrapper.user());
                 });
             }
         });
