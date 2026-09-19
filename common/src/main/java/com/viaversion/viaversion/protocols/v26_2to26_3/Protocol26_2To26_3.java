@@ -44,7 +44,6 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPack
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundConfigurationPackets1_21_9;
-import com.viaversion.viaversion.protocols.v26_2to26_3.data.BrewingItems26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.data.MappingData26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundConfigurationPackets26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundPacket26_3;
@@ -180,9 +179,9 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
             wrapper.write(Types.VAR_INT, size + 2);
 
             wrapper.write(Types.STRING, "minecraft:brewing_input");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, BrewingItems26_3.inputIds());
+            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, MAPPINGS.brewingInputIds());
             wrapper.write(Types.STRING, "minecraft:brewing_reagent");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, BrewingItems26_3.reagentIds());
+            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, MAPPINGS.brewingReagentIds());
         });
     }
 
