@@ -44,6 +44,7 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPack
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundConfigurationPackets1_21_9;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ServerboundConfigurationPackets1_21_9;
+import com.viaversion.viaversion.protocols.v26_2to26_3.data.BrewingItems26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.data.MappingData26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundConfigurationPackets26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundPacket26_3;
@@ -62,7 +63,6 @@ import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
-
 import java.util.BitSet;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
@@ -171,6 +171,18 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
             wrapper.passthrough(ChatType.TYPE); // Chat Type
             componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_TAG)); // Name
             componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Target Name
+        });
+
+        // 26.3 reads the items the brewing stand slots accept from the server, older clients have them hardcoded
+        appendClientbound(ClientboundPackets26_1.UPDATE_RECIPES, wrapper -> {
+            wrapper.resetReader();
+            final int size = wrapper.read(Types.VAR_INT);
+            wrapper.write(Types.VAR_INT, size + 2);
+
+            wrapper.write(Types.STRING, "minecraft:brewing_input");
+            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, BrewingItems26_3.inputIds());
+            wrapper.write(Types.STRING, "minecraft:brewing_reagent");
+            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, BrewingItems26_3.reagentIds());
         });
     }
 
