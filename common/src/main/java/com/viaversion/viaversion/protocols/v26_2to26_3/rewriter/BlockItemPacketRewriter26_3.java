@@ -36,6 +36,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrim26_3;
 import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimMaterial1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimMaterial26_3;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
@@ -201,6 +202,10 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
     @Override
     protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
         upgradeData(container);
+
+        // Add data components to fix issues in older protocols
+        appendItemDataFixComponents(connection, item, container);
+
         super.handleItemDataComponentsToClient(connection, item, container);
     }
 
@@ -208,6 +213,22 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
     protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
         downgradeData(container);
         super.handleItemDataComponentsToServer(connection, item, container);
+    }
+
+    private void appendItemDataFixComponents(final UserConnection connection, final Item item, final StructuredDataContainer container) {
+        final ProtocolVersion serverVersion = connection.getProtocolInfo().serverProtocolVersion();
+        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+            // Axes only started stripping logs in 1.13
+            if (item.identifier() == 1043 || item.identifier() == 1033 || item.identifier() == 1053 || item.identifier() == 1058 || item.identifier() == 1048 || item.identifier() == 1038 || item.identifier() == 1028) {
+                container.setEmpty(StructuredDataKey.BLOCK_TRANSFORMER);
+            }
+        }
+        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+            // Shovels only started creating dirt paths in 1.9
+            if (item.identifier() == 1036 || item.identifier() == 1046 || item.identifier() == 1041 || item.identifier() == 1026 || item.identifier() == 1056 || item.identifier() == 1031 || item.identifier() == 1051) {
+                container.setEmpty(StructuredDataKey.BLOCK_TRANSFORMER);
+            }
+        }
     }
 
     public static void upgradeData(final StructuredDataContainer container) {
