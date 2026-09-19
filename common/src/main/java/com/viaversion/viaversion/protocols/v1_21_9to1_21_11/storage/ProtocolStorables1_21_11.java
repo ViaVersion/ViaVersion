@@ -22,8 +22,17 @@ import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 public final class ProtocolStorables1_21_11 extends ProtocolStorablesBase {
 
     private final GameTimeStorage gameTimeStorage = new GameTimeStorage();
+    private boolean timelineTagsSent;
 
     public GameTimeStorage gameTimeStorage() {
         return gameTimeStorage;
+    }
+
+    public boolean timelineTagsSent() {
+        return timelineTagsSent;
+    }
+
+    public void setTimelineTagsSent(final boolean timelineTagsSent) {
+        this.timelineTagsSent = timelineTagsSent;
     }
 }

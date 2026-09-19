@@ -66,6 +66,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.block.BlockRewriter1_21_5;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 import com.viaversion.viaversion.util.Key;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -96,6 +97,13 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
         super.registerPackets();
 
         appendClientbound(ClientboundConfigurationPackets1_21_9.FINISH_CONFIGURATION, wrapper -> {
+            final ProtocolStorables1_21_11 storables = wrapper.user().storables(this);
+            if (!storables.timelineTagsSent()) {
+                final PacketWrapper tagsPacket = wrapper.create(ClientboundConfigurationPackets1_21_9.UPDATE_TAGS);
+                tagsPacket.write(Types.VAR_INT, 0);
+                tagsPacket.send(Protocol1_21_9To1_21_11.class, false);
+            }
+
             final PacketWrapper zombieNautilusVariantsPacket = wrapper.create(ClientboundConfigurationPackets1_21_9.REGISTRY_DATA);
             zombieNautilusVariantsPacket.write(Types.STRING, "zombie_nautilus_variant");
             final CompoundTag temperateZombieNautilus = new CompoundTag();
@@ -113,7 +121,11 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
             }
             timelinePacket.write(Types.REGISTRY_ENTRY_ARRAY, timelineEntries);
             timelinePacket.send(Protocol1_21_9To1_21_11.class);
+            storables.setTimelineTagsSent(false);
         });
+
+        replaceClientbound(ClientboundPackets1_21_9.UPDATE_TAGS, this::handleTags);
+        replaceClientbound(ClientboundConfigurationPackets1_21_9.UPDATE_TAGS, this::handleTags);
 
         registryDataRewriter.addHandler("dimension_type", (key, tag) -> {
             final ByteTag trueTag = new ByteTag((byte) 1);
@@ -248,6 +260,49 @@ public final class Protocol1_21_9To1_21_11 extends AbstractProtocol<ClientboundP
                 attributes.put("visual/ambient_particles", ambientParticles);
             }
         });
+    }
+
+    private void handleTags(final PacketWrapper wrapper) {
+        tagRewriter.handleGeneric(wrapper);
+        appendTimelineTags(wrapper, timelineIds());
+
+        final ProtocolStorables1_21_11 storables = wrapper.user().storables(this);
+        storables.setTimelineTagsSent(true);
+    }
+
+    static void appendTimelineTags(final PacketWrapper wrapper, final Map<String, Integer> timelineIds) {
+        final int villagerSchedule = timelineId(timelineIds, "villager_schedule");
+
+        wrapper.set(Types.VAR_INT, 0, wrapper.get(Types.VAR_INT, 0) + 1);
+        wrapper.write(Types.STRING, "minecraft:timeline");
+        wrapper.write(Types.VAR_INT, 4);
+        writeTag(wrapper, "minecraft:universal", villagerSchedule);
+        writeTag(wrapper, "minecraft:in_overworld", villagerSchedule, timelineId(timelineIds, "day"),
+            timelineId(timelineIds, "moon"), timelineId(timelineIds, "early_game"));
+        writeTag(wrapper, "minecraft:in_nether", villagerSchedule);
+        writeTag(wrapper, "minecraft:in_end", villagerSchedule);
+    }
+
+    private static Map<String, Integer> timelineIds() {
+        final Map<String, Integer> timelineIds = new HashMap<>(MAPPINGS.timelineRegistry().size());
+        int index = 0;
+        for (final String key : MAPPINGS.timelineRegistry().keySet()) {
+            timelineIds.put(Key.stripMinecraftNamespace(key), index++);
+        }
+        return timelineIds;
+    }
+
+    private static int timelineId(final Map<String, Integer> timelineIds, final String key) {
+        final Integer id = timelineIds.get(key);
+        if (id == null) {
+            throw new IllegalStateException("Missing synthetic timeline entry: " + key);
+        }
+        return id;
+    }
+
+    private static void writeTag(final PacketWrapper wrapper, final String key, final int... entries) {
+        wrapper.write(Types.STRING, key);
+        wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, entries);
     }
 
     private void addAmbientCaveSound(final CompoundTag attributes) {
