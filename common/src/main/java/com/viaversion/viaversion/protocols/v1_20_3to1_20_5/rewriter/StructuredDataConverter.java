@@ -271,7 +271,7 @@ public final class StructuredDataConverter {
                 if (values == null) values = new ListTag<>(CompoundTag.class);
                 final CompoundTag propertyTag = new CompoundTag();
                 propertyTag.putString("Value", property.value());
-                if (property.signature() != null) {
+                if (property.signature() != null && !property.signature().isEmpty()) {
                     propertyTag.putString("Signature", property.signature());
                 }
                 values.add(propertyTag);
