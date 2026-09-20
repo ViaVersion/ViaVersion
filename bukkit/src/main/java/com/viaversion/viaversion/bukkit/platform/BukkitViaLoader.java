@@ -213,8 +213,8 @@ public class BukkitViaLoader implements ViaPlatformLoader {
     private boolean hasSwingHandMethod() {
         try {
             BlockPlaceEvent.class.getDeclaredMethod("getHand");
-            Player.class.getDeclaredMethod("swingMainHand");
-            Player.class.getDeclaredMethod("swingOffHand");
+            Player.class.getMethod("swingMainHand");
+            Player.class.getMethod("swingOffHand");
             return true;
         } catch (final NoSuchMethodException e) {
             return false;
