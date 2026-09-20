@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.Protocol1_19_1To1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.packet.ClientboundPackets1_19_3;
+import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.PlayerDeathStorage;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import java.util.BitSet;
@@ -75,6 +76,11 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
             }
         });
 
+        protocol.registerClientbound(ClientboundPackets1_19_1.SET_HEALTH, wrapper -> {
+            final float health = wrapper.passthrough(Types.FLOAT);
+            wrapper.user().get(PlayerDeathStorage.class).setDead(health <= 0);
+        });
+
         protocol.registerClientbound(ClientboundPackets1_19_1.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
@@ -87,8 +93,15 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                 map(Types.BOOLEAN); // Flat
                 handler(worldDataTrackerHandlerByKey());
                 handler(wrapper -> {
-                    final boolean keepData = wrapper.read(Types.BOOLEAN);
-                    wrapper.write(Types.BYTE, keepData ? (byte) 0x03 : (byte) 0x00);
+                    final boolean keepAttributes = wrapper.read(Types.BOOLEAN);
+                    final PlayerDeathStorage deathStorage = wrapper.user().get(PlayerDeathStorage.class);
+                    // Old clients always keep the entity data, but taking over the health of 0 after a death would leave the client in the death screen
+                    byte keepDataMask = deathStorage.dead() ? (byte) 0x00 : (byte) 0x02;
+                    if (keepAttributes) {
+                        keepDataMask |= 0x01;
+                    }
+                    deathStorage.setDead(false);
+                    wrapper.write(Types.BYTE, keepDataMask);
                 });
             }
         });
