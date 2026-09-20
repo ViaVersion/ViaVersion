@@ -24,8 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
@@ -33,21 +31,6 @@ public class PlayerSwingAnimationListener extends ViaBukkitListener {
 
     public PlayerSwingAnimationListener(final ViaVersionPlugin plugin) {
         super(plugin, Protocol26_2To26_3.class);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onInventoryClick(final InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof final Player player)) {
-            return;
-        }
-
-        if (!isOnPipe(player)) return;
-
-        final ClickType click = event.getClick();
-        if (click == ClickType.WINDOW_BORDER_LEFT || click == ClickType.WINDOW_BORDER_RIGHT
-            || click == ClickType.DROP || click == ClickType.CONTROL_DROP) {
-            player.swingMainHand();
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
