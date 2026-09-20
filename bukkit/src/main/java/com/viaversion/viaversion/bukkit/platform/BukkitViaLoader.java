@@ -35,6 +35,7 @@ import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.BlockListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.DeathListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.HandItemCache;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.PaperPatch;
+import com.viaversion.viaversion.bukkit.listeners.v26_2to26_3.PlayerSwingAnimationListener;
 import com.viaversion.viaversion.bukkit.providers.BukkitAckSequenceProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitBlockConnectionProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
@@ -191,6 +192,9 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         }
         if (serverProtocolVersion.olderThan(ProtocolVersion.v1_21_4)) {
             Via.getManager().getProviders().use(PickItemProvider.class, new BukkitPickItemProvider(plugin));
+        }
+        if (serverProtocolVersion.olderThan(ProtocolVersion.v26_3)) {
+            new PlayerSwingAnimationListener(plugin).register();
         }
     }
 
