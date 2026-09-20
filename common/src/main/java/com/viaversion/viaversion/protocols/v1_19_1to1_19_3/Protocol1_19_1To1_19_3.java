@@ -51,7 +51,7 @@ import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.ComponentRew
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.EntityPacketRewriter1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.ItemPacketRewriter1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.NonceStorage1_19_3;
-import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.PlayerDeathStorage;
+import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.PlayerHealthStorage;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.ReceivedMessagesStorage;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ServerboundPackets1_19_1;
@@ -381,7 +381,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     public void init(final UserConnection user) {
         user.put(new ReceivedMessagesStorage());
-        user.put(new PlayerDeathStorage());
+        user.put(new PlayerHealthStorage());
         addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19_3.PLAYER));
     }
 

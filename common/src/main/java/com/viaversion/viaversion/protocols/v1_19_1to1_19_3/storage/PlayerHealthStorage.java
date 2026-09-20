@@ -19,9 +19,17 @@ package com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
 
-public final class PlayerDeathStorage implements StorableObject {
+public final class PlayerHealthStorage implements StorableObject {
 
     private boolean dead;
+    private int food;
+    private float saturation;
+
+    public void update(final float health, final int food, final float saturation) {
+        this.dead = health <= 0;
+        this.food = food;
+        this.saturation = saturation;
+    }
 
     public boolean dead() {
         return this.dead;
@@ -29,5 +37,13 @@ public final class PlayerDeathStorage implements StorableObject {
 
     public void setDead(final boolean dead) {
         this.dead = dead;
+    }
+
+    public int food() {
+        return this.food;
+    }
+
+    public float saturation() {
+        return this.saturation;
     }
 }
