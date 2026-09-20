@@ -87,12 +87,8 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                 map(Types.BOOLEAN); // Flat
                 handler(worldDataTrackerHandlerByKey());
                 handler(wrapper -> {
-                    final boolean keepAttributes = wrapper.read(Types.BOOLEAN);
-                    byte keepDataMask = 0x02; // Always keep entity data
-                    if (keepAttributes) {
-                        keepDataMask |= 0x01;
-                    }
-                    wrapper.write(Types.BYTE, keepDataMask);
+                    final boolean keepData = wrapper.read(Types.BOOLEAN);
+                    wrapper.write(Types.BYTE, keepData ? (byte) 0x03 : (byte) 0x00);
                 });
             }
         });
