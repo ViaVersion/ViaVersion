@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_2;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_3;
@@ -221,6 +222,9 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
             StructuredDataKey.PROVIDES_POTTERY_PATTERN, StructuredDataKey.BLOCK_TRANSFORMER, StructuredDataKey.COMPOSTABLE, StructuredDataKey.VILLAGER_FOOD,
             StructuredDataKey.COOKING_FUEL, StructuredDataKey.BREWING_FUEL, StructuredDataKey.MOB_VISIBILITY, StructuredDataKey.SIGN_TEXT_BACK, StructuredDataKey.SIGN_TEXT_FRONT,
             StructuredDataKey.WAXED, StructuredDataKey.CUSHION_COLOR, StructuredDataKey.ATTACK_ANIMATION, StructuredDataKey.INTERACT_ANIMATION);
+
+        tagRewriter.renameTag(RegistryType.BLOCK, "convertable_to_mud", "convertible_to_mud");
+
         super.onMappingDataLoaded();
     }
 
