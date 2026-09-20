@@ -57,6 +57,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -140,6 +141,10 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             new ArmorToggleListener(plugin).register();
         }
 
+        if (serverProtocolVersion.olderThan(ProtocolVersion.v26_3) && hasSwingHandMethod()) {
+            new PlayerSwingAnimationListener(plugin).register();
+        }
+
         /* Providers */
         if (serverProtocolVersion.olderThan(ProtocolVersion.v1_9)) {
             Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BukkitViaMovementTransmitter());
@@ -193,9 +198,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         if (serverProtocolVersion.olderThan(ProtocolVersion.v1_21_4)) {
             Via.getManager().getProviders().use(PickItemProvider.class, new BukkitPickItemProvider(plugin));
         }
-        if (serverProtocolVersion.olderThan(ProtocolVersion.v26_3)) {
-            new PlayerSwingAnimationListener(plugin).register();
-        }
     }
 
     private boolean hasGetHandMethod() {
@@ -204,6 +206,17 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             Material.class.getMethod("getEquipmentSlot");
             return true;
         } catch (NoSuchMethodException e) {
+            return false;
+        }
+    }
+
+    private boolean hasSwingHandMethod() {
+        try {
+            BlockPlaceEvent.class.getDeclaredMethod("getHand");
+            Player.class.getDeclaredMethod("swingMainHand");
+            Player.class.getDeclaredMethod("swingOffHand");
+            return true;
+        } catch (final NoSuchMethodException e) {
             return false;
         }
     }
