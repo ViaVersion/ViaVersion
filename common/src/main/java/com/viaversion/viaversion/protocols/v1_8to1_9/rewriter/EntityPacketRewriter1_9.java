@@ -36,6 +36,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.data.EntityDataIndex1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ArmorTracker;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
@@ -186,6 +187,12 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 // Item Rewriter
                 handler(wrapper -> {
                     Item stack = wrapper.get(Types.ITEM1_8, 0);
+                    EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
+                    if (!wrapper.isCancelled() && wrapper.get(Types.VAR_INT, 0) == entityTracker.clientEntityId()) {
+                        ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
+                        armorTracker.setArmor(5 - wrapper.get(Types.VAR_INT, 1), stack == null ? 0 : stack.identifier());
+                        armorTracker.sendArmorUpdate(wrapper.user());
+                    }
                     protocol.getItemRewriter().handleItemToClient(wrapper.user(), stack);
                 });
                 // Blocking
