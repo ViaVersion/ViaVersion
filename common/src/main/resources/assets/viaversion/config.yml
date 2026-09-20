@@ -175,6 +175,11 @@ resource-pack-1_17-prompt: ''
 # Only disable this if you know what you are doing.
 cache-1_17-light: true
 #
+# Chunk section cache size, in MiB. Per 1.17+ connection on older server versions.
+# Lets us send only the changed blocks when an old server sends partial chunks.
+# Smaller = less memory, but whole sections get re-sent more often.
+legacy-partial-chunk-cache-size: 4
+#
 # Force-update 1.19.4+ player's inventory when they try to swap armor in a pre-occupied slot.
 armor-toggle-fix: true
 #
