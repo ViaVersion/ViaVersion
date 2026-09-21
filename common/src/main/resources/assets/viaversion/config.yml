@@ -203,6 +203,9 @@ fix-1_21-placement-rotation: true
 # If enabled, cancel swing packets sent while having an inventory opened on 1.15.2 and below servers. This can cause false positives with anti-cheat plugins.
 cancel-swing-in-inventory: true
 #
+# If enabled, chest minecart rotation will be corrected for 26+ clients on older servers.
+correct-chest-minecart-orientation: true
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#
