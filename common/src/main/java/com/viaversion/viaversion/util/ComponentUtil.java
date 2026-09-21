@@ -25,6 +25,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.libs.mcstructs.text.Style;
 import com.viaversion.viaversion.libs.mcstructs.text.TextComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.TextFormatting;
 import com.viaversion.viaversion.libs.mcstructs.text.components.StringComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.components.TranslationComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.events.hover.HoverEvent;
@@ -204,11 +205,30 @@ public final class ComponentUtil {
     }
 
     public static String jsonToLegacy(final String value) {
-        return TextComponentSerializer.V1_12.deserializeReader(value).asLegacyFormatString();
+        return jsonToLegacy(TextComponentSerializer.V1_12.deserializeReader(value), false);
     }
 
     public static String jsonToLegacy(final JsonElement value) {
-        return SerializerVersion.V1_12.toComponent(value).asLegacyFormatString();
+        return jsonToLegacy(SerializerVersion.V1_12.toComponent(value), false);
+    }
+
+    public static String jsonToLegacyItem(final String value) {
+        return jsonToLegacy(TextComponentSerializer.V1_12.deserializeReader(value), true);
+    }
+
+    public static String jsonToLegacyItem(final JsonElement value) {
+        return jsonToLegacy(SerializerVersion.V1_12.toComponent(value), true);
+    }
+
+    private static String jsonToLegacy(final TextComponent component, boolean stripItalics) {
+        if (!stripItalics) {
+            return component.asLegacyFormatString();
+        }
+        final Style style = component.getStyle();
+        if (Boolean.FALSE.equals(style.getItalic()) && style.getFormattings().length == 0) {
+            return "§r" + component.asLegacyFormatString();
+        }
+        return component.asLegacyFormatString();
     }
 
     public static CompoundTag deserializeLegacyShowItem(final JsonElement element, final SerializerVersion version) {
