@@ -629,7 +629,26 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             }
             return trim;
         });
-        dataContainer.replaceKey(StructuredDataKey.POTION_CONTENTS1_21_2, StructuredDataKey.POTION_CONTENTS1_20_5);
+        dataContainer.replace(StructuredDataKey.POTION_CONTENTS1_21_2, StructuredDataKey.POTION_CONTENTS1_20_5, potion -> {
+            final String customName = potion.customName();
+            if (customName == null) {
+                return potion;
+            }
+            final String itemKey = switch (item.identifier()) {
+                case 998 -> "potion";
+                case 1158 -> "splash_potion";
+                case 1160 -> "tipped_arrow";
+                case 1161 -> "lingering_potion";
+                default -> null;
+            };
+            if (itemKey != null) {
+                final CompoundTag name = new CompoundTag();
+                name.putString("translate", "item.minecraft.%s.effect.%s".formatted(itemKey, customName));
+                // Always replace item_name, as the value in potion_contents has higher priority than it in 1.21.2
+                dataContainer.set(StructuredDataKey.ITEM_NAME, name);
+            }
+            return potion;
+        });
         dataContainer.replace(StructuredDataKey.DAMAGE_RESISTANT1_21_2, StructuredDataKey.FIRE_RESISTANT, damageResistant -> {
             if (damageResistant.typesTagKey().equals("is_fire")) {
                 return Unit.INSTANCE;
