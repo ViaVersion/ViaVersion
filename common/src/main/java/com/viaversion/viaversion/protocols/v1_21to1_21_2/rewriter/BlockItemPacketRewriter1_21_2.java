@@ -17,12 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
-import com.viaversion.nbt.tag.ByteTag;
-import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.IntArrayTag;
-import com.viaversion.nbt.tag.ListTag;
-import com.viaversion.nbt.tag.StringTag;
-import com.viaversion.nbt.tag.Tag;
+import com.viaversion.nbt.tag.*;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
@@ -38,16 +33,9 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.*;
 import com.viaversion.viaversion.api.minecraft.item.data.consumable.ApplyStatusEffects;
 import com.viaversion.viaversion.api.minecraft.item.data.consumable.Consumable1_21_2;
-import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant1_21_2;
-import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
-import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
-import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_21_2;
-import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
-import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_21_2;
-import com.viaversion.viaversion.api.minecraft.item.data.LockCode;
-import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.consumable.ConsumeEffect;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
@@ -562,7 +550,28 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             dataContainer.setEmpty(StructuredDataKey.CONSUMABLE1_21_2);
             dataContainer.setEmpty(StructuredDataKey.V1_21_2.useRemainder);
         });
-        dataContainer.replaceKey(StructuredDataKey.POTION_CONTENTS1_20_5, StructuredDataKey.POTION_CONTENTS1_21_2);
+        dataContainer.replace(StructuredDataKey.POTION_CONTENTS1_20_5, StructuredDataKey.POTION_CONTENTS1_21_2, potion -> {
+            final Tag itemName = dataContainer.get(StructuredDataKey.ITEM_NAME);
+            if (!(itemName instanceof CompoundTag tag) || !tag.contains("translate")) {
+                return potion;
+            }
+            final String itemKey = potionKey(item);
+            if (itemKey == null) {
+                return potion;
+            }
+            final String base = "item.minecraft.%s.effect.".formatted(itemKey);
+            final String translation = tag.getString("translate");
+            if (translation.startsWith(base)) {
+                dataContainer.remove(StructuredDataKey.ITEM_NAME);
+                return new PotionContents(
+                        potion.potion(),
+                        potion.customColor(),
+                        potion.customEffects(),
+                        translation.substring(base.length())
+                );
+            }
+            return potion;
+        });
         dataContainer.replace(StructuredDataKey.FIRE_RESISTANT, StructuredDataKey.DAMAGE_RESISTANT1_21_2, fireResistant -> new DamageResistant1_21_2(Key.of("minecraft:is_fire")));
         dataContainer.replace(StructuredDataKey.LOCK1_20_5, StructuredDataKey.LOCK1_21_2, tag -> {
             final String lock = ((StringTag) tag).getValue();
@@ -634,13 +643,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             if (customName == null) {
                 return potion;
             }
-            final String itemKey = switch (item.identifier()) {
-                case 998 -> "potion";
-                case 1158 -> "splash_potion";
-                case 1160 -> "tipped_arrow";
-                case 1161 -> "lingering_potion";
-                default -> null;
-            };
+            final String itemKey = potionKey(item);
             if (itemKey != null) {
                 final CompoundTag name = new CompoundTag();
                 name.putString("translate", "item.minecraft.%s.effect.%s".formatted(itemKey, customName));
@@ -656,5 +659,15 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             return null;
         });
         dataContainer.remove(NEW_DATA_TO_REMOVE);
+    }
+
+    private static String potionKey(final Item item) {
+        return switch (item.identifier()) {
+            case 998 -> "potion";
+            case 1158 -> "splash_potion";
+            case 1160 -> "tipped_arrow";
+            case 1161 -> "lingering_potion";
+            default -> null;
+        };
     }
 }
