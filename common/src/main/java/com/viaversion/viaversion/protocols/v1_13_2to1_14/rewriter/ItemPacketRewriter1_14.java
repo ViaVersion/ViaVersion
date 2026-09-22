@@ -235,7 +235,7 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
                     display.put("Lore", savedLore.copy());
                 } else {
                     for (StringTag loreEntry : lore) {
-                        loreEntry.setValue(ComponentUtil.jsonToLegacy(loreEntry.getValue()));
+                        loreEntry.setValue(ComponentUtil.jsonToLegacyItem(loreEntry.getValue()));
                     }
                 }
             }

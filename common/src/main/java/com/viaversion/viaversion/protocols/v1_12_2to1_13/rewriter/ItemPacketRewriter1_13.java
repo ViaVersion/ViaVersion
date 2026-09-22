@@ -559,7 +559,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                 StringTag name = display.getStringTag("Name");
                 if (name != null) {
                     Tag via = display.remove(nbtTagName("Name"));
-                    name.setValue(via instanceof StringTag ? (String) via.getValue() : ComponentUtil.jsonToLegacy(name.getValue()));
+                    name.setValue(via instanceof StringTag ? (String) via.getValue() : ComponentUtil.jsonToLegacyItem(name.getValue()));
                 }
             }
 
