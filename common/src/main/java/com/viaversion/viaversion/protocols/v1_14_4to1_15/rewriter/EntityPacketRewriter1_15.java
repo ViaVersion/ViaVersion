@@ -148,7 +148,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
 
             if (deadStatus == null) {
                 tracked.put(new DeadStatusStorage(isDead));
-                return; // if they are dead the first time it gets tracked, that means they are not dying right this moment, so we don't send the "dying right this moment" event
+                return; // if they are dead the first time it gets tracked, that means they were already dying when starting to be tracked, so we don't send the "died right now" event
             }
 
             if (isDead && !deadStatus.wasDead()) {
