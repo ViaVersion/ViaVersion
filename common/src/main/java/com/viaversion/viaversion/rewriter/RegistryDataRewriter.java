@@ -454,6 +454,14 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
                 }
             }
         }
+
+        Tag dripstoneParticle = TagUtil.getNamespacedTag(tag, "visual/default_dripstone_particle");
+        if (dripstoneParticle instanceof CompoundTag modifierTag && modifierTag.contains("argument")) {
+            dripstoneParticle = modifierTag.get("argument");
+        }
+        if (dripstoneParticle instanceof CompoundTag particle) {
+            handleParticleData(particle);
+        }
     }
 
     private void updateNestedEffect(final CompoundTag effectsTag) {
