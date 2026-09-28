@@ -86,8 +86,10 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
 
         switch (key) {
             case "enchantment" -> updateEnchantments(connection, entries);
-            case "trim_material" -> updateTrimMaterials(entries);
-            case "jukebox_song" -> updateJukeboxSongs(entries);
+            case "trim_material" -> updateTrimMaterials(connection, entries);
+            case "jukebox_song" -> updateJukeboxSongs(connection, entries);
+            case "trim_pattern", "instrument" -> updateTextComponents(connection, entries, "description");
+            case "painting_variant" -> updateTextComponents(connection, entries, "title", "author");
             case "worldgen/biome" -> updateBiomes(entries);
             case "worldgen/block_state_provider" -> updateBlockStateProviders(entries);
             case "dimension_type" -> updateDimensionTypes(entries);
@@ -291,6 +293,18 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         updateTextComponent(connection, tag, "tooltip");
     }
 
+    protected void updateTextComponents(final UserConnection connection, final RegistryEntry[] entries, final String... keys) {
+        for (final RegistryEntry entry : entries) {
+            if (!(entry.tag() instanceof final CompoundTag tag)) {
+                continue;
+            }
+
+            for (final String key : keys) {
+                updateTextComponent(connection, tag, key);
+            }
+        }
+    }
+
     protected void updateTextComponent(final UserConnection connection, @Nullable final CompoundTag tag, final String key) {
         if (tag != null && protocol.getComponentRewriter() != null) {
             protocol.getComponentRewriter().processTag(connection, tag.get(key));
@@ -333,6 +347,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             }
 
             final CompoundTag tag = (CompoundTag) entry.tag();
+            updateTextComponent(connection, tag, "description");
             if (!Mappings.isFullIdentity(protocol.getMappingData().getFullItemMappings())) {
                 updateItemList(tag.getListTag("supported_items", StringTag.class));
                 updateItemList(tag.getListTag("primary_items", StringTag.class));
@@ -365,7 +380,8 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         }
     }
 
-    public void updateTrimMaterials(final RegistryEntry[] entries) {
+    public void updateTrimMaterials(final UserConnection connection, final RegistryEntry[] entries) {
+        updateTextComponents(connection, entries, "description");
         if (Mappings.isFullIdentity(protocol.getMappingData().getFullItemMappings())) {
             return;
         }
@@ -384,7 +400,8 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         }
     }
 
-    public void updateJukeboxSongs(final RegistryEntry[] entries) {
+    public void updateJukeboxSongs(final UserConnection connection, final RegistryEntry[] entries) {
+        updateTextComponents(connection, entries, "description");
         // can be overridden
     }
 
