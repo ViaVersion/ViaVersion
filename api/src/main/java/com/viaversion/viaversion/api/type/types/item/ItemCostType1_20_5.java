@@ -34,7 +34,6 @@ import io.netty.buffer.ByteBuf;
 // Very similar to normal items (and just results in an item), except it allows non-positive amounts and has id/amount swapped because ???
 public final class ItemCostType1_20_5 extends Type<Item> {
 
-    private static final StructuredData<?>[] EMPTY_DATA_ARRAY = new StructuredData[0];
     private final Type<StructuredData<?>[]> dataArrayType;
 
     public ItemCostType1_20_5(final Type<StructuredData<?>[]> dataArrayType) {
@@ -54,7 +53,8 @@ public final class ItemCostType1_20_5 extends Type<Item> {
     public void write(final ByteBuf buffer, final Item object) {
         Types.VAR_INT.writePrimitive(buffer, object.identifier());
         Types.VAR_INT.writePrimitive(buffer, object.amount());
-        dataArrayType.write(buffer, object.dataContainer().data().values().toArray(EMPTY_DATA_ARRAY));
+        // Item costs are exact-match predicates without removal markers, so empty data can't be written
+        dataArrayType.write(buffer, object.dataContainer().data().values().stream().filter(StructuredData::isPresent).toArray(StructuredData[]::new));
     }
 
     public static final class OptionalItemCostType extends OptionalType<Item> {
