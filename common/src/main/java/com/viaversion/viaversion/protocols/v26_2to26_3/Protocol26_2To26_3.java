@@ -21,6 +21,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
@@ -70,6 +71,10 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket26_1, ClientboundPacket26_3, ServerboundPacket26_1, ServerboundPacket26_3> {
 
     public static final MappingData26_3 MAPPINGS = new MappingData26_3();
+    private static final int SPLASH_POTION_SOUND = 1053;
+    private static final int INSTANT_SPLASH_POTION_SOUND = 1054;
+    private static final int SPLASH_POTION_PARTICLES = 2002;
+    private static final int INSTANT_SPLASH_POTION_PARTICLES = 2007;
     private static final String[] POT_PATTERNS = {
         "angler",
         "archer",
@@ -171,6 +176,27 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
             wrapper.passthrough(ChatType.TYPE); // Chat Type
             componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_TAG)); // Name
             componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Target Name
+        });
+
+        // 26.3 plays the potion splash sound through its own level event, older clients played it together with the particles
+        appendClientbound(ClientboundPackets26_1.LEVEL_EVENT, wrapper -> {
+            final int id = wrapper.get(Types.INT, 0);
+            final BlockPosition position = wrapper.get(Types.BLOCK_POSITION1_14, 0);
+            final int soundId;
+            if (id == SPLASH_POTION_PARTICLES) {
+                soundId = SPLASH_POTION_SOUND;
+            } else if (id == INSTANT_SPLASH_POTION_PARTICLES) {
+                soundId = INSTANT_SPLASH_POTION_SOUND;
+            } else {
+                return;
+            }
+
+            final PacketWrapper soundPacket = wrapper.create(ClientboundPackets26_3.LEVEL_EVENT);
+            soundPacket.write(Types.INT, soundId);
+            soundPacket.write(Types.BLOCK_POSITION1_14, position);
+            soundPacket.write(Types.INT, 0); // Data
+            soundPacket.write(Types.BOOLEAN, false); // Global
+            soundPacket.scheduleSend(Protocol26_2To26_3.class);
         });
 
         // 26.3 reads the items the brewing stand slots accept from the server, older clients have them hardcoded
