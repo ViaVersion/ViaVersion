@@ -53,11 +53,8 @@ public final class ItemCostType1_20_5 extends Type<Item> {
     public void write(final ByteBuf buffer, final Item object) {
         Types.VAR_INT.writePrimitive(buffer, object.identifier());
         Types.VAR_INT.writePrimitive(buffer, object.amount());
-        // Item cost predicates only support components with values, not removal markers.
-        final StructuredData<?>[] data = object.dataContainer().data().values().stream()
-            .filter(StructuredData::isPresent)
-            .toArray(StructuredData[]::new);
-        dataArrayType.write(buffer, data);
+        // Item costs are exact-match predicates without removal markers, so empty data can't be written
+        dataArrayType.write(buffer, object.dataContainer().data().values().stream().filter(StructuredData::isPresent).toArray(StructuredData[]::new));
     }
 
     public static final class OptionalItemCostType extends OptionalType<Item> {
