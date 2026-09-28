@@ -20,17 +20,19 @@ package com.viaversion.viaversion.protocols.v1_14_4to1_15.storage;
 import com.viaversion.viaversion.api.connection.StorableObject;
 
 public final class DeadStatusStorage implements StorableObject {
+
     private boolean dead;
 
-    public DeadStatusStorage(boolean dead) {
-        this.setDead(dead);
+    public DeadStatusStorage(final boolean dead) {
+        this.dead = dead;
     }
 
-    public void setDead(boolean dead) {
+    public void setDead(final boolean dead) {
         this.dead = dead;
     }
 
     public boolean wasDead() {
         return this.dead;
     }
+
 }
