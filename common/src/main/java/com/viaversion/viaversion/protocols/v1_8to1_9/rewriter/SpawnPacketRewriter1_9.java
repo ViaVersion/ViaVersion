@@ -216,6 +216,11 @@ public class SpawnPacketRewriter1_9 {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.handleEntityData(entityID, entityDataList);
+
+                    // dragon default phase on 1.9+ is 10 (hovering), so we set it to match the only phase 1.8 had, which was 0 (circling)
+                    if (tracker.entityType(entityID) == EntityTypes1_9.EntityType.ENDER_DRAGON) {
+                        entityDataList.add(new EntityData(11, EntityDataTypes1_9.VAR_INT, 0)); // 11 = dragon phase id
+                    }
                 });
             }
         });
