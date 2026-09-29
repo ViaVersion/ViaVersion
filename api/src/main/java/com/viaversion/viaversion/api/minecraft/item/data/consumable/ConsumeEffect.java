@@ -56,7 +56,7 @@ public record ConsumeEffect<T>(int id, Type<T> type, T value) {
 
         @Override
         public void write(final Ops ops, final Float value) {
-            ops.writeMap(map -> map.write("diameter", Types.FLOAT, value, 16F));
+            ops.writeMap(map -> map.writeOptional("diameter", Types.FLOAT, value, 16F));
         }
     };
     public static final Type<TeleportRandomlyConsumeEffect> TELEPORT_RANDOMLY_TYPE26_3 = new Type<>(TeleportRandomlyConsumeEffect.class) {
@@ -76,8 +76,8 @@ public record ConsumeEffect<T>(int id, Type<T> type, T value) {
         @Override
         public void write(final Ops ops, final TeleportRandomlyConsumeEffect value) {
             ops.writeMap(map -> map
-                .write("diameter", Types.FLOAT, value.diameter(), 16F)
-                .write("directional_particles", Types.BOOLEAN, value.directionalParticles(), true)
+                .writeOptional("diameter", Types.FLOAT, value.diameter(), 16F)
+                .writeOptional("directional_particles", Types.BOOLEAN, value.directionalParticles(), true)
             );
         }
     };
