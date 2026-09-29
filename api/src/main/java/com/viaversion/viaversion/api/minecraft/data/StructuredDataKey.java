@@ -55,7 +55,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.CookingFuel;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
 import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant26_1;
-import com.viaversion.viaversion.api.minecraft.item.data.DamageType;
 import com.viaversion.viaversion.api.minecraft.item.data.DeathProtection;
 import com.viaversion.viaversion.api.minecraft.item.data.DebugStickState;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
@@ -125,7 +124,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Unit> UNBREAKABLE1_21_5 = new StructuredDataKey<>("unbreakable", Types.EMPTY);
     public static final StructuredDataKey<Tag> CUSTOM_NAME = new StructuredDataKey<>("custom_name", Types.TEXT_COMPONENT_TAG);
     public static final StructuredDataKey<Float> MINIMUM_ATTACK_CHARGE = new StructuredDataKey<>("minimum_attack_charge", Types.FLOAT);
-    public static final StructuredDataKey<DamageType> DAMAGE_TYPE1_21_11 = new StructuredDataKey<>("damage_type", DamageType.TYPE1_21_11);
+    public static final StructuredDataKey<Either<Integer, String>> DAMAGE_TYPE1_21_11 = new StructuredDataKey<>("damage_type", new SynchronizedRegistryEitherType(RegistryKey.of("damage_type")));
     public static final StructuredDataKey<Integer> DAMAGE_TYPE26_1 = new StructuredDataKey<>("damage_type", new SynchronizedRegistryValueType(RegistryKey.of("damage_type")));
     public static final StructuredDataKey<Tag> ITEM_NAME = new StructuredDataKey<>("item_name", Types.TEXT_COMPONENT_TAG);
     public static final StructuredDataKey<ItemModel> ITEM_MODEL = new StructuredDataKey<>("item_model", ItemModel.TYPE);
