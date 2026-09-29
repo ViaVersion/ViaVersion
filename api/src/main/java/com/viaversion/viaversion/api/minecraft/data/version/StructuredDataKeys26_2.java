@@ -32,6 +32,6 @@ public class StructuredDataKeys26_2 extends StructuredDataKeys1_21_11 {
 
     public StructuredDataKeys26_2(final VersionedTypesHolder types) {
         super(types);
-        this.sulfurCubeContent = add("sulfur_cube_content", types.item());
+        this.sulfurCubeContent = add("sulfur_cube_content", types.itemTemplate());
     }
 }
