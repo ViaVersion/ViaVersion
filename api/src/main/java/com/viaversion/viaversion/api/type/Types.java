@@ -227,6 +227,7 @@ public final class Types {
     public static final Type<Tag[]> TAG_ARRAY = new ArrayType<>(TAG);
     public static final Type<Tag> OPTIONAL_TAG = TagType.OptionalTagType.type();
     public static final Type<Tag> TEXT_COMPONENT_TAG = new TextComponentTagType(); // only strictly needed for hashing
+    public static final Type<Tag[]> TEXT_COMPONENT_TAG_ARRAY = new ArrayType<>(Types.TEXT_COMPONENT_TAG);
 
     public static final Type<Tag> CUSTOM_CLICK_ACTION_TAG = new LengthPrefixedTagType(65536);
     public static final FixedLengthArrayType<Tag> SIGN_TEXT = new FixedLengthArrayType<>(TAG, 4);
