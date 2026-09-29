@@ -37,7 +37,6 @@ import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-// TODO move block state provider rewriting to registry data rewriter
 public record BlockTransformData(CompoundTag blockStateProvider, Holder<SoundEvent> sound, int transformParticle,
                                  int[] disallowedFaces, @Nullable String loot, int dropStrategy,
                                  boolean updateFromNeighbors, int transformType,
@@ -82,9 +81,9 @@ public record BlockTransformData(CompoundTag blockStateProvider, Holder<SoundEve
                 .writeOptional("particle", EnumTypes.TRANSFORM_PARTICLE, data.transformParticle, 0)
                 .writeOptional("disallowed_faces", EnumTypes.DIRECTION.new EnumArrayType(), data.disallowedFaces, new int[0])
                 .writeOptional("loot", Types.STRING, data.loot)
-                .writeOptional("drop_strategy", Types.VAR_INT, data.dropStrategy, 1)
+                .writeOptional("drop_strategy", EnumTypes.TRAMNSFORM_DROP_STRATEGY, data.dropStrategy, 1)
                 .writeOptional("update_from_neighbors", Types.BOOLEAN, data.updateFromNeighbors, true)
-                .writeOptional("transform_type", Types.VAR_INT, data.transformType, 0)
+                .writeOptional("transform_type", EnumTypes.TRAMNSFORM_TYPE, data.transformType, 0)
                 .writeOptional("consume_on_use", Types.BOOLEAN, data.consumeOnUse, true)
                 .writeOptional("item_damage_per_use", Types.VAR_INT, data.itemDamagePerUse, 0)
             );
