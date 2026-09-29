@@ -34,7 +34,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class FilterableComponent extends Filterable<Tag> implements Copyable, Rewritable {
 
-    public static final Type<FilterableComponent> TYPE = new FilterableType<>(Types.TAG, Types.OPTIONAL_TAG, FilterableComponent.class) {
+    public static final Type<FilterableComponent> TYPE = new FilterableType<>(Types.TEXT_COMPONENT_TAG, Types.OPTIONAL_TAG, FilterableComponent.class) {
         @Override
         protected FilterableComponent create(final Tag raw, final Tag filtered) {
             return new FilterableComponent(raw, filtered);
