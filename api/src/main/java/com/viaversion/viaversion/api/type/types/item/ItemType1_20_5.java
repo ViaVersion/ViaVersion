@@ -127,22 +127,25 @@ public class ItemType1_20_5 extends Type<Item> {
         ops.writeMap(map -> {
             map.write("id", Types.IDENTIFIER, ops.context().registryAccess().item(item.identifier()))
                 .write("count", Types.VAR_INT, item.amount());
+            writeComponents(map, item);
+        });
+    }
 
-            if (item.dataContainer().isEmpty()) {
-                return;
-            }
+    protected void writeComponents(final Ops.MapSerializer map, final Item item) {
+        if (item.dataContainer().isEmpty()) {
+            return;
+        }
 
-            map.writeMap("components", components -> {
-                for (final StructuredData<?> data : item.dataContainer().data().values()) {
-                    String key = Key.namespaced(data.key().identifier());
-                    if (data.isEmpty()) {
-                        key = "!" + key;
-                    }
-
-                    //noinspection unchecked
-                    components.write(key, (Type<StructuredData<?>>) dataType, data);
+        map.writeMap("components", components -> {
+            for (final StructuredData<?> data : item.dataContainer().data().values()) {
+                String key = Key.namespaced(data.key().identifier());
+                if (data.isEmpty()) {
+                    key = "!" + key;
                 }
-            });
+
+                //noinspection unchecked
+                components.write(key, (Type<StructuredData<?>>) dataType, data);
+            }
         });
     }
 
