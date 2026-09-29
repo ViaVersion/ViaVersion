@@ -33,13 +33,13 @@ public record DeathProtection(ConsumeEffect<?>[] deathEffects) implements Copyab
     public static final Type<DeathProtection> TYPE1_21_2 = new TransformingType<>(ConsumeEffect.ARRAY_TYPE1_21_2, DeathProtection.class, DeathProtection::new, DeathProtection::deathEffects) {
         @Override
         public void write(final Ops ops, final DeathProtection value) {
-            ops.writeMap(map -> map.write("death_effects", ConsumeEffect.ARRAY_TYPE1_21_2, value.deathEffects));
+            ops.writeMap(map -> map.writeOptional("death_effects", ConsumeEffect.ARRAY_TYPE1_21_2, value.deathEffects, new ConsumeEffect<?>[0]));
         }
     };
     public static final Type<DeathProtection> TYPE26_3 = new TransformingType<>(ConsumeEffect.ARRAY_TYPE26_3, DeathProtection.class, DeathProtection::new, DeathProtection::deathEffects) {
         @Override
         public void write(final Ops ops, final DeathProtection value) {
-            ops.writeMap(map -> map.write("death_effects", ConsumeEffect.ARRAY_TYPE26_3, value.deathEffects));
+            ops.writeMap(map -> map.writeOptional("death_effects", ConsumeEffect.ARRAY_TYPE26_3, value.deathEffects, new ConsumeEffect<?>[0]));
         }
     };
 
