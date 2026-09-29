@@ -153,6 +153,8 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<FoodProperties1_20_5> FOOD1_21 = new StructuredDataKey<>("food", FoodProperties1_20_5.TYPE1_21);
     public static final StructuredDataKey<FoodProperties1_21_2> FOOD1_21_2 = new StructuredDataKey<>("food", FoodProperties1_21_2.TYPE);
     public static final StructuredDataKey<Consumable1_21_2> CONSUMABLE1_21_2 = new StructuredDataKey<>("consumable", Consumable1_21_2.TYPE1_21_2);
+    // 1.21.5-1.21.9 only, animation id 5 was still named spear
+    public static final StructuredDataKey<Consumable1_21_2> CONSUMABLE1_21_5 = new StructuredDataKey<>("consumable", Consumable1_21_2.TYPE1_21_5);
     public static final StructuredDataKey<Consumable1_21_2> CONSUMABLE26_3 = new StructuredDataKey<>("consumable", Consumable1_21_2.TYPE26_3);
     public static final StructuredDataKey<UseCooldown> USE_COOLDOWN = new StructuredDataKey<>("use_cooldown", UseCooldown.TYPE);
     public static final StructuredDataKey<Unit> FIRE_RESISTANT = new StructuredDataKey<>("fire_resistant", Types.EMPTY);

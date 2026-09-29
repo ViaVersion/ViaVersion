@@ -89,9 +89,11 @@ public final class BlockItemPacketRewriter1_21_11 extends StructuredItemRewriter
     }
 
     public static void upgradeData(final Item item, final StructuredDataContainer container) {
+        container.replaceKey(StructuredDataKey.CONSUMABLE1_21_5, StructuredDataKey.CONSUMABLE1_21_2);
     }
 
     public static void downgradeData(final Item item, final StructuredDataContainer container) {
+        container.replaceKey(StructuredDataKey.CONSUMABLE1_21_2, StructuredDataKey.CONSUMABLE1_21_5);
         container.remove(StructuredDataKey.SWING_ANIMATION);
         container.remove(StructuredDataKey.KINETIC_WEAPON);
         container.remove(StructuredDataKey.PIERCING_WEAPON);
