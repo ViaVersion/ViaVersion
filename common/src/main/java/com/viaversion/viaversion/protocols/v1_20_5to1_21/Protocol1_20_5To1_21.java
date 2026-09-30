@@ -55,6 +55,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -183,7 +184,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
         }
 
         uuid = UUIDUtil.parseUUID(Key.stripNamespace(id).toUpperCase(Locale.ROOT));
-        return uuid != null ? uuid : UUIDUtil.randomUUID();
+        return uuid != null ? uuid : UUID.nameUUIDFromBytes(id.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
