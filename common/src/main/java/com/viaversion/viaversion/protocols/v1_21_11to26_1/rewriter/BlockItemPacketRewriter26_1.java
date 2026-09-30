@@ -143,7 +143,7 @@ public final class BlockItemPacketRewriter26_1 extends StructuredItemRewriter<Cl
             return key != null ? new DamageResistant1_21_2(key) : null;
         });
         container.replace(StructuredDataKey.BLOCKS_ATTACKS26_1, StructuredDataKey.BLOCKS_ATTACKS1_21_5, blocksAttacks -> {
-            if (blocksAttacks.bypassedBy() == null) {
+            if (blocksAttacks.bypassedBy() == null || blocksAttacks.bypassedBy().hasTagKey()) {
                 return blocksAttacks;
             }
             // Remove bypassed by ids
