@@ -419,7 +419,8 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             }
 
             final FullMappings mappings = Protocol1_21_4To1_21_5.MAPPINGS.getDataComponentSerializerMappings();
-            if (tooltipDisplay.hiddenComponents().containsAll(HIDE_ADDITIONAL_KEYS.stream().map(key -> mappings.id(key.identifier())).toList())) {
+            // Components added in 1.21.5 don't have an id here and have already been dropped from the hidden set
+            if (tooltipDisplay.hiddenComponents().containsAll(HIDE_ADDITIONAL_KEYS.stream().map(key -> mappings.id(key.identifier())).filter(id -> id != -1).toList())) {
                 dataContainer.set(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP);
             }
         }
