@@ -692,6 +692,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (bannerPatterns != null) {
             restoreBannerPatternsFromBackup(bannerPatterns, data);
         }
+
+        final CompoundTag trim = backupTag.getCompoundTag("trim");
+        if (trim != null) {
+            restoreArmorTrimFromBackup(trim, data);
+        }
     }
 
     private void restoreInstrumentFromBackup(final CompoundTag instrument, final StructuredDataContainer data) {
@@ -797,6 +802,25 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             patternLayer.add(new BannerPatternLayer(pattern, dyeColor));
         }
         data.set(StructuredDataKey.BANNER_PATTERNS, patternLayer.toArray(new BannerPatternLayer[0]));
+    }
+
+    private void restoreArmorTrimFromBackup(final CompoundTag trim, final StructuredDataContainer data) {
+        final Tag materialTag = trim.get("material");
+        final Holder<ArmorTrimMaterial1_20_5> materialHolder;
+        if (materialTag instanceof IntTag materialIntTag) {
+            materialHolder = Holder.of(materialIntTag.asInt());
+        } else if (materialTag instanceof CompoundTag materialCompoundTag) {
+            ArmorTrimMaterial1_20_5 material = readTrimMaterial(materialCompoundTag);
+            if (material == null) {
+                return;
+            }
+            materialHolder = Holder.of(material);
+        } else return;
+
+        final Holder<ArmorTrimPattern> patternHolder = Holder.of(trim.getInt("pattern"));
+        final boolean showInTooltip = trim.getBoolean("show_in_tooltip");
+
+        data.set(StructuredDataKey.TRIM1_20_5, new ArmorTrim1_20_5(materialHolder, patternHolder, showInTooltip));
     }
 
     private AdventureModePredicate updateBlockPredicates(final UserConnection connection, final ListTag<StringTag> tag, final boolean showInTooltip) {
@@ -969,8 +993,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private void updateArmorTrim(final UserConnection connection, final StructuredDataContainer data, final CompoundTag trimTag, final boolean showInTooltip) {
         final Tag materialTag = trimTag.get("material");
         final Holder<ArmorTrimMaterial1_20_5> materialHolder;
-        final ProtocolStorables1_20_5 storables = connection.storables(protocol);
-        final ArmorTrimStorage trimStorage = storables.armorTrims();
+        final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
         if (materialTag instanceof StringTag materialStringTag) {
             final int id = trimStorage.trimMaterials().keyToId(materialStringTag.getValue());
             if (id == -1) {
@@ -979,39 +1002,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             materialHolder = Holder.of(id);
         } else if (materialTag instanceof CompoundTag materialCompoundTag) {
-            final StringTag assetNameTag = materialCompoundTag.getStringTag("asset_name");
-            final StringTag ingredientTag = materialCompoundTag.getStringTag("ingredient");
-            if (assetNameTag == null || ingredientTag == null) {
+            ArmorTrimMaterial1_20_5 material = readTrimMaterial(materialCompoundTag);
+            if (material == null) {
                 return;
             }
-
-            final int ingredientId = StructuredDataConverter.removeItemBackupTag(materialCompoundTag, toMappedItemId(ingredientTag.getValue()));
-            if (ingredientId == -1) {
-                return;
-            }
-
-            final NumberTag itemModelIndexTag = materialCompoundTag.getNumberTag("item_model_index");
-            final CompoundTag overrideArmorMaterialsTag = materialCompoundTag.getCompoundTag("override_armor_materials");
-            final Tag descriptionTag = materialCompoundTag.get("description");
-
-            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
-            if (overrideArmorMaterialsTag != null) {
-                for (final Map.Entry<String, Tag> entry : overrideArmorMaterialsTag.entrySet()) {
-                    if (!(entry.getValue() instanceof StringTag valueTag)) {
-                        continue;
-                    }
-
-                    overrideArmorMaterials.put(entry.getKey(), valueTag.getValue());
-                }
-            }
-
-            materialHolder = Holder.of(new ArmorTrimMaterial1_20_5(
-                assetNameTag.getValue(),
-                ingredientId,
-                itemModelIndexTag != null ? itemModelIndexTag.asFloat() : 0,
-                overrideArmorMaterials,
-                descriptionTag
-            ));
+            materialHolder = Holder.of(material);
         } else return;
 
         final Tag patternTag = trimTag.get("pattern");
@@ -1046,6 +1041,42 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         } else return;
 
         data.set(StructuredDataKey.TRIM1_20_5, new ArmorTrim1_20_5(materialHolder, patternHolder, showInTooltip));
+    }
+
+    private ArmorTrimMaterial1_20_5 readTrimMaterial(final CompoundTag tag) {
+        final StringTag assetNameTag = tag.getStringTag("asset_name");
+        final StringTag ingredientTag = tag.getStringTag("ingredient");
+        if (assetNameTag == null || ingredientTag == null) {
+            return null;
+        }
+
+        final int ingredientId = StructuredDataConverter.removeItemBackupTag(tag, toMappedItemId(ingredientTag.getValue()));
+        if (ingredientId == -1) {
+            return null;
+        }
+
+        final NumberTag itemModelIndexTag = tag.getNumberTag("item_model_index");
+        final CompoundTag overrideArmorMaterialsTag = tag.getCompoundTag("override_armor_materials");
+        final Tag descriptionTag = tag.get("description");
+
+        final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
+        if (overrideArmorMaterialsTag != null) {
+            for (final Map.Entry<String, Tag> entry : overrideArmorMaterialsTag.entrySet()) {
+                if (!(entry.getValue() instanceof StringTag valueTag)) {
+                    continue;
+                }
+
+                overrideArmorMaterials.put(entry.getKey(), valueTag.getValue());
+            }
+        }
+
+        return new ArmorTrimMaterial1_20_5(
+                assetNameTag.getValue(),
+                ingredientId,
+                itemModelIndexTag != null ? itemModelIndexTag.asFloat() : 0,
+                overrideArmorMaterials,
+                descriptionTag
+        );
     }
 
     private void updateMobTags(final StructuredDataContainer data, final CompoundTag tag) {
