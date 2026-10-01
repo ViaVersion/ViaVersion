@@ -235,6 +235,11 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         container.remove(StructuredDataKey.MAP_COLOR);
 
         container.replaceKey(StructuredDataKey.INSTRUMENT26_1, StructuredDataKey.INSTRUMENT26_3);
+        if (container.hasEmpty(StructuredDataKey.SWING_ANIMATION)) {
+            container.remove(StructuredDataKey.SWING_ANIMATION);
+            container.setEmpty(StructuredDataKey.ATTACK_ANIMATION);
+            container.setEmpty(StructuredDataKey.INTERACT_ANIMATION);
+        }
         container.replace(StructuredDataKey.SWING_ANIMATION, animation -> {
             container.set(StructuredDataKey.ATTACK_ANIMATION, animation);
             container.set(StructuredDataKey.INTERACT_ANIMATION, animation);
