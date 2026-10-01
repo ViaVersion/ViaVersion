@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v26_2to26_3.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -373,6 +374,11 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         }
 
         backupTrimMaterial(backupTag, "provides_trim_material", container.get(StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1));
+
+        final Integer mapColor = container.get(StructuredDataKey.MAP_COLOR);
+        if (mapColor != null) {
+            backupTag.putInt("map_color", mapColor);
+        }
     }
 
     private void backupTrimMaterial(final CompoundTag tag, final String key, @Nullable final Holder<ArmorTrimMaterial1_20_5> materialHolder) {
@@ -406,6 +412,11 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         final CompoundTag providesTrimMaterialTag = backupTag.getCompoundTag("provides_trim_material");
         if (providesTrimMaterialTag != null) {
             container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL26_3, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, material -> restoreTrimMaterial(material, providesTrimMaterialTag));
+        }
+
+        final IntTag mapColorTag = backupTag.getIntTag("map_color");
+        if (mapColorTag != null) {
+            container.set(StructuredDataKey.MAP_COLOR, mapColorTag.asInt());
         }
     }
 
