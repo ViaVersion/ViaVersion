@@ -1266,7 +1266,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (itemsTag != null) {
             final Item[] items = itemsTag.stream()
                 .limit(256)
-                .map(item -> itemFromTag(connection, item))
+                .map(item -> itemFromTag(connection, item.copy()))
                 .filter(item -> !item.isEmpty())
                 .toArray(Item[]::new);
             data.set(dataKey, items);
