@@ -41,10 +41,11 @@ public class JoinListener implements Listener {
     private static final Field CONNECTION;
     private static final Field NETWORK_MANAGER;
     private static final Field CHANNEL;
+    private static final Field PAPER_PROTOCOL_VERSION;
 
     static {
         Method getHandleMethod = null;
-        Field gamePacketListenerField = null, connectionField = null, channelField = null;
+        Field gamePacketListenerField = null, connectionField = null, channelField = null, protocolVersionField = null;
         try {
             getHandleMethod = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
             gamePacketListenerField = findField(false, getHandleMethod.getReturnType(), "PlayerConnection", "ServerGamePacketListenerImpl");
@@ -60,6 +61,13 @@ public class JoinListener implements Listener {
         CONNECTION = gamePacketListenerField;
         NETWORK_MANAGER = connectionField;
         CHANNEL = channelField;
+        try {
+            protocolVersionField = NETWORK_MANAGER.getType().getField("protocolVersion");
+            protocolVersionField.setAccessible(true);
+        } catch (NoSuchFieldException ignored) {
+            // not using Paper version where this was added, so either not using Paper or using a Paper version prior to 1.12.2
+        }
+        PAPER_PROTOCOL_VERSION = protocolVersionField;
     }
 
     // Loosely search a field with any name, as long as it matches a type name.
@@ -104,9 +112,11 @@ public class JoinListener implements Listener {
         if (CHANNEL == null) return;
         Player player = e.getPlayer();
 
+        Object networkManager;
         Channel channel;
         try {
-            channel = getChannel(player);
+            networkManager = getNetworkManager(player);
+            channel = getChannel(networkManager);
         } catch (Exception ex) {
             Via.getPlatform().getLogger().log(Level.WARNING, ex,
                 () -> "Could not find Channel for logging-in player " + player.getUniqueId());
@@ -131,6 +141,15 @@ public class JoinListener implements Listener {
         Via.getManager().getConnectionManager().onLoginSuccess(user);
 
         ConnectionDetails.sendConnectionDetails(user, ConnectionDetails.SERVER_CHANNEL);
+
+        if (PAPER_PROTOCOL_VERSION != null) {
+            try {
+                PAPER_PROTOCOL_VERSION.set(networkManager, info.getProtocolVersion());
+            } catch (Exception ex) {
+                Via.getPlatform().getLogger().log(Level.WARNING, ex,
+                    () -> "Could not update Paper protocol version for logging-in player " + player.getUniqueId());
+            }
+        }
     }
 
     private @Nullable UserConnection getUserConnection(Channel channel) {
@@ -138,10 +157,13 @@ public class JoinListener implements Listener {
         return encoder != null ? encoder.connection() : null;
     }
 
-    private Channel getChannel(Player player) throws Exception {
+    private Object getNetworkManager(Player player) throws Exception {
         Object entityPlayer = GET_HANDLE.invoke(player);
         Object pc = CONNECTION.get(entityPlayer);
-        Object nm = NETWORK_MANAGER.get(pc);
+        return NETWORK_MANAGER.get(pc);
+    }
+
+    private Channel getChannel(Object nm) throws Exception {
         return (Channel) CHANNEL.get(nm);
     }
 
