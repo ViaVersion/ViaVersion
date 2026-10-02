@@ -125,10 +125,27 @@ public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPacket
             }
             if (tag.getNumberTag("map") == null) {
                 tag.put("map", new IntTag(0));
+                tag.putBoolean(nbtTagName("map"), true);
             }
         }
 
         item.setIdentifier(this.protocol.getMappingData().getNewItemId(item.identifier()));
+        return item;
+    }
+
+    @Override
+    public Item handleItemToServer(UserConnection connection, Item item) {
+        if (item == null) return null;
+
+        super.handleItemToServer(connection, item);
+
+        CompoundTag tag = item.tag();
+        if (item.identifier() == 733 && tag != null && tag.remove(nbtTagName("map")) != null) {
+            tag.remove("map");
+            if (tag.isEmpty()) {
+                item.setTag(null);
+            }
+        }
         return item;
     }
 
