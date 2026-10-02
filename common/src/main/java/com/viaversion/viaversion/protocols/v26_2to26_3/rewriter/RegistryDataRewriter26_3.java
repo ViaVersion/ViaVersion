@@ -36,9 +36,12 @@ public final class RegistryDataRewriter26_3 extends RegistryDataRewriter {
         final StringTag condition = term.removeUnchecked("condition");
         if (condition != null) {
             term.put("type", condition);
+            if (Key.equals(condition.getValue(), "value_check")) {
+                updateValueCheck(term, condition);
+            }
         }
 
-        if (Key.equals(condition.getValue(), "damage_source_properties")) {
+        if (condition != null && Key.equals(condition.getValue(), "damage_source_properties")) {
             final CompoundTag predicate = term.getCompoundTag("predicate");
             if (predicate != null) {
                 final ListTag<CompoundTag> tags = predicate.getListTag("tags", CompoundTag.class);
@@ -51,7 +54,7 @@ public final class RegistryDataRewriter26_3 extends RegistryDataRewriter {
         super.updateEnchantmentTerm(term);
 
         // has to run after super, which maps the block id under the old key
-        if (Key.equals(condition.getValue(), "block_state_property")) {
+        if (condition != null && Key.equals(condition.getValue(), "block_state_property")) {
             condition.setValue("minecraft:match_block");
             term.put("blocks", term.remove("block"));
 
@@ -60,6 +63,31 @@ public final class RegistryDataRewriter26_3 extends RegistryDataRewriter {
                 term.put("state", properties);
             }
         }
+    }
+
+    private static void updateValueCheck(final CompoundTag term, final StringTag condition) {
+        final CompoundTag value = term.getCompoundTag("value");
+        if (value == null || !Key.equals(value.getString("type"), "enchantment_level")) {
+            return;
+        }
+
+        final Tag range = term.remove("range");
+        if (range == null) {
+            return;
+        }
+
+        condition.setValue("minecraft:int_value_check");
+        term.put("test", range);
+
+        // Pre-26.3 value_check compares NumberProvider#getInt(), which rounds float providers.
+        final CompoundTag roundedValue = new CompoundTag();
+        roundedValue.putString("type", "minecraft:round");
+        roundedValue.put("input", value);
+
+        final CompoundTag intValue = new CompoundTag();
+        intValue.putString("type", "minecraft:from_float");
+        intValue.put("input", roundedValue);
+        term.put("value", intValue);
     }
 
     @Override
