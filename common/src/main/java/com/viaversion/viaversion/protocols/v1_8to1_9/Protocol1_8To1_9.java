@@ -47,6 +47,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.storage.CommandBlockStorage
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.InventoryTracker;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
+import com.viaversion.viaversion.protocols.v1_8to1_9.storage.TeleportPositionStorage;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
 
@@ -107,6 +108,7 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
         userConnection.storables(this).setClientWorld(new ClientWorld1_9());
 
         userConnection.put(new MovementTracker());
+        userConnection.put(new TeleportPositionStorage());
         userConnection.put(new InventoryTracker());
         userConnection.put(new CommandBlockStorage());
     }
