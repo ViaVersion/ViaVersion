@@ -291,8 +291,11 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                     tracker.setEntityFlags(entityId, flags);
                 } else if (data.id() == 7) {
                     tracker.setRiptide(entityId, (((Number) data.getValue()).byteValue() & 0x4) != 0);
+                } else if (data.id() == 8) {
+                    // Health
+                    tracker.setDying(entityId, ((Number) data.getValue()).floatValue() <= 0.0f);
                 }
-                if (data.id() == 0 || data.id() == 7) {
+                if (data.id() == 0 || data.id() == 7 || data.id() == 8) {
                     event.createExtraData(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, recalculatePlayerPose(entityId, tracker)));
                 }
             }
@@ -437,6 +440,8 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
             pose = 4;
         } else if (isSneaking(flags)) {
             pose = 5;
+        } else if (tracker.isDying(entityId)) {
+            pose = 6;
         }
         return pose;
     }

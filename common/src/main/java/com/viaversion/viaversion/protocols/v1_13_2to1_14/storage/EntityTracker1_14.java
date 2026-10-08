@@ -23,6 +23,8 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EntityTracker1_14 extends EntityTrackerBase {
@@ -30,6 +32,7 @@ public class EntityTracker1_14 extends EntityTrackerBase {
     // 0x1 = sleeping, 0x2 = riptide
     private final Int2ObjectMap<Byte> sleepingAndRiptideData = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectMap<Byte> playerEntityFlags = new Int2ObjectOpenHashMap<>();
+    private final IntSet dyingPlayers = new IntOpenHashSet();
     private int latestTradeWindowId;
     private boolean forceSendCenterChunk = true;
     private int chunkCenterX;
@@ -44,6 +47,7 @@ public class EntityTracker1_14 extends EntityTrackerBase {
         insentientData.remove(entityId);
         sleepingAndRiptideData.remove(entityId);
         playerEntityFlags.remove(entityId);
+        dyingPlayers.remove(entityId);
         return super.removeEntity(entityId);
     }
 
@@ -93,6 +97,17 @@ public class EntityTracker1_14 extends EntityTrackerBase {
 
     public void setEntityFlags(int player, byte data) {
         playerEntityFlags.put(player, (Byte) data);
+    }
+
+    public boolean isDying(int player) {
+        return dyingPlayers.contains(player);
+    }
+
+    public void setDying(int player, boolean dying) {
+        dyingPlayers.remove(player);
+        if (dying) {
+            dyingPlayers.add(player);
+        }
     }
 
     public int getLatestTradeWindowId() {
