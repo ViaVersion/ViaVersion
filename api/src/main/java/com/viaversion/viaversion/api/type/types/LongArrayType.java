@@ -44,7 +44,9 @@ public class LongArrayType extends Type<long[]> {
     @Override
     public long[] read(final ByteBuf buffer) {
         final int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
-        Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
+        // Divided rather than multiplied to keep length * Long.BYTES from overflowing into a
+        // negative value, which isReadable would accept.
+        Preconditions.checkArgument(buffer.readableBytes() / Long.BYTES >= length, "Length is fewer than readable bytes");
         return readFixedLength(buffer, length);
     }
 

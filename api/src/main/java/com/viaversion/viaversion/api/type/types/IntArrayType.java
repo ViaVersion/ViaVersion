@@ -57,7 +57,9 @@ public class IntArrayType extends Type<int[]> {
     @Override
     public int[] read(final ByteBuf buffer) {
         final int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
-        Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
+        // Divided rather than multiplied to keep length * Integer.BYTES from overflowing into a
+        // negative value, which isReadable would accept.
+        Preconditions.checkArgument(buffer.readableBytes() / Integer.BYTES >= length, "Length is fewer than readable bytes");
         final int[] array = new int[length];
         for (int i = 0; i < length; i++) {
             array[i] = buffer.readInt();
