@@ -32,7 +32,7 @@ public class EntityTracker1_14 extends EntityTrackerBase {
     // 0x1 = sleeping, 0x2 = riptide
     private final Int2ObjectMap<Byte> sleepingAndRiptideData = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectMap<Byte> playerEntityFlags = new Int2ObjectOpenHashMap<>();
-    private final IntSet dyingPlayers = new IntOpenHashSet();
+    private final IntSet dyingEntities = new IntOpenHashSet();
     private int latestTradeWindowId;
     private boolean forceSendCenterChunk = true;
     private int chunkCenterX;
@@ -47,7 +47,7 @@ public class EntityTracker1_14 extends EntityTrackerBase {
         insentientData.remove(entityId);
         sleepingAndRiptideData.remove(entityId);
         playerEntityFlags.remove(entityId);
-        dyingPlayers.remove(entityId);
+        dyingEntities.remove(entityId);
         return super.removeEntity(entityId);
     }
 
@@ -99,14 +99,14 @@ public class EntityTracker1_14 extends EntityTrackerBase {
         playerEntityFlags.put(player, (Byte) data);
     }
 
-    public boolean isDying(int player) {
-        return dyingPlayers.contains(player);
+    public boolean isDying(int id) {
+        return dyingEntities.contains(id);
     }
 
-    public void setDying(int player, boolean dying) {
-        dyingPlayers.remove(player);
+    public void setDying(int id, boolean dying) {
+        dyingEntities.remove(id);
         if (dying) {
-            dyingPlayers.add(player);
+            dyingEntities.add(id);
         }
     }
 
