@@ -58,7 +58,7 @@ public class FloatArrayType extends Type<float[]> {
         final int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
         // Divided rather than multiplied to keep length * Float.BYTES from overflowing into a
         // negative value, which isReadable would accept.
-        Preconditions.checkArgument(buffer.readableBytes() / Float.BYTES >= length, "Length is fewer than readable bytes");
+        Preconditions.checkArgument(length >= 0 && buffer.readableBytes() / Float.BYTES >= length, "Invalid array length: %s", length);
         final float[] array = new float[length];
         for (int i = 0; i < length; i++) {
             array[i] = buffer.readFloat();
