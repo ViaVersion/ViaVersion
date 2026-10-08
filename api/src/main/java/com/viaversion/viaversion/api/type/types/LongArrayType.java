@@ -28,6 +28,8 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
+import static com.viaversion.viaversion.api.type.types.ArrayType.checkLength;
+
 public class LongArrayType extends Type<long[]> {
 
     private final int length;
@@ -43,8 +45,7 @@ public class LongArrayType extends Type<long[]> {
 
     @Override
     public long[] read(final ByteBuf buffer) {
-        final int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
-        Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
+        final int length = checkLength(this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length, Long.BYTES, buffer.readableBytes());
         return readFixedLength(buffer, length);
     }
 

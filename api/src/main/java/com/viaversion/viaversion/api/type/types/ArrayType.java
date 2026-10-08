@@ -111,4 +111,14 @@ public class ArrayType<T> extends Type<T[]> {
     public ArrayType<T> withMaxLength(final int maxLength) {
         return new ArrayType<>(this.getOutputClass(), this.elementType, maxLength);
     }
+
+    static int checkLength(final int length, final int elementBytes, final int readable) {
+        if (length < 0) {
+            throw new IllegalArgumentException("Length " + length + " is negative");
+        }
+        if ((long) length * elementBytes > readable) {
+            throw new IllegalArgumentException("Length " + length + " is larger than readable bytes");
+        }
+        return length;
+    }
 }
