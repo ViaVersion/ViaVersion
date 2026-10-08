@@ -423,11 +423,11 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             if (customName != null) {
                 container.set(StructuredDataKey.CUSTOM_NAME, customName);
             }
+        }
 
-            final Tag itemName = removeBackupTag(customData, "item_name");
-            if (itemName != null) {
-                container.set(StructuredDataKey.ITEM_NAME, itemName);
-            }
+        final Tag itemName = removeBackupTag(customData, "item_name");
+        if (itemName != null) {
+            container.set(StructuredDataKey.ITEM_NAME, itemName);
         }
     }
 
