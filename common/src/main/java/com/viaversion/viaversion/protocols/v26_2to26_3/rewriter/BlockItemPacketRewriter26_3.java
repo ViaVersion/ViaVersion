@@ -52,7 +52,6 @@ import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 import com.viaversion.viaversion.util.Key;
 import java.util.BitSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -74,7 +73,6 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         Map.entry("swamp_hut", "swamp_hut_map"),
         Map.entry("jungle_temple", "jungle_pyramid_map")
     );
-    private static final Set<String> EXPLORER_MAP_MODELS = new HashSet<>(EXPLORER_MAP_DECORATION_TO_MODEL.values());
     private static final int TELEPORT_RANDOMLY_EFFECT = 3;
     private static final String TRIM_PALETTE_PREFIX = "trim/";
     private static final int BREWING_STAND_MENU_TYPE = 11;
@@ -316,7 +314,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         container.remove(StructuredDataKey.CUSHION_COLOR);
 
         final ItemModel itemModel = container.get(StructuredDataKey.ITEM_MODEL);
-        if (itemModel != null && EXPLORER_MAP_MODELS.contains(itemModel.key().path())) {
+        if (itemModel != null && EXPLORER_MAP_DECORATION_TO_MODEL.containsValue(itemModel.key().path())) {
             container.remove(StructuredDataKey.ITEM_MODEL);
         }
 
