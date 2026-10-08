@@ -39,3 +39,8 @@ run/
 AGENTS.override.md
 .claude/
 !.claude/CLAUDE.md
+
+# Corpus and crash inputs written by Jazzer while fuzzing. A crash input is a working
+# reproducer, so it should be reported rather than committed.
+.cifuzz-corpus/
+**/src/test/resources/**/*FuzzTestInputs/

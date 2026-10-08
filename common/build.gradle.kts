@@ -10,6 +10,7 @@ dependencies {
     testImplementation(rootProject.libs.guava)
     testImplementation(rootProject.libs.snakeYaml)
     testImplementation(rootProject.libs.bundles.junit)
+    testImplementation(rootProject.libs.jazzerJunit)
     testRuntimeOnly(rootProject.libs.platformLauncher)
 }
 
@@ -61,5 +62,13 @@ tasks.register<JavaExec>("runViaProxy") {
     }
     if (System.getProperty("viaproxy.disableExtraPlatforms") != null) {
         jvmArgs("-Dviaproxy.enableViaBedrock=false", "-Dviaproxy.enableViaLegacy=false", "-Dviaproxy.enableViaAprilFools=false")
+    }
+}
+
+tasks.test {
+    // Fuzz tests run as ordinary regression tests over their stored corpus unless this is
+    // passed, so CI stays fast and only an explicit request actually fuzzes.
+    if (project.hasProperty("fuzz")) {
+        environment("JAZZER_FUZZ", "1")
     }
 }
