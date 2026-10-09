@@ -29,6 +29,11 @@ import com.viaversion.viaversion.rewriter.BlockRewriter;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BlockRewriter1_21_5<C extends ClientboundPacketType> extends BlockRewriter<C> {
+    private int signId = -1;
+    private int hangingSignId = -1;
+    private int shelfId = -1;
+    private int campfireId = -1;
+    private int vaultId = -1;
 
     public BlockRewriter1_21_5(final Protocol<C, ?, ?, ?> protocol, final ChunkTypeSupplier chunkTypeSupplier, @Nullable final ChunkTypeSupplier mappedChunkTypeSupplier) {
         super(protocol, Types.BLOCK_POSITION1_14, Types.TRUSTED_COMPOUND_TAG, chunkTypeSupplier, mappedChunkTypeSupplier);
@@ -41,17 +46,46 @@ public class BlockRewriter1_21_5<C extends ClientboundPacketType> extends BlockR
     @Override
     public void handleBlockEntity(final UserConnection connection, final BlockEntity blockEntity) {
         final CompoundTag tag = blockEntity.tag();
-        if (tag == null) {
+        if (tag == null || protocol.getComponentRewriter() == null) {
             return;
         }
 
-        final FullMappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
-        if (blockEntityMappings != null && protocol.getComponentRewriter() != null) {
+        final int typeId = blockEntity.typeId();
+        if (typeId == signId || typeId == hangingSignId) {
             // Update sign text components, relevant as of 1.21.5 given they are properly parsed and should not error on the client
-            if (blockEntity.typeId() == blockEntityMappings.mappedId("sign") || blockEntity.typeId() == blockEntityMappings.mappedId("hanging_sign")) {
-                updateSignMessages(connection, tag.getCompoundTag("front_text"));
-                updateSignMessages(connection, tag.getCompoundTag("back_text"));
+            updateSignMessages(connection, tag.getCompoundTag("front_text"));
+            updateSignMessages(connection, tag.getCompoundTag("back_text"));
+        } else if (typeId == shelfId || typeId == campfireId) {
+            // Update items that are actually visible to the client
+            final ListTag<CompoundTag> items = tag.getListTag("Items", CompoundTag.class);
+            if (items != null) {
+                for (final CompoundTag item : items) {
+                    updateItem(connection, item);
+                }
             }
+        } else if (typeId == vaultId) {
+            final CompoundTag sharedData = tag.getCompoundTag("shared_data");
+            if (sharedData != null) {
+                updateItem(connection, sharedData.getCompoundTag("display_item"));
+            }
+        }
+    }
+
+    @Override
+    public void onMappingDataLoaded() {
+        final FullMappings blockEntityMappings = protocol.getMappingData() != null ? protocol.getMappingData().getBlockEntityMappings() : null;
+        if (blockEntityMappings != null) {
+            signId = blockEntityMappings.mappedId("sign");
+            hangingSignId = blockEntityMappings.mappedId("hanging_sign");
+            shelfId = blockEntityMappings.mappedId("shelf");
+            campfireId = blockEntityMappings.mappedId("campfire");
+            vaultId = blockEntityMappings.mappedId("vault");
+        }
+    }
+
+    private void updateItem(final UserConnection connection, @Nullable final CompoundTag item) {
+        if (item != null && item.getStringTag("id") != null) {
+            protocol.getComponentRewriter().handleShowItem(connection, item);
         }
     }
 
