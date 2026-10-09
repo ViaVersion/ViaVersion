@@ -42,6 +42,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.ItemPacketRewriter
 import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.PlayerPacketRewriter1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.SpawnPacketRewriter1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.WorldPacketRewriter1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ArmorTracker;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientWorld1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.CommandBlockStorage;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
@@ -108,6 +109,7 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
 
         userConnection.put(new MovementTracker());
         userConnection.put(new InventoryTracker());
+        userConnection.put(new ArmorTracker());
         userConnection.put(new CommandBlockStorage());
     }
 
