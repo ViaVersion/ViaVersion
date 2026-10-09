@@ -269,7 +269,15 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
         filter().type(EntityTypes1_14.LIVING_ENTITY).index(8).handler((event, data) -> {
             float value = ((Number) data.getValue()).floatValue();
             if (Float.isNaN(value) && Via.getConfig().is1_14HealthNaNFix()) {
-                data.setValue(1F);
+                value = 1f;
+                data.setValue(value);
+            }
+            EntityTracker1_14 tracker = tracker(event.user());
+            boolean dying = value <= 0.0f;
+            tracker.setDying(event.entityId(), dying);
+            if (dying && !EntityTypes1_14.PLAYER.is(event.entityType())) {
+                // Set dying pose. Players are handled further down
+                event.createExtraData(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, 6));
             }
         });
 
@@ -292,7 +300,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 } else if (data.id() == 7) {
                     tracker.setRiptide(entityId, (((Number) data.getValue()).byteValue() & 0x4) != 0);
                 }
-                if (data.id() == 0 || data.id() == 7) {
+                if (data.id() == 0 || data.id() == 7 || data.id() == 8) {
                     event.createExtraData(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, recalculatePlayerPose(entityId, tracker)));
                 }
             }
@@ -437,6 +445,8 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
             pose = 4;
         } else if (isSneaking(flags)) {
             pose = 5;
+        } else if (tracker.isDying(entityId)) {
+            pose = 6;
         }
         return pose;
     }
