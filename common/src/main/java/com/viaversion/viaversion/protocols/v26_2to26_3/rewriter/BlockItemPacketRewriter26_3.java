@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItemTemplate;
+import com.viaversion.viaversion.api.minecraft.item.data.ItemModel;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations26_3;
 import com.viaversion.viaversion.api.minecraft.item.data.consumable.ConsumeEffect;
@@ -58,6 +59,20 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<ClientboundPacket26_1, ServerboundPacket26_3, Protocol26_2To26_3> {
 
     private static final Set<String> NEW_MAP_DECORATION_TYPES = Set.of("abandoned_camp", "ancient_city", "desert_pyramid", "mineshaft", "ocean_ruin_warm");
+    private static final Map<String, String> EXPLORER_MAP_DECORATION_TO_MODEL = Map.ofEntries(
+        Map.entry("target_x", "buried_treasure_map"), // 1.11/1.13 buried treasure marker
+        Map.entry("red_x", "buried_treasure_map"),    // 1.14+ buried treasure marker
+        Map.entry("monument", "ocean_monument_map"),
+        Map.entry("mansion", "woodland_mansion_map"),
+        Map.entry("trial_chambers", "buried_trial_chambers_map"),
+        Map.entry("village_desert", "desert_village_map"),
+        Map.entry("village_plains", "plains_village_map"),
+        Map.entry("village_savanna", "savanna_village_map"),
+        Map.entry("village_snowy", "snowy_village_map"),
+        Map.entry("village_taiga", "taiga_village_map"),
+        Map.entry("swamp_hut", "swamp_hut_map"),
+        Map.entry("jungle_temple", "jungle_pyramid_map")
+    );
     private static final int TELEPORT_RANDOMLY_EFFECT = 3;
     private static final String TRIM_PALETTE_PREFIX = "trim/";
     private static final int BREWING_STAND_MENU_TYPE = 11;
@@ -235,6 +250,11 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
     public static void upgradeData(final StructuredDataContainer container) {
         container.remove(StructuredDataKey.MAP_COLOR);
 
+        final String model = explorerMapModel(container);
+        if (model != null) {
+            container.set(StructuredDataKey.ITEM_MODEL, new ItemModel(Key.of(model)));
+        }
+
         container.replaceKey(StructuredDataKey.INSTRUMENT26_1, StructuredDataKey.INSTRUMENT26_3);
         if (container.hasEmpty(StructuredDataKey.SWING_ANIMATION)) {
             container.remove(StructuredDataKey.SWING_ANIMATION);
@@ -292,6 +312,11 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         container.remove(StructuredDataKey.SIGN_TEXT_BACK);
         container.remove(StructuredDataKey.WAXED);
         container.remove(StructuredDataKey.CUSHION_COLOR);
+
+        final ItemModel itemModel = container.get(StructuredDataKey.ITEM_MODEL);
+        if (itemModel != null && EXPLORER_MAP_DECORATION_TO_MODEL.containsValue(itemModel.key().path())) {
+            container.remove(StructuredDataKey.ITEM_MODEL);
+        }
 
 
         final CompoundTag mapDecorations = container.get(StructuredDataKey.MAP_DECORATIONS);
@@ -384,6 +409,10 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         if (mapColor != null) {
             backupTag.putInt("map_color", mapColor);
         }
+
+        if (explorerMapModel(container) != null) {
+            backupTag.putBoolean("added_item_model", true);
+        }
     }
 
     private void backupTrimMaterial(final CompoundTag tag, final String key, @Nullable final Holder<ArmorTrimMaterial1_20_5> materialHolder) {
@@ -423,6 +452,10 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         if (mapColorTag != null) {
             container.set(StructuredDataKey.MAP_COLOR, mapColorTag.asInt());
         }
+
+        if (backupTag.remove("added_item_model") != null) {
+            container.remove(StructuredDataKey.ITEM_MODEL);
+        }
     }
 
     private Holder<ArmorTrimMaterial1_20_5> restoreTrimMaterial(final Holder<ArmorTrimMaterial26_3> holder, final CompoundTag tag) {
@@ -446,5 +479,28 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             overrides,
             material.description()
         ));
+    }
+
+    private static @Nullable String explorerMapModel(final StructuredDataContainer container) {
+        if (container.has(StructuredDataKey.ITEM_MODEL)) {
+            return null;
+        }
+
+        final CompoundTag mapDecorations = container.get(StructuredDataKey.MAP_DECORATIONS);
+        if (mapDecorations == null) {
+            return null;
+        }
+
+        // Finds the 26.3 map item model based on at least one of the map decorations
+        for (final Map.Entry<String, Tag> entry : mapDecorations.entrySet()) {
+            final StringTag typeTag = ((CompoundTag) entry.getValue()).getStringTag("type");
+            if (typeTag != null) {
+                final String model = EXPLORER_MAP_DECORATION_TO_MODEL.get(Key.stripMinecraftNamespace(typeTag.getValue()));
+                if (model != null) {
+                    return model;
+                }
+            }
+        }
+        return null;
     }
 }
