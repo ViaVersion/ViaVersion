@@ -25,6 +25,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.GameMode;
+import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
@@ -39,6 +40,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MainHandProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientWorld1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
+import com.viaversion.viaversion.protocols.v1_8to1_9.storage.TeleportPositionStorage;
 import com.viaversion.viaversion.util.ComponentUtil;
 
 public class PlayerPacketRewriter1_9 {
@@ -112,6 +114,12 @@ public class PlayerPacketRewriter1_9 {
                 map(Types.BYTE); // 5 - Player Flags
 
                 create(Types.VAR_INT, 0); // 6 - Teleport ID was added
+
+                handler(wrapper -> {
+                    // Remember the teleport position so the client's reply can be rewritten to it
+                    final TeleportPositionStorage teleportPositions = wrapper.user().get(TeleportPositionStorage.class);
+                    teleportPositions.addPendingPosition(new Vector3d(wrapper.get(Types.DOUBLE, 0), wrapper.get(Types.DOUBLE, 1), wrapper.get(Types.DOUBLE, 2)));
+                });
             }
         });
 
@@ -449,6 +457,16 @@ public class PlayerPacketRewriter1_9 {
             tracker.incrementIdlePacket();
             tracker.setGround(wrapper.get(Types.BOOLEAN, 0));
         };
+        // 1.21.2+ clients reply to teleports with their own (e.g. mounted) position instead of the
+        // teleport position; rewrite it so the 1.8 server recognizes the teleport as confirmed.
+        final PacketHandler teleportPositionHandler = wrapper -> {
+            final Vector3d position = wrapper.user().get(TeleportPositionStorage.class).pollPendingPosition();
+            if (position != null) {
+                wrapper.set(Types.DOUBLE, 0, position.x());
+                wrapper.set(Types.DOUBLE, 1, position.y());
+                wrapper.set(Types.DOUBLE, 2, position.z());
+            }
+        };
         protocol.registerServerbound(ServerboundPackets1_9.MOVE_PLAYER_POS, new PacketHandlers() {
             @Override
             public void register() {
@@ -457,6 +475,7 @@ public class PlayerPacketRewriter1_9 {
                 map(Types.DOUBLE); // 2 - Z
                 map(Types.BOOLEAN); // 3 - Ground
                 handler(onGroundHandler);
+                handler(teleportPositionHandler);
             }
         });
         protocol.registerServerbound(ServerboundPackets1_9.MOVE_PLAYER_POS_ROT, new PacketHandlers() {
@@ -469,6 +488,7 @@ public class PlayerPacketRewriter1_9 {
                 map(Types.FLOAT); // 4 - Pitch
                 map(Types.BOOLEAN); // 5 - Ground
                 handler(onGroundHandler);
+                handler(teleportPositionHandler);
             }
         });
         protocol.registerServerbound(ServerboundPackets1_9.MOVE_PLAYER_ROT, new PacketHandlers() {
