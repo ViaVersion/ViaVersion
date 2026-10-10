@@ -659,6 +659,11 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                 }
                 tag.put("CanDestroy", newCanDestroy);
             }
+
+            // Damage, map and the original id are stored in a tag created in handleItemToClient
+            if (tag.isEmpty()) {
+                item.setTag(null);
+            }
         }
         return item;
     }
