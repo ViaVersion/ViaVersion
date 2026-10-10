@@ -494,9 +494,12 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     if (tag == null)
                         item.setTag(tag = new CompoundTag());
                     if (!tag.contains("EntityTag")) {
-                        CompoundTag entityTag = new CompoundTag();
-                        entityTag.put("id", new StringTag(eggEntityId.get()));
-                        tag.put("EntityTag", entityTag);
+                        tag.put("EntityTag", new CompoundTag());
+                    }
+                    // The id is removed from a remaining EntityTag in handleItemToClient
+                    CompoundTag entityTag = tag.getCompoundTag("EntityTag");
+                    if (entityTag != null && !entityTag.contains("id")) {
+                        entityTag.putString("id", eggEntityId.get());
                     }
                 } else {
                     rawId = IdAndData.getId(oldId) << 16 | oldId & 0xF;
