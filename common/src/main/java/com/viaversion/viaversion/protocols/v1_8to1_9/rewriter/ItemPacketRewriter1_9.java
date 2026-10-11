@@ -409,7 +409,10 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
             if (tag == null) {
                 tag = new CompoundTag();
             }
-            CompoundTag entityTag = new CompoundTag();
+            CompoundTag entityTag = tag.getCompoundTag("EntityTag");
+            if (entityTag == null) {
+                entityTag = new CompoundTag();
+            }
             String entityName = EntityIds1_8.ENTITY_ID_TO_NAME.get((int) item.data());
             if (entityName != null) {
                 StringTag id = new StringTag(entityName);
@@ -493,7 +496,13 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                         data = EntityIds1_8.ENTITY_NAME_TO_ID.get(id.getValue());
                     }
                 }
-                tag.remove("EntityTag");
+                entityTag.remove("id");
+                if (entityTag.isEmpty()) {
+                    tag.remove("EntityTag");
+                }
+            }
+            if (tag != null && tag.isEmpty()) {
+                tag = null;
             }
             item.setTag(tag);
             item.setData((short) data);
@@ -508,6 +517,9 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     data = PotionIdMappings1_9.POTION_NAME_TO_ID.get(potionName);
                 }
                 tag.remove("Potion");
+            }
+            if (tag != null && tag.isEmpty()) {
+                tag = null;
             }
             item.setTag(tag);
             item.setData((short) data);
@@ -524,6 +536,9 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     data = PotionIdMappings1_9.POTION_NAME_TO_ID.get(potionName) + 8192;
                 }
                 tag.remove("Potion");
+            }
+            if (tag != null && tag.isEmpty()) {
+                tag = null;
             }
             item.setTag(tag);
             item.setData((short) data);
