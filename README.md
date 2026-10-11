@@ -14,7 +14,7 @@ or as [a standalone proxy](https://github.com/ViaVersion/ViaProxy) to join from 
 any server version from the past decade. **See [HERE](https://viaversion.com) for an overview of the different Via\*
 projects.**
 
-> **Note:** While ViaVersion works reliably across all listed platforms, it has the highest performance and state accuracy on **Paper** servers and through **[ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus)** on clients, since both offer more extensive APIs and direct access to client/server state.
+**Note:** While ViaVersion works reliably across all listed platforms, it has the highest performance and state accuracy on **Paper** servers and through **[ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus)** on clients, since both offer more extensive APIs and direct access to client/server state.
 
 ### Supported Versions:
 
