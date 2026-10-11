@@ -548,6 +548,10 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     if (patternsTag != null) {
                         for (CompoundTag pattern : patternsTag) {
                             NumberTag colorTag = pattern.getNumberTag("Color");
+                            if (colorTag == null) {
+                                continue;
+                            }
+
                             pattern.putInt("Color", 15 - colorTag.asInt()); // Invert color id
                         }
                     }
