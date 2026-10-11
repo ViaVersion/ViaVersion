@@ -14,16 +14,17 @@ or as [a standalone proxy](https://github.com/ViaVersion/ViaProxy) to join from 
 any server version from the past decade. **See [HERE](https://viaversion.com) for an overview of the different Via\*
 projects.**
 
-> **Note:** While ViaVersion works reliably across all listed platforms, it has the highest performance and state accuracy on **Paper** servers and through **[ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus)** on clients, since both offer more extensive APIs and direct access to client/server state.
+**Note:** While ViaVersion works reliably across all listed platforms, it has the highest performance and state accuracy on **Paper** servers and through **[ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus)** on clients, since both offer more extensive APIs and direct access to client/server state.
 
-### Supported Versions:
+### Supported Versions
 
-| Server Version | Want newer versions to join? | Want older versions to join? |
-| :--- | :---: | :--- |
-| **1.8 – 1.9** | ✅ **ViaVersion** | add **[ViaRewind](https://github.com/ViaVersion/ViaRewind)** *(for 1.7–1.8 clients)* |
-| **1.10 – Latest** | ✅ **ViaVersion** | add **[ViaBackwards](https://github.com/ViaVersion/ViaBackwards)** *(for 1.9+ clients)*<br>plus **[ViaRewind](https://github.com/ViaVersion/ViaRewind)** *(also needed for 1.7–1.8 clients)* |
+| Players joining with…                           | Install    |
+| :--- | :--- |
+| **Newer** versions than the server              | ViaVersion |
+| **Older** versions than the server, down to 1.9 | ViaVersion + [ViaBackwards](https://github.com/ViaVersion/ViaBackwards)                                                        |
+| **1.7.x – 1.8.x**                               | ViaVersion + [ViaBackwards](https://github.com/ViaVersion/ViaBackwards) + [ViaRewind](https://github.com/ViaVersion/ViaRewind) |
 
- If you're stuck, try [this tool](https://viaversion.com/setup) to work out what plugins you need.
+If you're stuck, try [this tool](https://viaversion.com/setup) to work out what plugins you need.
 
 **User Docs:** [docs.viaversion.com](https://docs.viaversion.com)
 
