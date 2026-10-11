@@ -168,6 +168,10 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 map(Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST); // 7 - Entity data
 
                 handler(trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST, EntityTypes1_14.PLAYER));
+                handler(wrapper -> {
+                    EntityTracker1_14 tracker = wrapper.user().getEntityTracker(protocol);
+                    tracker.setDying(wrapper.get(Types.VAR_INT, 0), false);
+                });
             }
         });
 
@@ -253,6 +257,25 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
         });
 
         registerSetEntityData(ClientboundPackets1_13.SET_ENTITY_DATA, Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST);
+
+        protocol.registerClientbound(ClientboundPackets1_13.ENTITY_EVENT, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.INT);
+            final byte event = wrapper.passthrough(Types.BYTE);
+            if (event == 3) {
+                EntityTracker1_14 tracker = tracker(wrapper.user());
+                tracker.setDying(entityId, true);
+
+                if (tracker.clientEntityId() != entityId) {
+                    // Set dying pose immediately
+                    PacketWrapper entityDataPacket = wrapper.create(ClientboundPackets1_14.SET_ENTITY_DATA);
+                    entityDataPacket.write(Types.VAR_INT, entityId);
+                    List<EntityData> entityDataList = new ArrayList<>();
+                    entityDataList.add(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, 6));
+                    entityDataPacket.write(Types1_14.ENTITY_DATA_LIST, entityDataList);
+                    entityDataPacket.scheduleSend(Protocol1_13_2To1_14.class);
+                }
+            }
+        });
     }
 
     @Override
@@ -269,15 +292,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
         filter().type(EntityTypes1_14.LIVING_ENTITY).index(8).handler((event, data) -> {
             float value = ((Number) data.getValue()).floatValue();
             if (Float.isNaN(value) && Via.getConfig().is1_14HealthNaNFix()) {
-                value = 1f;
-                data.setValue(value);
-            }
-            EntityTracker1_14 tracker = tracker(event.user());
-            boolean dying = value <= 0.0f;
-            tracker.setDying(event.entityId(), dying);
-            if (dying && !EntityTypes1_14.PLAYER.is(event.entityType())) {
-                // Set dying pose. Players are handled further down
-                event.createExtraData(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, 6));
+                data.setValue(1F);
             }
         });
 
@@ -300,7 +315,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 } else if (data.id() == 7) {
                     tracker.setRiptide(entityId, (((Number) data.getValue()).byteValue() & 0x4) != 0);
                 }
-                if (data.id() == 0 || data.id() == 7 || data.id() == 8) {
+                if (data.id() == 0 || data.id() == 7) {
                     event.createExtraData(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, recalculatePlayerPose(entityId, tracker)));
                 }
             }
