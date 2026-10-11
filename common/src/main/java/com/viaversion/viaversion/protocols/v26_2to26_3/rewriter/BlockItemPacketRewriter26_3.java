@@ -299,7 +299,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             for (final Map.Entry<String, Tag> entry : mapDecorations.entrySet()) {
                 final StringTag typeTag = ((CompoundTag) entry.getValue()).getStringTag("type");
                 if (NEW_MAP_DECORATION_TYPES.contains(Key.stripMinecraftNamespace(typeTag.getValue()))) {
-                    typeTag.setValue("village_plains");
+                    typeTag.setValue("target_x");
                 }
             }
         }
