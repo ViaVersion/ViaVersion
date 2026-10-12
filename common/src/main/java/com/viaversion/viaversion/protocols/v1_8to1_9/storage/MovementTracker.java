@@ -24,6 +24,17 @@ public class MovementTracker implements StorableObject {
     private static final long IDLE_PACKET_LIMIT = 20; // Max 20 ticks behind
     private long nextIdlePacket;
     private boolean ground;
+    private boolean movementReceivedThisTick;
+
+    public void markMovementReceived() {
+        this.movementReceivedThisTick = true;
+    }
+
+    public boolean endClientTick() {
+        final boolean receivedMovement = this.movementReceivedThisTick;
+        this.movementReceivedThisTick = false;
+        return receivedMovement;
+    }
 
     public void incrementIdlePacket() {
         // Notify of next update
