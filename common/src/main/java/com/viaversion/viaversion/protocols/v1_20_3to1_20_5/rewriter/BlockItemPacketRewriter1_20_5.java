@@ -1552,6 +1552,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     }
                 }
 
+                tag.remove("Items");
                 data.set(StructuredDataKey.V1_20_5.container, filteredItems);
                 addBlockEntityId(tag, "shulker_box");
             }
