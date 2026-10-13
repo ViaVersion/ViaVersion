@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v26_2to26_3.rewriter;
 
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes26_3;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_3;
@@ -30,6 +31,7 @@ import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPack
 import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundPackets26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ServerboundPackets26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.storage.ProtocolStorables26_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPacket26_1, Protocol26_2To26_3> {
@@ -40,7 +42,12 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
     private static final int INTERPOLATION_STEP_TICKS = 3;
     private static final int MAIN_HAND = 0;
     private static final int OFF_HAND = 1;
+    private static final int START_DESTROY_BLOCK_ACTION = 0;
     private static final int CHANGE_DESTROY_DIRECTION_ACTION = 1;
+    private static final int ABORT_DESTROY_BLOCK_ACTION = 2;
+    private static final int STOP_DESTROY_BLOCK_ACTION = 3;
+    private static final int DESTROY_PROGRESS_PARTICLES = 2019;
+    private static final int DESTROY_PROGRESS_PARTICLES_AND_SOUND = 2020;
     private static final SwingAnimation DEFAULT_SWING_ANIMATION = new SwingAnimation(EnumTypes.SWING_ANIMATION1_21_11.idFromName("whack"), 6);
 
     public EntityPacketRewriter26_3(final Protocol26_2To26_3 protocol) {
@@ -139,16 +146,45 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
 
         protocol.registerServerbound(ServerboundPackets26_3.PUNCH, ServerboundPackets26_1.SWING, wrapper -> {
             wrapper.write(Types.VAR_INT, 0); // Main hand
+
+            // Sent every tick while destroying a block
+            final ProtocolStorables26_3 storables = wrapper.user().storables(protocol);
+            storables.setPunched();
+        });
+
+        protocol.registerServerbound(ServerboundPackets26_3.CLIENT_TICK_END, wrapper -> {
+            // Needs to be sent by the server every tick after starting now
+            final ProtocolStorables26_3 storables = wrapper.user().storables(protocol);
+            final int ticks = storables.endDestroyTick();
+            if (ticks <= 0) {
+                return;
+            }
+
+            final PacketWrapper levelEvent = wrapper.create(ClientboundPackets26_3.LEVEL_EVENT);
+            levelEvent.write(Types.INT, ticks % 4 == 0 ? DESTROY_PROGRESS_PARTICLES_AND_SOUND : DESTROY_PROGRESS_PARTICLES);
+            levelEvent.write(Types.BLOCK_POSITION1_14, storables.destroyPosition());
+            levelEvent.write(Types.INT, storables.destroyDirection());
+            levelEvent.write(Types.BOOLEAN, false); // Global
+            levelEvent.scheduleSend(Protocol26_2To26_3.class);
         });
 
         protocol.registerServerbound(ServerboundPackets26_3.PLAYER_ACTION, wrapper -> {
             final int action = wrapper.read(Types.VAR_INT);
+            final ProtocolStorables26_3 storables = wrapper.user().storables(protocol);
             if (action == CHANGE_DESTROY_DIRECTION_ACTION) {
+                wrapper.read(Types.BLOCK_POSITION1_14); // Position
+                storables.setDestroyDirection(wrapper.read(Types.UNSIGNED_BYTE));
                 wrapper.cancel(); // 26.2 has no equivalent and never sends anything here
                 return;
             }
 
             wrapper.write(Types.VAR_INT, action > CHANGE_DESTROY_DIRECTION_ACTION ? action - 1 : action);
+            if (action == START_DESTROY_BLOCK_ACTION) {
+                final BlockPosition position = wrapper.passthrough(Types.BLOCK_POSITION1_14);
+                storables.startDestroying(position, wrapper.passthrough(Types.UNSIGNED_BYTE));
+            } else if (action == ABORT_DESTROY_BLOCK_ACTION || action == STOP_DESTROY_BLOCK_ACTION) {
+                storables.stopDestroying();
+            }
         });
 
         protocol.registerClientbound(ClientboundPackets26_1.ANIMATE, wrapper -> {

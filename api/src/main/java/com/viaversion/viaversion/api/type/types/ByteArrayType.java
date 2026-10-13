@@ -56,7 +56,7 @@ public class ByteArrayType extends Type<byte[]> {
     @Override
     public byte[] read(final ByteBuf buffer) {
         final int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
-        Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
+        Preconditions.checkArgument(buffer.isReadable(length), "Length is larger than readable bytes");
         final byte[] array = new byte[length];
         buffer.readBytes(array);
         return array;

@@ -1,3 +1,5 @@
+import com.modrinth.minotaur.TaskModrinthUpload
+
 plugins {
     id("io.papermc.hangar-publish-plugin") version "0.1.4"
     id("com.modrinth.minotaur") version "2.+"
@@ -44,10 +46,10 @@ if (runNumber != null && (!isRelease || isMainBranch)) { // Only publish release
         "[$commitHash](https://github.com/ViaVersion/ViaVersion/commit/$commitHash) ${rootProject.latestCommitMessage()}"
     }
 
+    val mcVersions: List<String> = (property("mcVersions") as String)
+        .split(",")
+        .map { it.trim() }
     modrinth {
-        val mcVersions: List<String> = (property("mcVersions") as String)
-            .split(",")
-            .map { it.trim() }
         token.set(System.getenv("MODRINTH_TOKEN"))
         projectId.set("viaversion")
         versionType.set(if (isRelease) "release" else if (isMainBranch) "beta" else "alpha")
@@ -56,7 +58,6 @@ if (runNumber != null && (!isRelease || isMainBranch)) { // Only publish release
         changelog.set(changelogContent)
         uploadFile.set(tasks.shadowJar.flatMap { it.archiveFile })
         gameVersions.set(mcVersions)
-        loaders.add("fabric")
         loaders.add("paper")
         loaders.add("folia")
         loaders.add("velocity")
@@ -70,6 +71,21 @@ if (runNumber != null && (!isRelease || isMainBranch)) { // Only publish release
     }
     tasks.modrinth {
         notCompatibleWithConfigurationCache("")
+        finalizedBy("modrinthFabric")
+    }
+    // Fabric requires 1.14+ (18w43b), so it is uploaded separately with only the supported versions
+    val modrinthExtension = modrinth
+    tasks.register<TaskModrinthUpload>("modrinthFabric") {
+        group = "publishing"
+        dependsOn(tasks.assemble)
+        notCompatibleWithConfigurationCache("")
+        doFirst {
+            modrinthExtension.loaders.set(listOf("fabric"))
+            modrinthExtension.gameVersions.set(mcVersions.filter { version ->
+                val (major, minor) = version.split(".").map(String::toInt)
+                major > 1 || minor >= 14
+            })
+        }
     }
 
     hangarPublish {

@@ -233,6 +233,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         callOnMappingDataLoaded(getEntityRewriter());
         callOnMappingDataLoaded(getItemRewriter());
         callOnMappingDataLoaded(getTagRewriter());
+        callOnMappingDataLoaded(getBlockRewriter());
     }
 
     private void callRegister(@Nullable Rewriter<?> rewriter) {
