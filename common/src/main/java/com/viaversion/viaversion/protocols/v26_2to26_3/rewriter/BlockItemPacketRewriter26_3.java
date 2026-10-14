@@ -60,8 +60,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
 
     private static final Set<String> NEW_MAP_DECORATION_TYPES = Set.of("abandoned_camp", "ancient_city", "desert_pyramid", "mineshaft", "ocean_ruin_warm");
     private static final Map<String, String> EXPLORER_MAP_DECORATION_TO_MODEL = Map.ofEntries(
-        Map.entry("target_x", "buried_treasure_map"), // 1.11/1.13 buried treasure marker
-        Map.entry("red_x", "buried_treasure_map"),    // 1.14+ buried treasure marker
+        Map.entry("red_x", "buried_treasure_map"),
         Map.entry("monument", "ocean_monument_map"),
         Map.entry("mansion", "woodland_mansion_map"),
         Map.entry("trial_chambers", "buried_trial_chambers_map"),
@@ -232,6 +231,10 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
     }
 
     private void appendItemDataFixComponents(final UserConnection connection, final Item item, final StructuredDataContainer container) {
+        final String model = explorerMapModel(container);
+        if (model != null) {
+            container.set(StructuredDataKey.ITEM_MODEL, new ItemModel(Key.of(model)));
+        }
         final ProtocolVersion serverVersion = connection.getProtocolInfo().serverProtocolVersion();
         if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
             // Axes only started stripping logs in 1.13
@@ -249,11 +252,6 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
 
     public static void upgradeData(final StructuredDataContainer container) {
         container.remove(StructuredDataKey.MAP_COLOR);
-
-        final String model = explorerMapModel(container);
-        if (model != null) {
-            container.set(StructuredDataKey.ITEM_MODEL, new ItemModel(Key.of(model)));
-        }
 
         container.replaceKey(StructuredDataKey.INSTRUMENT26_1, StructuredDataKey.INSTRUMENT26_3);
         if (container.hasEmpty(StructuredDataKey.SWING_ANIMATION)) {
@@ -312,12 +310,6 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         container.remove(StructuredDataKey.SIGN_TEXT_BACK);
         container.remove(StructuredDataKey.WAXED);
         container.remove(StructuredDataKey.CUSHION_COLOR);
-
-        final ItemModel itemModel = container.get(StructuredDataKey.ITEM_MODEL);
-        if (itemModel != null && EXPLORER_MAP_DECORATION_TO_MODEL.containsValue(itemModel.key().path())) {
-            container.remove(StructuredDataKey.ITEM_MODEL);
-        }
-
 
         final CompoundTag mapDecorations = container.get(StructuredDataKey.MAP_DECORATIONS);
         if (mapDecorations != null) {
