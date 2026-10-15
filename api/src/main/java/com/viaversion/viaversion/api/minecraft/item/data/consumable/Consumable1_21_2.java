@@ -89,7 +89,9 @@ public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<S
     @Override
     public Consumable1_21_2 rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         final Holder<SoundEvent> soundHolder = SoundEvent.rewriteHolder(this.sound, Rewritable.soundRewriteFunction(protocol, clientbound));
-        return soundHolder == this.sound ? this : new Consumable1_21_2(consumeSeconds, animationType, soundHolder, hasConsumeParticles, consumeEffects);
+        final ConsumeEffect<?>[] consumeEffects = ConsumeEffect.rewrite(this.consumeEffects, connection, protocol, clientbound);
+        return soundHolder == this.sound && consumeEffects == this.consumeEffects ? this
+            : new Consumable1_21_2(consumeSeconds, animationType, soundHolder, hasConsumeParticles, consumeEffects);
     }
 
     @Override

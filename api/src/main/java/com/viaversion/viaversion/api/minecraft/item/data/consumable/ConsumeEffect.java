@@ -22,20 +22,23 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data.consumable;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.minecraft.item.data.EnumTypes;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.api.type.types.misc.HolderSetType;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 
-public record ConsumeEffect<T>(int id, Type<T> type, T value) {
+public record ConsumeEffect<T>(int id, Type<T> type, T value) implements Rewritable {
 
     private static final HolderSetType REMOVE_EFFECTS_TYPE = new HolderSetType() {
         @Override
@@ -121,6 +124,32 @@ public record ConsumeEffect<T>(int id, Type<T> type, T value) {
     static <T> ConsumeEffect<T> of(final int id, final Type<T> type, final Object value) {
         //noinspection unchecked
         return new ConsumeEffect<>(id, type, (T) value);
+    }
+
+    @Override
+    public ConsumeEffect<T> rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        if (this.type != PLAY_SOUND_TYPE) {
+            return this;
+        }
+
+        //noinspection unchecked
+        final Holder<SoundEvent> sound = (Holder<SoundEvent>) this.value;
+        final Holder<SoundEvent> rewrittenSound = SoundEvent.rewriteHolder(sound, Rewritable.soundRewriteFunction(protocol, clientbound));
+        return rewrittenSound == sound ? this : ConsumeEffect.of(this.id, this.type, rewrittenSound);
+    }
+
+    public static ConsumeEffect<?>[] rewrite(final ConsumeEffect<?>[] effects, final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        ConsumeEffect<?>[] rewrittenEffects = effects;
+        for (int i = 0; i < effects.length; i++) {
+            final ConsumeEffect<?> rewrittenEffect = effects[i].rewrite(connection, protocol, clientbound);
+            if (rewrittenEffect != effects[i]) {
+                if (rewrittenEffects == effects) {
+                    rewrittenEffects = effects.clone();
+                }
+                rewrittenEffects[i] = rewrittenEffect;
+            }
+        }
+        return rewrittenEffects;
     }
 
     void writeValue(final ByteBuf buf) {

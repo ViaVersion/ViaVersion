@@ -80,7 +80,7 @@ public interface Rewritable {
 
     static Int2IntFunction soundRewriteFunction(final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         return protocol.getMappingData().getSoundMappings() == null ? Int2IntFunction.identity()
-            : (clientbound ? protocol.getMappingData().getSoundMappings()::getNewId : protocol.getMappingData()::getOldSoundId);
+            : (clientbound ? protocol.getMappingData().getSoundMappings()::getNewId : protocol.getMappingData().getSoundMappings().inverse()::getNewId);
     }
 
     static Int2IntFunction entityRewriteFunction(final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
