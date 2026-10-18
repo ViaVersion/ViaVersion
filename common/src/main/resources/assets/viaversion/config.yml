@@ -15,10 +15,10 @@ send-supported-versions: false
 # Easier to configure alternative to 'block-protocols'. Uses readable version strings with possible '<' and '>' prefixes.
 # An example to block 1.16.4, everything below 1.16, as well as everything above 1.17.1 would be: ["<1.16", "1.16.4", ">1.17.1"]
 # You can use both this and the block-protocols option at the same time as well.
-block-versions: []
+block-versions: [ ]
 # Block specific Minecraft protocol version numbers.
 # List of all Minecraft protocol versions: https://minecraft.wiki/w/Protocol_version, or use a generator: https://via.krusic22.com
-block-protocols: []
+block-protocols: [ ]
 # Change the blocked disconnect message
 block-disconnect-msg: "You are using an unsupported Minecraft version!"
 # If you use ProtocolLib, we can't reload without kicking the players.
@@ -70,7 +70,7 @@ velocity-ping-save: true
 #  servername: protocolversion
 # You can find protocol ids on https://minecraft.wiki/w/Protocol_version
 # It will fall back to the default option if none found.
-velocity-servers: {}
+velocity-servers: { }
 #
 #----------------------------------------------------------#
 #                  GLOBAL PACKET LIMITER                   #
@@ -248,3 +248,5 @@ left-handed-handling: true
 cancel-block-sounds: true
 # If enabled, 1.21.11+ clients on 1.8 servers will get wider entity hitboxes when attacking with items
 use-1_8-hitbox-margin: true
+# If enabled, 1.20.5+ clients on 1.20.4 or older servers can't jump with negative jump boost levels (the effect icon is hidden while active)
+emulate-negative-jump-boost: true

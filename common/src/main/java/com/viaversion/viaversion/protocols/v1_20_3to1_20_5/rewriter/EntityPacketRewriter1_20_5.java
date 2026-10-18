@@ -69,6 +69,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
     private static final UUID CREATIVE_BLOCK_INTERACTION_RANGE = UUID.fromString("736565d2-e1a7-403d-a3f8-1aeb3e302542");
     private static final UUID CREATIVE_ENTITY_INTERACTION_RANGE = UUID.fromString("98491ef6-97b1-4584-ae82-71a8cc85cf73");
+    private static final UUID NEGATIVE_JUMP_BOOST = UUID.fromString("5d0a3b8e-2f6c-4b1e-9a47-c3e1f0b7d264");
+    private static final int JUMP_BOOST_EFFECT = 7;
 
     public EntityPacketRewriter1_20_5(final Protocol1_20_3To1_20_5 protocol) {
         super(protocol);
@@ -307,15 +309,37 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_MOB_EFFECT, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Entity ID
-            wrapper.passthrough(Types.VAR_INT); // Effect ID
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            final int effectId = wrapper.passthrough(Types.VAR_INT);
 
             final byte amplifier = wrapper.read(Types.BYTE);
+            if (effectId == JUMP_BOOST_EFFECT && entityId == tracker(wrapper.user()).clientEntityId() && Via.getConfig().emulateNegativeJumpBoost()) {
+                if (amplifier < 0) {
+                    // Negative amplifiers are clamped to 0 by the client, emulate the reduced jump power with the jump strength attribute instead
+                    final PacketWrapper removeEffect = wrapper.create(ClientboundPackets1_20_5.REMOVE_MOB_EFFECT);
+                    removeEffect.write(Types.VAR_INT, entityId);
+                    removeEffect.write(Types.VAR_INT, effectId);
+                    removeEffect.send(Protocol1_20_3To1_20_5.class);
+
+                    sendJumpStrength(wrapper.user(), 0.1D * (amplifier + 1));
+                    wrapper.cancel();
+                    return;
+                }
+                sendJumpStrength(wrapper.user(), 0D);
+            }
             wrapper.write(Types.VAR_INT, (int) amplifier);
 
             wrapper.passthrough(Types.VAR_INT); // Duration
             wrapper.passthrough(Types.BYTE); // Flags
             wrapper.read(Types.OPTIONAL_COMPOUND_TAG); // Remove factor data
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_20_3.REMOVE_MOB_EFFECT, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            final int effectId = wrapper.passthrough(Types.VAR_INT);
+            if (effectId == JUMP_BOOST_EFFECT && entityId == tracker(wrapper.user()).clientEntityId() && Via.getConfig().emulateNegativeJumpBoost()) {
+                sendJumpStrength(wrapper.user(), 0D);
+            }
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_ATTRIBUTES, wrapper -> {
@@ -431,6 +455,14 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         } else {
             this.writeAttribute(wrapper, "player.entity_interaction_range", 3D, creativeMode ? CREATIVE_ENTITY_INTERACTION_RANGE : null, 2D);
         }
+        wrapper.scheduleSend(Protocol1_20_3To1_20_5.class);
+    }
+
+    private void sendJumpStrength(final UserConnection connection, final double jumpBoost) {
+        final PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_20_5.UPDATE_ATTRIBUTES, connection);
+        wrapper.write(Types.VAR_INT, tracker(connection).clientEntityId());
+        wrapper.write(Types.VAR_INT, 1); // Number of attributes
+        this.writeAttribute(wrapper, "generic.jump_strength", 0.42D, jumpBoost != 0D ? NEGATIVE_JUMP_BOOST : null, jumpBoost);
         wrapper.scheduleSend(Protocol1_20_3To1_20_5.class);
     }
 
