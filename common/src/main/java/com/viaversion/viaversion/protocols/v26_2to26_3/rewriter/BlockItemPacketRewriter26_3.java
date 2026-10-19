@@ -124,15 +124,15 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         protocol.registerServerbound(ServerboundPackets26_3.SIGN_UPDATE, wrapper -> {
             wrapper.passthrough(Types.BLOCK_POSITION1_14);
 
-            wrapper.write(Types.BOOLEAN, true); // Front text - replace below if needed
+            // 26.3 replaced the isFrontText boolean with the sign text slot enum in the same
+            // position, so the slot has to be read before the lines. Reading it after them left
+            // the slot value unread, desynced the buffer and the client was kicked with an
+            // EncoderException when saving a sign (#5126).
+            final int signTextSlot = wrapper.read(Types.VAR_INT);
+            wrapper.write(Types.BOOLEAN, signTextSlot != 0);
 
             for (int i = 0; i < 4; i++) {
                 wrapper.passthrough(Types.STRING); // Line
-            }
-
-            final int signTextSlot = wrapper.read(Types.VAR_INT);
-            if (signTextSlot == 0) {
-                wrapper.set(Types.BOOLEAN, 0, false);
             }
         });
 
