@@ -448,6 +448,7 @@ public class PlayerPacketRewriter1_9 {
             final MovementTracker tracker = wrapper.user().get(MovementTracker.class);
             tracker.incrementIdlePacket();
             tracker.setGround(wrapper.get(Types.BOOLEAN, 0));
+            tracker.markMovementReceived();
         };
         protocol.registerServerbound(ServerboundPackets1_9.MOVE_PLAYER_POS, new PacketHandlers() {
             @Override
