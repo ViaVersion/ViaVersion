@@ -61,11 +61,29 @@ public class ItemType1_20_5 extends Type<Item> {
     protected Map<StructuredDataKey<?>, StructuredData<?>> readData(final ByteBuf buffer) {
         final int valuesSize = Types.VAR_INT.readPrimitive(buffer);
         final int markersSize = Types.VAR_INT.readPrimitive(buffer);
+        if (valuesSize < 0 || markersSize < 0) {
+            throw new IllegalArgumentException(
+                    "Negative item data component count: "
+                            + valuesSize + " added, "
+                            + markersSize + " removed"
+            );
+        }
+
+        final long totalComponents = (long) valuesSize + markersSize;
+
+        if (totalComponents > buffer.readableBytes()) {
+            throw new IllegalArgumentException(
+                    "Item data component count exceeds remaining buffer size"
+            );
+        }
+
         if (valuesSize == 0 && markersSize == 0) {
             return new Reference2ObjectOpenHashMap<>(0);
         }
 
-        final Map<StructuredDataKey<?>, StructuredData<?>> map = new Reference2ObjectOpenHashMap<>(Math.min(valuesSize + markersSize, 128));
+        final Map<StructuredDataKey<?>, StructuredData<?>> map =
+                new Reference2ObjectOpenHashMap<>((int) Math.min(totalComponents, 128L));
+
         for (int i = 0; i < valuesSize; i++) {
             final StructuredData<?> value = dataType.read(buffer);
             final StructuredDataKey<?> key = dataType.key(value.id());
