@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_17to1_17_1.rewriter;
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -138,19 +139,23 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
             return;
         }
 
+        // Both lists share the HideFlags/display backup, only take it from the unmodified tag
+        final boolean backedUp = hasInvalidEnchantmentsMarker(tag);
         tag.put(nbtTagName(tagName), new ByteTag(true));
 
-        final int originalHideFlags = tag.getInt("HideFlags");
-        tag.put(nbtTagName("HideFlags"), new ByteTag((byte) originalHideFlags));
+        final Tag originalHideFlagsTag = tag.get("HideFlags");
+        if (!backedUp && originalHideFlagsTag instanceof NumberTag) {
+            tag.put(nbtTagName("HideFlags"), originalHideFlagsTag.copy());
+        }
 
         final int hideBit = tagName.equals("Enchantments") ? 1 : (1 << 5);
-        tag.put("HideFlags", new ByteTag((byte) (originalHideFlags | hideBit)));
+        tag.put("HideFlags", new ByteTag((byte) (tag.getInt("HideFlags") | hideBit)));
 
         CompoundTag display = tag.getCompoundTag("display");
-        if (display != null) {
-            tag.put(nbtTagName("display"), display.copy());
-        } else {
+        if (display == null) {
             tag.put("display", display = new CompoundTag());
+        } else if (!backedUp) {
+            tag.put(nbtTagName("display"), display.copy());
         }
 
         ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
@@ -174,17 +179,15 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
 
     private void restoreInvalidEnchantments(final CompoundTag tag, final String tagName) {
         final Tag marker = tag.remove(nbtTagName(tagName));
-        if (marker == null) {
+        if (marker == null || hasInvalidEnchantmentsMarker(tag)) {
             return;
         }
 
         final Tag hideFlags = tag.remove(nbtTagName("HideFlags"));
-        if (hideFlags != null) {
-            if (((ByteTag) hideFlags).asByte() == 0) {
-                tag.remove("HideFlags");
-            } else {
-                tag.put("HideFlags", hideFlags);
-            }
+        if (hideFlags instanceof NumberTag numberTag && numberTag.asInt() != 0) {
+            tag.put("HideFlags", hideFlags);
+        } else {
+            tag.remove("HideFlags");
         }
 
         final Tag display = tag.remove(nbtTagName("display"));
@@ -193,5 +196,9 @@ public final class ItemPacketRewriter1_17_1 extends ItemRewriter<ClientboundPack
         } else {
             tag.remove("display");
         }
+    }
+
+    private boolean hasInvalidEnchantmentsMarker(final CompoundTag tag) {
+        return tag.contains(nbtTagName("Enchantments")) || tag.contains(nbtTagName("StoredEnchantments"));
     }
 }
