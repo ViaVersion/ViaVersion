@@ -92,6 +92,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     private JsonElement resourcePack1_17PromptMessage;
     private WorldIdentifiers map1_16WorldNames;
     private boolean cache1_17Light;
+    private int legacyPartialChunkCacheSize;
     private boolean translateOcelotToCat;
     private boolean enforceSecureChat;
     private boolean handleInvalidItemCount;
@@ -169,6 +170,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
             worlds.getOrDefault("nether", WorldIdentifiers.NETHER_DEFAULT),
             worlds.getOrDefault("end", WorldIdentifiers.END_DEFAULT));
         cache1_17Light = getBoolean("cache-1_17-light", true);
+        legacyPartialChunkCacheSize = getInt("legacy-partial-chunk-cache-size", 4);
         translateOcelotToCat = getBoolean("translate-ocelot-to-cat", true);
         enforceSecureChat = getBoolean("enforce-secure-chat", false);
         handleInvalidItemCount = getBoolean("handle-invalid-item-count", false);
@@ -600,6 +602,11 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     @Override
     public boolean cache1_17Light() {
         return cache1_17Light;
+    }
+
+    @Override
+    public int getLegacyPartialChunkCacheSize() {
+        return legacyPartialChunkCacheSize;
     }
 
     @Override

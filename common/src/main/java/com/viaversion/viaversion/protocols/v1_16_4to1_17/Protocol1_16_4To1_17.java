@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ServerboundPackets1_16_2;
@@ -38,6 +39,8 @@ import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.ComponentRewri
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.EntityPacketRewriter1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.ItemPacketRewriter1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.WorldPacketRewriter1_17;
+import com.viaversion.viaversion.protocols.v1_16_4to1_17.storage.LegacyChunkSectionStorage;
+import com.viaversion.viaversion.protocols.v1_16_4to1_17.storage.ProtocolStorables1_17;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -140,7 +143,25 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
                 map(Types.FLOAT); // Y
                 map(Types.FLOAT); // Z
                 map(Types.FLOAT); // Strength
-                handler(wrapper -> wrapper.write(Types.VAR_INT, wrapper.read(Types.INT))); // Collection length is now a var int
+                handler(wrapper -> {
+                    final int recordCount = wrapper.read(Types.INT);
+                    wrapper.write(Types.VAR_INT, recordCount); // Collection length is now a var int
+
+                    // Explosion records remove blocks client-side without requiring separate block
+                    // update packets, so mirror them into the partial-chunk diff.
+                    final int baseX = (int) Math.floor(wrapper.get(Types.FLOAT, 0));
+                    final int baseY = (int) Math.floor(wrapper.get(Types.FLOAT, 1));
+                    final int baseZ = (int) Math.floor(wrapper.get(Types.FLOAT, 2));
+                    final LegacyChunkSectionStorage storage = wrapper.user().<ProtocolStorables1_17>storables(Protocol1_16_4To1_17.this).legacyChunkSectionStorage();
+                    final int airBlockStateId = MAPPINGS.getNewBlockStateId(0);
+
+                    for (int i = 0; i < recordCount; i++) {
+                        final byte offsetX = wrapper.passthrough(Types.BYTE);
+                        final byte offsetY = wrapper.passthrough(Types.BYTE);
+                        final byte offsetZ = wrapper.passthrough(Types.BYTE);
+                        storage.updateBlock(baseX + offsetX, baseY + offsetY, baseZ + offsetZ, airBlockStateId);
+                    }
+                });
             }
         });
 
@@ -186,6 +207,11 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
     @Override
     public void init(UserConnection user) {
         addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_17.PLAYER));
+    }
+
+    @Override
+    public ProtocolStorablesBase createStorables() {
+        return new ProtocolStorables1_17();
     }
 
     @Override
