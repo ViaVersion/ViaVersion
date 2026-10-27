@@ -31,10 +31,12 @@ import com.viaversion.viaversion.codec.hash.HashOps;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ItemHashStorage1_21_5 implements ItemHasher {
 
     private final Cache<Long, StructuredData<?>> hashToStructuredData = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(512).build();
+    private final long keyMultiplier = ThreadLocalRandom.current().nextLong() | 1; // Odd to keep keys unique, random to not have predictable buckets
     private boolean processingClientboundInventoryPacket;
     private final CodecContext context;
 
@@ -54,7 +56,7 @@ public class ItemHashStorage1_21_5 implements ItemHasher {
             return;
         }
 
-        final long key = (long) structuredData.id() << 32 | hash;
+        final long key = key(structuredData.id(), hash);
         try {
             this.hashToStructuredData.get(key, structuredData::copy);
         } catch (final ExecutionException e) {
@@ -63,9 +65,14 @@ public class ItemHashStorage1_21_5 implements ItemHasher {
     }
 
     public StructuredData<?> dataFromHash(final int dataComponentId, final int hash) {
-        final long key = (long) dataComponentId << 32 | hash;
+        final long key = key(dataComponentId, hash);
         final StructuredData<?> data = this.hashToStructuredData.getIfPresent(key);
         return data != null ? data.copy() : null;
+    }
+
+    private long key(final int dataComponentId, final int hash) {
+        // Add a key multiplier to avoid collisions from Guava's cache unseeded hashing
+        return ((long) dataComponentId << 32 | (hash & 0xFFFFFFFFL)) * this.keyMultiplier;
     }
 
     private static <T> int hash(final Hasher hasher, final StructuredData<T> data) {
