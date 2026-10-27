@@ -59,6 +59,7 @@ import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfi
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
+import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.ProtocolLogger;
 import java.util.BitSet;
 import java.util.HashSet;
@@ -148,7 +149,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             final ProtocolStorables1_20_5 storables = wrapper.user().storables(this);
             final AcknowledgedMessagesStorage storage = storables.acknowledgedMessages();
             final long salt = wrapper.read(Types.LONG);
-            final int signatures = wrapper.read(Types.VAR_INT);
+            final int signatures = Limit.max(wrapper.read(Types.VAR_INT), 8);
             if (storage.isSecureChatEnforced()) {
                 wrapper.write(Types.LONG, salt);
                 wrapper.write(Types.VAR_INT, signatures);

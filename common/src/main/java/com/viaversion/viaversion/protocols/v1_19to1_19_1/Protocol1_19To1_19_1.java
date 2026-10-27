@@ -26,6 +26,7 @@ import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.signature.SignableCommandArgumentsProvider;
 import com.viaversion.viaversion.api.minecraft.signature.model.DecoratableMessage;
@@ -34,7 +35,9 @@ import com.viaversion.viaversion.api.minecraft.signature.storage.ChatSession1_19
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.libs.mcstructs.text.Style;
 import com.viaversion.viaversion.libs.mcstructs.text.TextComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.TextFormatting;
@@ -50,6 +53,7 @@ import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.storage.ChatTypeStorage;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.storage.NonceStorage1_19_1;
 import com.viaversion.viaversion.util.CipherUtil;
+import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.ProtocolLogger;
 import com.viaversion.viaversion.util.SerializerVersion;
@@ -64,6 +68,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19_1, ServerboundPackets1_19, ServerboundPackets1_19_1> {
 
     public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_19To1_19_1.class);
+    private static final Type<PlayerMessageSignature[]> LAST_SEEN_MESSAGES_TYPE = new ArrayType<>(Types.PLAYER_MESSAGE_SIGNATURE, 5);
 
     public Protocol1_19To1_19_1() {
         super(ClientboundPackets1_19.class, ClientboundPackets1_19_1.class, ServerboundPackets1_19.class, ServerboundPackets1_19_1.class);
@@ -139,7 +144,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                         wrapper.set(Types.BOOLEAN, 0, decoratableMessage.isDecorated()); // Signed preview
                     }
                 });
-                read(Types.PLAYER_MESSAGE_SIGNATURE_ARRAY); // Last seen messages
+                read(LAST_SEEN_MESSAGES_TYPE); // Last seen messages
                 read(Types.OPTIONAL_PLAYER_MESSAGE_SIGNATURE); // Last received message
             }
         });
@@ -153,7 +158,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                     final ChatSession1_19_0 chatSession = wrapper.user().get(ChatSession1_19_0.class);
                     final SignableCommandArgumentsProvider argumentsProvider = Via.getManager().getProviders().get(SignableCommandArgumentsProvider.class);
 
-                    final int signatures = wrapper.read(Types.VAR_INT);
+                    final int signatures = Limit.max(wrapper.read(Types.VAR_INT), 8);
                     for (int i = 0; i < signatures; i++) {
                         wrapper.read(Types.STRING); // Argument name
                         wrapper.read(Types.BYTE_ARRAY_PRIMITIVE); // Signature
@@ -187,7 +192,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                     }
                 });
                 map(Types.BOOLEAN); // Signed preview
-                read(Types.PLAYER_MESSAGE_SIGNATURE_ARRAY); // Last seen messages
+                read(LAST_SEEN_MESSAGES_TYPE); // Last seen messages
                 read(Types.OPTIONAL_PLAYER_MESSAGE_SIGNATURE); // Last received message
             }
         });
