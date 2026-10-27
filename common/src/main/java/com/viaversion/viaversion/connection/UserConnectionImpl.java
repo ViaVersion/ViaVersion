@@ -41,10 +41,10 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import java.nio.channels.ClosedChannelException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -225,10 +225,10 @@ public class UserConnectionImpl implements UserConnection {
 
     private void sendRawPacket(final ByteBuf packet, final boolean currentThread) {
         if (currentThread) {
-            sendRawPacketNow(packet);
+            sendRawPacketFuture(packet);
         } else {
             try {
-                channel.eventLoop().execute(() -> sendRawPacketNow(packet));
+                channel.eventLoop().execute(() -> sendRawPacketFuture(packet));
             } catch (Throwable e) {
                 packet.release(); // Couldn't schedule
                 e.printStackTrace();
@@ -236,25 +236,22 @@ public class UserConnectionImpl implements UserConnection {
         }
     }
 
-    private void sendRawPacketNow(final ByteBuf buf) {
-        final ChannelPipeline pipeline = getChannel().pipeline();
-        final ViaInjector injector = Via.getManager().getInjector();
-        if (clientSide) {
-            // We'll just assume that Via decoder isn't wrapping the original decoder
-            pipeline.context(injector.getDecoderName()).fireChannelRead(buf);
-        } else {
-            pipeline.context(injector.getEncoderName()).writeAndFlush(buf);
-        }
-    }
-
     @Override
     public ChannelFuture sendRawPacketFuture(final ByteBuf packet) {
+        final ViaInjector injector = Via.getManager().getInjector();
+        final ChannelHandlerContext context = channel.pipeline().context(clientSide ? injector.getDecoderName() : injector.getEncoderName());
+        if (context == null) {
+            // Handlers are removed once the channel is closed
+            packet.release();
+            return channel.newFailedFuture(new ClosedChannelException());
+        }
+
         if (clientSide) {
             // Assume that decoder isn't wrapping
-            getChannel().pipeline().context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(packet);
-            return getChannel().newSucceededFuture();
+            context.fireChannelRead(packet);
+            return channel.newSucceededFuture();
         } else {
-            return channel.pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
+            return context.writeAndFlush(packet);
         }
     }
 
@@ -343,7 +340,7 @@ public class UserConnectionImpl implements UserConnection {
             writeAndFlush(packet);
         } else {
             try {
-                getChannel().eventLoop().execute(() -> writeAndFlush(packet));
+                channel.eventLoop().execute(() -> writeAndFlush(packet));
             } catch (Throwable e) {
                 e.printStackTrace();
                 packet.release(); // Couldn't schedule
@@ -352,7 +349,12 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     private void writeAndFlush(final ByteBuf buf) {
-        getChannel().pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(buf);
+        final ChannelHandlerContext context = channel.pipeline().context(Via.getManager().getInjector().getEncoderName());
+        if (context == null) {
+            buf.release();
+            return;
+        }
+        context.writeAndFlush(buf);
     }
 
     @Override
