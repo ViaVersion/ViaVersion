@@ -1525,11 +1525,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             final ListTag<CompoundTag> itemsTag = tag.getListTag("Items", CompoundTag.class);
             if (itemsTag != null) {
+                // Only convert once, items can contain further containers
+                final int size = Math.min(itemsTag.size(), 256);
+                final Item[] items = new Item[size];
                 int highestSlot = 0;
 
-                for (int i = 0, size = Math.min(itemsTag.size(), 256); i < size; i++) {
+                for (int i = 0; i < size; i++) {
                     final CompoundTag itemTag = itemsTag.get(i);
                     final Item item = itemFromTag(connection, itemTag);
+                    items[i] = item;
                     if (item.isEmpty()) {
                         continue;
                     }
@@ -1540,13 +1544,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
                 final Item[] filteredItems = new Item[highestSlot + 1];
                 Arrays.fill(filteredItems, StructuredItem.empty());
-                for (final CompoundTag itemTag : itemsTag) {
-                    final Item item = itemFromTag(connection, itemTag);
+                for (int i = 0; i < size; i++) {
+                    final Item item = items[i];
                     if (item.isEmpty()) {
                         continue;
                     }
 
-                    final int slot = itemTag.getByte("Slot");
+                    final int slot = itemsTag.get(i).getByte("Slot");
                     if (slot >= 0 && slot < filteredItems.length) {
                         filteredItems[slot] = item;
                     }
