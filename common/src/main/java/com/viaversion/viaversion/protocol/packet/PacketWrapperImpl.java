@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PacketWrapperImpl implements PacketWrapper {
@@ -271,7 +273,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             .set("Server Protocol", protocolInfo.serverProtocolVersion().getName())
             .set("Index", index)
             .set("Type", type.getTypeName())
-            .set("Data", this.packetValues)
+            .set("Data", new PacketValuesSummary(this.packetValues))
             .set("Packet ID", this.id);
     }
 
@@ -619,6 +621,49 @@ public class PacketWrapperImpl implements PacketWrapper {
             ", values=" + packetValues +
             ", readable=" + readableObjects +
             '}';
+    }
+
+    private static final class PacketValuesSummary {
+        private final List<PacketValue<?>> values;
+        private String s;
+
+        private PacketValuesSummary(final List<PacketValue<?>> values) {
+            this.values = values;
+        }
+
+        @Override
+        public String toString() {
+            if (this.s == null) {
+                this.s = Via.getManager().isDebug() ? this.values.toString() : summarize();
+            }
+            return this.s;
+        }
+
+        private String summarize() {
+            final int maxLength = Math.max(0, Via.getConfig().maxErrorLength());
+            final StringBuilder builder = new StringBuilder("[");
+            for (final PacketValue<?> packetValue : this.values) {
+                if (builder.length() > 1) {
+                    builder.append(", ");
+                }
+                builder.append('{').append(packetValue.type()).append(": ").append(stringToLog(packetValue.value())).append('}');
+                if (builder.length() >= maxLength) {
+                    builder.setLength(maxLength);
+                    return builder.append("...").toString();
+                }
+            }
+            return builder.append(']').toString();
+        }
+
+        private static String stringToLog(@Nullable final Object value) {
+            if (value == null || value instanceof Number || value instanceof Boolean || value instanceof Character
+                || value instanceof CharSequence || value instanceof UUID || value instanceof Enum<?>) {
+                return String.valueOf(value);
+            } else if (value instanceof Item item) {
+                return "Item{id=" + item.identifier() + ", amount=" + item.amount() + "}";
+            }
+            return "<" + value.getClass().getSimpleName() + ">";
+        }
     }
 
     public static final class PacketValue<T> {
