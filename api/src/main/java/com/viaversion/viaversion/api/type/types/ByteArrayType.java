@@ -32,15 +32,30 @@ import io.netty.buffer.ByteBuf;
 public class ByteArrayType extends Type<byte[]> {
 
     private final int length;
+    private final int maxLength;
 
     public ByteArrayType(final int length) {
-        super(byte[].class);
-        this.length = length;
+        this(length, -1);
     }
 
     public ByteArrayType() {
+        this(-1, -1);
+    }
+
+    private ByteArrayType(final int length, final int maxLength) {
         super(byte[].class);
-        this.length = -1;
+        this.length = length;
+        this.maxLength = maxLength;
+    }
+
+    /**
+     * Returns a length-prefixed byte array type that rejects arrays longer than the given maximum.
+     *
+     * @param maxLength maximum array length
+     * @return length-prefixed byte array type with the given maximum length
+     */
+    public static ByteArrayType withMaxLength(final int maxLength) {
+        return new ByteArrayType(-1, maxLength);
     }
 
     @Override
@@ -48,6 +63,7 @@ public class ByteArrayType extends Type<byte[]> {
         if (this.length != -1) {
             Preconditions.checkArgument(length == object.length, "Length does not match expected length");
         } else {
+            checkMaxLength(object.length);
             Types.VAR_INT.writePrimitive(buffer, object.length);
         }
         buffer.writeBytes(object);
@@ -55,11 +71,18 @@ public class ByteArrayType extends Type<byte[]> {
 
     @Override
     public byte[] read(final ByteBuf buffer) {
-        final int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
+        final int length = this.length == -1 ? checkMaxLength(Types.VAR_INT.readPrimitive(buffer)) : this.length;
         Preconditions.checkArgument(buffer.isReadable(length), "Length is larger than readable bytes");
         final byte[] array = new byte[length];
         buffer.readBytes(array);
         return array;
+    }
+
+    private int checkMaxLength(final int length) {
+        if (maxLength != -1 && length > maxLength) {
+            throw new IllegalArgumentException("Byte array length " + length + " is longer than maximum " + maxLength);
+        }
+        return length;
     }
 
     @Override
