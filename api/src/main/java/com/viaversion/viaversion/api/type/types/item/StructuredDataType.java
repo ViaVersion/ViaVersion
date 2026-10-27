@@ -76,7 +76,7 @@ public class StructuredDataType extends Type<StructuredData<?>> implements Struc
     }
 
     <T> StructuredData<T> readData(final ByteBuf buffer, final StructuredDataKey<T> key, final int id) {
-        return StructuredData.of(key, key.type().read(buffer), id);
+        return StructuredData.of(key, key.type().readTrackingDepth(buffer), id);
     }
 
     public DataFiller filler(final Protocol<?, ?, ?, ?> protocol) {

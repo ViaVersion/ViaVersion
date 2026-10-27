@@ -23,6 +23,8 @@
 package com.viaversion.viaversion.api.type;
 
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
+import com.viaversion.viaversion.util.NestingLimiter;
+import io.netty.buffer.ByteBuf;
 
 /**
  * Type for buffer reading and writing.
@@ -61,6 +63,22 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T>, Cod
      */
     public String getTypeName() {
         return typeName != null && !typeName.isEmpty() ? typeName : this.getClass().getName();
+    }
+
+    /**
+     * Reads a value and counts it towards the nesting depth limit of the current thread, to be used by recursive types.
+     *
+     * @param buffer buffer to read from
+     * @return read value
+     * @see NestingLimiter
+     */
+    public T readTrackingDepth(final ByteBuf buffer) {
+        NestingLimiter.increment();
+        try {
+            return read(buffer);
+        } finally {
+            NestingLimiter.decrement();
+        }
     }
 
     @Override

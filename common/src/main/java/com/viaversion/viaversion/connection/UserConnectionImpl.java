@@ -36,6 +36,7 @@ import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.util.ChatColorUtil;
+import com.viaversion.viaversion.util.NestingLimiter;
 import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -58,6 +59,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class UserConnectionImpl implements UserConnection {
     private static final int PASSTHROUGH_DATA_BYTES = Long.BYTES + 2;
+    private static final int MAX_SERVERBOUND_NESTING_DEPTH = 128;
     private static final AtomicLong IDS = new AtomicLong();
     private final long id = IDS.incrementAndGet();
     private final SplittableRandom random = new SplittableRandom();
@@ -408,10 +410,13 @@ public class UserConnectionImpl implements UserConnection {
 
         final int valuesReaderIndex = buf.readerIndex();
         final PacketWrapperImpl wrapper = new PacketWrapperImpl(id, buf, this);
+        final int previousMaxDepth = NestingLimiter.setMaxDepth(direction == Direction.SERVERBOUND ? MAX_SERVERBOUND_NESTING_DEPTH : -1);
         try {
             protocolInfo.getPipeline().transform(direction, protocolInfo.getState(direction), wrapper);
         } catch (final CancelException ex) {
             throw cancelSupplier.apply(ex);
+        } finally {
+            NestingLimiter.setMaxDepth(previousMaxDepth);
         }
 
         writeToBuffer(wrapper, buf, id, valuesReaderIndex);
