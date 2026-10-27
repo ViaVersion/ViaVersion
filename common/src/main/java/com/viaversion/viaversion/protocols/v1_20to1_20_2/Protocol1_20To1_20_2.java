@@ -151,11 +151,15 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         registerServerbound(State.LOGIN, ServerboundLoginPackets.LOGIN_ACKNOWLEDGED.getId(), -1, wrapper -> {
             wrapper.cancel();
 
+            final ProtocolStorables1_20_2 storables = wrapper.user().storables(this);
+            final ConfigurationState configurationState = storables.configurationState();
+            if (configurationState.bridgePhase() != BridgePhase.PROFILE_SENT) {
+                return;
+            }
+
             // Overwrite the state set in the base protocol to what the server actually keeps sending
             wrapper.user().getProtocolInfo().setServerState(State.PLAY);
 
-            final ProtocolStorables1_20_2 storables = wrapper.user().storables(this);
-            final ConfigurationState configurationState = storables.configurationState();
             configurationState.setBridgePhase(BridgePhase.CONFIGURATION);
             configurationState.sendQueuedPackets(wrapper.user());
         });

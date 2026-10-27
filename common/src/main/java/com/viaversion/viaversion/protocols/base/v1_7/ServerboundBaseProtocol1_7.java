@@ -48,7 +48,9 @@ public class ServerboundBaseProtocol1_7 extends AbstractProtocol<BaseClientbound
         // State tracking
         registerServerbound(ServerboundLoginPackets.LOGIN_ACKNOWLEDGED, wrapper -> {
             final ProtocolInfo info = wrapper.user().getProtocolInfo();
-            info.setState(State.CONFIGURATION);
+            if (info.getUuid() != null) {
+                info.setState(State.CONFIGURATION);
+            }
         });
 
         // Handle blocked version disconnect
