@@ -212,13 +212,24 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             return null;
         }
 
+        final MappingData mappingData = protocol.getMappingData();
+        final FullMappings dataComponentMappings = mappingData != null ? mappingData.getDataComponentSerializerMappings() : null;
+        if (dataComponentMappings == null) {
+            return null;
+        }
+
+        final int dataComponentTypes = Math.max(dataComponentMappings.size(), dataComponentMappings.mappedSize());
         final OriginalHashedItem hashedItem = new OriginalHashedItem(idTag.asInt(), item.amount(), backupTagName);
         try {
             for (final Map.Entry<String, Tag> entry : originalHashes.entrySet()) {
                 if (entry.getValue() instanceof IntTag hashTag) {
                     final String key = entry.getKey();
                     if (!key.equals("id")) {
-                        hashedItem.dataHashesById().put(Integer.parseInt(key), hashTag.asInt());
+                        final int id = Integer.parseInt(key);
+                        if (id < 0 || id >= dataComponentTypes) {
+                            return null;
+                        }
+                        hashedItem.dataHashesById().put(id, hashTag.asInt());
                     }
                 }
             }
@@ -229,6 +240,9 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         final IntArrayTag removedTag = originalHashes.getIntArrayTag("removed");
         if (removedTag != null) {
             for (final int id : removedTag.getValue()) {
+                if (id < 0 || id >= dataComponentTypes) {
+                    return null;
+                }
                 hashedItem.removedDataIds().add(id);
             }
         }
