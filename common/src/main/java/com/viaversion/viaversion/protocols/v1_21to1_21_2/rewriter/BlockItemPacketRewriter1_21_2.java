@@ -502,6 +502,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
         final IntArrayTag emptyEnchantments = customData.getIntArrayTag(nbtTagName("0_enchants"));
         if (emptyEnchantments != null) {
+            Limit.max(emptyEnchantments.length(), 256);
             Enchantments enchantments = dataContainer.get(StructuredDataKey.ENCHANTMENTS1_20_5);
             if (enchantments == null) {
                 enchantments = new Enchantments(true);

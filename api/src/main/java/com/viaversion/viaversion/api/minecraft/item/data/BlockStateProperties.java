@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public record BlockStateProperties(Map<String, String> properties) implements Copyable {
@@ -36,7 +36,7 @@ public record BlockStateProperties(Map<String, String> properties) implements Co
         @Override
         public BlockStateProperties read(final ByteBuf buffer) {
             final int size = Types.VAR_INT.readPrimitive(buffer);
-            final Map<String, String> properties = new Object2ObjectOpenHashMap<>();
+            final Map<String, String> properties = new HashMap<>();
             for (int i = 0; i < size; i++) {
                 properties.put(Types.STRING.read(buffer), Types.STRING.read(buffer));
             }
@@ -64,6 +64,6 @@ public record BlockStateProperties(Map<String, String> properties) implements Co
 
     @Override
     public BlockStateProperties copy() {
-        return new BlockStateProperties(new Object2ObjectOpenHashMap<>(properties));
+        return new BlockStateProperties(new HashMap<>(properties));
     }
 }
