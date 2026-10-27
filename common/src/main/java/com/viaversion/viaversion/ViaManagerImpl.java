@@ -37,6 +37,7 @@ import com.viaversion.viaversion.commands.ViaCommandHandler;
 import com.viaversion.viaversion.configuration.ConfigurationProviderImpl;
 import com.viaversion.viaversion.connection.ConnectionManagerImpl;
 import com.viaversion.viaversion.debug.DebugHandlerImpl;
+import com.viaversion.viaversion.platform.UserConnectionViaVersionPlatform;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionRange;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
@@ -203,6 +204,10 @@ public class ViaManagerImpl implements ViaManager {
         // Refresh Versions
         protocolManager.refreshVersions();
 
+        if (protocolVersion.isKnown() && !(platform instanceof UserConnectionViaVersionPlatform)) {
+            exploitableVersionsWarning(protocolVersion);
+        }
+
         for (final Runnable listener : postEnableListeners) {
             listener.run();
         }
@@ -241,6 +246,28 @@ public class ViaManagerImpl implements ViaManager {
         scheduler.shutdown();
 
         platform.getLogger().info("ViaVersion has been disabled; uninjected the platform and shut down the scheduler.");
+    }
+
+    private void exploitableVersionsWarning(final ServerProtocolVersion serverProtocolVersion) {
+        if (!platform.isProxy() && isExploitableVersion(serverProtocolVersion.highestSupportedProtocolVersion())) {
+            platform.getLogger().warning("The Vanilla protocol of Minecraft 1.20.5-1.21.4 is exploitable easily. Please consider updating your server to at least 1.21.5.");
+            return;
+        }
+
+        final List<String> versions = new ArrayList<>();
+        for (final ProtocolVersion version : protocolManager.getSupportedVersions()) {
+            if (isExploitableVersion(version) && !platform.getConf().blockedProtocolVersions().contains(version)) {
+                versions.add('"' + version.getName() + '"');
+            }
+        }
+        if (!versions.isEmpty()) {
+            platform.getLogger().warning("The Vanilla protocol of Minecraft 1.20.5-1.21.4 is easily exploitable. "
+                + "If you don't need to support these versions, consider adding them to block-versions in the ViaVersion config: " + String.join(", ", versions));
+        }
+    }
+
+    private static boolean isExploitableVersion(final ProtocolVersion version) {
+        return version.betweenInclusive(ProtocolVersion.v1_20_5, ProtocolVersion.v1_21_4);
     }
 
     private void checkJavaVersion() {
