@@ -194,6 +194,10 @@ enforce-secure-chat: false
 # Handles items with invalid count values (higher than max stack size) on 1.20.3 servers.
 handle-invalid-item-count: false
 #
+# Backs up the original data of nested items (e.g. in shulker boxes or bundles) for 1.20.5+ clients on 1.20.4 and older servers.
+# This keeps their data intact when taken out individually in creative mode, but greatly increases the size of deeply nested items.
+backup-nested-items: false
+#
 # Hides sidebar scoreboard numbers for 1.20.3+ clients on older server versions.
 hide-scoreboard-numbers: false
 #

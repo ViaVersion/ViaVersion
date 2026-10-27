@@ -95,6 +95,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     private boolean translateOcelotToCat;
     private boolean enforceSecureChat;
     private boolean handleInvalidItemCount;
+    private boolean backupNestedItems;
     private boolean cancelBlockSounds;
     private boolean hideScoreboardNumbers;
     private boolean fix1_21PlacementRotation;
@@ -172,6 +173,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
         translateOcelotToCat = getBoolean("translate-ocelot-to-cat", true);
         enforceSecureChat = getBoolean("enforce-secure-chat", false);
         handleInvalidItemCount = getBoolean("handle-invalid-item-count", false);
+        backupNestedItems = getBoolean("backup-nested-items", false);
         cancelBlockSounds = getBoolean("cancel-block-sounds", true);
         hideScoreboardNumbers = getBoolean("hide-scoreboard-numbers", false);
         fix1_21PlacementRotation = getBoolean("fix-1_21-placement-rotation", true);
@@ -620,6 +622,11 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     @Override
     public boolean handleInvalidItemCount() {
         return handleInvalidItemCount;
+    }
+
+    @Override
+    public boolean backupNestedItems() {
+        return backupNestedItems;
     }
 
     @Override

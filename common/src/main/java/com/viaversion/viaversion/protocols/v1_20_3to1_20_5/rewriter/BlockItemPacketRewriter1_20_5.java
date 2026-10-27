@@ -379,7 +379,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             tag.putBoolean(nbtTagName(), true);
             structuredItem.dataContainer().set(StructuredDataKey.CUSTOM_DATA, tag);
         }
+        return handleStructuredItemToClient(connection, structuredItem);
+    }
 
+    private Item handleStructuredItemToClient(final UserConnection connection, final Item structuredItem) {
         // Add data components to fix issues in older protocols
         appendItemDataFixComponents(connection, structuredItem);
 
@@ -429,6 +432,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     public Item toStructuredItem(final UserConnection connection, final Item old) {
+        return toStructuredItem(connection, old, false);
+    }
+
+    // Nested items are converted from a copy made by the root item, no need to copy again
+    private Item toStructuredItem(final UserConnection connection, final Item old, final boolean copied) {
         final CompoundTag tag = old.tag();
         final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new StructuredDataContainer());
         final StructuredDataContainer data = item.dataContainer();
@@ -482,7 +490,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
         if (blockEntityTag != null) {
-            final CompoundTag clonedTag = blockEntityTag.copy();
+            final CompoundTag clonedTag = copied ? blockEntityTag : blockEntityTag.copy();
             // Same as above
             updateBlockEntityTag(connection, data, clonedTag);
             CompoundTag spawnData = clonedTag.getCompoundTag("SpawnData");
@@ -571,9 +579,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         updateMobTags(data, tag);
 
-        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.V1_20_5.chargedProjectiles);
+        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.V1_20_5.chargedProjectiles, copied);
         if (old.identifier() == 927) {
-            updateItemList(connection, data, tag, "Items", StructuredDataKey.V1_20_5.bundleContents);
+            updateItemList(connection, data, tag, "Items", StructuredDataKey.V1_20_5.bundleContents, copied);
         }
 
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS1_20_5, (hideFlagsValue & StructuredDataConverter.HIDE_ENCHANTMENTS) == 0);
@@ -1261,12 +1269,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateItemList(final UserConnection connection, final StructuredDataContainer data, final CompoundTag tag,
-                                final String key, final StructuredDataKey<Item[]> dataKey) {
+                                final String key, final StructuredDataKey<Item[]> dataKey, final boolean copied) {
         final ListTag<CompoundTag> itemsTag = tag.getListTag(key, CompoundTag.class);
         if (itemsTag != null) {
             final Item[] items = itemsTag.stream()
                 .limit(256)
-                .map(item -> itemFromTag(connection, item.copy()))
+                .map(item -> itemFromTag(connection, copied ? item : item.copy()))
                 .filter(item -> !item.isEmpty())
                 .toArray(Item[]::new);
             data.set(dataKey, items);
@@ -1286,7 +1294,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final byte count = item.getByte("Count", (byte) 1);
         final CompoundTag tag = item.getCompoundTag("tag");
-        return handleItemToClient(connection, new DataItem(itemId, count, tag));
+        final DataItem dataItem = new DataItem(itemId, count, tag);
+        if (Via.getConfig().backupNestedItems()) {
+            return handleItemToClient(connection, dataItem);
+        }
+        return handleStructuredItemToClient(connection, toStructuredItem(connection, dataItem, true));
     }
 
     private void updateEnchantments(final StructuredDataContainer data, final CompoundTag tag, final String key,
