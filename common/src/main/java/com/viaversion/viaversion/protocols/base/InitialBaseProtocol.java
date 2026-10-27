@@ -154,6 +154,9 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
                 info.setState(State.STATUS);
             } else if (state == LOGIN_INTENT || state == TRANSFER_INTENT) {
                 info.setState(State.LOGIN);
+            } else {
+                // Unknown intent, don't handle further packets as handshakes
+                wrapper.user().setActive(false);
             }
         });
     }
