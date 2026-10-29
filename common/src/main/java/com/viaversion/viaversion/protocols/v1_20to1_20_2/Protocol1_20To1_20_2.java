@@ -34,6 +34,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
@@ -48,7 +49,6 @@ import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.rewriter.BlockItemPacketRewriter1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.rewriter.BlockRewriter1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.rewriter.EntityPacketRewriter1_20_2;
-import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ConfigurationState;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ConfigurationState.BridgePhase;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.LastResourcePack;
@@ -344,7 +344,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         protocolInfo.setServerState(State.CONFIGURATION);
 
         final PacketWrapper registryDataPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.REGISTRY_DATA, connection);
-        registryDataPacket.write(Types.COMPOUND_TAG, dimensionRegistry);
+        registryDataPacket.write(Types.COMPOUND_TAG, dimensionRegistry.copy());
         registryDataPacket.send(Protocol1_20To1_20_2.class);
 
         // If we tracked enables features, they'd be sent here
