@@ -40,8 +40,8 @@ public final class ConfigurationRegistrations {
         ctx.clientbound(ClientboundPackets1_20_2.START_CONFIGURATION, packetType -> ctx.protocol().registerClientbound(packetType, wrapper -> {
             wrapper.user().getProtocolInfo().setServerState(State.CONFIGURATION);
 
-            // Mimic client behaviour by resetting tracked entities when configuration starts.
-            final EntityTracker tracker = wrapper.user().getEntityTracker(ctx.protocol().getClass());
+            // Mimic client behavior by resetting tracked entities when configuration starts.
+            final EntityTracker tracker = wrapper.user().getEntityTracker(ctx.protocol());
             if (tracker != null) {
                 tracker.clear();
             }
