@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
+import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.LongArrayTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -272,6 +273,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
 
         final StructuredDataContainer dataContainer = item.dataContainer();
         updateItemDataComponentTypeIds(dataContainer, true);
+        backupHiddenAttributeModifiers(item);
         handleRewritablesToClient(connection, dataContainer, null);
 
         updateItemData(item);
@@ -296,6 +298,53 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
     protected void handleItemDataComponentsToServer(final UserConnection connection, final Item item, final StructuredDataContainer container) {
         downgradeItemData(item);
         super.handleItemDataComponentsToServer(connection, item, container);
+    }
+
+    private void backupHiddenAttributeModifiers(final Item item) {
+        final AttributeModifiers1_21 attributeModifiers = item.dataContainer().get(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21);
+        if (attributeModifiers == null || attributeModifiers.showInTooltip()) {
+            return;
+        }
+
+        final ListTag<CompoundTag> modifiersTag = new ListTag<>(CompoundTag.class);
+        for (final AttributeModifiers1_21.AttributeModifier modifier : attributeModifiers.modifiers()) {
+            final CompoundTag modifierTag = new CompoundTag();
+            modifierTag.putInt("attribute", modifier.attribute());
+            modifierTag.putString("id", modifier.modifier().id());
+            modifierTag.putDouble("amount", modifier.modifier().amount());
+            modifierTag.putInt("operation", modifier.modifier().operation());
+            modifierTag.putInt("slot", modifier.slotType());
+            modifiersTag.add(modifierTag);
+        }
+        saveTag(createCustomTag(item), modifiersTag, "hidden_attribute_modifiers");
+    }
+
+    @Override
+    protected void restoreBackupData(final Item item, final StructuredDataContainer container, final CompoundTag customData) {
+        super.restoreBackupData(item, container, customData);
+
+        final ListTag<CompoundTag> modifiersTag = customData.getListTag(nbtTagName("hidden_attribute_modifiers"), CompoundTag.class);
+        if (modifiersTag == null) {
+            return;
+        }
+
+        removeBackupTag(customData, "hidden_attribute_modifiers");
+        if (container.has(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5)) {
+            return;
+        }
+
+        final AttributeModifiers1_21.AttributeModifier[] modifiers = new AttributeModifiers1_21.AttributeModifier[modifiersTag.size()];
+        for (int i = 0; i < modifiers.length; i++) {
+            final CompoundTag modifierTag = modifiersTag.get(i);
+            final AttributeModifiers1_21.ModifierData modifierData = new AttributeModifiers1_21.ModifierData(
+                modifierTag.getString("id"),
+                modifierTag.getDouble("amount"),
+                modifierTag.getInt("operation")
+            );
+            modifiers[i] = new AttributeModifiers1_21.AttributeModifier(modifierTag.getInt("attribute"), modifierData, modifierTag.getInt("slot"));
+        }
+        // Show state is applied from tooltip_display afterwards
+        container.set(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5, new AttributeModifiers1_21(modifiers, true));
     }
 
     public static void updateItemData(final Item item) {
