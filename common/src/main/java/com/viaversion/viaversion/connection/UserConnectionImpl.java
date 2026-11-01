@@ -37,11 +37,12 @@ import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.NestingLimiter;
-import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandler;
 import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -55,6 +56,7 @@ import java.util.SplittableRandom;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class UserConnectionImpl implements UserConnection {
@@ -302,10 +304,6 @@ public class UserConnectionImpl implements UserConnection {
         final int initialCapacity = active ? packet.readableBytes() + PASSTHROUGH_DATA_BYTES : packet.readableBytes();
         final ByteBuf buf = packet.alloc().buffer(initialCapacity);
         try {
-            // We'll use passing through because there are some encoder wrappers
-            ChannelHandlerContext context = PipelineUtil
-                .getPreviousContext(Via.getManager().getInjector().getDecoderName(), channel.pipeline());
-
             if (shouldTransformPacket()) {
                 // Bypass serverbound packet decoder transforming
                 Types.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
@@ -313,27 +311,46 @@ public class UserConnectionImpl implements UserConnection {
             }
 
             buf.writeBytes(packet);
-            if (currentThread) {
-                fireChannelRead(context, buf);
-            } else {
-                try {
-                    channel.eventLoop().execute(() -> fireChannelRead(context, buf));
-                } catch (Throwable t) {
-                    // Couldn't schedule
-                    buf.release();
-                    throw t;
-                }
-            }
+        } catch (Throwable t) {
+            buf.release();
+            throw t;
         } finally {
             packet.release();
         }
+
+        if (currentThread && channel.eventLoop().inEventLoop()) {
+            fireChannelRead(buf);
+        } else {
+            try {
+                channel.eventLoop().execute(() -> fireChannelRead(buf));
+            } catch (Throwable t) {
+                // Couldn't schedule
+                buf.release();
+                throw t;
+            }
+        }
     }
 
-    private void fireChannelRead(@Nullable final ChannelHandlerContext context, final ByteBuf buf) {
-        if (context != null) {
-            context.fireChannelRead(buf);
-        } else {
-            channel.pipeline().fireChannelRead(buf);
+    private void fireChannelRead(final ByteBuf buf) {
+        final ChannelHandlerContext context = channel.pipeline().context(Via.getManager().getInjector().getDecoderName());
+        if (context == null) {
+            buf.release();
+            return;
+        }
+
+        // Directly invoke the decoder, copied from Netty's fireChannelRead of the previous handler
+        final ChannelHandler handler = context.handler();
+        try {
+            ((ChannelInboundHandler) handler).channelRead(context, buf);
+        } catch (Throwable t) {
+            try {
+                handler.exceptionCaught(context, t);
+            } catch (Throwable e) {
+                if (e != t) {
+                    e.addSuppressed(t);
+                }
+                Via.getPlatform().getLogger().log(Level.WARNING, "Exception thrown by exceptionCaught of " + handler, e);
+            }
         }
     }
 
