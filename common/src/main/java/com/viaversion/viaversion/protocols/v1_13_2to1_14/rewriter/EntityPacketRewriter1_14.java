@@ -168,6 +168,10 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 map(Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST); // 7 - Entity data
 
                 handler(trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST, EntityTypes1_14.PLAYER));
+                handler(wrapper -> {
+                    EntityTracker1_14 tracker = wrapper.user().getEntityTracker(protocol);
+                    tracker.setDying(wrapper.get(Types.VAR_INT, 0), false);
+                });
             }
         });
 
@@ -253,6 +257,25 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
         });
 
         registerSetEntityData(ClientboundPackets1_13.SET_ENTITY_DATA, Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST);
+
+        protocol.registerClientbound(ClientboundPackets1_13.ENTITY_EVENT, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.INT);
+            final byte event = wrapper.passthrough(Types.BYTE);
+            if (event == 3) {
+                EntityTracker1_14 tracker = tracker(wrapper.user());
+                tracker.setDying(entityId, true);
+
+                if (tracker.clientEntityId() != entityId) {
+                    // Set dying pose immediately
+                    PacketWrapper entityDataPacket = wrapper.create(ClientboundPackets1_14.SET_ENTITY_DATA);
+                    entityDataPacket.write(Types.VAR_INT, entityId);
+                    List<EntityData> entityDataList = new ArrayList<>();
+                    entityDataList.add(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, 6));
+                    entityDataPacket.write(Types1_14.ENTITY_DATA_LIST, entityDataList);
+                    entityDataPacket.scheduleSend(Protocol1_13_2To1_14.class);
+                }
+            }
+        });
     }
 
     @Override
@@ -437,6 +460,8 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
             pose = 4;
         } else if (isSneaking(flags)) {
             pose = 5;
+        } else if (tracker.isDying(entityId)) {
+            pose = 6;
         }
         return pose;
     }
