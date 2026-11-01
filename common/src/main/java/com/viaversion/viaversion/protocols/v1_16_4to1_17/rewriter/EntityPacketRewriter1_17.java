@@ -83,7 +83,7 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
                 newPacket.write(Types.VAR_INT, entityId);
                 newPacket.send(Protocol1_16_4To1_17.class);
             }
-        });
+        }, true);
 
         protocol.registerClientbound(ClientboundPackets1_16_2.LOGIN, new PacketHandlers() {
             @Override

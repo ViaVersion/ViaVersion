@@ -44,7 +44,7 @@ final class EntityRegistrations {
         ctx.clientbound(ClientboundPackets1_14_4.ADD_MOB, er::registerTracker);
     }
 
-    static <CU extends ClientboundPacketType> void registerEntityPackets1_16_2(final RegistrationContext<CU, ?> ctx, final EntityRewriter<CU, ?> er) {
+    static <CU extends ClientboundPacketType> void registerEntityPackets1_17(final RegistrationContext<CU, ?> ctx, final EntityRewriter<CU, ?> er) {
         // remove_entities got temporarily changed to only take a single entity...
         ctx.clientbound(ClientboundPackets1_14_4.ADD_ENTITY, er::registerTrackerWithData);
         ctx.clientbound(ClientboundPackets1_14_4.ADD_MOB, er::registerTracker);
