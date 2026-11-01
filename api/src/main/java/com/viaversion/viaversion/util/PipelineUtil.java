@@ -30,6 +30,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public final class PipelineUtil {
     private static final MethodHandle DECODE_METHOD = privateHandleUnchecked(ByteToMessageDecoder.class, "decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
     private static final MethodHandle ENCODE_METHOD = privateHandleUnchecked(MessageToByteEncoder.class, "encode", ChannelHandlerContext.class, Object.class, ByteBuf.class);
     private static final MethodHandle MTM_DECODE = privateHandleUnchecked(MessageToMessageDecoder.class, "decode", ChannelHandlerContext.class, Object.class, List.class);
+    private static final VarHandle PREV_CONTEXT = privateVarHandleUnchecked("io.netty.channel.AbstractChannelHandlerContext", "prev");
 
     /**
      * Calls the decode method on a netty ByteToMessageDecoder.
@@ -162,14 +164,8 @@ public final class PipelineUtil {
     }
 
     public static @Nullable ChannelHandlerContext getPreviousContext(String name, ChannelPipeline pipeline) {
-        String previous = null;
-        for (String entry : pipeline.toMap().keySet()) {
-            if (entry.equals(name)) {
-                return pipeline.context(previous);
-            }
-            previous = entry;
-        }
-        return null;
+        final ChannelHandlerContext context = pipeline.context(name);
+        return (ChannelHandlerContext) PREV_CONTEXT.getVolatile(context);
     }
 
     private static MethodHandle privateHandle(final Class<?> clazz, final String method, final Class<?>... parameterTypes) throws NoSuchMethodException, IllegalAccessException {
@@ -182,6 +178,18 @@ public final class PipelineUtil {
         try {
             return privateHandle(clazz, method, args);
         } catch (final NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static VarHandle privateVarHandle(final Class<?> clazz, final String fieldName) throws NoSuchFieldException, IllegalAccessException {
+        return MethodHandles.privateLookupIn(clazz, MethodHandles.lookup()).findVarHandle(clazz, fieldName, clazz.getDeclaredField(fieldName).getType());
+    }
+
+    private static VarHandle privateVarHandleUnchecked(final String className, final String fieldName) {
+        try {
+            return privateVarHandle(Class.forName(className), fieldName);
+        } catch (final ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
