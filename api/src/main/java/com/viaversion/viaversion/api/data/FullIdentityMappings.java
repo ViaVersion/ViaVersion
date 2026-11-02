@@ -30,7 +30,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class FullIdentityMappings extends FullMappingsBase {
 
     public FullIdentityMappings(final IdentifiersPair identifiersPair, final Mappings mappings) {
-        this(toInverseMap(identifiersPair.unmapped()), identifiersPair.unmapped().stream().map(Key::of).toArray(Key[]::new), mappings);
+        this(MappingDataLoader.identifierIndex(identifiersPair.unmapped()), mappings);
+    }
+
+    private FullIdentityMappings(final MappingDataLoader.IdentifierIndex index, final Mappings mappings) {
+        this(index.ids(), index.keys(), mappings);
     }
 
     private FullIdentityMappings(final Object2IntMap<String> stringToId, final Key[] idToKey, final Mappings mappings) {

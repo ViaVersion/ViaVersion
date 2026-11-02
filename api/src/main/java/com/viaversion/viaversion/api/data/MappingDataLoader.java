@@ -38,6 +38,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -64,6 +65,11 @@ public class MappingDataLoader {
     public static final MappingDataLoader INSTANCE = new MappingDataLoader(MappingDataLoader.class, "assets/viaversion/data/");
     public static final TagReader<CompoundTag> MAPPINGS_READER = NBTIO.reader(CompoundTag.class).named();
     private static final Map<String, String[]> GLOBAL_IDENTIFIER_INDEXES = new HashMap<>();
+    // Most identifier lists repeat across the mappings of neighbouring versions, so while mappings load,
+    // equal lists share their keys and id map, and equal identifiers share their key
+    private static final Map<List<String>, IdentifierIndex> IDENTIFIER_INDEX_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, Key> KEY_CACHE = new ConcurrentHashMap<>();
+    private static volatile boolean identifierCacheValid = true;
     private static final int VERSION = 2;
     private static final byte DIRECT_ID = 0;
     private static final byte SHIFTS_ID = 1;
@@ -118,6 +124,47 @@ public class MappingDataLoader {
     public void clearCache() {
         cacheValid = false;
         mappingsCache.clear();
+        if (this == INSTANCE) {
+            identifierCacheValid = false;
+            IDENTIFIER_INDEX_CACHE.clear();
+            KEY_CACHE.clear();
+        }
+    }
+
+    /**
+     * Returns the keys of the identifiers and a map from each identifier to its index.
+     * While mappings are loading, equal identifier lists share the same instance.
+     * The returned array and map must not be modified.
+     *
+     * @param identifiers identifiers
+     * @return keys and inverse map of the identifiers
+     */
+    public static IdentifierIndex identifierIndex(final List<String> identifiers) {
+        if (!identifierCacheValid) {
+            return createIdentifierIndex(identifiers, false);
+        }
+
+        final IdentifierIndex cached = IDENTIFIER_INDEX_CACHE.get(identifiers);
+        if (cached != null) {
+            return cached;
+        }
+
+        final IdentifierIndex index = createIdentifierIndex(identifiers, true);
+        final IdentifierIndex existing = IDENTIFIER_INDEX_CACHE.putIfAbsent(new ArrayList<>(identifiers), index);
+        return existing != null ? existing : index;
+    }
+
+    private static IdentifierIndex createIdentifierIndex(final List<String> identifiers, final boolean shareKeys) {
+        final int size = identifiers.size();
+        final Key[] keys = new Key[size];
+        final Object2IntMap<String> ids = new Object2IntOpenHashMap<>(size);
+        ids.defaultReturnValue(-1);
+        for (int i = 0; i < size; i++) {
+            final String identifier = identifiers.get(i);
+            keys[i] = shareKeys ? KEY_CACHE.computeIfAbsent(identifier, Key::of) : Key.of(identifier);
+            ids.put(identifier, i);
+        }
+        return new IdentifierIndex(keys, ids);
     }
 
     /**
@@ -461,6 +508,9 @@ public class MappingDataLoader {
         public IdentifiersPair(final List<String> identifiers) {
             this(identifiers, identifiers, true);
         }
+    }
+
+    public record IdentifierIndex(Key[] keys, Object2IntMap<String> ids) {
     }
 
     private record ValuePairs(int[] first, int[] second) {

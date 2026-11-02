@@ -40,10 +40,12 @@ public class FullMappingsBase implements FullMappings {
     public FullMappingsBase(final IdentifiersPair identifiersPair, final Mappings mappings) {
         Preconditions.checkNotNull(mappings, "Mappings cannot be null");
         this.mappings = mappings;
-        this.stringToId = toInverseMap(identifiersPair.unmapped());
-        this.idToKey = identifiersPair.unmapped().stream().map(Key::of).toArray(Key[]::new);
-        this.mappedStringToId = toInverseMap(identifiersPair.mapped());
-        this.mappedIdToKey = identifiersPair.mapped().stream().map(Key::of).toArray(Key[]::new);
+        final MappingDataLoader.IdentifierIndex unmapped = MappingDataLoader.identifierIndex(identifiersPair.unmapped());
+        final MappingDataLoader.IdentifierIndex mapped = MappingDataLoader.identifierIndex(identifiersPair.mapped());
+        this.stringToId = unmapped.ids();
+        this.idToKey = unmapped.keys();
+        this.mappedStringToId = mapped.ids();
+        this.mappedIdToKey = mapped.keys();
     }
 
     protected FullMappingsBase(final Object2IntMap<String> stringToId, final Object2IntMap<String> mappedStringToId, final Key[] idToKey, final Key[] mappedIdToKey, final Mappings mappings) {
