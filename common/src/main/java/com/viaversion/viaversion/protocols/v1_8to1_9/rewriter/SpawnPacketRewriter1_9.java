@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_8to1_9.rewriter;
 
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
@@ -197,6 +198,17 @@ public class SpawnPacketRewriter1_9 {
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
+
+                // Has to happen before the entity data is handled, which may create the boss bar
+                handler(wrapper -> {
+                    final int entityId = wrapper.get(Types.VAR_INT, 0);
+                    final double x = wrapper.get(Types.DOUBLE, 0);
+                    final double y = wrapper.get(Types.DOUBLE, 1);
+                    final double z = wrapper.get(Types.DOUBLE, 2);
+
+                    final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
+                    tracker.setBossPosition(entityId, new Vector3d(x, y, z));
+                });
 
                 map(Types.ENTITY_DATA_LIST1_8, Types.ENTITY_DATA_LIST1_9);
                 handler(wrapper -> {
