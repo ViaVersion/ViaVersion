@@ -93,6 +93,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             case "worldgen/biome" -> updateBiomes(entries);
             case "worldgen/block_state_provider" -> updateBlockStateProviders(entries);
             case "dimension_type" -> updateDimensionTypes(entries);
+            case "timeline" -> updateTimelines(entries);
             case "dialog" -> updateDialogs(connection, entries);
         }
 
@@ -459,18 +460,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         if (ambientParticles instanceof CompoundTag modifierTag) {
             ambientParticles = modifierTag.get("argument");
         }
-        if (ambientParticles instanceof ListTag<?> ambientParticlesList) {
-            for (final Tag ambientParticle : ambientParticlesList) {
-                if (!(ambientParticle instanceof CompoundTag ambientParticleTag)) {
-                    continue;
-                }
-
-                final CompoundTag particle = ambientParticleTag.getCompoundTag("particle");
-                if (particle != null) {
-                    handleParticleData(particle);
-                }
-            }
-        }
+        handleAmbientParticles(ambientParticles);
 
         Tag dripstoneParticle = TagUtil.getNamespacedTag(tag, "visual/default_dripstone_particle");
         if (dripstoneParticle instanceof CompoundTag modifierTag && modifierTag.contains("argument")) {
@@ -478,6 +468,59 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         }
         if (dripstoneParticle instanceof CompoundTag particle) {
             handleParticleData(particle);
+        }
+    }
+
+    private void handleAmbientParticles(final @Nullable Tag ambientParticles) {
+        if (!(ambientParticles instanceof ListTag<?> ambientParticlesList)) {
+            return;
+        }
+
+        for (final Tag ambientParticle : ambientParticlesList) {
+            if (!(ambientParticle instanceof CompoundTag ambientParticleTag)) {
+                continue;
+            }
+
+            final CompoundTag particle = ambientParticleTag.getCompoundTag("particle");
+            if (particle != null) {
+                handleParticleData(particle);
+            }
+        }
+    }
+
+    public void updateTimelines(final RegistryEntry[] entries) {
+        final MappingData mappings = protocol.getMappingData();
+        if (mappings == null) {
+            return;
+        }
+
+        for (final RegistryEntry entry : entries) {
+            if (entry.tag() == null) {
+                continue;
+            }
+
+            final CompoundTag tracks = ((CompoundTag) entry.tag()).getCompoundTag("tracks");
+            if (tracks == null) {
+                continue;
+            }
+
+            if (mappings.changedEnvironmentAttributes() != null) {
+                for (final String attribute : mappings.changedEnvironmentAttributes()) {
+                    TagUtil.removeNamespaced(tracks, attribute);
+                }
+            }
+
+            final CompoundTag ambientParticlesTrack = TagUtil.getNamespacedCompoundTag(tracks, "visual/ambient_particles");
+            if (ambientParticlesTrack == null) {
+                continue;
+            }
+
+            final ListTag<CompoundTag> keyframes = ambientParticlesTrack.getListTag("keyframes", CompoundTag.class);
+            if (keyframes != null) {
+                for (final CompoundTag keyframe : keyframes) {
+                    handleAmbientParticles(keyframe.get("value"));
+                }
+            }
         }
     }
 
