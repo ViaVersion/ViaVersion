@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v26_2to26_3.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
@@ -28,6 +29,23 @@ public final class ComponentRewriter26_3 extends NBTComponentRewriter<Clientboun
 
     public ComponentRewriter26_3(final Protocol26_2To26_3 protocol) {
         super(protocol);
+    }
+
+    @Override
+    protected void handleTranslate(final UserConnection connection, final CompoundTag parentTag, final StringTag translateTag) {
+        switch (translateTag.getValue()) {
+            case "filled_map.buried_treasure" -> translateTag.setValue("item.minecraft.buried_treasure_map");
+            case "filled_map.monument" -> translateTag.setValue("item.minecraft.ocean_monument_map");
+            case "filled_map.mansion" -> translateTag.setValue("item.minecraft.woodland_mansion_map");
+            case "filled_map.trial_chambers" -> translateTag.setValue("item.minecraft.buried_trial_chambers_map");
+            case "filled_map.village_desert" -> translateTag.setValue("item.minecraft.desert_village_map");
+            case "filled_map.village_plains" -> translateTag.setValue("item.minecraft.plains_village_map");
+            case "filled_map.village_savanna" -> translateTag.setValue("item.minecraft.savanna_village_map");
+            case "filled_map.village_snowy" -> translateTag.setValue("item.minecraft.snowy_village_map");
+            case "filled_map.village_taiga" -> translateTag.setValue("item.minecraft.taiga_village_map");
+            case "filled_map.explorer_swamp" -> translateTag.setValue("item.minecraft.swamp_hut_map");
+            case "filled_map.explorer_jungle" -> translateTag.setValue("item.minecraft.jungle_pyramid_map");
+        }
     }
 
     @Override
