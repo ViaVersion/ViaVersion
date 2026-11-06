@@ -55,6 +55,7 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.CipherUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.Limit;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_19> {
@@ -243,7 +244,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                     final String command = wrapper.get(Types.STRING, 0);
                     wrapper.set(Types.STRING, 0, "/" + command);
 
-                    final int signatures = wrapper.read(Types.VAR_INT);
+                    final int signatures = Limit.max(wrapper.read(Types.VAR_INT), 8);
                     for (int i = 0; i < signatures; i++) {
                         wrapper.read(Types.STRING); // Argument name
                         wrapper.read(Types.BYTE_ARRAY_PRIMITIVE); // Signature

@@ -22,13 +22,16 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.minecraft.item.data.consumable.ConsumeEffect;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Rewritable;
 
-public record DeathProtection(ConsumeEffect<?>[] deathEffects) implements Copyable {
+public record DeathProtection(ConsumeEffect<?>[] deathEffects) implements Copyable, Rewritable {
 
     public static final Type<DeathProtection> TYPE1_21_2 = new TransformingType<>(ConsumeEffect.ARRAY_TYPE1_21_2, DeathProtection.class, DeathProtection::new, DeathProtection::deathEffects) {
         @Override
@@ -42,6 +45,12 @@ public record DeathProtection(ConsumeEffect<?>[] deathEffects) implements Copyab
             ops.writeMap(map -> map.writeOptional("death_effects", ConsumeEffect.ARRAY_TYPE26_3, value.deathEffects, new ConsumeEffect<?>[0]));
         }
     };
+
+    @Override
+    public DeathProtection rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        final ConsumeEffect<?>[] deathEffects = ConsumeEffect.rewrite(this.deathEffects, connection, protocol, clientbound);
+        return deathEffects == this.deathEffects ? this : new DeathProtection(deathEffects);
+    }
 
     @Override
     public DeathProtection copy() {

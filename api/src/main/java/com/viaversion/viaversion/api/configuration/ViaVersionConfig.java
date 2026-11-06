@@ -501,6 +501,13 @@ public interface ViaVersionConfig extends Config {
     boolean handleInvalidItemCount();
 
     /**
+     * Backs up the original data of nested items (e.g. in containers or bundles) for 1.20.5+ clients on 1.20.4 and older servers.
+     *
+     * @return true if enabled
+     */
+    boolean backupNestedItems();
+
+    /**
      * Tries to cancel block break/place sounds sent by 1.8 servers to 1.9+ clients to prevent them from playing twice
      *
      * @return true if enabled

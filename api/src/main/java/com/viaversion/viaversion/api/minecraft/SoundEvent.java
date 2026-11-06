@@ -39,4 +39,11 @@ public record SoundEvent(String identifier, @Nullable Float fixedRange) {
         }
         return holder.updateId(soundRewriteFunction, () -> UNKNOWN);
     }
+
+    public static @Nullable Holder<SoundEvent> rewriteOptionalHolder(@Nullable final Holder<SoundEvent> holder, final Int2IntFunction soundRewriteFunction) {
+        if (holder == null) {
+            return null;
+        }
+        return holder.updateId(soundRewriteFunction, () -> null);
+    }
 }

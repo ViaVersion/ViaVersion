@@ -22,19 +22,22 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record KineticWeapon(int contactCooldownTicks, int delayTicks, @Nullable Condition dismountConditions,
                             @Nullable Condition knockbackConditions, @Nullable Condition damageConditions,
                             float forwardMovement, float damageMultiplier,
-                            @Nullable Holder<SoundEvent> sound, @Nullable Holder<SoundEvent> hitSound) {
+                            @Nullable Holder<SoundEvent> sound, @Nullable Holder<SoundEvent> hitSound) implements Rewritable {
 
     public static final Type<KineticWeapon> TYPE = new Type<>(KineticWeapon.class) {
         @Override
@@ -79,6 +82,13 @@ public record KineticWeapon(int contactCooldownTicks, int delayTicks, @Nullable 
             );
         }
     };
+
+    @Override
+    public KineticWeapon rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        final Holder<SoundEvent> sound = SoundEvent.rewriteOptionalHolder(this.sound, Rewritable.soundRewriteFunction(protocol, clientbound));
+        final Holder<SoundEvent> hitSound = SoundEvent.rewriteOptionalHolder(this.hitSound, Rewritable.soundRewriteFunction(protocol, clientbound));
+        return sound == this.sound && hitSound == this.hitSound ? this : new KineticWeapon(contactCooldownTicks, delayTicks, dismountConditions, knockbackConditions, damageConditions, forwardMovement, damageMultiplier, sound, hitSound);
+    }
 
     public record Condition(int maxDurationTicks, float minSpeed, float minRelativeSpeed) {
 

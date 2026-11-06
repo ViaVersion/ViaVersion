@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.Limit;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -41,7 +42,7 @@ public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) imple
         @Override
         public Enchantments read(final ByteBuf buffer) {
             final Int2IntMap enchantments = new Int2IntOpenHashMap();
-            final int size = Types.VAR_INT.readPrimitive(buffer);
+            final int size = Limit.max(Types.VAR_INT.readPrimitive(buffer), 256);
             for (int i = 0; i < size; i++) {
                 final int id = Types.VAR_INT.readPrimitive(buffer);
                 final int level = Types.VAR_INT.readPrimitive(buffer);
@@ -65,7 +66,7 @@ public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) imple
         @Override
         public Enchantments read(final ByteBuf buffer) {
             final Int2IntMap enchantments = new Int2IntOpenHashMap();
-            final int size = Types.VAR_INT.readPrimitive(buffer);
+            final int size = Limit.max(Types.VAR_INT.readPrimitive(buffer), 256);
             for (int i = 0; i < size; i++) {
                 final int id = Types.VAR_INT.readPrimitive(buffer);
                 final int level = Types.VAR_INT.readPrimitive(buffer);

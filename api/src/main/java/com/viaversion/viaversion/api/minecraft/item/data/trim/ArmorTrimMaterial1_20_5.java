@@ -32,7 +32,7 @@ import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public record ArmorTrimMaterial1_20_5(String assetName, int itemId, float itemModelIndex,
@@ -57,7 +57,7 @@ public record ArmorTrimMaterial1_20_5(String assetName, int itemId, float itemMo
             final float itemModelIndex = buffer.readFloat();
 
             final int overrideArmorMaterialsSize = Types.VAR_INT.readPrimitive(buffer);
-            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
+            final Map<String, String> overrideArmorMaterials = new HashMap<>();
             for (int i = 0; i < overrideArmorMaterialsSize; i++) {
                 final int key = Types.VAR_INT.readPrimitive(buffer);
                 final String value = Types.STRING.read(buffer);
@@ -91,7 +91,7 @@ public record ArmorTrimMaterial1_20_5(String assetName, int itemId, float itemMo
             final float itemModelIndex = buffer.readFloat();
 
             final int overrideArmorMaterialsSize = Types.VAR_INT.readPrimitive(buffer);
-            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
+            final Map<String, String> overrideArmorMaterials = new HashMap<>();
             for (int i = 0; i < overrideArmorMaterialsSize; i++) {
                 final String key = Types.STRING.read(buffer);
                 final String value = Types.STRING.read(buffer);
@@ -124,7 +124,7 @@ public record ArmorTrimMaterial1_20_5(String assetName, int itemId, float itemMo
             final int item = Types.VAR_INT.readPrimitive(buffer);
 
             final int overrideArmorMaterialsSize = Types.VAR_INT.readPrimitive(buffer);
-            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
+            final Map<String, String> overrideArmorMaterials = new HashMap<>();
             for (int i = 0; i < overrideArmorMaterialsSize; i++) {
                 final String key = Types.STRING.read(buffer);
                 final String value = Types.STRING.read(buffer);
@@ -155,7 +155,7 @@ public record ArmorTrimMaterial1_20_5(String assetName, int itemId, float itemMo
             final String assetName = Types.STRING.read(buffer);
 
             final int overrideArmorMaterialsSize = Types.VAR_INT.readPrimitive(buffer);
-            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
+            final Map<String, String> overrideArmorMaterials = new HashMap<>();
             for (int i = 0; i < overrideArmorMaterialsSize; i++) {
                 final String key = Types.STRING.read(buffer);
                 final String value = Types.STRING.read(buffer);
@@ -207,6 +207,6 @@ public record ArmorTrimMaterial1_20_5(String assetName, int itemId, float itemMo
 
     @Override
     public ArmorTrimMaterial1_20_5 copy() {
-        return new ArmorTrimMaterial1_20_5(assetName, itemId, itemModelIndex, new Object2ObjectArrayMap<>(overrideArmorMaterials), description);
+        return new ArmorTrimMaterial1_20_5(assetName, itemId, itemModelIndex, new HashMap<>(overrideArmorMaterials), description);
     }
 }

@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WallConnectionHandler extends AbstractFenceConnectionHandler {
-    private static final BlockFace[] BLOCK_FACES = {BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST};
-    private static final int[] OPPOSITES = {3, 2, 1, 0};
 
     static List<ConnectionData.ConnectorInitAction> init() {
         List<ConnectionData.ConnectorInitAction> actions = new ArrayList<>(2);
@@ -49,7 +47,7 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
     @Override
     protected byte getStates(UserConnection user, BlockPosition position) {
         byte states = super.getStates(user, position);
-        if (up(user, position)) states |= 16;
+        if (up(user, position, states)) states |= 16;
         return states;
     }
 
@@ -58,28 +56,9 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
         return 32;
     }
 
-    public boolean up(UserConnection user, BlockPosition position) {
-        if (isWall(getBlockData(user, position.getRelative(BlockFace.BOTTOM))) || isWall(getBlockData(user, position.getRelative(BlockFace.TOP))))
-            return true;
-        int blockFaces = getBlockFaces(user, position);
-        if (blockFaces == 0 || blockFaces == 0xF) return true;
-        for (int i = 0; i < BLOCK_FACES.length; i++) {
-            if ((blockFaces & (1 << i)) != 0 && (blockFaces & (1 << OPPOSITES[i])) == 0) return true;
-        }
-        return false;
-    }
-
-    private int getBlockFaces(UserConnection user, BlockPosition position) {
-        int blockFaces = 0;
-        for (int i = 0; i < BLOCK_FACES.length; i++) {
-            if (isWall(getBlockData(user, position.getRelative(BLOCK_FACES[i])))) {
-                blockFaces |= 1 << i;
-            }
-        }
-        return blockFaces;
-    }
-
-    private boolean isWall(int id) {
-        return getBlockStates().contains(id);
+    private boolean up(UserConnection user, BlockPosition position, byte states) {
+        // Only straight walls with air above have no post, see BlockWall#getActualState
+        boolean straight = states == (2 | 4) || states == (1 | 8);
+        return !straight || getBlockData(user, position.getRelative(BlockFace.TOP)) != 0;
     }
 }

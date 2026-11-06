@@ -40,7 +40,7 @@ public record PotionEffectData(int amplifier, int duration, boolean ambient, boo
             final boolean ambient = buffer.readBoolean();
             final boolean showParticles = buffer.readBoolean();
             final boolean showIcon = buffer.readBoolean();
-            final PotionEffectData hiddenEffect = OPTIONAL_TYPE.read(buffer);
+            final PotionEffectData hiddenEffect = OPTIONAL_TYPE.readTrackingDepth(buffer);
             return new PotionEffectData(amplifier, duration, ambient, showParticles, showIcon, hiddenEffect);
         }
 

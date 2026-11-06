@@ -130,8 +130,8 @@ public record BlocksAttacks(
 
     @Override
     public BlocksAttacks rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
-        final Holder<SoundEvent> blockSound = SoundEvent.rewriteHolder(this.blockSound, Rewritable.soundRewriteFunction(protocol, clientbound));
-        final Holder<SoundEvent> disableSound = SoundEvent.rewriteHolder(this.disableSound, Rewritable.soundRewriteFunction(protocol, clientbound));
+        final Holder<SoundEvent> blockSound = SoundEvent.rewriteOptionalHolder(this.blockSound, Rewritable.soundRewriteFunction(protocol, clientbound));
+        final Holder<SoundEvent> disableSound = SoundEvent.rewriteOptionalHolder(this.disableSound, Rewritable.soundRewriteFunction(protocol, clientbound));
         return new BlocksAttacks(this.blockDelaySeconds, this.disableCooldownScale, this.damageReductions, this.itemDamage, this.bypassedBy, blockSound, disableSound);
     }
 
