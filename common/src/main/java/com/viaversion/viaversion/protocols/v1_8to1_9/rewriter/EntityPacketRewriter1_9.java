@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
+import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -113,6 +114,15 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 map(Types.BOOLEAN); // 6 - On Ground
 
                 handler(wrapper -> {
+                    final int entityId = wrapper.get(Types.VAR_INT, 0);
+                    final double x = wrapper.get(Types.DOUBLE, 0);
+                    final double y = wrapper.get(Types.DOUBLE, 1);
+                    final double z = wrapper.get(Types.DOUBLE, 2);
+
+                    final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
+                    tracker.setBossPosition(entityId, new Vector3d(x, y, z));
+                });
+                handler(wrapper -> {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     if (Via.getConfig().isHologramPatch()) {
                         EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
@@ -140,6 +150,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 map(Types.BYTE); // 5 - Pitch
 
                 map(Types.BOOLEAN); // 6 - On Ground
+                handler(wrapper -> moveBoss(wrapper, protocol));
             }
         });
         protocol.registerClientbound(ClientboundPackets1_8.MOVE_ENTITY_POS, new PacketHandlers() {
@@ -152,6 +163,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 map(Types.BYTE, toNewShort); // 3 - Z
 
                 map(Types.BOOLEAN); // 4 - On Ground
+                handler(wrapper -> moveBoss(wrapper, protocol));
             }
         });
         protocol.registerClientbound(ClientboundPackets1_8.SET_EQUIPPED_ITEM, new PacketHandlers() {
@@ -377,6 +389,17 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 });
             }
         });
+    }
+
+    private static void moveBoss(PacketWrapper wrapper, Protocol1_8To1_9 protocol) {
+        // Deltas were already converted to 1.9 units (1/4096 of a block)
+        final int entityId = wrapper.get(Types.VAR_INT, 0);
+        final double deltaX = wrapper.get(Types.SHORT, 0) / 4096D;
+        final double deltaY = wrapper.get(Types.SHORT, 1) / 4096D;
+        final double deltaZ = wrapper.get(Types.SHORT, 2) / 4096D;
+
+        final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
+        tracker.moveBoss(entityId, deltaX, deltaY, deltaZ);
     }
 
     @Override
