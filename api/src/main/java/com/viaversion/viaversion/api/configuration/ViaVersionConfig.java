@@ -473,6 +473,14 @@ public interface ViaVersionConfig extends Config {
     boolean cache1_17Light();
 
     /**
+     * Returns the maximum amount of memory, in MiB per connection, used to cache block-section
+     * snapshots for translating legacy partial chunks to 1.17+ clients.
+     *
+     * @return cache size in MiB
+     */
+    int getLegacyPartialChunkCacheSize();
+
+    /**
      * Force-update 1.19.4+ player's inventory when they try to swap armor in a pre-occupied slot.
      *
      * @return true if enabled
