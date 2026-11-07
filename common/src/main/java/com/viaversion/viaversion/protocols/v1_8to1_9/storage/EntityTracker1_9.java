@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
 import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.GameMode;
+import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9.EntityType;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_9;
@@ -58,9 +59,15 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class EntityTracker1_9 extends EntityTrackerBase {
     public static final String WITHER_TRANSLATABLE = "{\"translate\":\"entity.WitherBoss.name\"}";
     public static final String DRAGON_TRANSLATABLE = "{\"translate\":\"entity.EnderDragon.name\"}";
+    // 1.8 Entity#isInRangeToRenderDist: average bounding box edge length * 64
+    private static final double WITHER_RENDER_DISTANCE = (0.9 + 3.5 + 0.9) / 3 * 64;
+    private static final double DRAGON_RENDER_DISTANCE = (16.0 + 8.0 + 16.0) / 3 * 64;
     private final Int2ObjectMap<UUID> uuidMap = new Int2ObjectOpenHashMap<>();
     private final Int2IntMap vehicleMap = new Int2IntOpenHashMap();
     private final Int2ObjectMap<BossBar> bossBarMap = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<Vector3d> bossPositions = new Int2ObjectOpenHashMap<>();
+    private BossBar shownBossBar;
+    private Vector3d playerPosition = Vector3d.ZERO;
     private final IntSet validBlocking = new IntOpenHashSet();
     private final IntSet knownHolograms = new IntOpenHashSet();
     private final Set<BlockPosition> blockInteractions = Collections.newSetFromMap(CacheBuilder.newBuilder()
@@ -143,14 +150,90 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         validBlocking.remove(entityId);
         knownHolograms.remove(entityId);
 
-        BossBar bar = bossBarMap.remove(entityId);
-        if (bar != null) {
-            bar.hide();
-            // Send to provider
-            Via.getManager().getProviders().get(BossBarProvider.class).handleRemove(user(), bar.getId());
+        this.bossPositions.remove(entityId);
+        BossBar bar = this.bossBarMap.remove(entityId);
+        if (bar != null && bar == this.shownBossBar) {
+            this.updateShownBossBar();
         }
 
         return super.removeEntity(entityId);
+    }
+
+    public void setBossPosition(final int entityId, final Vector3d position) {
+        final com.viaversion.viaversion.api.minecraft.entities.EntityType type = this.entityType(entityId);
+        if (type != EntityType.WITHER && type != EntityType.ENDER_DRAGON) {
+            return;
+        }
+
+        this.bossPositions.put(entityId, position);
+        this.updateShownBossBar();
+    }
+
+    public void moveBoss(final int entityId, final double deltaX, final double deltaY, final double deltaZ) {
+        final Vector3d position = this.bossPositions.get(entityId);
+        if (position != null) {
+            this.setBossPosition(entityId, new Vector3d(position.x() + deltaX, position.y() + deltaY, position.z() + deltaZ));
+        }
+    }
+
+    public Vector3d getPlayerPosition() {
+        return this.playerPosition;
+    }
+
+    public void setPlayerPosition(final Vector3d playerPosition) {
+        this.playerPosition = playerPosition;
+        this.updateShownBossBar();
+    }
+
+    private void updateShownBossBar() {
+        BossBar best = null;
+        int bestSectionDistance = -1;
+        for (final Int2ObjectMap.Entry<BossBar> entry : this.bossBarMap.int2ObjectEntrySet()) {
+            final Vector3d position = this.bossPositions.get(entry.getIntKey());
+            if (position == null) {
+                continue;
+            }
+
+            final double deltaX = position.x() - this.playerPosition.x();
+            final double deltaY = position.y() - this.playerPosition.y();
+            final double deltaZ = position.z() - this.playerPosition.z();
+            final double range = this.entityType(entry.getIntKey()) == EntityType.ENDER_DRAGON ? DRAGON_RENDER_DISTANCE : WITHER_RENDER_DISTANCE;
+            if (deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ >= range * range) {
+                continue;
+            }
+
+            final int distanceX = Math.abs(sectionCoord(position.x()) - sectionCoord(this.playerPosition.x()));
+            final int distanceY = Math.abs(sectionCoord(position.y()) - sectionCoord(this.playerPosition.y()));
+            final int distanceZ = Math.abs(sectionCoord(position.z()) - sectionCoord(this.playerPosition.z()));
+            final int sectionDistance = distanceX + distanceY + distanceZ;
+            // Prefer the currently shown bar on ties to avoid needless switching
+            if (sectionDistance > bestSectionDistance || (sectionDistance == bestSectionDistance && entry.getValue() == shownBossBar)) {
+                best = entry.getValue();
+                bestSectionDistance = sectionDistance;
+            }
+        }
+        this.showBossBar(best);
+    }
+
+    private static int sectionCoord(double coord) {
+        return (int) Math.floor(coord) >> 4;
+    }
+
+    private void showBossBar(@Nullable final BossBar bar) {
+        if (bar == this.shownBossBar) {
+            return;
+        }
+
+        final BossBarProvider provider = Via.getManager().getProviders().get(BossBarProvider.class);
+        if (this.shownBossBar != null) {
+            this.shownBossBar.removeConnection(user());
+            provider.handleRemove(user(), this.shownBossBar.getId());
+        }
+        this.shownBossBar = bar;
+        if (bar != null) {
+            bar.addConnection(user());
+            provider.handleAdd(user(), bar.getId());
+        }
     }
 
     public boolean interactedBlockRecently(final int x, final int y, final int z) {
@@ -253,11 +336,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                         if (bar == null) {
                             bar = Via.getAPI().legacyAPI().createLegacyBossBar(title, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityId, bar);
-                            bar.addConnection(user());
-                            bar.show();
-
-                            // Send to provider
-                            Via.getManager().getProviders().get(BossBarProvider.class).handleAdd(user(), bar.getId());
+                            updateShownBossBar();
                         } else {
                             bar.setTitle(title);
                         }
@@ -270,10 +349,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                             String title = type == EntityType.ENDER_DRAGON ? DRAGON_TRANSLATABLE : WITHER_TRANSLATABLE;
                             bar = Via.getAPI().legacyAPI().createLegacyBossBar(title, health, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityId, bar);
-                            bar.addConnection(user());
-                            bar.show();
-                            // Send to provider
-                            Via.getManager().getProviders().get(BossBarProvider.class).handleAdd(user(), bar.getId());
+                            updateShownBossBar();
                         } else {
                             bar.setHealth(health);
                         }
