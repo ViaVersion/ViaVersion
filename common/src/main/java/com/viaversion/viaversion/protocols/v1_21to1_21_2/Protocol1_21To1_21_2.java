@@ -36,6 +36,9 @@ import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
@@ -92,7 +95,20 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         registerServerbound(ServerboundConfigurationPackets1_20_5.CLIENT_INFORMATION, this::clientInformation);
 
         cancelServerbound(ServerboundPackets1_21_2.BUNDLE_ITEM_SELECTED);
-        cancelServerbound(ServerboundPackets1_21_2.CLIENT_TICK_END);
+        registerServerbound(ServerboundPackets1_21_2.CLIENT_TICK_END, null, wrapper -> {
+            wrapper.cancel();
+            final MovementTracker tracker = wrapper.user().get(MovementTracker.class);
+            // Only the 1.8-and-older path needs a flying packet every client tick.
+            if (tracker == null || tracker.endClientTick() || !wrapper.user().getEntityTracker(Protocol1_8To1_9.class).hasClientEntityId()) {
+                return;
+            }
+
+            // Send immediately on the packet path to preserve ordering with attacks, without an idle timer.
+            // A real movement packet already serves as the tick for ticks in which the client moves.
+            final PacketWrapper movement = wrapper.create(ServerboundPackets1_8.MOVE_PLAYER_STATUS_ONLY);
+            movement.write(Types.BOOLEAN, tracker.isGround());
+            movement.sendToServer(Protocol1_8To1_9.class);
+        });
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
             wrapper.passthrough(Types.UUID); // UUID
