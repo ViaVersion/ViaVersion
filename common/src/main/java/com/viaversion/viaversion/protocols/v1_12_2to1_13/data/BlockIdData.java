@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.data;
 import com.google.gson.reflect.TypeToken;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.util.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.io.IOException;
@@ -33,6 +34,7 @@ import java.util.logging.Level;
 
 public class BlockIdData {
     public static final Map<String, String[]> blockIdMapping = new HashMap<>();
+    public static final Map<String, Pair<String, Short>> blockIdInverseMapping = new HashMap<>();
     public static final Map<String, String[]> fallbackReverseMapping = new HashMap<>();
     public static final Int2ObjectMap<String> numberIdToString = new Int2ObjectOpenHashMap<>();
 
@@ -54,6 +56,11 @@ public class BlockIdData {
                 }
             }
             reverse.forEach((val, keys) -> fallbackReverseMapping.put(val, keys.toArray(new String[0])));
+            blockIdMapping.forEach((string112, strings113) -> {
+                for (int i = 0; i < strings113.length; i++) {
+                    blockIdInverseMapping.put(strings113[i], new Pair<>(string112, (short) i));
+                }
+            });
         } catch (IOException e) {
             Protocol1_12_2To1_13.LOGGER.log(Level.SEVERE, "Failed to load block id mappings", e);
         }
