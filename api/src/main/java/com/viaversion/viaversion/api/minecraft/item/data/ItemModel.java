@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ import com.viaversion.viaversion.util.Rewritable;
 
 public record ItemModel(Key key) implements Rewritable {
 
-    public static final Type<ItemModel> TYPE = TransformingType.of(Types.RESOURCE_LOCATION, ItemModel.class, ItemModel::new, ItemModel::key);
+    public static final Type<ItemModel> TYPE = TransformingType.of(Types.IDENTIFIER, ItemModel.class, ItemModel::new, ItemModel::key);
 
     @Override
     public ItemModel rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {

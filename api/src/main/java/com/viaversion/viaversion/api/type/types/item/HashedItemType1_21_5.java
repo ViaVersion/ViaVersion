@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
 public class HashedItemType1_21_5 extends Type<HashedItem> {
+    private static final int MAX_DATA_TYPE_ID = 255; // Needs adjusting if we ever get beyond this
 
     public HashedItemType1_21_5() {
         super(HashedItem.class);
@@ -51,7 +52,7 @@ public class HashedItemType1_21_5 extends Type<HashedItem> {
         final int addedComponentsSize = Limit.max(Types.VAR_INT.readPrimitive(buffer), 256);
         final Int2IntMap dataHashes = new Int2IntOpenHashMap(addedComponentsSize);
         for (int i = 0; i < addedComponentsSize; i++) {
-            final int dataType = Types.VAR_INT.readPrimitive(buffer);
+            final int dataType = readDataType(buffer);
             final int hash = Types.INT.readPrimitive(buffer);
             dataHashes.put(dataType, hash);
         }
@@ -59,10 +60,18 @@ public class HashedItemType1_21_5 extends Type<HashedItem> {
         final int removedComponentsSize = Limit.max(Types.VAR_INT.readPrimitive(buffer), 256);
         final IntSet removedData = new IntOpenHashSet(removedComponentsSize);
         for (int i = 0; i < removedComponentsSize; i++) {
-            final int dataType = Types.VAR_INT.readPrimitive(buffer);
+            final int dataType = readDataType(buffer);
             removedData.add(dataType);
         }
         return new HashedStructuredItem(id, amount, dataHashes, removedData);
+    }
+
+    private static int readDataType(final ByteBuf buffer) {
+        final int dataType = Types.VAR_INT.readPrimitive(buffer);
+        if (dataType < 0 || dataType > MAX_DATA_TYPE_ID) {
+            throw new IllegalArgumentException("Invalid data component type " + dataType);
+        }
+        return dataType;
     }
 
     @Override

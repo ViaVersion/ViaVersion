@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ import com.viaversion.viaversion.protocols.v1_15_2to1_16.Protocol1_15_2To1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.data.AttributeMappings1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ServerboundPackets1_16;
-import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.InventoryTracker1_16;
+import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.ProtocolStorables1_16;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import com.viaversion.viaversion.util.Key;
@@ -57,7 +57,7 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
             clearPacket.send(Protocol1_15_2To1_16.class);
         };
 
-        protocol.registerClientbound(ClientboundPackets1_15.OPEN_SCREEN, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_15.OPEN_SCREEN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // Window Id
@@ -66,12 +66,12 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
 
                 handler(cursorRemapper);
                 handler(wrapper -> {
-                    InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
+                    final ProtocolStorables1_16 storables = wrapper.user().storables(protocol);
                     int windowType = wrapper.get(Types.VAR_INT, 1);
                     if (windowType >= 20) { // smithing added with id 20
                         wrapper.set(Types.VAR_INT, 1, ++windowType);
                     }
-                    inventoryTracker.setInventoryOpen(true);
+                    storables.inventoryTracker().setInventoryOpen(true);
                 });
             }
         });
@@ -81,8 +81,8 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
             public void register() {
                 handler(cursorRemapper);
                 handler(wrapper -> {
-                    InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
-                    inventoryTracker.setInventoryOpen(false);
+                    final ProtocolStorables1_16 storables = wrapper.user().storables(protocol);
+                    storables.inventoryTracker().setInventoryOpen(false);
                 });
             }
         });
@@ -106,12 +106,6 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
             }
         });
 
-        registerCooldown(ClientboundPackets1_15.COOLDOWN);
-        registerSetContent(ClientboundPackets1_15.CONTAINER_SET_CONTENT);
-        registerMerchantOffers(ClientboundPackets1_15.MERCHANT_OFFERS);
-        registerSetSlot(ClientboundPackets1_15.CONTAINER_SET_SLOT);
-        registerAdvancements(ClientboundPackets1_15.UPDATE_ADVANCEMENTS);
-
         protocol.registerClientbound(ClientboundPackets1_15.SET_EQUIPPED_ITEM, ClientboundPackets1_16.SET_EQUIPMENT, new PacketHandlers() {
             @Override
             public void register() {
@@ -127,12 +121,9 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_15.UPDATE_RECIPES);
 
-        registerContainerClick(ServerboundPackets1_16.CONTAINER_CLICK);
-        registerSetCreativeModeSlot(ServerboundPackets1_16.SET_CREATIVE_MODE_SLOT);
-
         protocol.registerServerbound(ServerboundPackets1_16.CONTAINER_CLOSE, wrapper -> {
-            InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
-            inventoryTracker.setInventoryOpen(false);
+            final ProtocolStorables1_16 storables = wrapper.user().storables(protocol);
+            storables.inventoryTracker().setInventoryOpen(false);
         });
 
         protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)));

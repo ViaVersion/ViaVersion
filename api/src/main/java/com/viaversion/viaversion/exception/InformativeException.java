@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class InformativeException extends RuntimeException {
-    private static final int MAX_MESSAGE_LENGTH = 5_000;
     private final List<DataEntry> dataEntries = new ArrayList<>();
     private boolean shouldBePrinted = true;
     private int sources;
@@ -61,7 +60,7 @@ public class InformativeException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        final StringBuilder builder = new StringBuilder("Please report this on the Via support Discord or open an issue on the relevant GitHub repository\n");
+        final StringBuilder builder = new StringBuilder("Please report the full error (!) from the console on the Via support Discord or open an issue on the relevant GitHub repository.\n");
         boolean first = true;
         for (final DataEntry entry : dataEntries) {
             if (!first) {
@@ -72,8 +71,8 @@ public class InformativeException extends RuntimeException {
 
             builder.append(entry.name()).append(": ");
             String s = String.valueOf(entry.value());
-            if (!Via.getManager().isDebug() && s.length() > 10 && builder.length() + s.length() > MAX_MESSAGE_LENGTH) {
-                final int remaining = Math.max(0, MAX_MESSAGE_LENGTH - builder.length());
+            if (!Via.getManager().isDebug() && s.length() > 10 && builder.length() + s.length() > Via.getConfig().maxErrorLength()) {
+                final int remaining = Math.max(0, Via.getConfig().maxErrorLength() - builder.length());
                 s = s.substring(0, Math.min(remaining, s.length())) + "...";
             }
             builder.append(StringUtil.forLogging(s));

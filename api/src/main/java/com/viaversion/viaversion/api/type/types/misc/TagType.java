@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,15 +43,25 @@ import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.io.FastByteBufInputStream;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.Map;
 
 public class TagType extends Type<Tag> {
 
+    static final boolean USE_JAVA_DATA_IO = Runtime.version().feature() >= 24; // Improved by a lot in JDK 24
+    private final int maxBytes;
+
     public TagType() {
+        this(true);
+    }
+
+    public TagType(final boolean limitBytes) {
         super(Tag.class);
+        this.maxBytes = limitBytes ? TagLimiter.DEFAULT_MAX_BYTES : Integer.MAX_VALUE;
     }
 
     @Override
@@ -61,9 +71,10 @@ public class TagType extends Type<Tag> {
             return null;
         }
 
-        final TagLimiter tagLimiter = TagLimiter.create(NamedCompoundTagType.MAX_NBT_BYTES, NamedCompoundTagType.MAX_NESTING_LEVEL);
+        final TagLimiter tagLimiter = TagLimiter.create(this.maxBytes, TagLimiter.DEFAULT_MAX_NESTING_LEVEL);
         try {
-            return TagRegistry.read(id, new ByteBufInputStream(buffer), tagLimiter, 0);
+            final DataInput in = USE_JAVA_DATA_IO ? new ByteBufInputStream(buffer) : new FastByteBufInputStream(buffer);
+            return TagRegistry.read(id, in, tagLimiter, 0);
         } catch (final IOException e) {
             if (Via.getManager().isDebug()) {
                 throw new RuntimeException(e);
@@ -127,8 +138,16 @@ public class TagType extends Type<Tag> {
 
     public static final class OptionalTagType extends OptionalType<Tag> {
 
-        public OptionalTagType() {
-            super(Types.TAG);
+        private OptionalTagType(final Type<Tag> tagType) {
+            super(tagType);
+        }
+
+        public static OptionalTagType type() {
+            return new OptionalTagType(Types.TAG);
+        }
+
+        public static OptionalTagType trustedType() {
+            return new OptionalTagType(Types.TRUSTED_TAG);
         }
     }
 }

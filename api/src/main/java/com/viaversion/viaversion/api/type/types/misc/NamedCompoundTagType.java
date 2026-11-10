@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,16 +28,17 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.io.FastByteBufInputStream;
+import com.viaversion.viaversion.io.FastByteBufOutputStream;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class NamedCompoundTagType extends Type<CompoundTag> {
-
-    public static final int MAX_NBT_BYTES = 2097152; // 2mb
-    public static final int MAX_NESTING_LEVEL = 512;
 
     public NamedCompoundTagType() {
         super(CompoundTag.class);
@@ -46,7 +47,7 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
     @Override
     public CompoundTag read(final ByteBuf buffer) {
         try {
-            return read(buffer, true);
+            return read(buffer, TagLimiter.DEFAULT_MAX_BYTES, true);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -61,7 +62,7 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
         }
     }
 
-    public static CompoundTag read(final ByteBuf buffer, final boolean readName) throws IOException {
+    public static CompoundTag read(final ByteBuf buffer, final int maxBytes, final boolean readName) throws IOException {
         final byte id = buffer.readByte();
         if (id == 0) {
             return null;
@@ -74,8 +75,9 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
             buffer.skipBytes(buffer.readUnsignedShort());
         }
 
-        final TagLimiter tagLimiter = TagLimiter.create(MAX_NBT_BYTES, MAX_NESTING_LEVEL);
-        return CompoundTag.read(new ByteBufInputStream(buffer), tagLimiter, 0);
+        final TagLimiter tagLimiter = TagLimiter.create(maxBytes, TagLimiter.DEFAULT_MAX_NESTING_LEVEL);
+        final DataInput in = TagType.USE_JAVA_DATA_IO ? new ByteBufInputStream(buffer) : new FastByteBufInputStream(buffer);
+        return CompoundTag.read(in, tagLimiter, 0);
     }
 
     public static void write(final ByteBuf buffer, final Tag tag, final @Nullable String name) throws IOException {
@@ -84,7 +86,7 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
             return;
         }
 
-        final ByteBufOutputStream out = new ByteBufOutputStream(buffer);
+        final DataOutput out = TagType.USE_JAVA_DATA_IO ? new ByteBufOutputStream(buffer) : new FastByteBufOutputStream(buffer);
         out.writeByte(tag.getTagId());
         if (name != null) {
             out.writeUTF(name);

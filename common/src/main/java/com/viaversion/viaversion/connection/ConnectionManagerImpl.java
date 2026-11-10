@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
     protected final Map<UUID, UserConnection> serverConnections = new ConcurrentHashMap<>();
     protected final Map<UUID, UserConnection> clientConnections = new ConcurrentHashMap<>();
     protected final Set<UserConnection> connections = ConcurrentHashMap.newKeySet();
+    private final Set<UserConnection> connectionsView = Collections.unmodifiableSet(connections);
 
     @Override
     public void onLoginSuccess(UserConnection connection) {
@@ -120,7 +121,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
 
     @Override
     public Set<UserConnection> getConnections() {
-        return Collections.unmodifiableSet(connections);
+        return connectionsView;
     }
 
 }

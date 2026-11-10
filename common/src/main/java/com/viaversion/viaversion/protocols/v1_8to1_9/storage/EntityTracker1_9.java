@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.storage;
 import com.google.common.cache.CacheBuilder;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
 import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
 import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
@@ -39,6 +40,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -51,6 +53,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EntityTracker1_9 extends EntityTrackerBase {
     public static final String WITHER_TRANSLATABLE = "{\"translate\":\"entity.WitherBoss.name\"}";
@@ -79,7 +82,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     }
 
     public UUID getEntityUUID(int id) {
-        return uuidMap.computeIfAbsent(id, k -> UUID.randomUUID());
+        return uuidMap.computeIfAbsent(id, k -> UUIDUtil.randomUUID());
     }
 
     public void setSecondHand(Item item) {
@@ -134,9 +137,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     }
 
     @Override
-    public void removeEntity(int entityId) {
-        super.removeEntity(entityId);
-
+    public @Nullable TrackedEntity removeEntity(int entityId) {
         vehicleMap.remove(entityId);
         uuidMap.remove(entityId);
         validBlocking.remove(entityId);
@@ -148,6 +149,8 @@ public class EntityTracker1_9 extends EntityTrackerBase {
             // Send to provider
             Via.getManager().getProviders().get(BossBarProvider.class).handleRemove(user(), bar.getId());
         }
+
+        return super.removeEntity(entityId);
     }
 
     public boolean interactedBlockRecently(final int x, final int y, final int z) {

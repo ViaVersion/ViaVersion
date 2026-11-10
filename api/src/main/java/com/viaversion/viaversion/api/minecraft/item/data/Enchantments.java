@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.Limit;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -41,7 +42,7 @@ public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) imple
         @Override
         public Enchantments read(final ByteBuf buffer) {
             final Int2IntMap enchantments = new Int2IntOpenHashMap();
-            final int size = Types.VAR_INT.readPrimitive(buffer);
+            final int size = Limit.max(Types.VAR_INT.readPrimitive(buffer), 256);
             for (int i = 0; i < size; i++) {
                 final int id = Types.VAR_INT.readPrimitive(buffer);
                 final int level = Types.VAR_INT.readPrimitive(buffer);
@@ -65,7 +66,7 @@ public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) imple
         @Override
         public Enchantments read(final ByteBuf buffer) {
             final Int2IntMap enchantments = new Int2IntOpenHashMap();
-            final int size = Types.VAR_INT.readPrimitive(buffer);
+            final int size = Limit.max(Types.VAR_INT.readPrimitive(buffer), 256);
             for (int i = 0; i < size; i++) {
                 final int id = Types.VAR_INT.readPrimitive(buffer);
                 final int level = Types.VAR_INT.readPrimitive(buffer);
@@ -89,7 +90,7 @@ public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) imple
             ops.writeMap(map -> {
                 for (final Int2IntMap.Entry entry : value.enchantments.int2IntEntrySet()) {
                     final Key key = ops.context().registryAccess().registryKey("enchantment", entry.getIntKey());
-                    map.write(Types.RESOURCE_LOCATION, key, Types.VAR_INT, entry.getIntValue());
+                    map.write(Types.IDENTIFIER, key, Types.VAR_INT, entry.getIntValue());
                 }
             });
         }

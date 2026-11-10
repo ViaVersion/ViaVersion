@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ public enum ServerboundPackets1_21_6 implements ServerboundPacket1_21_6, Serverb
     CONTAINER_SLOT_STATE_CHANGED, // 0x13
     COOKIE_RESPONSE, // 0x14
     CUSTOM_PAYLOAD, // 0x15
-    DEBUG_SAMPLE_SUBSCRIPTION, // 0x16
+    DEBUG_SUBSCRIPTION_REQUEST, // 0x16
     EDIT_BOOK, // 0x17
     ENTITY_TAG_QUERY, // 0x18
     INTERACT, // 0x19

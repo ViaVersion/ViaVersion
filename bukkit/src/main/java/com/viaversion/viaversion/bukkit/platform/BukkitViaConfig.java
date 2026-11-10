@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,10 +50,6 @@ public class BukkitViaConfig extends AbstractViaConfig {
         useNewDeathMessages = getBoolean("use-new-deathmessages", true);
         itemCache = getBoolean("item-cache", true);
         nmsPlayerTicking = getBoolean("nms-player-ticking", true);
-    }
-
-    @Override
-    protected void handleConfig(Map<String, Object> config) {
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,11 +29,11 @@ public class EitherImpl<X, Y> implements Either<X, Y> {
     private final X left;
     private final Y right;
 
-    protected EitherImpl(final X left, final Y value) {
+    protected EitherImpl(final X left, final Y right) {
         this.left = left;
-        this.right = value;
-        Preconditions.checkArgument(left == null || value == null, "Either.left and Either.right are both present");
-        Preconditions.checkArgument(left != null || value != null, "Either.left and Either.right are both null");
+        this.right = right;
+        Preconditions.checkArgument(left == null || right == null, "Either.left and Either.right are both present");
+        Preconditions.checkArgument(left != null || right != null, "Either.left and Either.right are both null");
     }
 
     @Override

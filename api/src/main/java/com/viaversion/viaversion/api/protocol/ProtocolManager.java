@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -249,7 +249,17 @@ public interface ProtocolManager {
      *
      * @return true if the executor has now been shut down
      */
-    boolean checkForMappingCompletion();
+    default boolean checkForMappingCompletion() {
+        return checkForMappingCompletion(false);
+    }
+
+    /**
+     * Shuts down the executor and uncaches mappings if all futures have been completed.
+     *
+     * @param propagateErrors whether to propagate errors from the futures to the caller
+     * @return true if the executor has now been shut down
+     */
+    boolean checkForMappingCompletion(boolean propagateErrors);
 
     /**
      * Executes the given runnable asynchronously, adding a {@link CompletableFuture}
@@ -308,4 +318,12 @@ public interface ProtocolManager {
      * @return whether the mappings have been loaded
      */
     boolean hasLoadedMappings();
+
+    /**
+     * Returns the number of registered protocols.
+     * Used to size per-connection protocol data arrays.
+     *
+     * @return number of registered protocols
+     */
+    int registeredProtocolCount();
 }

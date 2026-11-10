@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ import java.util.Arrays;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class PacketArrayMappings implements PacketMappings {
-    private final PacketMapping[][] packets = new PacketMapping[State.values().length][];
+    private final PacketMapping[][] packets = new PacketMapping[State.statesCount()][];
 
     @Override
     public @Nullable PacketMapping mappedPacket(final State state, final int unmappedId) {

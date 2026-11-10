@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,14 +34,18 @@ import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ChunkType1_21_5 extends Type<Chunk> {
+public class ChunkType1_21_5 extends Type<Chunk> {
     private final ChunkSectionType1_18 sectionType;
     private final int ySectionCount;
 
     public ChunkType1_21_5(final int ySectionCount, final int globalPaletteBlockBits, final int globalPaletteBiomeBits) {
+        this(new ChunkSectionType1_21_5(globalPaletteBlockBits, globalPaletteBiomeBits), ySectionCount);
+    }
+
+    protected ChunkType1_21_5(final ChunkSectionType1_18 sectionType, final int ySectionCount) {
         super(Chunk.class);
         Preconditions.checkArgument(ySectionCount > 0);
-        this.sectionType = new ChunkSectionType1_21_5(globalPaletteBlockBits, globalPaletteBiomeBits);
+        this.sectionType = sectionType;
         this.ySectionCount = ySectionCount;
     }
 

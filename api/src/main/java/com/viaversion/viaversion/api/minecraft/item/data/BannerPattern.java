@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ public record BannerPattern(String assetId, String translationKey) {
         @Override
         public void writeDirect(final Ops ops, final BannerPattern object) {
             ops.writeMap(map -> map
-                .write("asset_id", Types.RESOURCE_LOCATION, Key.of(object.assetId))
+                .write("asset_id", Types.IDENTIFIER, Key.of(object.assetId))
                 .write("translation_key", Types.STRING, object.translationKey));
         }
 

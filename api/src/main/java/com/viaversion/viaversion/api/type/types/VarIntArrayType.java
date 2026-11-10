@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,13 +28,21 @@ import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class VarIntArrayType extends Type<int[]> {
-    public VarIntArrayType() {
+
+    private final int length;
+
+    public VarIntArrayType(final int length) {
         super(int[].class);
+        this.length = length;
+    }
+
+    public VarIntArrayType() {
+        this(-1);
     }
 
     @Override
     public int[] read(ByteBuf buffer) {
-        int length = Types.VAR_INT.readPrimitive(buffer);
+        int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
         Preconditions.checkArgument(buffer.isReadable(length)); // Sanity check, at least 1 byte will be used for each varint
         int[] array = new int[length];
         for (int i = 0; i < array.length; i++) {
@@ -45,7 +53,11 @@ public class VarIntArrayType extends Type<int[]> {
 
     @Override
     public void write(ByteBuf buffer, int[] object) {
-        Types.VAR_INT.writePrimitive(buffer, object.length);
+        if (this.length != -1) {
+            Preconditions.checkArgument(length == object.length, "Length does not match expected length");
+        } else {
+            Types.VAR_INT.writePrimitive(buffer, object.length);
+        }
         for (int i : object) {
             Types.VAR_INT.writePrimitive(buffer, i);
         }

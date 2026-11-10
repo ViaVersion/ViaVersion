@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,12 @@
  */
 package com.viaversion.viaversion.common;
 
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.common.dummy.DummyInitializer;
 import org.junit.jupiter.api.BeforeAll;
 
 public abstract class PlatformTestBase {
 
     @BeforeAll
     static void loadPlatform() throws InterruptedException {
-        DummyInitializer.init();
-        while (!Via.getManager().getProtocolManager().hasLoadedMappings()) {
-            Thread.sleep(100);
-        }
+        PlatformTestLoader.ensureLoaded();
     }
 }

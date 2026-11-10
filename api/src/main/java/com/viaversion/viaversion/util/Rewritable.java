@@ -1,25 +1,32 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package com.viaversion.viaversion.util;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -55,6 +62,12 @@ public interface Rewritable {
         return mappings == null ? itemId : (clientbound ? mappedIdentifier(mappings, itemId) : unmappedIdentifier(mappings, itemId));
     }
 
+    static @Nullable Item rewriteItem(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound, final Item item) {
+        final ItemRewriter<?> rewriter = protocol.getItemRewriter();
+        return rewriter == null ? item
+            : (clientbound ? rewriter.handleItemToClient(connection, item) : rewriter.handleItemToServer(connection, item));
+    }
+
     static Int2IntFunction itemRewriteFunction(final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         return protocol.getMappingData().getItemMappings() == null ? Int2IntFunction.identity()
             : (clientbound ? protocol.getMappingData()::getNewItemId : protocol.getMappingData()::getOldItemId);
@@ -67,7 +80,7 @@ public interface Rewritable {
 
     static Int2IntFunction soundRewriteFunction(final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         return protocol.getMappingData().getSoundMappings() == null ? Int2IntFunction.identity()
-            : (clientbound ? protocol.getMappingData().getSoundMappings()::getNewId : protocol.getMappingData()::getOldSoundId);
+            : (clientbound ? protocol.getMappingData().getSoundMappings()::getNewId : protocol.getMappingData().getSoundMappings().inverse()::getNewId);
     }
 
     static Int2IntFunction entityRewriteFunction(final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {

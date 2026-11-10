@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,9 +34,10 @@ import com.viaversion.viaversion.protocols.v1_15_2to1_16.data.AttributeMappings1
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.data.DimensionRegistries1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ServerboundPackets1_16;
-import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.InventoryTracker1_16;
+import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.ProtocolStorables1_16;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.UUIDUtil;
 import java.util.UUID;
 
 public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1_15, Protocol1_15_2To1_16> {
@@ -91,9 +92,9 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 return;
             }
 
-            wrapper.user().getEntityTracker(Protocol1_15_2To1_16.class).addEntity(entityId, EntityTypes1_16.LIGHTNING_BOLT);
+            wrapper.user().getEntityTracker(protocol).addEntity(entityId, EntityTypes1_16.LIGHTNING_BOLT);
 
-            wrapper.write(Types.UUID, UUID.randomUUID()); // uuid
+            wrapper.write(Types.UUID, UUIDUtil.randomUUID()); // uuid
             wrapper.write(Types.VAR_INT, EntityTypes1_16.LIGHTNING_BOLT.getId()); // entity type
 
             wrapper.passthrough(Types.DOUBLE); // x
@@ -107,11 +108,8 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
             wrapper.write(Types.SHORT, (short) 0); // velocity
         });
 
-        registerTrackerWithData(ClientboundPackets1_15.ADD_ENTITY, EntityTypes1_16.FALLING_BLOCK);
-        registerTracker(ClientboundPackets1_15.ADD_MOB);
         registerTracker(ClientboundPackets1_15.ADD_PLAYER, EntityTypes1_16.PLAYER);
         registerSetEntityData(ClientboundPackets1_15.SET_ENTITY_DATA, Types1_14.ENTITY_DATA_LIST, Types1_16.ENTITY_DATA_LIST);
-        registerRemoveEntities(ClientboundPackets1_15.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_15.RESPAWN, new PacketHandlers() {
             @Override
@@ -170,7 +168,7 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 if (attributeIdentifier == null) {
                     attributeIdentifier = Key.namespaced(key);
                     if (!Key.isValid(attributeIdentifier)) {
-                        if (!Via.getConfig().isSuppressConversionWarnings()) {
+                        if (Via.getConfig().logOtherConversionWarnings()) {
                             protocol.getLogger().warning("Invalid attribute: " + key);
                         }
                         actualSize--;
@@ -205,9 +203,9 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 return;
             }
 
-            InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
+            final ProtocolStorables1_16 storables = wrapper.user().storables(protocol);
             // Don't send an arm swing if the player has an inventory opened.
-            if (inventoryTracker.isInventoryOpen()) {
+            if (storables.inventoryTracker().isInventoryOpen()) {
                 wrapper.cancel();
             }
         });
@@ -225,11 +223,6 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
             int angerTime = (mask & 0x02) != 0 ? Integer.MAX_VALUE : 0;
             event.createExtraData(new EntityData(20, Types1_16.ENTITY_DATA_TYPES.varIntType, angerTime));
         });
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@ import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.EntityPacketRe
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.ItemPacketRewriter1_12;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPackets1_9_3;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
 
 public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
 
@@ -58,6 +57,16 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
     protected void registerPackets() {
         super.registerPackets();
 
+        registerClientbound(ClientboundPackets1_9_3.SOUND, wrapper -> {
+            int soundId = wrapper.read(Types.VAR_INT);
+            int mappedId = getNewSoundId(soundId);
+            if (mappedId == -1) {
+                wrapper.cancel();
+            } else {
+                wrapper.write(Types.VAR_INT, mappedId);
+            }
+        });
+
         registerClientbound(ClientboundPackets1_9_3.CHAT, wrapper -> {
             final JsonElement element = wrapper.passthrough(Types.COMPONENT);
             TranslateRewriter.toClient(wrapper.user(), element);
@@ -67,7 +76,7 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
         });
 
         registerClientbound(ClientboundPackets1_9_3.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_11_1To1_12.class);
+            ClientWorld clientWorld = wrapper.user().storables(this).clientWorld();
 
             ChunkType1_9_3 type = ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment());
             Chunk chunk = wrapper.passthrough(type);
@@ -95,9 +104,6 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
                 }
             }
         });
-
-        new SoundRewriter<>(this, this::getNewSoundId).registerSound(ClientboundPackets1_9_3.SOUND);
-
 
         // New packet at 0x01
         cancelServerbound(ServerboundPackets1_12.CRAFTING_RECIPE_PLACEMENT);
@@ -167,8 +173,8 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, EntityTypes1_12.EntityType.PLAYER));
-        userConnection.addClientWorld(this.getClass(), new ClientWorld());
+        addEntityTracker(userConnection, new EntityTrackerBase(userConnection, EntityTypes1_12.EntityType.PLAYER));
+        userConnection.storables(this).setClientWorld(new ClientWorld());
     }
 
     @Override

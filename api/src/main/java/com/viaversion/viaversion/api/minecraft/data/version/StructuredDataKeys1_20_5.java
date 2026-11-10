@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,8 +33,9 @@ public class StructuredDataKeys1_20_5 extends VersionedStructuredDataKeys {
     public final StructuredDataKey<Item[]> bundleContents;
 
     public StructuredDataKeys1_20_5(final VersionedTypesHolder types) {
-        this.container = add("container", types.itemArray());
-        this.chargedProjectiles = add("charged_projectiles", types.itemArray());
-        this.bundleContents = add("bundle_contents", types.itemArray());
+        // Also includes later vanilla limits
+        this.container = add("container", types.itemArray().withMaxLength(256));
+        this.chargedProjectiles = add("charged_projectiles", types.itemArray().withMaxLength(1024));
+        this.bundleContents = add("bundle_contents", types.itemArray().withMaxLength(1024));
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_7to1_21_9.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class DimensionScaleStorage implements StorableObject {
+public final class DimensionScaleStorage {
 
     private final Map<Integer, Double> dimensionScales = new HashMap<>(4);
 

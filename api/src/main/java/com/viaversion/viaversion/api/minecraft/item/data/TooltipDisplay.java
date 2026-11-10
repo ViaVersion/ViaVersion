@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
@@ -42,7 +43,7 @@ public record TooltipDisplay(boolean hideTooltip,
         public TooltipDisplay read(final ByteBuf buffer) {
             final boolean hideTooltip = buffer.readBoolean();
             final IntSortedSet hiddenComponents = new IntLinkedOpenHashSet();
-            final int size = Types.VAR_INT.readPrimitive(buffer);
+            final int size = Limit.max(Types.VAR_INT.readPrimitive(buffer), 256);
             for (int i = 0; i < size; i++) {
                 hiddenComponents.add(Types.VAR_INT.readPrimitive(buffer));
             }
@@ -63,7 +64,7 @@ public record TooltipDisplay(boolean hideTooltip,
             final Key[] hiddenComponents = value.hiddenComponents.intStream().mapToObj(id -> ops.context().registryAccess().dataComponentType(id)).toArray(Key[]::new);
             ops.writeMap(map -> map
                 .writeOptional("hide_tooltip", Types.BOOLEAN, value.hideTooltip, false)
-                .writeOptional("hidden_components", Types.RESOURCE_LOCATION_ARRAY, hiddenComponents, new Key[0]));
+                .writeOptional("hidden_components", Types.IDENTIFIER_ARRAY, hiddenComponents, new Key[0]));
         }
     };
 
@@ -75,7 +76,10 @@ public record TooltipDisplay(boolean hideTooltip,
 
         final IntSortedSet newHiddenComponents = new IntLinkedOpenHashSet();
         for (final int hiddenComponent : hiddenComponents) {
-            newHiddenComponents.add(Rewritable.rewriteDataComponentType(protocol, clientbound, hiddenComponent));
+            final int mappedId = Rewritable.rewriteDataComponentType(protocol, clientbound, hiddenComponent);
+            if (mappedId != -1) {
+                newHiddenComponents.add(mappedId);
+            }
         }
         return new TooltipDisplay(hideTooltip, newHiddenComponents);
     }

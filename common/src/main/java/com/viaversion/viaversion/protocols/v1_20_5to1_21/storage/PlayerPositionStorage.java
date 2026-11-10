@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_5to1_21.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
-
-public final class PlayerPositionStorage implements StorableObject {
+public final class PlayerPositionStorage {
 
     private double x;
     private double y;

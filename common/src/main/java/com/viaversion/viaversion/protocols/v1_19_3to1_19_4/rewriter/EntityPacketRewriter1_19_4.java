@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.Protocol1_19_3To1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.storage.PlayerVehicleTracker;
+import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.storage.ProtocolStorables1_19_4;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.TagUtil;
 
@@ -63,6 +64,11 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
                     final CompoundTag damageTypeRegistry = protocol.getMappingData().damageTypesRegistry();
                     registry.put("minecraft:damage_type", damageTypeRegistry);
 
+                    final CompoundTag trimMaterialRegistry = new CompoundTag();
+                    trimMaterialRegistry.putString("type", "minecraft:trim_material");
+                    trimMaterialRegistry.put("value", new ListTag<>(CompoundTag.class));
+                    registry.put("minecraft:trim_material", trimMaterialRegistry);
+
                     final ListTag<CompoundTag> biomes = TagUtil.getRegistryEntries(registry, "worldgen/biome");
                     for (final CompoundTag biomeTag : biomes) {
                         final CompoundTag biomeData = biomeTag.getCompoundTag("element");
@@ -86,7 +92,8 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
                 map(Types.VAR_INT); // Id
                 handler(wrapper -> {
                     if (wrapper.read(Types.BOOLEAN)) { // Dismount vehicle
-                        final PlayerVehicleTracker playerVehicleTracker = wrapper.user().get(PlayerVehicleTracker.class);
+                        final ProtocolStorables1_19_4 storables = wrapper.user().storables(protocol);
+                        final PlayerVehicleTracker playerVehicleTracker = storables.playerVehicleTracker();
                         if (playerVehicleTracker.getVehicleId() != -1) {
                             final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_19_4.BUNDLE_DELIMITER);
                             bundleStart.send(Protocol1_19_3To1_19_4.class);
@@ -112,8 +119,9 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
                 map(Types.VAR_INT); // vehicle id
                 map(Types.VAR_INT_ARRAY_PRIMITIVE); // passenger ids
                 handler(wrapper -> {
-                    final PlayerVehicleTracker playerVehicleTracker = wrapper.user().get(PlayerVehicleTracker.class);
-                    final int clientEntityId = wrapper.user().getEntityTracker(Protocol1_19_3To1_19_4.class).clientEntityId();
+                    final ProtocolStorables1_19_4 storables = wrapper.user().storables(protocol);
+                    final PlayerVehicleTracker playerVehicleTracker = storables.playerVehicleTracker();
+                    final int clientEntityId = wrapper.user().getEntityTracker(protocol).clientEntityId();
                     final int vehicleId = wrapper.get(Types.VAR_INT, 0);
 
                     if (playerVehicleTracker.getVehicleId() == vehicleId) {
@@ -136,7 +144,7 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
             protected void register() {
                 handler(wrapper -> {
                     final int entityId = wrapper.read(Types.VAR_INT); // entity id
-                    final int clientEntityId = wrapper.user().getEntityTracker(Protocol1_19_3To1_19_4.class).clientEntityId();
+                    final int clientEntityId = wrapper.user().getEntityTracker(protocol).clientEntityId();
                     if (entityId != clientEntityId) {
                         wrapper.write(Types.VAR_INT, entityId); // entity id
                         return;
@@ -178,7 +186,7 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
                 map(Types.STRING); // Dimension
                 map(Types.STRING); // World
                 handler(worldDataTrackerHandlerByKey());
-                handler(wrapper -> wrapper.user().put(new PlayerVehicleTracker()));
+                handler(wrapper -> wrapper.user().<ProtocolStorables1_19_4>storables(protocol).setPlayerVehicleTracker(new PlayerVehicleTracker()));
             }
         });
 
@@ -191,8 +199,8 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
                 wrapper.setPacketType(ClientboundPackets1_19_4.DAMAGE_EVENT);
                 wrapper.write(Types.VAR_INT, entityId);
                 wrapper.write(Types.VAR_INT, damageType);
-                wrapper.write(Types.VAR_INT, 0); // No source entity
-                wrapper.write(Types.VAR_INT, 0); // No direct source entity
+                wrapper.write(Types.OPTIONAL_VAR_INT, null); // No source entity
+                wrapper.write(Types.OPTIONAL_VAR_INT, null); // No direct source entity
                 wrapper.write(Types.BOOLEAN, false); // No source position
                 return;
             }
@@ -201,8 +209,6 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
             wrapper.write(Types.BYTE, event);
         });
 
-        registerTrackerWithData1_19(ClientboundPackets1_19_3.ADD_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
-        registerRemoveEntities(ClientboundPackets1_19_3.REMOVE_ENTITIES);
         registerSetEntityData(ClientboundPackets1_19_3.SET_ENTITY_DATA, Types1_19_3.ENTITY_DATA_LIST, Types1_19_4.ENTITY_DATA_LIST);
     }
 
@@ -231,11 +237,6 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
         });
 
         filter().type(EntityTypes1_19_4.ABSTRACT_HORSE).removeIndex(18); // Owner UUID
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

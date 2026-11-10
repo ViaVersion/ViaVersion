@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
+import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentPredicate;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.ArrayType;
@@ -53,12 +54,13 @@ public record AdventureModePredicate(BlockPredicate[] predicates,
         }
     };
 
+    // Shared with 1.21.11 too using the predicate array param
     public static final class AdventureModePredicateType1_21_5 extends Type<AdventureModePredicate> {
         private final Type<BlockPredicate[]> blockPredicateType;
 
-        public AdventureModePredicateType1_21_5(final Type<StructuredData<?>[]> dataArrayType) {
+        public AdventureModePredicateType1_21_5(final Type<StructuredData<?>[]> dataArrayType, final Type<DataComponentPredicate[]> predicateArrayType) {
             super(AdventureModePredicate.class);
-            this.blockPredicateType = new ArrayType<>(new BlockPredicate.BlockPredicateType1_21_5(dataArrayType));
+            this.blockPredicateType = new ArrayType<>(new BlockPredicate.BlockPredicateType1_21_5(dataArrayType, predicateArrayType));
         }
 
         @Override

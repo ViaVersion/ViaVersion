@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,8 +54,6 @@ public class EntityPacketRewriter1_14_1 extends EntityRewriter<ClientboundPacket
                 handler(trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST));
             }
         });
-
-        registerRemoveEntities(ClientboundPackets1_14.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_14.ADD_PLAYER, new PacketHandlers() {
             @Override

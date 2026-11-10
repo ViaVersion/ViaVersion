@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -60,6 +60,17 @@ public interface ChunkSection {
     int getNonAirBlocksCount();
 
     void setNonAirBlocksCount(int nonAirBlocksCount);
+
+    /**
+     * Returns the number of fluid blocks in this section.
+     * <p>
+     * Available with versions 26.1+.
+     *
+     * @return fluid blocks in this section
+     */
+    int getFluidCount();
+
+    void setFluidCount(int fluidCount);
 
     /**
      * Returns whether this section holds light data.

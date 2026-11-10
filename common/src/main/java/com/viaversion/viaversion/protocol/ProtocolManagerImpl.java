@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import com.google.common.collect.Range;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
@@ -38,6 +39,7 @@ import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionType;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocol.packet.VersionedPacketTransformerImpl;
+import com.viaversion.viaversion.protocol.shared_registration.def.DefaultRegistrations;
 import com.viaversion.viaversion.protocols.base.InitialBaseProtocol;
 import com.viaversion.viaversion.protocols.base.v1_16.ClientboundBaseProtocol1_16;
 import com.viaversion.viaversion.protocols.base.v1_7.ClientboundBaseProtocol1_7;
@@ -76,27 +78,32 @@ import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.Protocol1_20_2To1_20_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.Protocol1_20To1_20_2;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.Protocol1_21_11To26_1;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.Protocol1_21_2To1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_5to1_21_6.Protocol1_21_5To1_21_6;
 import com.viaversion.viaversion.protocols.v1_21_6to1_21_7.Protocol1_21_6To1_21_7;
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.Protocol1_21_7To1_21_9;
+import com.viaversion.viaversion.protocols.v1_21_9to1_21_11.Protocol1_21_9To1_21_11;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.Protocol1_9_1To1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_3to1_10.Protocol1_9_3To1_10;
 import com.viaversion.viaversion.protocols.v1_9to1_9_1.Protocol1_9To1_9_1;
+import com.viaversion.viaversion.protocols.v26_1to26_2.Protocol26_1To26_2;
+import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
 import com.viaversion.viaversion.util.MathUtil;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -111,13 +118,12 @@ import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Function;
 import java.util.logging.Level;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ProtocolManagerImpl implements ProtocolManager {
-    private static final Protocol BASE_PROTOCOL = new InitialBaseProtocol();
+    public static final AtomicInteger PROTOCOL_INDEX = new AtomicInteger();
+    private static final InitialBaseProtocol BASE_PROTOCOL = new InitialBaseProtocol();
 
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private final Object2ObjectMap<ProtocolVersion, Object2ObjectMap<ProtocolVersion, Protocol>> registryMap = new Object2ObjectOpenHashMap<>(32);
@@ -144,6 +150,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
             worker.setName("Via-Mappingloader-" + threadIndex.incrementAndGet());
             return worker;
         }, ForkJoinWorkerThread.getDefaultUncaughtExceptionHandler(), true);
+
+        DefaultRegistrations.apply();
     }
 
     public void registerProtocols() {
@@ -211,6 +219,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
         registerProtocol(new Protocol1_21_5To1_21_6(), ProtocolVersion.v1_21_6, ProtocolVersion.v1_21_5);
         registerProtocol(new Protocol1_21_6To1_21_7(), ProtocolVersion.v1_21_7, ProtocolVersion.v1_21_6);
         registerProtocol(new Protocol1_21_7To1_21_9(), ProtocolVersion.v1_21_9, ProtocolVersion.v1_21_7);
+        registerProtocol(new Protocol1_21_9To1_21_11(), ProtocolVersion.v1_21_11, ProtocolVersion.v1_21_9);
+
+        registerProtocol(new Protocol1_21_11To26_1(), ProtocolVersion.v26_1, ProtocolVersion.v1_21_11);
+        registerProtocol(new Protocol26_1To26_2(), ProtocolVersion.v26_2, ProtocolVersion.v26_1);
+        registerProtocol(new Protocol26_2To26_3(), ProtocolVersion.v26_3, ProtocolVersion.v26_2);
     }
 
     @Override
@@ -220,8 +233,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void registerProtocol(Protocol protocol, List<ProtocolVersion> supportedClientVersion, ProtocolVersion serverVersion) {
-        // Register the protocol's handlers
-        protocol.initialize();
+        // Set the server version and index on AbstractProtocol instances before initialization
+        if (protocol instanceof AbstractProtocol<?, ?, ?, ?> abstractProtocol) {
+            abstractProtocol.setServerVersion(serverVersion);
+            abstractProtocol.setClientVersion(supportedClientVersion.stream().max(ProtocolVersion::compareTo).orElseThrow());
+        }
 
         // Clear cache as this may make new routes.
         if (!pathCache.isEmpty()) {
@@ -243,14 +259,22 @@ public class ProtocolManagerImpl implements ProtocolManager {
             refreshVersions();
         }
 
-        if (protocol.hasMappingDataToLoad()) {
-            if (mappingLoaderExecutor != null) {
-                // Submit mapping data loading
-                addMappingLoaderFuture(protocol.getClass(), protocol::loadMappingData);
+        // Load mapping data and register the protocol's handlers
+        if (!protocol.hasMappingDataToLoad()) {
+            protocol.initialize();
+            return;
+        }
+
+        // Submit mapping data loading
+        if (mappingLoaderExecutor != null) {
+            if (protocol.dependsOn() != null) {
+                addMappingLoaderFuture(protocol.getClass(), protocol.dependsOn(), protocol::loadMappingData);
             } else {
-                // Late protocol adding - just do it on the current thread
-                protocol.loadMappingData();
+                addMappingLoaderFuture(protocol.getClass(), protocol::loadMappingData);
             }
+        } else {
+            // Late protocol adding - just do it on the current thread
+            protocol.loadMappingData();
         }
     }
 
@@ -302,17 +326,15 @@ public class ProtocolManagerImpl implements ProtocolManager {
         }
 
         // Calculate path
-        Object2ObjectSortedMap<ProtocolVersion, Protocol> outputPath = getProtocolPath(new Object2ObjectLinkedOpenHashMap<>(), clientVersion, serverVersion);
-        if (outputPath == null) {
+        List<ProtocolPathEntry> path = calculateProtocolPath(clientVersion, serverVersion);
+        if (path == null) {
             // Also cache that there is no path
-            pathCache.put(protocolKey, List.of());
+            if (clientVersion.isKnown() && serverVersion.isKnown()) {
+                pathCache.put(protocolKey, List.of());
+            }
             return null;
         }
 
-        List<ProtocolPathEntry> path = new ArrayList<>(outputPath.size());
-        for (Map.Entry<ProtocolVersion, Protocol> entry : outputPath.entrySet()) {
-            path.add(new ProtocolPathEntryImpl(entry.getKey(), entry.getValue()));
-        }
         pathCache.put(protocolKey, path);
         return path;
     }
@@ -328,56 +350,70 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     /**
-     * Calculates a path to get from an input protocol to the server's protocol.
+     * Calculates the shortest path to get from an input protocol to the server's protocol using a breadth-first search.
      *
-     * @param current       current items in the path
-     * @param clientVersion current input version
+     * @param clientVersion input version
      * @param serverVersion desired output version
-     * @return path that has been generated, null if failed
+     * @return shortest path to the server version, or null if none exists
      */
-    private @Nullable Object2ObjectSortedMap<ProtocolVersion, Protocol> getProtocolPath(Object2ObjectSortedMap<ProtocolVersion, Protocol> current, ProtocolVersion clientVersion, ProtocolVersion serverVersion) {
-        if (current.size() > maxProtocolPathSize) return null; // Fail-safe, protocol too complicated.
+    private @Nullable List<ProtocolPathEntry> calculateProtocolPath(ProtocolVersion clientVersion, ProtocolVersion serverVersion) {
+        Set<ProtocolVersion> visited = new HashSet<>();
+        visited.add(clientVersion);
 
-        // First, check if there is any protocols for this
-        Object2ObjectMap<ProtocolVersion, Protocol> toServerProtocolMap = registryMap.get(clientVersion);
-        if (toServerProtocolMap == null) {
-            return null; // Not supported
-        }
+        Deque<PathNode> queue = new ArrayDeque<>();
+        queue.add(new PathNode(null, clientVersion, null, 0));
 
-        // Next, check if there is a direct, single Protocol path
-        Protocol protocol = toServerProtocolMap.get(serverVersion);
-        if (protocol != null) {
-            current.put(serverVersion, protocol);
-            return current; // Easy solution
-        }
+        PathNode node;
+        while ((node = queue.poll()) != null) {
+            if (node.depth() > maxProtocolPathSize){
+                continue; // Fail-safe, protocol too complicated
+            }
 
-        // There might be a more advanced solution... So we'll see if any of the others can get us there
-        Object2ObjectSortedMap<ProtocolVersion, Protocol> shortest = null;
-        for (Map.Entry<ProtocolVersion, Protocol> entry : toServerProtocolMap.entrySet()) {
-            // Ensure we don't go back to already contained versions
-            ProtocolVersion translatedToVersion = entry.getKey();
-            if (current.containsKey(translatedToVersion)) continue;
+            Object2ObjectMap<ProtocolVersion, Protocol> toServerProtocolMap = registryMap.get(node.version());
+            if (toServerProtocolMap == null) {
+                continue; // Not supported
+            }
 
-            // Check if the new version is farther away than the current client version
-            if (maxPathDeltaIncrease != -1 && translatedToVersion.getVersionType() == clientVersion.getVersionType()) {
-                final int delta = Math.abs(serverVersion.getVersion() - translatedToVersion.getVersion()) - Math.abs(serverVersion.getVersion() - clientVersion.getVersion());
-                if (delta > maxPathDeltaIncrease) {
+            // Check if there is a direct protocol path; always preferred over paths through other versions,
+            // even if it first moves farther away from the server version
+            Protocol protocol = toServerProtocolMap.get(serverVersion);
+            if (protocol != null) {
+                return reconstructPath(new PathNode(node, serverVersion, protocol, node.depth() + 1));
+            }
+
+            for (Map.Entry<ProtocolVersion, Protocol> entry : toServerProtocolMap.entrySet()) {
+                // Ensure we don't go back to already visited versions
+                ProtocolVersion translatedToVersion = entry.getKey();
+                if (visited.contains(translatedToVersion)) {
                     continue;
                 }
-            }
 
-            // Create a copy
-            Object2ObjectSortedMap<ProtocolVersion, Protocol> newCurrent = new Object2ObjectLinkedOpenHashMap<>(current);
-            newCurrent.put(translatedToVersion, entry.getValue());
+                // Check if the new version is farther away than the current client version
+                if (maxPathDeltaIncrease != -1 && translatedToVersion.getVersionType() == node.version().getVersionType()) {
+                    final int delta = Math.abs(serverVersion.getVersion() - translatedToVersion.getVersion()) - Math.abs(serverVersion.getVersion() - node.version().getVersion());
+                    if (delta > maxPathDeltaIncrease) {
+                        continue;
+                    }
+                }
 
-            // Calculate the rest of the protocol starting from translatedToVersion and take the shortest
-            newCurrent = getProtocolPath(newCurrent, translatedToVersion, serverVersion);
-            if (newCurrent != null && (shortest == null || newCurrent.size() < shortest.size())) {
-                shortest = newCurrent;
+                // Go on to the next node
+                visited.add(translatedToVersion);
+                queue.add(new PathNode(node, translatedToVersion, entry.getValue(), node.depth() + 1));
             }
         }
+        return null; // No path found
+    }
 
-        return shortest; // null if none found
+    private List<ProtocolPathEntry> reconstructPath(PathNode node) {
+        // Go back the full path again to build the final list
+        final ProtocolPathEntry[] path = new ProtocolPathEntry[node.depth()];
+        for (PathNode current = node; current.protocol() != null; current = current.parent()) {
+            path[current.depth() - 1] = new ProtocolPathEntryImpl(current.version(), current.protocol());
+        }
+        return List.of(path);
+    }
+
+    private record PathNode(@Nullable PathNode parent, ProtocolVersion version, @Nullable Protocol protocol, int depth) {
     }
 
     @Override
@@ -479,7 +515,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public boolean checkForMappingCompletion() {
+    public boolean checkForMappingCompletion(final boolean propagateErrors) {
         mappingLoaderLock.readLock().lock();
         try {
             if (mappingsLoaded) {
@@ -490,6 +526,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
                 // Return if any future hasn't completed yet
                 if (!future.isDone()) {
                     return false;
+                }
+                if (propagateErrors) {
+                    future.join();
                 }
             }
 
@@ -502,7 +541,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Runnable runnable) {
-        CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor).exceptionally(mappingLoaderThrowable(protocolClass));
+        CompletableFuture<Void> future = CompletableFuture.runAsync(runnable, mappingLoaderExecutor)
+            .whenComplete(($, t) -> logIfErrored(protocolClass, t));
 
         mappingLoaderLock.writeLock().lock();
         try {
@@ -514,8 +554,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Class<? extends Protocol> dependsOn, Runnable runnable) {
-        CompletableFuture<Void> future = getMappingLoaderFuture(dependsOn)
-            .whenCompleteAsync((v, throwable) -> runnable.run(), mappingLoaderExecutor).exceptionally(mappingLoaderThrowable(protocolClass));
+        CompletableFuture<Void> future = getMappingLoaderFuture(dependsOn).thenRunAsync(runnable, mappingLoaderExecutor)
+            .whenComplete(($, t) -> logIfErrored(protocolClass, t));
 
         mappingLoaderLock.writeLock().lock();
         try {
@@ -551,6 +591,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
         return mappingsLoaded;
     }
 
+    @Override
+    public int registeredProtocolCount() {
+        return PROTOCOL_INDEX.get();
+    }
+
     public void shutdownLoaderExecutor() {
         Preconditions.checkArgument(!mappingsLoaded);
 
@@ -566,10 +611,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
         MappingDataLoader.INSTANCE.clearCache();
     }
 
-    private Function<Throwable, Void> mappingLoaderThrowable(Class<? extends Protocol> protocolClass) {
-        return throwable -> {
-            Via.getPlatform().getLogger().log(Level.SEVERE, "Error during mapping loading of " + protocolClass.getSimpleName(), throwable);
-            return null;
-        };
+    private void logIfErrored(final Class<? extends Protocol> protocolClass, @Nullable final Throwable throwable) {
+        if (throwable != null) {
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Error during loading of " + protocolClass.getSimpleName(), throwable);
+        }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.NumberTag;
-import com.viaversion.nbt.tag.ShortTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
@@ -59,7 +57,7 @@ public final class ComponentRewriter1_14<C extends ClientboundPacketType> extend
         try {
             tag = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_13);
         } catch (Exception e) {
-            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 Protocol1_13_2To1_14.LOGGER.log(Level.WARNING, "Error reading NBT in show_item: " + StringUtil.forLogging(value), e);
             }
             return;
@@ -84,7 +82,7 @@ public final class ComponentRewriter1_14<C extends ClientboundPacketType> extend
             showItem.addProperty("text", SerializerVersion.V1_14.toSNBT(tag));
             hoverEvent.add("value", newValue);
         } catch (Exception e) {
-            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 Protocol1_13_2To1_14.LOGGER.log(Level.WARNING, "Error writing NBT in show_item: " + StringUtil.forLogging(value), e);
             }
         }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ public class DontBugMeSubCmd implements ViaSubCommand {
 
         config.setCheckForUpdates(newValue);
         config.save();
-        sendMessage(sender, "&6We will %snotify you about updates.", (newValue ? "&a" : "&cnot "));
+        sendMessage(sender, "&6We will %snotify &6you about updates.", (newValue ? "&a" : "&cnot "));
 
         return true;
     }

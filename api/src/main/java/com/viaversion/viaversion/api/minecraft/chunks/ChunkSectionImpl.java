@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ public class ChunkSectionImpl implements ChunkSection {
     private final EnumMap<PaletteType, DataPalette> palettes = new EnumMap<>(PaletteType.class);
     private ChunkSectionLight light;
     private int nonAirBlocksCount;
+    private int fluidCount;
 
     public ChunkSectionImpl() {
     }
@@ -56,6 +57,16 @@ public class ChunkSectionImpl implements ChunkSection {
     @Override
     public void setNonAirBlocksCount(final int nonAirBlocksCount) {
         this.nonAirBlocksCount = nonAirBlocksCount;
+    }
+
+    @Override
+    public int getFluidCount() {
+        return fluidCount;
+    }
+
+    @Override
+    public void setFluidCount(final int fluidCount) {
+        this.fluidCount = fluidCount;
     }
 
     @Override

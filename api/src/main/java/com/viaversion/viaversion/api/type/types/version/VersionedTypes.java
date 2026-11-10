@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,19 @@
 package com.viaversion.viaversion.api.type.types.version;
 
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_20_5;
+import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_2;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_5;
+import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_2;
+import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_3;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_20_5;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_11;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_2;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_5;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_9;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_1;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_3;
 
 /**
  * Holds versioned accessors for highly volatile types, specifically around items and data components.
@@ -46,4 +52,8 @@ public final class VersionedTypes {
     public static final Types1_20_5<StructuredDataKeys1_21_5, EntityDataTypes1_21_5> V1_21_5 = new Types1_20_5<>(StructuredDataKeys1_21_5::new, EntityDataTypes1_21_5::new);
     public static final Types1_20_5<StructuredDataKeys1_21_5, EntityDataTypes1_21_5> V1_21_6 = new Types1_20_5<>(StructuredDataKeys1_21_5::new, EntityDataTypes1_21_5::new);
     public static final Types1_20_5<StructuredDataKeys1_21_5, EntityDataTypes1_21_9> V1_21_9 = new Types1_20_5<>(StructuredDataKeys1_21_5::new, EntityDataTypes1_21_9::new);
+    public static final Types1_20_5<StructuredDataKeys1_21_11, EntityDataTypes1_21_11> V1_21_11 = new Types1_20_5<>(StructuredDataKeys1_21_11::new, EntityDataTypes1_21_11::new);
+    public static final Types26_1<StructuredDataKeys1_21_11, EntityDataTypes26_1> V26_1 = new Types26_1<>(StructuredDataKeys1_21_11::new, EntityDataTypes26_1::new);
+    public static final Types26_1<StructuredDataKeys26_2, EntityDataTypes26_1> V26_2 = new Types26_1<>(StructuredDataKeys26_2::new, EntityDataTypes26_1::new);
+    public static final Types26_1<StructuredDataKeys26_3, EntityDataTypes26_3> V26_3 = new Types26_1<>(StructuredDataKeys26_3::new, EntityDataTypes26_3::new);
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -187,8 +188,18 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
     }
 
     public void finalizeRecipes() {
-        // Need to be sorted alphabetically
-        stoneCutterRecipes.sort(Comparator.comparing(recipe -> recipe.identifier));
+        // Now sorted by the output's description translation key (block.minecraft.<block>).
+        // We get the same result by sorting via the item identifier and separating blocks and items,
+        // though Vanilla will always exclusively send blocks for stonecutter recipes
+        final FullMappings itemMappings = protocol.getMappingData().getFullItemMappings();
+        final FullMappings blockMappings = protocol.getMappingData().getFullBlockMappings();
+        stoneCutterRecipes.sort(Comparator.comparing(recipe -> {
+            final String identifier = itemMappings.mappedIdentifier(recipe.result.identifier());
+            if (blockMappings.mappedId(identifier) == -1) {
+                return "|" + identifier; // Sort after blocks
+            }
+            return identifier;
+        }));
     }
 
     public void writeUpdateRecipeInputs(final PacketWrapper wrapper) {

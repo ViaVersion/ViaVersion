@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,5 +38,12 @@ public record SoundEvent(String identifier, @Nullable Float fixedRange) {
             return null;
         }
         return holder.updateId(soundRewriteFunction, () -> UNKNOWN);
+    }
+
+    public static @Nullable Holder<SoundEvent> rewriteOptionalHolder(@Nullable final Holder<SoundEvent> holder, final Int2IntFunction soundRewriteFunction) {
+        if (holder == null) {
+            return null;
+        }
+        return holder.updateId(soundRewriteFunction, () -> null);
     }
 }

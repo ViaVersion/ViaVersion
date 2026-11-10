@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,15 @@ public abstract class AbstractEntityDataTypes implements EntityDataTypes {
         return values;
     }
 
+    public Class<? extends EntityDataType> getDataTypeClass() {
+        return byId(0).getClass();
+    }
+
     protected EntityDataType add(final int typeId, final Type<?> type) {
+        if (values[typeId] != null) {
+            throw new IllegalArgumentException("Entity data type ID " + typeId + " is already registered as " + values[typeId]);
+        }
+
         final EntityDataType dataType = EntityDataType.create(typeId, type);
         values[typeId] = dataType;
         return dataType;

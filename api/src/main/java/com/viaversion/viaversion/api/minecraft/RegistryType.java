@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,14 +34,16 @@ public enum RegistryType implements RegistryKey {
     FLUID("fluid"),
     ENTITY("entity_type"),
     GAME_EVENT("game_event"),
-    ENCHANTMENT("enchantment");
+    ENCHANTMENT("enchantment"),
+    DAMAGE_TYPE("damage_type"),
+    BANNER_PATTERN("banner_pattern");
 
     private static final Map<String, RegistryType> MAP = new HashMap<>();
     private static final RegistryType[] VALUES = values();
 
     static {
         for (RegistryType type : getValues()) {
-            MAP.put(type.resourceLocation, type);
+            MAP.put(type.identifier(), type);
         }
     }
 
@@ -49,22 +51,22 @@ public enum RegistryType implements RegistryKey {
         return VALUES;
     }
 
-    public static @Nullable RegistryType getByKey(String resourceKey) {
-        return MAP.get(resourceKey);
+    public static @Nullable RegistryType getByKey(String identifier) {
+        return MAP.get(identifier);
     }
 
-    private final String resourceLocation;
+    private final Key key;
 
-    RegistryType(final String resourceLocation) {
-        this.resourceLocation = resourceLocation;
+    RegistryType(final String identifier) {
+        this.key = Key.of(identifier);
     }
 
-    public String resourceLocation() {
-        return resourceLocation;
+    public String identifier() {
+        return key.path();
     }
 
     @Override
-    public Key key() {
-        return Key.of(resourceLocation);
+    public Key registry() {
+        return this.key;
     }
 }

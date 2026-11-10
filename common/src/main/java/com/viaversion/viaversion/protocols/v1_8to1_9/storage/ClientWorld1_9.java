@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,13 @@
 package com.viaversion.viaversion.protocols.v1_8to1_9.storage;
 
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ClientWorld1_9 extends ClientWorld {
 
-    private final Set<Long> loadedChunks = new HashSet<>();
+    private final Set<Long> loadedChunks = new LongOpenHashSet();
 
     public Set<Long> getLoadedChunks() {
         return loadedChunks;

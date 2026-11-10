@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_20to1_20_2.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.TagData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -28,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class LastTags implements StorableObject {
+public class LastTags {
 
     private final List<RegistryTags> registryTags = new ArrayList<>();
     private boolean sentDuringConfigPhase;
@@ -48,9 +47,9 @@ public class LastTags implements StorableObject {
         }
     }
 
-    public void sendLastTags(final UserConnection connection) {
+    public boolean sendLastTags(final UserConnection connection) {
         if (registryTags.isEmpty()) {
-            return;
+            return false;
         }
 
         final PacketWrapper packet = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS, connection);
@@ -64,6 +63,7 @@ public class LastTags implements StorableObject {
             }
         }
         packet.send(Protocol1_20To1_20_2.class);
+        return true;
     }
 
     public void setSentDuringConfigPhase(final boolean sentDuringConfigPhase) {

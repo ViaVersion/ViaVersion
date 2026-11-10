@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,8 @@
  * SOFTWARE.
  */
 package com.viaversion.viaversion.api.data;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface Mappings {
 
@@ -84,4 +86,40 @@ public interface Mappings {
      * @return mappings with keys and values swapped
      */
     Mappings inverse();
+
+
+    /**
+     * Returns whether the mappings are unchanged identity mappings.
+     *
+     * @return whether the mappings are unchanged identity mappings
+     */
+    default boolean isIdentity() {
+        return false;
+    }
+
+    /**
+     * Returns whether the mappings null or identity mappings.
+     *
+     * @param mappings mappings
+     * @return whether the mappings are identity mappings
+     * @see #isFullIdentity(Mappings)
+     */
+    static boolean isIntIdIdentity(@Nullable final Mappings mappings) {
+        if (mappings == null) {
+            return true;
+        }
+        return mappings instanceof FullMappings fullMappings ? fullMappings.isIntIdIdentity() : mappings.isIdentity();
+    }
+
+    /**
+     * Returns whether the mappings null or full identity mappings.
+     * Stronger than {@link #isIntIdIdentity(Mappings)}, but equal to that if not {@link FullMappings}.
+     *
+     * @param mappings mappings
+     * @return whether the mappings are full identity mappings
+     * @see #isIntIdIdentity(Mappings)
+     */
+    static boolean isFullIdentity(@Nullable final Mappings mappings) {
+        return mappings == null || mappings.isIdentity();
+    }
 }

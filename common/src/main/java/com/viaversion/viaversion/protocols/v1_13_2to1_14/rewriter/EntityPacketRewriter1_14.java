@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                     }
 
                     // Register Type ID
-                    wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class).addEntity(entityId, type1_14);
+                    wrapper.user().getEntityTracker(protocol).addEntity(entityId, type1_14);
 
                     wrapper.set(Types.VAR_INT, 1, typeId);
                 });
@@ -178,7 +178,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 handler(wrapper -> {
                     short animation = wrapper.passthrough(Types.UNSIGNED_BYTE);
                     if (animation == 2) {  //Leave bed
-                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
+                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(protocol);
                         int entityId = wrapper.get(Types.VAR_INT, 0);
                         tracker.setSleeping(entityId, false);
 
@@ -204,7 +204,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 map(Types.INT); // 2 - Dimension
                 handler(wrapper -> {
                     // Store the player
-                    ClientWorld clientChunks = wrapper.user().getClientWorld(Protocol1_13_2To1_14.class);
+                    ClientWorld clientChunks = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 1);
                     clientChunks.setEnvironment(dimensionId);
                 });
@@ -237,7 +237,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
             public void register() {
                 map(Types.VAR_INT);
                 handler(wrapper -> {
-                    EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
+                    EntityTracker1_14 tracker = wrapper.user().getEntityTracker(protocol);
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     tracker.setSleeping(entityId, true);
 
@@ -252,7 +252,6 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
             }
         });
 
-        registerRemoveEntities(ClientboundPackets1_13.REMOVE_ENTITIES);
         registerSetEntityData(ClientboundPackets1_13.SET_ENTITY_DATA, Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST);
     }
 
@@ -386,7 +385,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
 
     @Override
     public void onMappingDataLoaded() {
-        mapTypes();
+        super.onMappingDataLoaded();
         if (Via.getConfig().translateOcelotToCat()) {
             // A better solution for this would be to despawn the ocelot and spawn a cat in its place, but that would
             // require a lot of data tracking and is not worth the effort.

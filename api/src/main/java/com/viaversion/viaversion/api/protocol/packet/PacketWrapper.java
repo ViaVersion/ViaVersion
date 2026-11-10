@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -258,9 +258,7 @@ public interface PacketWrapper {
      * @param packetType packet type of the new packet
      * @return The newly created packet wrapper
      */
-    default PacketWrapper create(PacketType packetType) {
-        return create(packetType.getId());
-    }
+    PacketWrapper create(PacketType packetType);
 
     /**
      * Creates a new packet with values.
@@ -269,9 +267,7 @@ public interface PacketWrapper {
      * @param handler    handler to write to the packet
      * @return newly created packet wrapper
      */
-    default PacketWrapper create(PacketType packetType, PacketHandler handler) throws InformativeException {
-        return create(packetType.getId(), handler);
-    }
+    PacketWrapper create(PacketType packetType, PacketHandler handler) throws InformativeException;
 
     /**
      * Creates a new packet for the target of this packet.
@@ -333,6 +329,13 @@ public interface PacketWrapper {
     void resetReader();
 
     /**
+     * Rewind the reader by the given number of arguments, so they can be read again.
+     *
+     * @param values number of values to add to the reader dequeue again
+     */
+    void rewindReader(int values);
+
+    /**
      * Sends this packet to the server.
      * <b>Unlike {@link #sendToServer(Class)}, this method does not handle the pipeline with packet id and data changes.</b>
      *
@@ -387,11 +390,20 @@ public interface PacketWrapper {
     void scheduleSendToServer(Class<? extends Protocol> protocol, boolean skipCurrentPipeline) throws InformativeException;
 
     /**
+     * Allows running through code that may both read and write data to/from this packet wrapper,
+     * but will no-op any write call.
+     *
+     * @param runnable runnable to do further method calls on this packet wrapper
+     */
+    void consumeReadsOnly(Runnable runnable);
+
+    /**
      * Returns the packet type, or null if not transformed or manually unset.
      *
      * @return packet type if set
      */
-    @Nullable PacketType getPacketType();
+    @Nullable
+    PacketType getPacketType();
 
     /**
      * Sets the packet type. If set to null, it will not be written to the buffer with {@link #writeToBuffer(ByteBuf)}.

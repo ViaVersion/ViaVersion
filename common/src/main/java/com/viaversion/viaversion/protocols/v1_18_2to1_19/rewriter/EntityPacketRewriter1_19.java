@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,9 +60,8 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
     public void registerPackets() {
         registerTracker(ClientboundPackets1_18.ADD_PLAYER, EntityTypes1_19.PLAYER);
         registerSetEntityData(ClientboundPackets1_18.SET_ENTITY_DATA, Types1_18.ENTITY_DATA_LIST, Types1_19.ENTITY_DATA_LIST);
-        registerRemoveEntities(ClientboundPackets1_18.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_18.ADD_ENTITY, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_18.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // Entity id
@@ -89,40 +88,35 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.ADD_PAINTING, ClientboundPackets1_19.ADD_ENTITY, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // Entity id
-                map(Types.UUID); // Entity UUID
-                handler(wrapper -> {
-                    wrapper.write(Types.VAR_INT, EntityTypes1_19.PAINTING.getId());
+        protocol.registerClientbound(ClientboundPackets1_18.ADD_PAINTING, ClientboundPackets1_19.ADD_ENTITY, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            wrapper.passthrough(Types.UUID);
+            wrapper.write(Types.VAR_INT, EntityTypes1_19.PAINTING.getId());
 
-                    final int motive = wrapper.read(Types.VAR_INT);
-                    final BlockPosition blockPosition = wrapper.read(Types.BLOCK_POSITION1_14);
-                    final byte direction = wrapper.read(Types.BYTE);
-                    wrapper.write(Types.DOUBLE, blockPosition.x() + 0.5d);
-                    wrapper.write(Types.DOUBLE, blockPosition.y() + 0.5d);
-                    wrapper.write(Types.DOUBLE, blockPosition.z() + 0.5d);
-                    wrapper.write(Types.BYTE, (byte) 0); // Pitch
-                    wrapper.write(Types.BYTE, (byte) 0); // Yaw
-                    wrapper.write(Types.BYTE, (byte) 0); // Head yaw
-                    wrapper.write(Types.VAR_INT, to3dId(direction)); // Data
-                    wrapper.write(Types.SHORT, (short) 0); // Velocity x
-                    wrapper.write(Types.SHORT, (short) 0); // Velocity y
-                    wrapper.write(Types.SHORT, (short) 0); // Velocity z
+            final int motive = wrapper.read(Types.VAR_INT);
+            final BlockPosition blockPosition = wrapper.read(Types.BLOCK_POSITION1_14);
+            final byte direction = wrapper.read(Types.BYTE);
+            wrapper.write(Types.DOUBLE, blockPosition.x() + 0.5d);
+            wrapper.write(Types.DOUBLE, blockPosition.y() + 0.5d);
+            wrapper.write(Types.DOUBLE, blockPosition.z() + 0.5d);
+            wrapper.write(Types.BYTE, (byte) 0); // Pitch
+            wrapper.write(Types.BYTE, (byte) 0); // Yaw
+            wrapper.write(Types.BYTE, (byte) 0); // Head yaw
+            wrapper.write(Types.VAR_INT, to3dId(direction)); // Data
+            wrapper.write(Types.SHORT, (short) 0); // Velocity x
+            wrapper.write(Types.SHORT, (short) 0); // Velocity y
+            wrapper.write(Types.SHORT, (short) 0); // Velocity z
 
-                    wrapper.send(Protocol1_18_2To1_19.class);
-                    wrapper.cancel();
+            wrapper.send(Protocol1_18_2To1_19.class);
+            wrapper.cancel();
 
-                    // Send motive in entity data
-                    final PacketWrapper entityDataPacket = wrapper.create(ClientboundPackets1_19.SET_ENTITY_DATA);
-                    entityDataPacket.write(Types.VAR_INT, wrapper.get(Types.VAR_INT, 0)); // Entity id
-                    final List<EntityData> entityData = new ArrayList<>();
-                    entityData.add(new EntityData(8, Types1_19.ENTITY_DATA_TYPES.paintingVariantType, protocol.getMappingData().getPaintingMappings().getNewIdOrDefault(motive, 0)));
-                    entityDataPacket.write(Types1_19.ENTITY_DATA_LIST, entityData);
-                    entityDataPacket.send(Protocol1_18_2To1_19.class);
-                });
-            }
+            // Send motive in entity data
+            final PacketWrapper entityDataPacket = wrapper.create(ClientboundPackets1_19.SET_ENTITY_DATA);
+            entityDataPacket.write(Types.VAR_INT, entityId);
+            final List<EntityData> entityData = new ArrayList<>();
+            entityData.add(new EntityData(8, Types1_19.ENTITY_DATA_TYPES.paintingVariantType, protocol.getMappingData().getPaintingMappings().getNewIdOrDefault(motive, 0)));
+            entityDataPacket.write(Types1_19.ENTITY_DATA_LIST, entityData);
+            entityDataPacket.send(Protocol1_18_2To1_19.class);
         });
 
         protocol.registerClientbound(ClientboundPackets1_18.ADD_MOB, ClientboundPackets1_19.ADD_ENTITY, new PacketHandlers() {
@@ -239,7 +233,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
         addMonsterSpawnData(currentDimension);
         String dimensionKey = registryStorage.dimensionKey(currentDimension);
         if (dimensionKey == null) {
-            if (!Via.getConfig().isSuppressConversionWarnings()) {
+            if (Via.getConfig().logOtherConversionWarnings()) {
                 protocol.getLogger().warning("The server tried to send dimension data from a dimension the client wasn't told about on join. " +
                     "Plugins and mods have to make sure they are not creating new dimension types while players are online, and proxies need to make sure they don't scramble dimension data." +
                     " Received dimension: " + currentDimension + ". Known dimensions: " + registryStorage.dimensions());
@@ -298,11 +292,6 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
         registerBlockStateHandler(EntityTypes1_19.ABSTRACT_MINECART, 11);
 
         filter().type(EntityTypes1_19.CAT).index(19).mapDataType(typeId -> Types1_19.ENTITY_DATA_TYPES.catVariantType);
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,14 @@
  */
 package com.viaversion.viaversion.bukkit.handlers;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
 import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.platform.ViaEncodeHandler;
 import com.viaversion.viaversion.util.ByteBufUtil;
 import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
@@ -30,16 +33,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.MessageToMessageEncoder;
 import java.util.List;
 
 @ChannelHandler.Sharable
-public final class BukkitEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
-    private final UserConnection connection;
-    private boolean handledCompression = BukkitChannelInitializer.COMPRESSION_ENABLED_EVENT != null;
+public final class BukkitEncodeHandler extends ViaEncodeHandler {
+    private boolean handledCompression = BukkitChannelInitializer.COMPRESSION_ENABLED_EVENT != null || Boolean.getBoolean("com.viaversion.disableLegacyCompressionReorder");
 
     public BukkitEncodeHandler(final UserConnection connection) {
-        this.connection = connection;
+        super(connection);
     }
 
     @Override
@@ -55,7 +56,7 @@ public final class BukkitEncodeHandler extends MessageToMessageEncoder<ByteBuf> 
 
         final ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), bytebuf);
         try {
-            final boolean needsCompression = !handledCompression && handleCompressionOrder(ctx, transformedBuf);
+            final boolean needsCompression = !handledCompression && connection.getProtocolInfo().compressionEnabled() && handleCompressionOrder(ctx, transformedBuf);
             connection.transformClientbound(transformedBuf, CancelEncoderException::generate);
             if (needsCompression) {
                 recompress(ctx, transformedBuf);
@@ -76,7 +77,8 @@ public final class BukkitEncodeHandler extends MessageToMessageEncoder<ByteBuf> 
         }
 
         handledCompression = true;
-        if (compressorIndex > names.indexOf(BukkitChannelInitializer.VIA_ENCODER)) {
+        final ViaInjector injector = Via.getManager().getInjector();
+        if (compressorIndex > names.indexOf(injector.getEncoderName())) {
             // Need to decompress this packet due to bad order
             final ByteBuf decompressed = (ByteBuf) PipelineUtil.callDecode((ByteToMessageDecoder) pipeline.get(BukkitChannelInitializer.MINECRAFT_DECOMPRESSOR), ctx, buf).get(0);
             try {
@@ -85,8 +87,8 @@ public final class BukkitEncodeHandler extends MessageToMessageEncoder<ByteBuf> 
                 decompressed.release();
             }
 
-            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_COMPRESSOR, BukkitChannelInitializer.VIA_ENCODER, pipeline.remove(BukkitChannelInitializer.VIA_ENCODER));
-            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_DECOMPRESSOR, BukkitChannelInitializer.VIA_DECODER, pipeline.remove(BukkitChannelInitializer.VIA_DECODER));
+            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_COMPRESSOR, injector.getEncoderName(), pipeline.remove(injector.getEncoderName()));
+            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_DECOMPRESSOR, injector.getDecoderName(), pipeline.remove(injector.getDecoderName()));
             return true;
         }
         return false;
@@ -104,7 +106,7 @@ public final class BukkitEncodeHandler extends MessageToMessageEncoder<ByteBuf> 
 
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        if (PipelineUtil.containsCause(cause, CancelCodecException.class)) {
+        if (PipelineUtil.containsCause(cause, CancelCodecException.class)) { // ProtocolLib previously wrapped all exceptions, check causes
             return;
         }
 
@@ -119,9 +121,5 @@ public final class BukkitEncodeHandler extends MessageToMessageEncoder<ByteBuf> 
             cause.printStackTrace();
             exception.setShouldBePrinted(false);
         }
-    }
-
-    public UserConnection connection() {
-        return connection;
     }
 }

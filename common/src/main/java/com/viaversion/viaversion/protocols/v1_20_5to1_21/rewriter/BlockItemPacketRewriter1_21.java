@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_21;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
@@ -39,7 +38,7 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.AttributeModifierMappings1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.ProtocolStorables1_21;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import java.util.Arrays;
 import java.util.List;
@@ -62,16 +61,7 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
 
     @Override
     public void registerPackets() {
-        final BlockRewriter<ClientboundPacket1_20_5> blockRewriter = BlockRewriter.for1_20_2(protocol);
-        blockRewriter.registerBlockEvent(ClientboundPackets1_20_5.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_20_5.BLOCK_UPDATE);
-        blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_20_5.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_20_5.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
-        blockRewriter.registerBlockEntityData(ClientboundPackets1_20_5.BLOCK_ENTITY_DATA);
-
-        registerCooldown(ClientboundPackets1_20_5.COOLDOWN);
-        registerSetContent1_17_1(ClientboundPackets1_20_5.CONTAINER_SET_CONTENT);
-        protocol.registerClientbound(ClientboundPackets1_20_5.CONTAINER_SET_SLOT, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_20_5.CONTAINER_SET_SLOT, wrapper -> {
             final byte containerId = wrapper.passthrough(Types.BYTE);
             wrapper.passthrough(Types.VAR_INT); // State id
             final short slotId = wrapper.passthrough(Types.SHORT);
@@ -83,7 +73,8 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
                 return;
             }
 
-            final EfficiencyAttributeStorage storage = wrapper.user().get(EfficiencyAttributeStorage.class);
+            final ProtocolStorables1_21 storables = wrapper.user().storables(protocol);
+            final EfficiencyAttributeStorage storage = storables.efficiencyAttributes();
             Enchantments enchants = item.dataContainer().get(StructuredDataKey.ENCHANTMENTS1_20_5);
             EfficiencyAttributeStorage.ActiveEnchants active = storage.activeEnchants();
             active = switch (slotId) {
@@ -94,11 +85,6 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             };
             storage.setEnchants(-1, wrapper.user(), active);
         });
-        registerAdvancements1_20_3(ClientboundPackets1_20_5.UPDATE_ADVANCEMENTS);
-        registerSetEquipment(ClientboundPackets1_20_5.SET_EQUIPMENT);
-        registerContainerClick1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);
-        registerMerchantOffers1_20_5(ClientboundPackets1_20_5.MERCHANT_OFFERS);
-        registerSetCreativeModeSlot(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
 
         protocol.registerClientbound(ClientboundPackets1_20_5.HORSE_SCREEN_OPEN, wrapper -> {
             wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
@@ -108,7 +94,7 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             wrapper.write(Types.VAR_INT, Math.max(0, (size - 1) / 3));
         });
 
-        protocol.registerClientbound(ClientboundPackets1_20_5.LEVEL_EVENT, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_20_5.LEVEL_EVENT, wrapper -> {
             final int id = wrapper.passthrough(Types.INT);
             wrapper.passthrough(Types.BLOCK_POSITION1_14);
 
@@ -137,7 +123,8 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             if (!Via.getConfig().fix1_21PlacementRotation()) {
                 return;
             }
-            final PlayerPositionStorage storage = wrapper.user().get(PlayerPositionStorage.class);
+            final ProtocolStorables1_21 storables1_21 = wrapper.user().storables(protocol);
+            final PlayerPositionStorage storage = storables1_21.playerPosition();
 
             // Not correct but *enough* for vanilla/normal servers to have block placement synchronized
             final PacketWrapper playerRotation = wrapper.create(ServerboundPackets1_20_5.MOVE_PLAYER_POS_ROT);

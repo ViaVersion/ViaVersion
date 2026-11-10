@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.connection.ProtocolStorables;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -33,6 +34,7 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
@@ -58,6 +60,22 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public interface Protocol<CU extends ClientboundPacketType, CM extends ClientboundPacketType, SM extends ServerboundPacketType, SU extends ServerboundPacketType> {
 
+    /**
+     * Returns the server protocol version for this protocol,
+     * or null if not set (e.g. for base protocols).
+     *
+     * @return the server protocol version
+     */
+    @Nullable ProtocolVersion getServerVersion();
+
+    /**
+     * Returns the client protocol version for this protocol,
+     * or null if not set (e.g. for base protocols).
+     *
+     * @return the client protocol version for this protocol
+     */
+    @Nullable ProtocolVersion getClientVersion();
+
     default void registerClientbound(State state, ClientboundPacketType packetType, @Nullable PacketHandler handler) {
         Preconditions.checkArgument(packetType.state() == state);
         registerClientbound(state, packetType.getId(), packetType.getId(), handler, false);
@@ -68,10 +86,6 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
         registerServerbound(state, packetType.getId(), packetType.getId(), handler, false);
     }
 
-    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler) {
-        registerServerbound(state, unmappedPacketId, mappedPacketId, handler, false);
-    }
-
     /**
      * Registers a serverbound packet, with id transformation and remapper.
      *
@@ -79,18 +93,16 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @param unmappedPacketId unmapped packet id
      * @param mappedPacketId   mapped packet id
      * @param handler          packet handler
-     * @param override         whether an existing mapper should be overridden
      * @see #registerServerbound(ServerboundPacketType, ServerboundPacketType, PacketHandler, boolean)
      */
+    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler) {
+        registerServerbound(state, unmappedPacketId, mappedPacketId, handler, false);
+    }
+
+    @Deprecated(forRemoval = true)
     void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler, boolean override);
 
     void cancelServerbound(State state, int mappedPacketId);
-
-    default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler) {
-        registerClientbound(state, unmappedPacketId, mappedPacketId, handler, false);
-    }
-
-    void cancelClientbound(State state, int unmappedPacketId);
 
     /**
      * Registers a clientbound packet, with id transformation and remapper.
@@ -99,9 +111,15 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @param unmappedPacketId unmapped packet id
      * @param mappedPacketId   mapped packet id
      * @param handler          packet handler
-     * @param override         whether an existing mapper should be overridden
      * @see #registerClientbound(ClientboundPacketType, ClientboundPacketType, PacketHandler, boolean)
      */
+    default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler) {
+        registerClientbound(state, unmappedPacketId, mappedPacketId, handler, false);
+    }
+
+    void cancelClientbound(State state, int unmappedPacketId);
+
+    @Deprecated(forRemoval = true)
     void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler, boolean override);
 
     // ---------------------------------------------------------------------------------------
@@ -144,6 +162,7 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @param handler          packet handler
      * @param override         whether an existing mapping should be overridden if present
      */
+    @Deprecated(forRemoval = true)
     void registerClientbound(CU packetType, @Nullable CM mappedPacketType, @Nullable PacketHandler handler, boolean override);
 
     /**
@@ -191,6 +210,7 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @param handler          packet handler
      * @param override         whether an existing mapping should be overridden if present
      */
+    @Deprecated(forRemoval = true)
     void registerServerbound(SU packetType, @Nullable SM mappedPacketType, @Nullable PacketHandler handler, boolean override);
 
     /**
@@ -259,6 +279,22 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @param handler packet handler
      */
     void appendServerbound(SU type, PacketHandler handler);
+
+    /**
+     * Replaces a clientbound packet type handler with another.
+     *
+     * @param type    clientbound packet type
+     * @param handler packet handler
+     */
+    void replaceClientbound(CU type, @Nullable PacketHandler handler);
+
+    /**
+     * Replaces a serverbound packet type handler with another.
+     *
+     * @param type    serverbound packet type
+     * @param handler packet handler
+     */
+    void replaceServerbound(SU type, @Nullable PacketHandler handler);
 
     /**
      * Transform a packet using this protocol
@@ -440,5 +476,23 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      */
     default boolean isBaseProtocol() {
         return false;
+    }
+
+    /**
+     * Returns the index assigned to this protocol during registration.
+     *
+     * @return protocol index, or -1 if not yet registered
+     */
+    int index();
+
+    ProtocolStorables createStorables();
+
+    /**
+     * Marks this protocol as dependent on another. Before being initialized, it will wait for the dependency's completion.
+     *
+     * @return protocol class to depend on
+     */
+    default @Nullable Class<? extends Protocol<?, ?, ?, ?>> dependsOn() {
+        return null;
     }
 }

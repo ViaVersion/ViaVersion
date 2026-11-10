@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -75,5 +75,12 @@ public final class MathUtil {
             return min;
         }
         return d > max ? max : d;
+    }
+
+    public static long clamp(final long l, final long min, final long max) {
+        if (l < min) {
+            return min;
+        }
+        return l > max ? max : l;
     }
 }

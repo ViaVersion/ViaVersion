@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class FilterableComponent extends Filterable<Tag> implements Copyable, Rewritable {
 
-    public static final Type<FilterableComponent> TYPE = new FilterableType<>(Types.TAG, Types.OPTIONAL_TAG, FilterableComponent.class) {
+    public static final Type<FilterableComponent> TYPE = new FilterableType<>(Types.TEXT_COMPONENT_TAG, Types.OPTIONAL_TAG, FilterableComponent.class) {
         @Override
         protected FilterableComponent create(final Tag raw, final Tag filtered) {
             return new FilterableComponent(raw, filtered);

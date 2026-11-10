@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.Limit;
 
 public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPackets1_16_2, ServerboundPackets1_17, Protocol1_16_4To1_17> {
 
@@ -40,20 +41,11 @@ public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPacket
 
     @Override
     public void registerPackets() {
-        registerCooldown(ClientboundPackets1_16_2.COOLDOWN);
-        registerSetContent(ClientboundPackets1_16_2.CONTAINER_SET_CONTENT);
-        registerMerchantOffers(ClientboundPackets1_16_2.MERCHANT_OFFERS);
-        registerSetSlot(ClientboundPackets1_16_2.CONTAINER_SET_SLOT);
-        registerAdvancements(ClientboundPackets1_16_2.UPDATE_ADVANCEMENTS);
-        registerSetEquipment(ClientboundPackets1_16_2.SET_EQUIPMENT);
-
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_16_2.UPDATE_RECIPES);
-
-        registerSetCreativeModeSlot(ServerboundPackets1_17.SET_CREATIVE_MODE_SLOT);
 
         protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)));
 
-        protocol.registerServerbound(ServerboundPackets1_17.CONTAINER_CLICK, new PacketHandlers() {
+        protocol.replaceServerbound(ServerboundPackets1_17.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.BYTE); // Window Id
@@ -64,7 +56,7 @@ public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPacket
 
                 handler(wrapper -> {
                     // Affected items - throw them away!
-                    int length = wrapper.read(Types.VAR_INT);
+                    int length = Limit.max(wrapper.read(Types.VAR_INT), 128);
                     for (int i = 0; i < length; i++) {
                         wrapper.read(Types.SHORT); // Slot
                         wrapper.read(Types.ITEM1_13_2);
@@ -134,10 +126,27 @@ public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPacket
             }
             if (tag.getNumberTag("map") == null) {
                 tag.put("map", new IntTag(0));
+                tag.putBoolean(nbtTagName("map"), true);
             }
         }
 
         item.setIdentifier(this.protocol.getMappingData().getNewItemId(item.identifier()));
+        return item;
+    }
+
+    @Override
+    public Item handleItemToServer(UserConnection connection, Item item) {
+        if (item == null) return null;
+
+        super.handleItemToServer(connection, item);
+
+        CompoundTag tag = item.tag();
+        if (item.identifier() == 733 && tag != null && tag.remove(nbtTagName("map")) != null) {
+            tag.remove("map");
+            if (tag.isEmpty()) {
+                item.setTag(null);
+            }
+        }
         return item;
     }
 

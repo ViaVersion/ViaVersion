@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,6 +73,11 @@ public final class TagUtil {
     public static @Nullable CompoundTag getNamespacedCompoundTag(final CompoundTag tag, final String key) {
         final CompoundTag compoundTag = tag.getCompoundTag(Key.namespaced(key));
         return compoundTag != null ? compoundTag : tag.getCompoundTag(Key.stripMinecraftNamespace(key));
+    }
+
+    public static @Nullable ListTag<? extends Tag> getNamespacedTagList(final CompoundTag tag, final String key) {
+        final ListTag<? extends Tag> listTag = tag.getListTag(Key.namespaced(key));
+        return listTag != null ? listTag : tag.getListTag(Key.stripMinecraftNamespace(key));
     }
 
     public static @Nullable ListTag<CompoundTag> getNamespacedCompoundTagList(final CompoundTag tag, final String key) {

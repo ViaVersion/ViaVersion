@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,9 +64,6 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
 
     @Override
     public void registerPackets() {
-        registerCooldown(ClientboundPackets1_13.COOLDOWN);
-        registerAdvancements(ClientboundPackets1_13.UPDATE_ADVANCEMENTS);
-
         protocol.registerClientbound(ClientboundPackets1_13.OPEN_SCREEN, null, wrapper -> {
             Short windowId = wrapper.read(Types.UNSIGNED_BYTE);
             String type = wrapper.read(Types.STRING);
@@ -112,9 +109,6 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
             }
         });
 
-        registerSetContent(ClientboundPackets1_13.CONTAINER_SET_CONTENT);
-        registerSetSlot(ClientboundPackets1_13.CONTAINER_SET_SLOT);
-
         protocol.registerClientbound(ClientboundPackets1_13.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
@@ -127,7 +121,7 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
                         wrapper.read(Types.STRING); // Remove channel
 
                         int windowId = wrapper.read(Types.INT);
-                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
+                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(protocol);
                         tracker.setLatestTradeWindowId(windowId);
                         wrapper.write(Types.VAR_INT, windowId);
 
@@ -166,8 +160,6 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
             }
         });
 
-        registerSetEquippedItem(ClientboundPackets1_13.SET_EQUIPPED_ITEM);
-
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_13.UPDATE_RECIPES, wrapper -> {
             int size = wrapper.passthrough(Types.VAR_INT);
@@ -188,12 +180,10 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
         });
 
 
-        registerContainerClick(ServerboundPackets1_14.CONTAINER_CLICK);
-
         protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, wrapper -> {
             // Selecting trade now moves the items, we need to resync the inventory
             PacketWrapper resyncPacket = wrapper.create(ServerboundPackets1_13.CONTAINER_CLICK);
-            EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
+            EntityTracker1_14 tracker = wrapper.user().getEntityTracker(protocol);
             resyncPacket.write(Types.BYTE, ((byte) tracker.getLatestTradeWindowId())); // 0 - Window ID
             resyncPacket.write(Types.SHORT, ((short) -999)); // 1 - Slot
             resyncPacket.write(Types.BYTE, (byte) 2); // 2 - Button - End left click
@@ -204,8 +194,6 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
             resyncPacket.write(Types.ITEM1_13_2, new DataItem(1, (byte) 1, tag)); // 5 - Clicked Item
             resyncPacket.scheduleSendToServer(Protocol1_13_2To1_14.class);
         });
-
-        registerSetCreativeModeSlot(ServerboundPackets1_14.SET_CREATIVE_MODE_SLOT);
     }
 
     @Override

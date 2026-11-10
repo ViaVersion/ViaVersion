@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,66 +17,36 @@
  */
 package com.viaversion.viaversion.velocity.handlers;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.exception.CancelCodecException;
-import com.viaversion.viaversion.exception.CancelDecoderException;
-import com.viaversion.viaversion.util.ByteBufUtil;
-import io.netty.buffer.ByteBuf;
+import com.viaversion.viaversion.api.platform.ViaInjector;
+import com.viaversion.viaversion.platform.ViaDecodeHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.MessageToMessageDecoder;
-import java.util.List;
 
 @ChannelHandler.Sharable
-public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
-    private final UserConnection info;
+public class VelocityDecodeHandler extends ViaDecodeHandler {
 
-    public VelocityDecodeHandler(UserConnection info) {
-        this.info = info;
-    }
-
-    @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf bytebuf, List<Object> out) throws Exception {
-        if (!info.checkIncomingPacket(bytebuf.readableBytes())) throw CancelDecoderException.generate(null);
-        if (!info.shouldTransformPacket()) {
-            out.add(bytebuf.retain());
-            return;
-        }
-
-        ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), bytebuf);
-        try {
-            info.transformIncoming(transformedBuf, CancelDecoderException::generate);
-            out.add(transformedBuf.retain());
-        } finally {
-            transformedBuf.release();
-        }
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (cause instanceof CancelCodecException) return;
-        super.exceptionCaught(ctx, cause);
+    public VelocityDecodeHandler(final UserConnection connection) {
+        super(connection);
     }
 
     // Abuse decoder handler to catch events
     @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object event) throws Exception {
-        if (event != VelocityChannelInitializer.COMPRESSION_ENABLED_EVENT) {
-            super.userEventTriggered(ctx, event);
-            return;
+    public void userEventTriggered(final ChannelHandlerContext ctx, final Object event) throws Exception {
+        if (event == VelocityChannelInitializer.COMPRESSION_ENABLED_EVENT) {
+            // When Velocity adds the compression handlers, the order becomes Minecraft Encoder -> Compressor -> Via Encoder
+            // Move Via codec handlers back to right position
+            final ViaInjector injector = Via.getManager().getInjector();
+            final ChannelPipeline pipeline = ctx.pipeline();
+
+            final ChannelHandler encoder = pipeline.remove(injector.getEncoderName());
+            pipeline.addBefore(VelocityChannelInitializer.MINECRAFT_ENCODER, injector.getEncoderName(), encoder);
+
+            final ChannelHandler decoder = pipeline.remove(injector.getDecoderName());
+            pipeline.addBefore(VelocityChannelInitializer.MINECRAFT_DECODER, injector.getDecoderName(), decoder);
         }
-
-        // When Velocity adds the compression handlers, the order becomes Minecraft Encoder -> Compressor -> Via Encoder
-        // Move Via codec handlers back to right position
-        ChannelPipeline pipeline = ctx.pipeline();
-
-        ChannelHandler encoder = pipeline.remove(VelocityChannelInitializer.VIA_ENCODER);
-        pipeline.addBefore(VelocityChannelInitializer.MINECRAFT_ENCODER, VelocityChannelInitializer.VIA_ENCODER, encoder);
-
-        ChannelHandler decoder = pipeline.remove(VelocityChannelInitializer.VIA_DECODER);
-        pipeline.addBefore(VelocityChannelInitializer.MINECRAFT_DECODER, VelocityChannelInitializer.VIA_DECODER, decoder);
-
         super.userEventTriggered(ctx, event);
     }
 }

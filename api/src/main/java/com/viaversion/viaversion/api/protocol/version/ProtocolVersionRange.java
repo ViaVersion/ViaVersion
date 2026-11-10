@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,9 +27,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Wrapper class file for {@link com.google.common.collect.Range} to support multiple ranges. This class is used to
+ * Wrapper class file for {@link Range} to support multiple ranges. This class is used to
  * compare {@link ProtocolVersion} objects.
  */
 public class ProtocolVersionRange {
@@ -43,7 +44,7 @@ public class ProtocolVersionRange {
     }
 
     /**
-     * Returns a range that contains all versions.
+     * Returns a range that contains all versions. Adding new ranges to this range is not supported.
      *
      * @return the range
      */
@@ -83,6 +84,37 @@ public class ProtocolVersionRange {
     }
 
     /**
+     * Returns a range that contains only the given version.
+     *
+     * @param version the version
+     * @return the range
+     *
+     */
+    public static ProtocolVersionRange singleton(final ProtocolVersion version) {
+        return new ProtocolVersionRange(Collections.singletonList(Range.singleton(version)));
+    }
+
+    /**
+     * Returns a range that contains all versions equal to or newer than the given version.
+     *
+     * @param version the version
+     * @return the range
+     */
+    public static ProtocolVersionRange andNewer(final ProtocolVersion version) {
+        return new ProtocolVersionRange(Collections.singletonList(Range.atLeast(version)));
+    }
+
+    /**
+     * Returns a range that contains all versions equal to or older than the given version.
+     *
+     * @param version the version
+     * @return the range
+     */
+    public static ProtocolVersionRange andOlder(final ProtocolVersion version) {
+        return new ProtocolVersionRange(Collections.singletonList(Range.atMost(version)));
+    }
+
+    /**
      * Adds a new range to this range. This method is only available if the range is not already containing all versions.
      *
      * @param range the range to add
@@ -93,6 +125,24 @@ public class ProtocolVersionRange {
             throw new UnsupportedOperationException("Range already contains all versions. Cannot add a new range.");
         }
         ranges.add(range);
+        return this;
+    }
+
+    /**
+     * Adds all ranges from the given range to this range. This method is only available if the range is not already containing all versions.
+     *
+     * @param range the range to add
+     * @return this range
+     */
+    public ProtocolVersionRange add(final ProtocolVersionRange range) {
+        if (ranges == null) {
+            throw new UnsupportedOperationException("Range already contains all versions. Cannot add a new range.");
+        }
+        if (range.ranges != null) {
+            ranges.addAll(range.ranges);
+        } else {
+            ranges = null;
+        }
         return this;
     }
 
@@ -108,6 +158,46 @@ public class ProtocolVersionRange {
             if (range.contains(version)) return true;
         }
         return false;
+    }
+
+    /**
+     * Gets the minimum version in this range. If there are multiple ranges, the lowest minimum is returned.
+     *
+     * @return the minimum version, or null if there is no minimum
+     */
+    public @Nullable ProtocolVersion getMin() {
+        ProtocolVersion min = null;
+        if (this.ranges != null) {
+            for (Range<ProtocolVersion> range : this.ranges) {
+                if (range.hasLowerBound()) {
+                    ProtocolVersion rangeMin = range.lowerEndpoint();
+                    if (min == null || rangeMin.compareTo(min) < 0) {
+                        min = rangeMin;
+                    }
+                }
+            }
+        }
+        return min;
+    }
+
+    /**
+     * Gets the maximum version in this range. If there are multiple ranges, the highest maximum is returned.
+     *
+     * @return the maximum version, or null if there is no maximum
+     */
+    public @Nullable ProtocolVersion getMax() {
+        ProtocolVersion max = null;
+        if (this.ranges != null) {
+            for (Range<ProtocolVersion> range : this.ranges) {
+                if (range.hasUpperBound()) {
+                    ProtocolVersion rangeMax = range.upperEndpoint();
+                    if (max == null || rangeMax.compareTo(max) > 0) {
+                        max = rangeMax;
+                    }
+                }
+            }
+        }
+        return max;
     }
 
     @Override
@@ -148,7 +238,7 @@ public class ProtocolVersionRange {
     }
 
     /**
-     * Parses a range from a string.
+     * Parses a range from a string generated by {@link #toString()}.
      *
      * @param str the string
      * @return the range

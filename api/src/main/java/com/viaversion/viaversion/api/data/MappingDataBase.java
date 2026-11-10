@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,14 @@
  */
 package com.viaversion.viaversion.api.data;
 
+import com.viaversion.nbt.tag.ByteArrayTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
+import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.MappingDataLoader.IdentifiersPair;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -34,7 +38,9 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingDataBase implements MappingData {
@@ -45,6 +51,7 @@ public class MappingDataBase implements MappingData {
     protected FullMappings entityMappings;
     protected FullMappings recipeSerializerMappings;
     protected FullMappings itemDataSerializerMappings;
+    protected FullMappings slotDisplayMappings;
     protected FullMappings attributeMappings;
     protected FullMappings blockEntityMappings;
     protected ParticleMappings particleMappings;
@@ -61,6 +68,7 @@ public class MappingDataBase implements MappingData {
      * Set of block ids that have had type or property changes.
      */
     protected IntSet changedBlocks;
+    protected Set<String> changedEnvironmentAttributes;
 
     public MappingDataBase(final String unmappedVersion, final String mappedVersion) {
         this.unmappedVersion = unmappedVersion;
@@ -89,19 +97,19 @@ public class MappingDataBase implements MappingData {
 
             entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
             argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
+            slotDisplayMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "slot_displays");
             recipeSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "recipe_serializers");
             itemDataSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "data_component_type");
             attributeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "attributes");
             blockEntityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "blockentities");
 
-            final List<String> unmappedParticles = identifiersFromGlobalIds(unmappedIdentifierData, "particles");
-            final List<String> mappedParticles = identifiersFromGlobalIds(mappedIdentifierData, "particles");
-            if (unmappedParticles != null && mappedParticles != null) {
+            final IdentifiersPair particleIdentifiers = identifiersFromGlobalIds(unmappedIdentifierData, mappedIdentifierData, "particles");
+            if (particleIdentifiers != null) {
                 Mappings particleMappings = loadMappings(data, "particles");
                 if (particleMappings == null) {
-                    particleMappings = new IdentityMappings(unmappedParticles.size(), mappedParticles.size());
+                    particleMappings = new IdentityMappings(particleIdentifiers.unmapped().size(), particleIdentifiers.mapped().size());
                 }
-                this.particleMappings = new ParticleMappings(unmappedParticles, mappedParticles, particleMappings);
+                this.particleMappings = new ParticleMappings(particleIdentifiers, particleMappings);
             }
         } else {
             // Might not have identifiers in older versions
@@ -116,6 +124,7 @@ public class MappingDataBase implements MappingData {
             loadTags(RegistryType.ITEM, tagsTag);
             loadTags(RegistryType.BLOCK, tagsTag);
             loadTags(RegistryType.ENTITY, tagsTag);
+            loadTags(RegistryType.FLUID, tagsTag);
         }
 
         final IntArrayTag changedBlocks = data.getIntArrayTag("changed_blocks");
@@ -123,11 +132,20 @@ public class MappingDataBase implements MappingData {
             this.changedBlocks = new IntOpenHashSet(changedBlocks.getValue());
         }
 
+        final ListTag<StringTag> changedEnvironmentAttributes = data.getListTag("changed_environment_attributes", StringTag.class);
+        if (changedEnvironmentAttributes != null) {
+            this.changedEnvironmentAttributes = changedEnvironmentAttributes.stream().map(StringTag::getValue).collect(Collectors.toSet());
+        }
+
         loadExtras(data);
     }
 
     protected @Nullable List<String> identifiersFromGlobalIds(final CompoundTag mappingsTag, final String key) {
         return MappingDataLoader.INSTANCE.identifiersFromGlobalIds(mappingsTag, key);
+    }
+
+    protected @Nullable IdentifiersPair identifiersFromGlobalIds(final CompoundTag unmappedTag, final CompoundTag mappedTag, final String key) {
+        return MappingDataLoader.INSTANCE.identifiersFromGlobalIds(unmappedTag, mappedTag, key);
     }
 
     protected @Nullable CompoundTag readMappingsFile(final String name) {
@@ -156,14 +174,16 @@ public class MappingDataBase implements MappingData {
             return null;
         }
 
-        final List<String> unmappedIdentifiers = identifiersFromGlobalIds(unmappedIdentifiersTag, key);
-        final List<String> mappedIdentifiers = identifiersFromGlobalIds(mappedIdentifiersTag, key);
+        final IdentifiersPair identifiersPair = identifiersFromGlobalIds(unmappedIdentifiersTag, mappedIdentifiersTag, key);
         Mappings mappings = loadBiMappings(data, key); // Load as bi-mappings to keep the inverse cached
         if (mappings == null) {
-            mappings = new IdentityMappings(unmappedIdentifiers.size(), mappedIdentifiers.size());
+            mappings = new IdentityMappings(identifiersPair.unmapped().size(), identifiersPair.mapped().size());
         }
+        return createFullMappings(identifiersPair, mappings);
+    }
 
-        return new FullMappingsBase(unmappedIdentifiers, mappedIdentifiers, mappings);
+    protected FullMappings createFullMappings(final IdentifiersPair identifiersPair, final Mappings mappings) {
+        return FullMappingsBase.of(identifiersPair, mappings);
     }
 
     protected @Nullable BiMappings loadBiMappings(final CompoundTag data, final String key) {
@@ -172,15 +192,21 @@ public class MappingDataBase implements MappingData {
     }
 
     private void loadTags(final RegistryType type, final CompoundTag data) {
-        final CompoundTag tag = data.getCompoundTag(type.resourceLocation());
+        final CompoundTag tag = data.getCompoundTag(type.identifier());
         if (tag == null) {
             return;
         }
 
         final List<TagData> tagsList = new ArrayList<>(tags.size());
         for (final Map.Entry<String, Tag> entry : tag.entrySet()) {
-            final IntArrayTag entries = (IntArrayTag) entry.getValue();
-            tagsList.add(new TagData(entry.getKey(), entries.getValue()));
+            final int[] entries;
+            if (entry.getValue() instanceof final ByteArrayTag rangesTag) {
+                entries = IdRanges.decodeAsList(rangesTag).toIntArray();
+            } else {
+                // Old format / if the values need to be sorted
+                entries = ((IntArrayTag) entry.getValue()).getValue();
+            }
+            tagsList.add(new TagData(entry.getKey(), entries));
         }
 
         this.tags.put(type, tagsList);
@@ -336,8 +362,18 @@ public class MappingDataBase implements MappingData {
     }
 
     @Override
+    public @Nullable FullMappings getSlotDisplayMappings() {
+        return slotDisplayMappings;
+    }
+
+    @Override
     public @Nullable IntSet changedBlocks() {
         return changedBlocks;
+    }
+
+    @Override
+    public @Nullable Set<String> changedEnvironmentAttributes() {
+        return changedEnvironmentAttributes;
     }
 
     protected Logger getLogger() {
@@ -354,7 +390,7 @@ public class MappingDataBase implements MappingData {
      */
     protected int checkValidity(final int id, final int mappedId, final String type) {
         if (mappedId == -1) {
-            if (!Via.getConfig().isSuppressConversionWarnings()) {
+            if (Via.getConfig().logOtherConversionWarnings()) {
                 getLogger().warning(String.format("Missing %s %s for %s %s %d", mappedVersion, type, unmappedVersion, type, id));
             }
             return 0;

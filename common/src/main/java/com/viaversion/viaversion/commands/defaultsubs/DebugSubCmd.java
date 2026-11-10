@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,11 @@ public class DebugSubCmd implements ViaSubCommand {
     }
 
     @Override
+    public String usage() {
+        return "debug [clear|pre|post], or debug <add|remove> <packet>";
+    }
+
+    @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
         final DebugHandler debug = Via.getManager().debugHandler();
         if (args.length == 0) {
@@ -49,11 +54,11 @@ public class DebugSubCmd implements ViaSubCommand {
                 debug.clearPacketTypesToLog();
                 sendMessage(sender, "&6Cleared packet types to log");
                 return true;
-            } else if (args[0].equalsIgnoreCase("logpretransform")) {
+            } else if (args[0].equalsIgnoreCase("pre")) {
                 debug.setLogPrePacketTransform(!debug.logPrePacketTransform());
                 sendMessage(sender, "&6Pre transform packet logging is now %s", (debug.logPrePacketTransform() ? "&aenabled" : "&cdisabled"));
                 return true;
-            } else if (args[0].equalsIgnoreCase("logposttransform")) {
+            } else if (args[0].equalsIgnoreCase("post")) {
                 debug.setLogPostPacketTransform(!debug.logPostPacketTransform());
                 sendMessage(sender, "&6Post transform packet logging is now %s", (debug.logPostPacketTransform() ? "&aenabled" : "&cdisabled"));
                 return true;
@@ -75,7 +80,7 @@ public class DebugSubCmd implements ViaSubCommand {
     @Override
     public List<String> onTabComplete(final ViaCommandSender sender, final String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("clear", "logposttransform", "add", "remove");
+            return Arrays.asList("clear", "pre", "post", "add", "remove");
         }
         return Collections.emptyList();
     }

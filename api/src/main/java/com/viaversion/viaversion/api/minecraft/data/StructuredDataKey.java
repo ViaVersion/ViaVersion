@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +30,16 @@ import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.PaintingVariant;
 import com.viaversion.viaversion.api.minecraft.RegistryKey;
 import com.viaversion.viaversion.api.minecraft.ResolvableProfile;
-import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_20_5;
+import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_11;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_2;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys1_21_5;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrim1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrim26_3;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimMaterial1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimMaterial26_3;
+import com.viaversion.viaversion.api.minecraft.item.data.AttackRange;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_21;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
@@ -43,9 +47,14 @@ import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockEntityData;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.BlocksAttacks;
-import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
+import com.viaversion.viaversion.api.minecraft.item.data.BreakSound;
+import com.viaversion.viaversion.api.minecraft.item.data.BrewingFuel;
+import com.viaversion.viaversion.api.minecraft.item.data.Compostable;
+import com.viaversion.viaversion.api.minecraft.item.data.consumable.Consumable1_21_2;
+import com.viaversion.viaversion.api.minecraft.item.data.CookingFuel;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
-import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant;
+import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant1_21_2;
+import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant26_1;
 import com.viaversion.viaversion.api.minecraft.item.data.DeathProtection;
 import com.viaversion.viaversion.api.minecraft.item.data.DebugStickState;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
@@ -62,18 +71,27 @@ import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.ItemModel;
 import com.viaversion.viaversion.api.minecraft.item.data.JukeboxPlayable;
+import com.viaversion.viaversion.api.minecraft.item.data.JukeboxPlayable.JukeboxSong;
+import com.viaversion.viaversion.api.minecraft.item.data.KineticWeapon;
 import com.viaversion.viaversion.api.minecraft.item.data.LockCode;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
-import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
+import com.viaversion.viaversion.api.minecraft.item.data.MobVisibility;
+import com.viaversion.viaversion.api.minecraft.item.data.PiercingWeapon;
+import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
-import com.viaversion.viaversion.api.minecraft.item.data.ProvidesTrimMaterial;
+import com.viaversion.viaversion.api.minecraft.item.data.ProvidesBannerPatterns;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ProvidesTrimMaterial1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.Repairable;
+import com.viaversion.viaversion.api.minecraft.item.data.SignText;
 import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.SwingAnimation;
 import com.viaversion.viaversion.api.minecraft.item.data.ToolProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.TooltipDisplay;
 import com.viaversion.viaversion.api.minecraft.item.data.TropicalFishPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.UseCooldown;
+import com.viaversion.viaversion.api.minecraft.item.data.UseEffects;
+import com.viaversion.viaversion.api.minecraft.item.data.VillagerFood;
 import com.viaversion.viaversion.api.minecraft.item.data.Weapon;
 import com.viaversion.viaversion.api.minecraft.item.data.WritableBook;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
@@ -91,8 +109,8 @@ import com.viaversion.viaversion.util.Unit;
  * Holds data component keys.
  *
  * @param identifier string identifier
- * @param type data type
- * @param <T> data type
+ * @param type       data type
+ * @param <T>        data type
  * @see VersionedTypes
  */
 public record StructuredDataKey<T>(String identifier, Type<T> type) {
@@ -102,8 +120,12 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> MAX_DAMAGE = new StructuredDataKey<>("max_damage", Types.VAR_INT);
     public static final StructuredDataKey<Integer> DAMAGE = new StructuredDataKey<>("damage", Types.VAR_INT);
     public static final StructuredDataKey<Unbreakable> UNBREAKABLE1_20_5 = new StructuredDataKey<>("unbreakable", Unbreakable.TYPE);
+    public static final StructuredDataKey<UseEffects> USE_EFFECTS = new StructuredDataKey<>("use_effects", UseEffects.TYPE);
     public static final StructuredDataKey<Unit> UNBREAKABLE1_21_5 = new StructuredDataKey<>("unbreakable", Types.EMPTY);
     public static final StructuredDataKey<Tag> CUSTOM_NAME = new StructuredDataKey<>("custom_name", Types.TEXT_COMPONENT_TAG);
+    public static final StructuredDataKey<Float> MINIMUM_ATTACK_CHARGE = new StructuredDataKey<>("minimum_attack_charge", Types.FLOAT);
+    public static final StructuredDataKey<Either<Integer, String>> DAMAGE_TYPE1_21_11 = new StructuredDataKey<>("damage_type", new SynchronizedRegistryEitherType(RegistryKey.of("damage_type")));
+    public static final StructuredDataKey<Integer> DAMAGE_TYPE26_1 = new StructuredDataKey<>("damage_type", new SynchronizedRegistryValueType(RegistryKey.of("damage_type")));
     public static final StructuredDataKey<Tag> ITEM_NAME = new StructuredDataKey<>("item_name", Types.TEXT_COMPONENT_TAG);
     public static final StructuredDataKey<ItemModel> ITEM_MODEL = new StructuredDataKey<>("item_model", ItemModel.TYPE);
     public static final StructuredDataKey<Tag[]> LORE = new StructuredDataKey<>("lore", new ArrayType<>(Types.TEXT_COMPONENT_TAG, 256));
@@ -129,24 +151,40 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<FoodProperties1_20_5> FOOD1_20_5 = new StructuredDataKey<>("food", FoodProperties1_20_5.TYPE1_20_5);
     public static final StructuredDataKey<FoodProperties1_20_5> FOOD1_21 = new StructuredDataKey<>("food", FoodProperties1_20_5.TYPE1_21);
     public static final StructuredDataKey<FoodProperties1_21_2> FOOD1_21_2 = new StructuredDataKey<>("food", FoodProperties1_21_2.TYPE);
-    public static final StructuredDataKey<Consumable1_21_2> CONSUMABLE1_21_2 = new StructuredDataKey<>("consumable", Consumable1_21_2.TYPE);
+    public static final StructuredDataKey<Consumable1_21_2> CONSUMABLE1_21_2 = new StructuredDataKey<>("consumable", Consumable1_21_2.TYPE1_21_2);
+    // 1.21.5-1.21.9 only, animation id 5 was still named spear
+    public static final StructuredDataKey<Consumable1_21_2> CONSUMABLE1_21_5 = new StructuredDataKey<>("consumable", Consumable1_21_2.TYPE1_21_5);
+    public static final StructuredDataKey<Consumable1_21_2> CONSUMABLE26_3 = new StructuredDataKey<>("consumable", Consumable1_21_2.TYPE26_3);
     public static final StructuredDataKey<UseCooldown> USE_COOLDOWN = new StructuredDataKey<>("use_cooldown", UseCooldown.TYPE);
     public static final StructuredDataKey<Unit> FIRE_RESISTANT = new StructuredDataKey<>("fire_resistant", Types.EMPTY);
-    public static final StructuredDataKey<DamageResistant> DAMAGE_RESISTANT = new StructuredDataKey<>("damage_resistant", DamageResistant.TYPE);
+    public static final StructuredDataKey<DamageResistant1_21_2> DAMAGE_RESISTANT1_21_2 = new StructuredDataKey<>("damage_resistant", DamageResistant1_21_2.TYPE);
+    public static final StructuredDataKey<DamageResistant26_1> DAMAGE_RESISTANT26_1 = new StructuredDataKey<>("damage_resistant", DamageResistant26_1.TYPE);
     public static final StructuredDataKey<ToolProperties> TOOL1_20_5 = new StructuredDataKey<>("tool", ToolProperties.TYPE1_20_5);
     public static final StructuredDataKey<ToolProperties> TOOL1_21_5 = new StructuredDataKey<>("tool", ToolProperties.TYPE1_21_5);
     public static final StructuredDataKey<Weapon> WEAPON = new StructuredDataKey<>("weapon", Weapon.TYPE);
+    public static final StructuredDataKey<AttackRange> ATTACK_RANGE = new StructuredDataKey<>("attack_range", AttackRange.TYPE);
     public static final StructuredDataKey<Enchantable> ENCHANTABLE = new StructuredDataKey<>("enchantable", Enchantable.TYPE);
     public static final StructuredDataKey<Equippable> EQUIPPABLE1_21_2 = new StructuredDataKey<>("equippable", Equippable.TYPE1_21_2);
     public static final StructuredDataKey<Equippable> EQUIPPABLE1_21_5 = new StructuredDataKey<>("equippable", Equippable.TYPE1_21_5);
     public static final StructuredDataKey<Equippable> EQUIPPABLE1_21_6 = new StructuredDataKey<>("equippable", Equippable.TYPE1_21_6);
     public static final StructuredDataKey<Repairable> REPAIRABLE = new StructuredDataKey<>("repairable", Repairable.TYPE);
     public static final StructuredDataKey<Unit> GLIDER = new StructuredDataKey<>("glider", Types.EMPTY);
-    public static final StructuredDataKey<Key> TOOLTIP_STYLE = new StructuredDataKey<>("tooltip_style", Types.RESOURCE_LOCATION);
-    public static final StructuredDataKey<DeathProtection> DEATH_PROTECTION = new StructuredDataKey<>("death_protection", DeathProtection.TYPE);
-    public static final StructuredDataKey<BlocksAttacks> BLOCKS_ATTACKS = new StructuredDataKey<>("blocks_attacks", BlocksAttacks.TYPE);
+    public static final StructuredDataKey<Key> TOOLTIP_STYLE = new StructuredDataKey<>("tooltip_style", Types.IDENTIFIER);
+    public static final StructuredDataKey<DeathProtection> DEATH_PROTECTION1_21_2 = new StructuredDataKey<>("death_protection", DeathProtection.TYPE1_21_2);
+    public static final StructuredDataKey<DeathProtection> DEATH_PROTECTION26_3 = new StructuredDataKey<>("death_protection", DeathProtection.TYPE26_3);
+    public static final StructuredDataKey<BlocksAttacks> BLOCKS_ATTACKS1_21_5 = new StructuredDataKey<>("blocks_attacks", BlocksAttacks.TYPE1_21_5);
+    public static final StructuredDataKey<BlocksAttacks> BLOCKS_ATTACKS26_1 = new StructuredDataKey<>("blocks_attacks", BlocksAttacks.TYPE26_1);
+    public static final StructuredDataKey<PiercingWeapon> PIERCING_WEAPON = new StructuredDataKey<>("piercing_weapon", PiercingWeapon.TYPE);
+    public static final StructuredDataKey<KineticWeapon> KINETIC_WEAPON = new StructuredDataKey<>("kinetic_weapon", KineticWeapon.TYPE);
+    public static final StructuredDataKey<SwingAnimation> SWING_ANIMATION = new StructuredDataKey<>("swing_animation", SwingAnimation.TYPE);
+    public static final StructuredDataKey<SwingAnimation> ATTACK_ANIMATION = new StructuredDataKey<>("attack_animation", SwingAnimation.TYPE);
+    public static final StructuredDataKey<SwingAnimation> INTERACT_ANIMATION = new StructuredDataKey<>("interact_animation", SwingAnimation.TYPE);
+    public static final StructuredDataKey<Integer> ADDITIONAL_TRADE_COST = new StructuredDataKey<>("additional_trade_cost", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> BLOCK_TRANSFORMER = new StructuredDataKey<>("block_transformer", new SynchronizedRegistryValueType(RegistryKey.of("block_transformer")));
+    public static final StructuredDataKey<VillagerFood> VILLAGER_FOOD = new StructuredDataKey<>("villager_food", VillagerFood.TYPE);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS1_20_5 = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE1_20_5);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS1_21_5 = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE1_21_5);
+    public static final StructuredDataKey<Integer> DYE = new StructuredDataKey<>("dye", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<DyedColor> DYED_COLOR1_20_5 = new StructuredDataKey<>("dyed_color", DyedColor.TYPE1_20_5);
     public static final StructuredDataKey<DyedColor> DYED_COLOR1_21_5 = new StructuredDataKey<>("dyed_color", DyedColor.TYPE1_21_5);
     public static final StructuredDataKey<Integer> MAP_COLOR = new StructuredDataKey<>("map_color", Types.INT);
@@ -159,10 +197,11 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<SuspiciousStewEffect[]> SUSPICIOUS_STEW_EFFECTS = new StructuredDataKey<>("suspicious_stew_effects", SuspiciousStewEffect.ARRAY_TYPE);
     public static final StructuredDataKey<WritableBook> WRITABLE_BOOK_CONTENT = new StructuredDataKey<>("writable_book_content", WritableBook.TYPE);
     public static final StructuredDataKey<WrittenBook> WRITTEN_BOOK_CONTENT = new StructuredDataKey<>("written_book_content", WrittenBook.TYPE);
-    public static final StructuredDataKey<ArmorTrim> TRIM1_20_5 = new StructuredDataKey<>("trim", ArmorTrim.TYPE1_20_5);
-    public static final StructuredDataKey<ArmorTrim> TRIM1_21_2 = new StructuredDataKey<>("trim", ArmorTrim.TYPE1_21_2);
-    public static final StructuredDataKey<ArmorTrim> TRIM1_21_4 = new StructuredDataKey<>("trim", ArmorTrim.TYPE1_21_4);
-    public static final StructuredDataKey<ArmorTrim> TRIM1_21_5 = new StructuredDataKey<>("trim", ArmorTrim.TYPE1_21_5);
+    public static final StructuredDataKey<ArmorTrim1_20_5> TRIM1_20_5 = new StructuredDataKey<>("trim", ArmorTrim1_20_5.TYPE1_20_5);
+    public static final StructuredDataKey<ArmorTrim1_20_5> TRIM1_21_2 = new StructuredDataKey<>("trim", ArmorTrim1_20_5.TYPE1_21_2);
+    public static final StructuredDataKey<ArmorTrim1_20_5> TRIM1_21_4 = new StructuredDataKey<>("trim", ArmorTrim1_20_5.TYPE1_21_4);
+    public static final StructuredDataKey<ArmorTrim1_20_5> TRIM1_21_5 = new StructuredDataKey<>("trim", ArmorTrim1_20_5.TYPE1_21_5);
+    public static final StructuredDataKey<ArmorTrim26_3> TRIM26_3 = new StructuredDataKey<>("trim", ArmorTrim26_3.TYPE);
     public static final StructuredDataKey<DebugStickState> DEBUG_STICK_STATE = new StructuredDataKey<>("debug_stick_state", DebugStickState.TYPE);
     public static final StructuredDataKey<CompoundTag> ENTITY_DATA1_20_5 = new StructuredDataKey<>("entity_data", Types.COMPOUND_TAG);
     public static final StructuredDataKey<EntityData> ENTITY_DATA1_21_9 = new StructuredDataKey<>("entity_data", EntityData.TYPE);
@@ -170,30 +209,46 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<CompoundTag> BLOCK_ENTITY_DATA1_20_5 = new StructuredDataKey<>("block_entity_data", Types.COMPOUND_TAG);
     public static final StructuredDataKey<BlockEntityData> BLOCK_ENTITY_DATA1_21_9 = new StructuredDataKey<>("block_entity_data", BlockEntityData.TYPE);
     public static final StructuredDataKey<Holder<Instrument1_20_5>> INSTRUMENT1_20_5 = new StructuredDataKey<>("instrument", Instrument1_20_5.TYPE);
-    public static final StructuredDataKey<Holder<Instrument1_21_2>> INSTRUMENT1_21_2 = new StructuredDataKey<>("instrument", Instrument1_21_2.TYPE);
+    public static final StructuredDataKey<Holder<Instrument1_21_2>> INSTRUMENT1_21_2 = new StructuredDataKey<>("instrument", Instrument1_21_2.TYPE1_21_2);
     public static final StructuredDataKey<EitherHolder<Instrument1_21_2>> INSTRUMENT1_21_5 = new StructuredDataKey<>("instrument", Instrument1_21_2.EITHER_HOLDER_TYPE);
-    public static final StructuredDataKey<ProvidesTrimMaterial> PROVIDES_TRIM_MATERIAL = new StructuredDataKey<>("provides_trim_material", ProvidesTrimMaterial.TYPE);
+    public static final StructuredDataKey<Holder<Instrument1_21_2>> INSTRUMENT26_1 = new StructuredDataKey<>("instrument", Instrument1_21_2.TYPE1_21_2);
+    public static final StructuredDataKey<Holder<Instrument1_21_2>> INSTRUMENT26_3 = new StructuredDataKey<>("instrument", Instrument1_21_2.TYPE26_3);
+    public static final StructuredDataKey<ProvidesTrimMaterial1_20_5> PROVIDES_TRIM_MATERIAL1_21_5 = new StructuredDataKey<>("provides_trim_material", ProvidesTrimMaterial1_20_5.TYPE);
+    public static final StructuredDataKey<Holder<ArmorTrimMaterial1_20_5>> PROVIDES_TRIM_MATERIAL26_1 = new StructuredDataKey<>("provides_trim_material", ArmorTrimMaterial1_20_5.TYPE1_21_5);
+    public static final StructuredDataKey<Holder<ArmorTrimMaterial26_3>> PROVIDES_TRIM_MATERIAL26_3 = new StructuredDataKey<>("provides_trim_material", ArmorTrimMaterial26_3.TYPE);
     public static final StructuredDataKey<Integer> OMINOUS_BOTTLE_AMPLIFIER = new StructuredDataKey<>("ominous_bottle_amplifier", Types.VAR_INT);
     public static final StructuredDataKey<JukeboxPlayable> JUKEBOX_PLAYABLE1_21 = new StructuredDataKey<>("jukebox_playable", JukeboxPlayable.TYPE1_21);
     public static final StructuredDataKey<JukeboxPlayable> JUKEBOX_PLAYABLE1_21_5 = new StructuredDataKey<>("jukebox_playable", JukeboxPlayable.TYPE1_21_5);
-    public static final StructuredDataKey<Key> PROVIDES_BANNER_PATTERNS = new StructuredDataKey<>("provides_banner_patterns", Types.TAG_KEY);
+    public static final StructuredDataKey<Holder<JukeboxSong>> JUKEBOX_PLAYABLE26_1 = new StructuredDataKey<>("jukebox_playable", JukeboxSong.TYPE);
+    public static final StructuredDataKey<Key> PROVIDES_BANNER_PATTERNS1_21_5 = new StructuredDataKey<>("provides_banner_patterns", Types.TAG_KEY);
+    public static final StructuredDataKey<ProvidesBannerPatterns> PROVIDES_BANNER_PATTERNS26_1 = new StructuredDataKey<>("provides_banner_patterns", ProvidesBannerPatterns.TYPE);
     public static final StructuredDataKey<Tag> RECIPES = new StructuredDataKey<>("recipes", Types.TAG);
     public static final StructuredDataKey<LodestoneTracker> LODESTONE_TRACKER = new StructuredDataKey<>("lodestone_tracker", LodestoneTracker.TYPE);
     public static final StructuredDataKey<FireworkExplosion> FIREWORK_EXPLOSION = new StructuredDataKey<>("firework_explosion", FireworkExplosion.TYPE);
     public static final StructuredDataKey<Fireworks> FIREWORKS = new StructuredDataKey<>("fireworks", Fireworks.TYPE);
     public static final StructuredDataKey<GameProfile> PROFILE1_20_5 = new StructuredDataKey<>("profile", Types.GAME_PROFILE);
     public static final StructuredDataKey<ResolvableProfile> PROFILE1_21_9 = new StructuredDataKey<>("profile", Types.RESOLVABLE_PROFILE);
-    public static final StructuredDataKey<Key> NOTE_BLOCK_SOUND = new StructuredDataKey<>("note_block_sound", Types.RESOURCE_LOCATION);
+    public static final StructuredDataKey<Key> NOTE_BLOCK_SOUND = new StructuredDataKey<>("note_block_sound", Types.IDENTIFIER);
     public static final StructuredDataKey<BannerPatternLayer[]> BANNER_PATTERNS = new StructuredDataKey<>("banner_patterns", BannerPatternLayer.ARRAY_TYPE);
     public static final StructuredDataKey<Integer> BASE_COLOR = new StructuredDataKey<>("base_color", EnumTypes.DYE_COLOR);
-    public static final StructuredDataKey<PotDecorations> POT_DECORATIONS = new StructuredDataKey<>("pot_decorations", PotDecorations.TYPE);
+    public static final StructuredDataKey<PotDecorations1_20_5> POT_DECORATIONS1_20_5 = new StructuredDataKey<>("pot_decorations", PotDecorations1_20_5.TYPE);
+    // 26.3+ pot decorations are in their own key classes
     public static final StructuredDataKey<BlockStateProperties> BLOCK_STATE = new StructuredDataKey<>("block_state", BlockStateProperties.TYPE);
     public static final StructuredDataKey<Bee[]> BEES1_20_5 = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE1_20_5);
     public static final StructuredDataKey<Bee[]> BEES1_21_9 = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE1_21_9);
     public static final StructuredDataKey<Tag> LOCK1_20_5 = new StructuredDataKey<>("lock", Types.TAG);
     public static final StructuredDataKey<LockCode> LOCK1_21_2 = new StructuredDataKey<>("lock", LockCode.TYPE);
     public static final StructuredDataKey<CompoundTag> CONTAINER_LOOT = new StructuredDataKey<>("container_loot", Types.COMPOUND_TAG);
-    public static final StructuredDataKey<Holder<SoundEvent>> BREAK_SOUND = new StructuredDataKey<>("break_sound", Types.SOUND_EVENT);
+    public static final StructuredDataKey<BreakSound> BREAK_SOUND = new StructuredDataKey<>("break_sound", BreakSound.TYPE);
+    public static final StructuredDataKey<Compostable> COMPOSTABLE = new StructuredDataKey<>("compostable", Compostable.TYPE);
+    public static final StructuredDataKey<CookingFuel> COOKING_FUEL = new StructuredDataKey<>("cooking_fuel", CookingFuel.TYPE);
+    public static final StructuredDataKey<BrewingFuel> BREWING_FUEL = new StructuredDataKey<>("brewing_fuel", BrewingFuel.TYPE);
+    public static final StructuredDataKey<MobVisibility> MOB_VISIBILITY = new StructuredDataKey<>("mob_visibility", MobVisibility.TYPE);
+    public static final StructuredDataKey<Integer> PROVIDES_POTTERY_PATTERN = new StructuredDataKey<>("provides_pottery_pattern", new SynchronizedRegistryValueType(RegistryKey.of("decorated_pot_pattern")));
+    public static final StructuredDataKey<SignText> SIGN_TEXT_FRONT = new StructuredDataKey<>("sign_text_front", SignText.TYPE);
+    public static final StructuredDataKey<SignText> SIGN_TEXT_BACK = new StructuredDataKey<>("sign_text_back", SignText.TYPE);
+    public static final StructuredDataKey<Unit> WAXED = new StructuredDataKey<>("waxed", Types.EMPTY);
+    public static final StructuredDataKey<Integer> CUSHION_COLOR = new StructuredDataKey<>("cushion/color", EnumTypes.DYE_COLOR);
 
     public static final StructuredDataKey<Integer> VILLAGER_VARIANT = new StructuredDataKey<>("villager/variant", EnumTypes.VILLAGER_TYPE);
     public static final StructuredDataKey<Integer> WOLF_VARIANT = new StructuredDataKey<>("wolf/variant", new SynchronizedRegistryValueType(RegistryKey.of("wolf_variant")));
@@ -209,7 +264,10 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> RABBIT_VARIANT = new StructuredDataKey<>("rabbit/variant", EnumTypes.RABBIT_VARIANT);
     public static final StructuredDataKey<Integer> PIG_VARIANT = new StructuredDataKey<>("pig/variant", new SynchronizedRegistryValueType(RegistryKey.of("pig_variant")));
     public static final StructuredDataKey<Integer> COW_VARIANT = new StructuredDataKey<>("cow/variant", new SynchronizedRegistryValueType(RegistryKey.of("cow_variant")));
-    public static final StructuredDataKey<Either<Integer, String>> CHICKEN_VARIANT = new StructuredDataKey<>("chicken/variant", new SynchronizedRegistryEitherType(RegistryKey.of("chicken_variant")));
+    public static final StructuredDataKey<Either<Integer, String>> CHICKEN_VARIANT1_21_5 = new StructuredDataKey<>("chicken/variant", new SynchronizedRegistryEitherType(RegistryKey.of("chicken_variant")));
+    public static final StructuredDataKey<Integer> CHICKEN_VARIANT26_1 = new StructuredDataKey<>("chicken/variant", new SynchronizedRegistryValueType(RegistryKey.of("chicken_variant")));
+    public static final StructuredDataKey<Either<Integer, String>> ZOMBIE_NAUTILUS_VARIANT1_21_11 = new StructuredDataKey<>("zombie_nautilus/variant", new SynchronizedRegistryEitherType(RegistryKey.of("zombie_nautilus_variant"))); // ???
+    public static final StructuredDataKey<Integer> ZOMBIE_NAUTILUS_VARIANT26_1 = new StructuredDataKey<>("zombie_nautilus/variant", new SynchronizedRegistryValueType(RegistryKey.of("zombie_nautilus_variant")));
     public static final StructuredDataKey<Integer> FROG_VARIANT = new StructuredDataKey<>("frog/variant", new SynchronizedRegistryValueType(RegistryKey.of("frog_variant")));
     public static final StructuredDataKey<Integer> HORSE_VARIANT = new StructuredDataKey<>("horse/variant", EnumTypes.HORSE_VARIANT);
     public static final StructuredDataKey<Holder<PaintingVariant>> PAINTING_VARIANT = new StructuredDataKey<>("painting/variant", PaintingVariant.TYPE1_21_2);
@@ -219,6 +277,10 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> CAT_COLLAR = new StructuredDataKey<>("cat/collar", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<Integer> SHEEP_COLOR = new StructuredDataKey<>("sheep/color", EnumTypes.DYE_COLOR);
     public static final StructuredDataKey<Integer> SHULKER_COLOR = new StructuredDataKey<>("shulker/color", EnumTypes.DYE_COLOR);
+    public static final StructuredDataKey<Integer> PIG_SOUND_VARIANT = new StructuredDataKey<>("pig/sound_variant", new SynchronizedRegistryValueType(RegistryKey.of("pig_sound_variant")));
+    public static final StructuredDataKey<Integer> COW_SOUND_VARIANT = new StructuredDataKey<>("cow/sound_variant", new SynchronizedRegistryValueType(RegistryKey.of("cow_sound_variant")));
+    public static final StructuredDataKey<Integer> CHICKEN_SOUND_VARIANT = new StructuredDataKey<>("chicken/sound_variant", new SynchronizedRegistryValueType(RegistryKey.of("chicken_sound_variant")));
+    public static final StructuredDataKey<Integer> CAT_SOUND_VARIANT = new StructuredDataKey<>("cat/sound_variant", new SynchronizedRegistryValueType(RegistryKey.of("cat_sound_variant")));
 
     // These are only safe to use after protocol loading
     public static final StructuredDataKeys1_20_5 V1_20_5 = VersionedTypes.V1_20_5.structuredDataKeys();
@@ -228,6 +290,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKeys1_21_5 V1_21_5 = VersionedTypes.V1_21_5.structuredDataKeys();
     public static final StructuredDataKeys1_21_5 V1_21_6 = VersionedTypes.V1_21_6.structuredDataKeys();
     public static final StructuredDataKeys1_21_5 V1_21_9 = VersionedTypes.V1_21_9.structuredDataKeys();
+    public static final StructuredDataKeys1_21_11 V1_21_11 = VersionedTypes.V1_21_11.structuredDataKeys();
 
     @Override
     public String toString() {

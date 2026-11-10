@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,20 +22,35 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
-import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2.ConsumeEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.consumable.ConsumeEffect;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Rewritable;
 
-public record DeathProtection(ConsumeEffect<?>[] deathEffects) implements Copyable {
+public record DeathProtection(ConsumeEffect<?>[] deathEffects) implements Copyable, Rewritable {
 
-    public static final Type<DeathProtection> TYPE = new TransformingType<>(ConsumeEffect.ARRAY_TYPE, DeathProtection.class, DeathProtection::new, DeathProtection::deathEffects) {
+    public static final Type<DeathProtection> TYPE1_21_2 = new TransformingType<>(ConsumeEffect.ARRAY_TYPE1_21_2, DeathProtection.class, DeathProtection::new, DeathProtection::deathEffects) {
         @Override
         public void write(final Ops ops, final DeathProtection value) {
-            ops.writeMap(map -> map.write("death_effects", ConsumeEffect.ARRAY_TYPE, value.deathEffects));
+            ops.writeMap(map -> map.writeOptional("death_effects", ConsumeEffect.ARRAY_TYPE1_21_2, value.deathEffects, new ConsumeEffect<?>[0]));
         }
     };
+    public static final Type<DeathProtection> TYPE26_3 = new TransformingType<>(ConsumeEffect.ARRAY_TYPE26_3, DeathProtection.class, DeathProtection::new, DeathProtection::deathEffects) {
+        @Override
+        public void write(final Ops ops, final DeathProtection value) {
+            ops.writeMap(map -> map.writeOptional("death_effects", ConsumeEffect.ARRAY_TYPE26_3, value.deathEffects, new ConsumeEffect<?>[0]));
+        }
+    };
+
+    @Override
+    public DeathProtection rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        final ConsumeEffect<?>[] deathEffects = ConsumeEffect.rewrite(this.deathEffects, connection, protocol, clientbound);
+        return deathEffects == this.deathEffects ? this : new DeathProtection(deathEffects);
+    }
 
     @Override
     public DeathProtection copy() {

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,8 @@ import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.Quaternion;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
+import com.viaversion.viaversion.api.minecraft.ResolvableFloat;
+import com.viaversion.viaversion.api.minecraft.ResolvableInt;
 import com.viaversion.viaversion.api.minecraft.ResolvableProfile;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.Vector;
@@ -58,6 +60,7 @@ import com.viaversion.viaversion.api.type.types.ByteType;
 import com.viaversion.viaversion.api.type.types.ComponentType;
 import com.viaversion.viaversion.api.type.types.DoubleType;
 import com.viaversion.viaversion.api.type.types.EmptyType;
+import com.viaversion.viaversion.api.type.types.FixedLengthArrayType;
 import com.viaversion.viaversion.api.type.types.FloatArrayType;
 import com.viaversion.viaversion.api.type.types.FloatType;
 import com.viaversion.viaversion.api.type.types.IntArrayType;
@@ -103,10 +106,12 @@ import com.viaversion.viaversion.api.type.types.math.BlockPositionType1_8;
 import com.viaversion.viaversion.api.type.types.math.ChunkPositionType;
 import com.viaversion.viaversion.api.type.types.math.EulerAngleType;
 import com.viaversion.viaversion.api.type.types.math.GlobalBlockPositionType;
-import com.viaversion.viaversion.api.type.types.math.MovementVectorType;
+import com.viaversion.viaversion.api.type.types.math.LowPrecisionVectorType;
 import com.viaversion.viaversion.api.type.types.math.QuaternionType;
+import com.viaversion.viaversion.api.type.types.math.Vector3dType;
 import com.viaversion.viaversion.api.type.types.math.Vector3fType;
 import com.viaversion.viaversion.api.type.types.math.VectorType;
+import com.viaversion.viaversion.api.type.types.misc.CompoundTagHolderType;
 import com.viaversion.viaversion.api.type.types.misc.CompoundTagType;
 import com.viaversion.viaversion.api.type.types.misc.GameProfileType;
 import com.viaversion.viaversion.api.type.types.misc.HolderSetType;
@@ -117,8 +122,10 @@ import com.viaversion.viaversion.api.type.types.misc.NamedCompoundTagType;
 import com.viaversion.viaversion.api.type.types.misc.PlayerMessageSignatureType;
 import com.viaversion.viaversion.api.type.types.misc.ProfileKeyType;
 import com.viaversion.viaversion.api.type.types.misc.ProfilePropertyType;
-import com.viaversion.viaversion.api.type.types.misc.SoundEventType;
+import com.viaversion.viaversion.api.type.types.misc.ResolvableFloatType;
+import com.viaversion.viaversion.api.type.types.misc.ResolvableIntType;
 import com.viaversion.viaversion.api.type.types.misc.ResolvableProfileType;
+import com.viaversion.viaversion.api.type.types.misc.SoundEventType;
 import com.viaversion.viaversion.api.type.types.misc.TagKeyType;
 import com.viaversion.viaversion.api.type.types.misc.TagType;
 import com.viaversion.viaversion.api.type.types.misc.TextComponentTagType;
@@ -178,17 +185,23 @@ public final class Types {
     public static final Type<UUID[]> UUID_ARRAY = new ArrayType<>(Types.UUID);
 
     public static final VarIntType VAR_INT = new VarIntType();
-    public static final OptionalVarIntType OPTIONAL_VAR_INT = new OptionalVarIntType();
+    public static final OptionalVarIntType OPTIONAL_VAR_INT = new OptionalVarIntType(); // compact
+    public static final OptionalType<Integer> BOOL_OPTIONAL_VAR_INT = new VarIntType.OptionalVarIntType(); // regular boolean prefixed
     public static final Type<int[]> VAR_INT_ARRAY_PRIMITIVE = new VarIntArrayType();
     public static final VarLongType VAR_LONG = new VarLongType();
+
+    public static final BitSetType BIT_SET = new BitSetType(); // Generic length
 
     /* MC Types */
     public static final Type<byte[]> SERVERBOUND_CUSTOM_PAYLOAD_DATA = new RemainingBytesType(Short.MAX_VALUE);
 
-    public static final Type<Key> RESOURCE_LOCATION = new KeyType();
-    public static final Type<Key> OPTIONAL_RESOURCE_LOCATION = new KeyType.OptionalKeyType();
-    public static final Type<Key[]> RESOURCE_LOCATION_ARRAY = new ArrayType<>(RESOURCE_LOCATION);
+    public static final Type<Key> IDENTIFIER = new KeyType();
+    public static final Type<Key> OPTIONAL_IDENTIFIER = new KeyType.OptionalKeyType();
+    public static final Type<Key[]> IDENTIFIER_ARRAY = new ArrayType<>(IDENTIFIER);
     public static final Type<Key> TAG_KEY = new TagKeyType();
+
+    public static final Type<ResolvableFloat> RESOLVABLE_FLOAT = new ResolvableFloatType();
+    public static final Type<ResolvableInt> RESOLVABLE_INT = new ResolvableIntType();
 
     public static final Type<BlockPosition> BLOCK_POSITION1_8 = new BlockPositionType1_8();
     public static final Type<BlockPosition> OPTIONAL_POSITION1_8 = new BlockPositionType1_8.OptionalBlockPositionType();
@@ -197,19 +210,33 @@ public final class Types {
     public static final Type<EulerAngle> ROTATIONS = new EulerAngleType();
     public static final Type<Vector> VECTOR = new VectorType();
     public static final Type<Vector3f> VECTOR3F = new Vector3fType();
+    public static final Type<Vector3d> VECTOR3D = new Vector3dType();
     public static final Type<Quaternion> QUATERNION = new QuaternionType();
-    public static final Type<Vector3d> MOVEMENT_VECTOR = new MovementVectorType();
+    public static final Type<Vector3d> LOW_PRECISION_VECTOR = new LowPrecisionVectorType();
+    @Deprecated(forRemoval = true)
+    public static final Type<Vector3d> MOVEMENT_VECTOR = LOW_PRECISION_VECTOR;
 
     public static final Type<CompoundTag> NAMED_COMPOUND_TAG = new NamedCompoundTagType();
     public static final Type<CompoundTag> OPTIONAL_NAMED_COMPOUND_TAG = new NamedCompoundTagType.OptionalNamedCompoundTagType();
     public static final Type<CompoundTag[]> NAMED_COMPOUND_TAG_ARRAY = new ArrayType<>(Types.NAMED_COMPOUND_TAG);
     public static final Type<CompoundTag> COMPOUND_TAG = new CompoundTagType();
-    public static final Type<CompoundTag> OPTIONAL_COMPOUND_TAG = new CompoundTagType.OptionalCompoundTagType();
+    public static final Type<CompoundTag> OPTIONAL_COMPOUND_TAG = CompoundTagType.OptionalCompoundTagType.type();
+    public static final HolderType<CompoundTag> TRUSTED_COMPOUND_TAG_HOLDER = new CompoundTagHolderType();
+
     public static final Type<Tag> TAG = new TagType();
     public static final Type<Tag[]> TAG_ARRAY = new ArrayType<>(TAG);
-    public static final Type<Tag> OPTIONAL_TAG = new TagType.OptionalTagType();
+    public static final Type<Tag> OPTIONAL_TAG = TagType.OptionalTagType.type();
     public static final Type<Tag> TEXT_COMPONENT_TAG = new TextComponentTagType(); // only strictly needed for hashing
+    public static final Type<Tag[]> TEXT_COMPONENT_TAG_ARRAY = new ArrayType<>(Types.TEXT_COMPONENT_TAG);
+
     public static final Type<Tag> CUSTOM_CLICK_ACTION_TAG = new LengthPrefixedTagType(65536);
+    public static final FixedLengthArrayType<Tag> SIGN_TEXT = new FixedLengthArrayType<>(TAG, 4);
+    public static final Type<Tag[]> OPTIONAL_SIGN_TEXT = SIGN_TEXT.new OptionalFixedLengthArrayType();
+
+    public static final Type<Tag> TRUSTED_TAG = new TagType(false);
+    public static final Type<Tag> TRUSTED_OPTIONAL_TAG = TagType.OptionalTagType.trustedType();
+    public static final Type<CompoundTag> TRUSTED_COMPOUND_TAG = new CompoundTagType(false);
+    public static final Type<CompoundTag> TRUSTED_OPTIONAL_COMPOUND_TAG = CompoundTagType.OptionalCompoundTagType.trustedType();
 
     public static final Type<GlobalBlockPosition> GLOBAL_POSITION = new GlobalBlockPositionType();
     public static final Type<GlobalBlockPosition> OPTIONAL_GLOBAL_POSITION = new GlobalBlockPositionType.OptionalGlobalPositionType();
@@ -268,6 +295,7 @@ public final class Types {
     public static final Type<List<EntityData>> ENTITY_DATA_LIST1_8 = new EntityDataListType(ENTITY_DATA1_8);
     public static final Type<List<EntityData>> ENTITY_DATA_LIST1_9 = new EntityDataListType(ENTITY_DATA1_9);
     public static final Type<List<EntityData>> ENTITY_DATA_LIST1_12 = new EntityDataListType(ENTITY_DATA1_12);
+
 
     // No longer used past 1.20.2
     public static final Type<Item> ITEM1_8 = new ItemType1_8();

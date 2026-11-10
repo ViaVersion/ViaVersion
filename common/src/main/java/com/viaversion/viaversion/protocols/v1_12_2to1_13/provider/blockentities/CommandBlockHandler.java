@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,11 @@ import com.viaversion.viaversion.util.ComponentUtil;
 
 public class CommandBlockHandler implements BlockEntityProvider.BlockEntityHandler {
 
-    private final Protocol1_12_2To1_13 protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_12_2To1_13.class);
+    private final Protocol1_12_2To1_13 protocol;
+
+    public CommandBlockHandler(final Protocol1_12_2To1_13 protocol) {
+        this.protocol = protocol;
+    }
 
     @Override
     public int transform(UserConnection user, CompoundTag tag) {

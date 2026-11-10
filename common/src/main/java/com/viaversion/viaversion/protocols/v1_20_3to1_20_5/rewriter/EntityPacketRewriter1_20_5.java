@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
@@ -48,11 +49,13 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundCon
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ProtocolStorables1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ScoreboardTeamStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.KeyMappings;
 import com.viaversion.viaversion.util.TagUtil;
+import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.Arrays;
@@ -73,11 +76,9 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_20_3.ADD_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
         registerSetEntityData(ClientboundPackets1_20_3.SET_ENTITY_DATA, Types1_20_3.ENTITY_DATA_LIST, VersionedTypes.V1_20_5.entityDataList);
-        registerRemoveEntities(ClientboundPackets1_20_3.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_20_3.SET_EQUIPMENT, wrapper -> {
+        protocol.replaceClientbound(ClientboundPackets1_20_3.SET_EQUIPMENT, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT); // Entity id
             final EntityType type = tracker(wrapper.user()).entityType(entityId);
 
@@ -198,10 +199,11 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 }
 
                 // Track custom armor trims
+                final ProtocolStorables1_20_5 storables = wrapper.user().storables(protocol);
                 if (strippedKey.equals("trim_pattern")) {
-                    wrapper.user().get(ArmorTrimStorage.class).setTrimPatterns(toMappings(registryEntries));
+                    storables.armorTrims().setTrimPatterns(toMappings(registryEntries));
                 } else if (strippedKey.equals("trim_material")) {
-                    wrapper.user().get(ArmorTrimStorage.class).setTrimMaterials(toMappings(registryEntries));
+                    storables.armorTrims().setTrimMaterials(toMappings(registryEntries));
                 }
 
                 final PacketWrapper registryPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
@@ -225,15 +227,14 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
             final PacketWrapper bannerPatternsPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
             bannerPatternsPacket.write(Types.STRING, "minecraft:banner_pattern");
-            final RegistryEntry[] patternEntries = new RegistryEntry[BannerPatterns1_20_5.keys().length];
-            final String[] keys = BannerPatterns1_20_5.keys();
+            final Key[] keys = BannerPatterns1_20_5.keys();
+            final RegistryEntry[] patternEntries = new RegistryEntry[keys.length];
             for (int i = 0; i < keys.length; i++) {
                 final CompoundTag pattern = new CompoundTag();
-                final String key = keys[i];
-                final String resourceLocation = "minecraft:" + key;
-                pattern.putString("asset_id", key);
-                pattern.putString("translation_key", "block.minecraft.banner." + key);
-                patternEntries[i] = new RegistryEntry(resourceLocation, pattern);
+                final Key key = keys[i];
+                pattern.putString("asset_id", key.path());
+                pattern.putString("translation_key", "block.minecraft.banner." + key.path());
+                patternEntries[i] = new RegistryEntry(key.toString(), pattern);
             }
             bannerPatternsPacket.write(Types.REGISTRY_ENTRY_ARRAY, patternEntries);
             bannerPatternsPacket.send(Protocol1_20_3To1_20_5.class);
@@ -268,7 +269,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 handler(playerTrackerHandler());
                 handler(wrapper -> {
                     // Enforces secure chat - moved from server data (which is unfortunately sent a while after this)
-                    final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+                    final ProtocolStorables1_20_5 storables = wrapper.user().storables(protocol);
+                    final AcknowledgedMessagesStorage storage = storables.acknowledgedMessages();
                     if (storage.secureChatEnforced() != null) {
                         // Just put in what we know if this is sent multiple times
                         wrapper.write(Types.BOOLEAN, storage.isSecureChatEnforced());
@@ -278,11 +280,10 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
                     storage.clear();
 
-                    // Handle creative interaction range
                     final byte gamemode = wrapper.get(Types.BYTE, 0);
-                    if (gamemode == GameMode.CREATIVE.id()) {
-                        sendRangeAttributes(wrapper.user(), true);
-                    }
+                    final boolean creativeMode = gamemode == GameMode.CREATIVE.id();
+                    sendRangeAttributes(wrapper.user(), creativeMode);
+                    tracker(wrapper.user()).setInstaBuild(creativeMode);
                 });
             }
         });
@@ -297,9 +298,12 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             wrapper.passthrough(Types.LONG); // Seed
 
             final byte gamemode = wrapper.passthrough(Types.BYTE);
-            sendRangeAttributes(wrapper.user(), gamemode == GameMode.CREATIVE.id());
+            final boolean creativeMode = gamemode == GameMode.CREATIVE.id();
+            sendRangeAttributes(wrapper.user(), creativeMode);
+            tracker(wrapper.user()).setInstaBuild(creativeMode);
 
-            wrapper.user().put(new ScoreboardTeamStorage());
+            final ProtocolStorables1_20_5 storables = wrapper.user().storables(protocol);
+            storables.setScoreboardTeams(new ScoreboardTeamStorage());
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_MOB_EFFECT, wrapper -> {
@@ -342,7 +346,14 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
             // Resend attributes either with their original list or with the creative range modifier added
             final int value = (int) Math.floor(wrapper.passthrough(Types.FLOAT) + 0.5F);
-            sendRangeAttributes(wrapper.user(), value == GameMode.CREATIVE.id());
+            final boolean creativeMode = value == GameMode.CREATIVE.id();
+            sendRangeAttributes(wrapper.user(), creativeMode);
+            tracker(wrapper.user()).setInstaBuild(creativeMode);
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_20_3.PLAYER_ABILITIES, wrapper -> {
+            final byte flags = wrapper.passthrough(Types.BYTE);
+            tracker(wrapper.user()).setInstaBuild((flags & 1 << 3) != 0);
         });
     }
 
@@ -400,7 +411,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
         for (int i = 0; i < entries.length; i++) {
             if (entries[i] == null) {
-                entries[i] = first.withKey(UUID.randomUUID().toString());
+                entries[i] = first.withKey(UUIDUtil.randomUUID().toString());
             }
         }
     }
@@ -408,9 +419,18 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     private void sendRangeAttributes(final UserConnection connection, final boolean creativeMode) {
         final PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_20_5.UPDATE_ATTRIBUTES, connection);
         wrapper.write(Types.VAR_INT, tracker(connection).clientEntityId());
-        wrapper.write(Types.VAR_INT, 2); // Number of attributes
-        writeAttribute(wrapper, "player.block_interaction_range", 4.5, creativeMode ? CREATIVE_BLOCK_INTERACTION_RANGE : null, 0.5);
-        writeAttribute(wrapper, "player.entity_interaction_range", 3.0, creativeMode ? CREATIVE_ENTITY_INTERACTION_RANGE : null, 2.0);
+        if (connection.getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
+            wrapper.write(Types.VAR_INT, 3); // Number of attributes
+            this.writeAttribute(wrapper, "generic.step_height", 0.5D, null, 0D);
+        } else {
+            wrapper.write(Types.VAR_INT, 2); // Number of attributes
+        }
+        this.writeAttribute(wrapper, "player.block_interaction_range", 4.5D, creativeMode ? CREATIVE_BLOCK_INTERACTION_RANGE : null, 0.5D);
+        if (connection.getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+            this.writeAttribute(wrapper, "player.entity_interaction_range", 3D, creativeMode ? CREATIVE_ENTITY_INTERACTION_RANGE : null, 1D);
+        } else {
+            this.writeAttribute(wrapper, "player.entity_interaction_range", 3D, creativeMode ? CREATIVE_ENTITY_INTERACTION_RANGE : null, 2D);
+        }
         wrapper.scheduleSend(Protocol1_20_3To1_20_5.class);
     }
 
@@ -550,11 +570,6 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
             particle.getArgument(0).setValue(withAlpha(color));
         }
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

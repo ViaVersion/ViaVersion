@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ public record PotionEffectData(int amplifier, int duration, boolean ambient, boo
             final boolean ambient = buffer.readBoolean();
             final boolean showParticles = buffer.readBoolean();
             final boolean showIcon = buffer.readBoolean();
-            final PotionEffectData hiddenEffect = OPTIONAL_TYPE.read(buffer);
+            final PotionEffectData hiddenEffect = OPTIONAL_TYPE.readTrackingDepth(buffer);
             return new PotionEffectData(amplifier, duration, ambient, showParticles, showIcon, hiddenEffect);
         }
 

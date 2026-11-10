@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,18 +23,22 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
-import com.viaversion.viaversion.api.data.entity.StoredEntityData;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.KeyMappings;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeListener {
     protected final Int2ObjectMap<TrackedEntity> entities = new Int2ObjectOpenHashMap<>();
+    private final Map<String, KeyMappings> registryKeyMappings = new HashMap<>();
     private final UserConnection connection;
     private final EntityType playerType;
     private Integer clientEntityId;
@@ -45,6 +49,8 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     private int biomesSent = -1;
     private Map<String, DimensionData> dimensions = Collections.emptyMap();
     private boolean instaBuild;
+    private Type<Chunk> chunkType;
+    private Type<Chunk> mappedChunkType;
 
     public EntityTrackerBase(UserConnection connection, @Nullable EntityType playerType) {
         this.connection = connection;
@@ -57,8 +63,10 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     }
 
     @Override
-    public void addEntity(int id, EntityType type) {
-        entities.put(id, new TrackedEntityImpl(type));
+    public TrackedEntity addEntity(int id, EntityType type) {
+        final TrackedEntityImpl entity = new TrackedEntityImpl(type);
+        entities.put(id, entity);
+        return entity;
     }
 
     @Override
@@ -78,20 +86,8 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     }
 
     @Override
-    public @Nullable StoredEntityData entityData(int id) {
-        final TrackedEntity entity = entities.get(id);
-        return entity != null ? entity.data() : null;
-    }
-
-    @Override
-    public @Nullable StoredEntityData entityDataIfPresent(int id) {
-        final TrackedEntity entity = entities.get(id);
-        return entity != null && entity.hasData() ? entity.data() : null;
-    }
-
-    @Override
-    public void removeEntity(int id) {
-        entities.remove(id);
+    public TrackedEntity removeEntity(int id) {
+        return entities.remove(id);
     }
 
     @Override
@@ -115,6 +111,7 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
         }
 
         clientEntityId = null;
+        registryKeyMappings.clear();
     }
 
     @Override
@@ -160,6 +157,10 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
 
     @Override
     public void setCurrentWorldSectionHeight(int currentWorldSectionHeight) {
+        if (this.currentWorldSectionHeight != currentWorldSectionHeight) {
+            this.chunkType = null;
+            this.mappedChunkType = null;
+        }
         this.currentWorldSectionHeight = currentWorldSectionHeight;
     }
 
@@ -200,7 +201,25 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
 
     @Override
     public void setBiomesSent(int biomesSent) {
+        if (this.biomesSent != biomesSent) {
+            this.chunkType = null;
+            this.mappedChunkType = null;
+        }
         this.biomesSent = biomesSent;
+    }
+
+    @Override
+    public @Nullable Type<Chunk> chunkType(final boolean mapped) {
+        return mapped ? mappedChunkType : chunkType;
+    }
+
+    @Override
+    public void setChunkType(final boolean mapped, @Nullable final Type<Chunk> chunkType) {
+        if (mapped) {
+            this.mappedChunkType = chunkType;
+        } else {
+            this.chunkType = chunkType;
+        }
     }
 
     @Override
@@ -215,11 +234,21 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
 
     @Override
     public @Nullable DimensionData dimensionData(int dimensionId) {
-        return dimensions.values().stream().filter(data -> data.id() == dimensionId).findFirst().orElse(null); // TODO Store as array as well
+        return dimensions.values().stream().filter(data -> data.id() == dimensionId).findFirst().orElse(null);
     }
 
     @Override
     public void setDimensions(Map<String, DimensionData> dimensions) {
         this.dimensions = dimensions;
+    }
+
+    @Override
+    public @Nullable KeyMappings registryKeys(String registryKey) {
+        return registryKeyMappings.get(Key.stripMinecraftNamespace(registryKey));
+    }
+
+    @Override
+    public void addRegistryKeys(String registryKey, KeyMappings mappings) {
+        registryKeyMappings.put(Key.stripMinecraftNamespace(registryKey), mappings);
     }
 }

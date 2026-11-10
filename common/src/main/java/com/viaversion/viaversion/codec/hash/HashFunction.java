@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@ package com.viaversion.viaversion.codec.hash;
 @FunctionalInterface
 public interface HashFunction {
 
-    HashFunction CRC32C = new CRC32C();
+    static HashFunction crc32c() {
+        return Runtime.version().feature() < 9 ? new FallbackCRC32C() : new JavaCRC32C();
+    }
 
     int hashBytes(byte[] data, int length);
 

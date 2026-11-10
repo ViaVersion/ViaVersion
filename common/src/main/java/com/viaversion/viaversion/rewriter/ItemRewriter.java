@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
+import com.viaversion.viaversion.data.item.OriginalHashedItem;
 import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Rewritable;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
@@ -50,6 +51,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     private final Type<Item[]> itemArrayType;
     private final Type<Item[]> mappedItemArrayType;
     private final Type<Item> itemCostType;
+    private final Type<Item> itemTemplateType;
+    private final Type<Item> mappedItemTemplateType;
     private final Type<Item> mappedItemCostType;
     private final Type<Item> optionalItemCostType;
     private final Type<Item> mappedOptionalItemCostType;
@@ -62,6 +65,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         this.itemArrayType = types.itemArray();
         this.mappedItemType = mappedTypes.item();
         this.mappedItemArrayType = mappedTypes.itemArray();
+        this.itemTemplateType = types.itemTemplate();
+        this.mappedItemTemplateType = mappedTypes.itemTemplate();
         this.itemCostType = types.itemCost();
         this.mappedItemCostType = mappedTypes.itemCost();
         this.optionalItemCostType = types.optionalItemCost();
@@ -74,6 +79,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         this.itemArrayType = itemArrayType;
         this.mappedItemType = mappedItemType;
         this.mappedItemArrayType = mappedItemArrayType;
+        this.itemTemplateType = null;
+        this.mappedItemTemplateType = null;
         this.itemCostType = null;
         this.mappedItemCostType = null;
         this.optionalItemCostType = null;
@@ -87,7 +94,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     @Override
     public @Nullable Item handleItemToClient(final UserConnection connection, @Nullable Item item) {
         if (item == null) return null;
-        if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
+        if (protocol.getMappingData() != null && !Mappings.isIntIdIdentity(protocol.getMappingData().getItemMappings())) {
             item.setIdentifier(protocol.getMappingData().getNewItemId(item.identifier()));
         }
         return item;
@@ -96,7 +103,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     @Override
     public @Nullable Item handleItemToServer(final UserConnection connection, @Nullable Item item) {
         if (item == null) return null;
-        if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
+        if (protocol.getMappingData() != null && !Mappings.isIntIdIdentity(protocol.getMappingData().getItemMappings())) {
             item.setIdentifier(protocol.getMappingData().getOldItemId(item.identifier()));
         }
         return item;
@@ -104,6 +111,12 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     @Override
     public HashedItem handleHashedItem(final UserConnection connection, final HashedItem item) {
+        if (item instanceof OriginalHashedItem restoredItem) {
+            // Pass through until we're at the original backup protocol.
+            // This means it won't be correct every step of the way, but it will be once it reaches the target protocol
+            return restoredItem.backupTagName().equals(nbtTagName()) ? restoredItem.asRegularItem() : item;
+        }
+
         final MappingData mappingData = protocol.getMappingData();
         if (mappingData == null) {
             return item;
@@ -111,16 +124,18 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
         final FullMappings dataComponentMappings = mappingData.getDataComponentSerializerMappings();
         if (dataComponentMappings != null) {
-            updateHashedItemDataComponentIds(item, dataComponentMappings.inverse());
+            if (!dataComponentMappings.isIdentity()) {
+                updateHashedItemDataComponentIds(item, dataComponentMappings.inverse());
+            }
 
             final int customDataId = dataComponentMappings.id("custom_data");
             if (item.dataHashesById().containsKey(customDataId)) {
                 // Use the original hashed item if we can find it in the cache
                 final int customDataHash = item.dataHashesById().get(customDataId);
                 final ItemHasherBase itemHasher = itemHasher(connection);
-                final HashedItem originalHashedItem = itemHasher.originalHashedItem(customDataHash, item);
+                final OriginalHashedItem originalHashedItem = itemHasher.originalHashedItem(customDataHash, item);
                 if (originalHashedItem != null) {
-                    return originalHashedItem;
+                    return originalHashedItem.backupTagName().equals(nbtTagName()) ? originalHashedItem.asRegularItem() : originalHashedItem;
                 }
             }
         }
@@ -163,21 +178,27 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     public void registerOpenScreen(C packetType) {
-        protocol.registerClientbound(packetType, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Container id
-            handleMenuType(wrapper);
-        });
-    }
-
-    public void handleMenuType(final PacketWrapper wrapper) {
-        final int windowType = wrapper.read(Types.VAR_INT);
-        final int mappedId = protocol.getMappingData().getMenuMappings().getNewId(windowType);
-        if (mappedId == -1) {
-            wrapper.cancel();
+        if ((protocol.getMappingData() == null || Mappings.isIntIdIdentity(protocol.getMappingData().getMenuMappings()))
+            && protocol.getComponentRewriter() == null) {
             return;
         }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Container id
 
-        wrapper.write(Types.VAR_INT, mappedId);
+            int windowType = wrapper.read(Types.VAR_INT);
+            if (protocol.getMappingData() != null && protocol.getMappingData().getMenuMappings() != null) {
+                windowType = protocol.getMappingData().getMenuMappings().getNewId(windowType);
+                if (windowType == -1) {
+                    wrapper.cancel();
+                    return;
+                }
+            }
+            wrapper.write(Types.VAR_INT, windowType);
+
+            if (protocol.getComponentRewriter() != null) {
+                protocol.getComponentRewriter().passthroughAndProcess(wrapper);
+            }
+        });
     }
 
     public void registerSetSlot(C packetType) {
@@ -230,6 +251,17 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     public void registerSetCreativeModeSlot(S packetType) {
         protocol.registerServerbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.SHORT); // Slot
+            wrapper.write(itemType, handleItemToServer(wrapper.user(), wrapper.read(mappedItemType)));
+        });
+    }
+
+    public void registerSetCreativeModeSlot1_20_5(S packetType) {
+        protocol.registerServerbound(packetType, wrapper -> {
+            if (protocol.getEntityRewriter() != null && !protocol.getEntityRewriter().tracker(wrapper.user()).canInstaBuild()) {
+                wrapper.cancel();
+                return;
+            }
             wrapper.passthrough(Types.SHORT); // Slot
             wrapper.write(itemType, handleItemToServer(wrapper.user(), wrapper.read(mappedItemType)));
         });
@@ -298,6 +330,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     public void registerCooldown(C packetType) {
+        if (protocol.getMappingData() == null || Mappings.isIntIdIdentity(protocol.getMappingData().getItemMappings())) {
+            return;
+        }
         protocol.registerClientbound(packetType, wrapper -> {
             int itemId = wrapper.read(Types.VAR_INT);
             wrapper.write(Types.VAR_INT, protocol.getMappingData().getNewItemId(itemId));
@@ -305,6 +340,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     public void registerCooldown1_21_2(C packetType) {
+        if (protocol.getMappingData() == null || Mappings.isFullIdentity(protocol.getMappingData().getFullItemMappings())) {
+            return;
+        }
         protocol.registerClientbound(packetType, wrapper -> {
             String itemIdentifier = wrapper.read(Types.STRING);
             if (itemIdentifier != null) {
@@ -348,8 +386,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
 
-    // 1.14.4+
-    public void registerMerchantOffers(C packetType) {
+    public void registerMerchantOffers1_14_4(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.VAR_INT);
             int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
@@ -402,13 +439,13 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
                 final Item input = wrapper.read(itemCostType);
-                wrapper.write(mappedItemCostType, handleItemToClient(wrapper.user(), input));
+                wrapper.write(mappedItemCostType, handleItemToClientAndTrackHash(wrapper.user(), input));
 
                 passthroughClientboundItem(wrapper); // Result
 
                 Item secondInput = wrapper.read(optionalItemCostType);
                 if (secondInput != null) {
-                    handleItemToClient(wrapper.user(), secondInput);
+                    handleItemToClientAndTrackHash(wrapper.user(), secondInput);
                 }
                 wrapper.write(mappedOptionalItemCostType, secondInput);
 
@@ -472,20 +509,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
                 // Display data
                 if (wrapper.passthrough(Types.BOOLEAN)) {
-                    final Tag title = wrapper.passthrough(Types.TAG);
-                    final Tag description = wrapper.passthrough(Types.TAG);
-                    final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
-                    if (componentRewriter != null) {
-                        componentRewriter.processTag(wrapper.user(), title);
-                        componentRewriter.processTag(wrapper.user(), description);
-                    }
-
-                    passthroughClientboundItem(wrapper); // Icon
-                    wrapper.passthrough(Types.VAR_INT); // Frame type
-                    int flags = wrapper.passthrough(Types.INT); // Flags
-                    if ((flags & 1) != 0) {
-                        wrapper.passthrough(Types.STRING); // Background texture
-                    }
+                    passthroughAdvancementDisplayData(wrapper);
                     wrapper.passthrough(Types.FLOAT); // X
                     wrapper.passthrough(Types.FLOAT); // Y
                 }
@@ -500,23 +524,64 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
+    public void registerAdvancements26_3(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.BOOLEAN); // Reset/clear
+            final int size = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                wrapper.passthrough(Types.STRING); // Identifier
+                wrapper.passthrough(Types.OPTIONAL_STRING); // Parent
+
+                // Display data
+                if (wrapper.passthrough(Types.BOOLEAN)) {
+                    passthroughAdvancementDisplayData(wrapper);
+                }
+
+                final int requirements = wrapper.passthrough(Types.VAR_INT);
+                for (int array = 0; array < requirements; array++) {
+                    wrapper.passthrough(Types.STRING_ARRAY);
+                }
+
+                wrapper.passthrough(Types.BOOLEAN); // Send telemetry
+            }
+
+            wrapper.passthrough(Types.FLOAT); // X
+            wrapper.passthrough(Types.FLOAT); // Y
+        });
+    }
+
+    private void passthroughAdvancementDisplayData(final PacketWrapper wrapper) {
+        final Tag title = wrapper.passthrough(Types.TRUSTED_TAG);
+        final Tag description = wrapper.passthrough(Types.TRUSTED_TAG);
+        final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
+        if (componentRewriter != null) {
+            componentRewriter.processTag(wrapper.user(), title);
+            componentRewriter.processTag(wrapper.user(), description);
+        }
+
+        passthroughClientboundItemTemplate(wrapper); // Icon
+        wrapper.passthrough(Types.VAR_INT); // Frame type
+        final int flags = wrapper.passthrough(Types.INT); // Flags
+        if ((flags & 1) != 0) {
+            wrapper.passthrough(Types.STRING); // Background texture
+        }
+    }
+
     public void registerSetCursorItem(C packetType) {
         protocol.registerClientbound(packetType, this::passthroughClientboundItemAndTrackHash);
     }
 
     // Pre 1.21 for enchantments
     public void registerContainerSetData(C packetType) {
+        if (protocol.getMappingData() == null || Mappings.isIntIdIdentity(protocol.getMappingData().getEnchantmentMappings())) {
+            return;
+        }
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
 
-            Mappings mappings = protocol.getMappingData().getEnchantmentMappings();
-            if (mappings == null) {
-                return;
-            }
-
             short property = wrapper.passthrough(Types.SHORT);
             if (property >= 4 && property <= 6) { // Enchantment id
-                short enchantmentId = (short) mappings.getNewId(wrapper.read(Types.SHORT));
+                short enchantmentId = (short) protocol.getMappingData().getEnchantmentMappings().getNewId(wrapper.read(Types.SHORT));
                 wrapper.write(Types.SHORT, enchantmentId);
             }
         });
@@ -556,13 +621,19 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         wrapper.write(mappedItemType, item);
     }
 
+    protected void passthroughClientboundItemTemplate(final PacketWrapper wrapper) {
+        // Uses the regular item type pre 26.1
+        final Item item = handleItemToClient(wrapper.user(), wrapper.read(itemTemplateType()));
+        wrapper.write(mappedItemTemplateType(), item);
+    }
+
     protected void passthroughHashedItem(final PacketWrapper wrapper) {
         final HashedItem item = handleHashedItem(wrapper.user(), wrapper.read(Types.HASHED_ITEM));
         wrapper.write(Types.HASHED_ITEM, item);
     }
 
     protected <T extends ItemHasher> @Nullable T itemHasher(final UserConnection connection) {
-        return connection.getItemHasher(protocol.getClass());
+        return connection.getItemHasher(protocol);
     }
 
     protected void updateHashedItemDataComponentIds(final HashedItem item, final FullMappings mappings) {
@@ -615,5 +686,15 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     @Override
     public Type<Item[]> mappedItemArrayType() {
         return mappedItemArrayType;
+    }
+
+    @Override
+    public Type<Item> itemTemplateType() {
+        return itemTemplateType;
+    }
+
+    @Override
+    public Type<Item> mappedItemTemplateType() {
+        return mappedItemTemplateType;
     }
 }

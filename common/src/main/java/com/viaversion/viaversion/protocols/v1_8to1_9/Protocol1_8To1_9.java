@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -103,8 +103,8 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.addEntityTracker(this.getClass(), new EntityTracker1_9(userConnection));
-        userConnection.addClientWorld(this.getClass(), new ClientWorld1_9());
+        addEntityTracker(userConnection, new EntityTracker1_9(userConnection));
+        userConnection.storables(this).setClientWorld(new ClientWorld1_9());
 
         userConnection.put(new MovementTracker());
         userConnection.put(new InventoryTracker());

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArrayType<T> extends Type<T[]> {
-    private final Type<T> elementType;
+    private static final int MAX_PRESIZED_LENGTH = 128;
+    protected final Type<T> elementType;
     private final int maxLength;
 
     public ArrayType(Type<T> type) {
@@ -41,6 +42,12 @@ public class ArrayType<T> extends Type<T[]> {
     public ArrayType(Type<T> type, int maxLength) {
         //noinspection unchecked
         super(type.getTypeName() + " Array", (Class<T[]>) getArrayClass(type.getOutputClass()));
+        this.elementType = type;
+        this.maxLength = maxLength;
+    }
+
+    private ArrayType(Class<? super T[]> outputClass, Type<T> type, int maxLength) {
+        super(type.getTypeName() + " Array", outputClass);
         this.elementType = type;
         this.maxLength = maxLength;
     }
@@ -57,10 +64,10 @@ public class ArrayType<T> extends Type<T[]> {
             throw new IllegalArgumentException("Array length " + amount + " is longer than maximum " + maxLength);
         }
 
-        return amount < Short.MAX_VALUE ? readArray(buffer, amount) : readList(buffer, amount);
+        return amount <= MAX_PRESIZED_LENGTH ? readArray(buffer, amount) : readList(buffer, amount);
     }
 
-    private T[] readArray(ByteBuf buffer, int length) {
+    protected T[] readArray(ByteBuf buffer, int length) {
         T[] array = createArray(length);
         for (int i = 0; i < length; i++) {
             array[i] = elementType.read(buffer);
@@ -100,5 +107,19 @@ public class ArrayType<T> extends Type<T[]> {
                 list.write(elementType, element);
             }
         });
+    }
+
+    public ArrayType<T> withMaxLength(final int maxLength) {
+        return new ArrayType<>(this.getOutputClass(), this.elementType, maxLength);
+    }
+
+    static int checkLength(final int length, final int elementBytes, final int readable) {
+        if (length < 0) {
+            throw new IllegalArgumentException("Length " + length + " is negative");
+        }
+        if ((long) length * elementBytes > readable) {
+            throw new IllegalArgumentException("Length " + length + " is larger than readable bytes");
+        }
+        return length;
     }
 }

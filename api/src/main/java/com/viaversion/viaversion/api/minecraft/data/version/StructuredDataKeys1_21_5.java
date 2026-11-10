@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.data.version;
 
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.data.predicate.DataComponentPredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate.AdventureModePredicateType1_21_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
@@ -34,7 +35,7 @@ public class StructuredDataKeys1_21_5 extends StructuredDataKeys1_21_2 {
 
     public StructuredDataKeys1_21_5(final VersionedTypesHolder types) {
         super(types);
-        final AdventureModePredicateType1_21_5 adventureModePredicateType = new AdventureModePredicateType1_21_5(types.structuredDataArray());
+        final AdventureModePredicateType1_21_5 adventureModePredicateType = new AdventureModePredicateType1_21_5(types.structuredDataArray(), DataComponentPredicate.ARRAY_TYPE1_21_5);
         this.canPlaceOn = add("can_place_on", adventureModePredicateType);
         this.canBreak = add("can_break", adventureModePredicateType);
         this.unsupportedForOps.add(this.canPlaceOn);

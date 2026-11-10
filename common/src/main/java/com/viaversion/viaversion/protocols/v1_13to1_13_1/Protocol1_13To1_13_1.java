@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +35,8 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.rewriter.EntityPacketRewriter1_13_1;
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.rewriter.ItemPacketRewriter1_13_1;
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.rewriter.WorldPacketRewriter1_13_1;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_13, ClientboundPackets1_13, ServerboundPackets1_13, ServerboundPackets1_13> {
@@ -46,6 +46,7 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
     private final ItemPacketRewriter1_13_1 itemRewriter = new ItemPacketRewriter1_13_1(this);
     private final ParticleRewriter<ClientboundPackets1_13> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_13> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPackets1_13> blockRewriter = BlockRewriter.legacy(this);
 
     public Protocol1_13To1_13_1() {
         super(ClientboundPackets1_13.class, ClientboundPackets1_13.class, ServerboundPackets1_13.class, ServerboundPackets1_13.class);
@@ -130,15 +131,12 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         tagRewriter.register(ClientboundPackets1_13.UPDATE_TAGS, RegistryType.ITEM);
-        particleRewriter.registerLevelParticles1_13(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_13.AWARD_STATS);
     }
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, EntityTypes1_13.EntityType.PLAYER));
-        userConnection.addClientWorld(this.getClass(), new ClientWorld());
+        addEntityTracker(userConnection, new EntityTrackerBase(userConnection, EntityTypes1_13.EntityType.PLAYER));
+        userConnection.storables(this).setClientWorld(new ClientWorld());
     }
 
     @Override
@@ -154,6 +152,11 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public ItemPacketRewriter1_13_1 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPackets1_13> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

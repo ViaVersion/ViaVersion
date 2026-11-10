@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,12 @@
 package com.viaversion.viaversion.protocols.v1_10to1_11.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11.EntityType;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EntityTracker1_11 extends EntityTrackerBase {
     private final IntSet holograms = new IntOpenHashSet();
@@ -31,10 +33,9 @@ public class EntityTracker1_11 extends EntityTrackerBase {
     }
 
     @Override
-    public void removeEntity(int entityId) {
-        super.removeEntity(entityId);
-
+    public @Nullable TrackedEntity removeEntity(int entityId) {
         removeHologram(entityId);
+        return super.removeEntity(entityId);
     }
 
     public boolean addHologram(int entId) {

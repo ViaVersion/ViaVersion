@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                             flags |= 1;
                             Optional<SoundSource1_12_2> finalSource = SoundSource1_12_2.findBySource(originalSource);
                             if (finalSource.isEmpty()) {
-                                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                                if (Via.getConfig().logOtherConversionWarnings()) {
                                     Protocol1_12_2To1_13.LOGGER.warning("Could not handle unknown sound source " + originalSource + " falling back to default: master");
                                 }
                                 finalSource = Optional.of(SoundSource1_12_2.MASTER);
@@ -144,7 +144,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                         String old = channel;
                         channel = getNewPluginChannelId(channel);
                         if (channel == null) {
-                            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                            if (Via.getConfig().logOtherConversionWarnings()) {
                                 protocol.getLogger().warning("Ignoring clientbound plugin message with channel: " + old);
                             }
                             wrapper.cancel();
@@ -156,7 +156,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                                 String rewritten = getNewPluginChannelId(s);
                                 if (rewritten != null) {
                                     rewrittenChannels.add(rewritten);
-                                } else if (!Via.getConfig().isSuppressConversionWarnings()) {
+                                } else if (Via.getConfig().logOtherConversionWarnings()) {
                                     protocol.getLogger().warning("Ignoring plugin channel in clientbound " + Key.stripMinecraftNamespace(channel).toUpperCase(Locale.ROOT) + ": " + s);
                                 }
                             }
@@ -474,7 +474,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
             } else if (Protocol1_12_2To1_13.MAPPINGS.getItemMappings().getNewId(IdAndData.removeData(rawId)) != -1) {
                 rawId = IdAndData.removeData(rawId);
             } else {
-                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                if (Via.getConfig().logOtherConversionWarnings()) {
                     protocol.getLogger().warning("Failed to get new item for " + item.identifier());
                 }
                 rawId = 16; // Stone
@@ -537,9 +537,12 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     if (tag == null)
                         item.setTag(tag = new CompoundTag());
                     if (!tag.contains("EntityTag")) {
-                        CompoundTag entityTag = new CompoundTag();
-                        entityTag.put("id", new StringTag(eggEntityId.get()));
-                        tag.put("EntityTag", entityTag);
+                        tag.put("EntityTag", new CompoundTag());
+                    }
+                    // The id is removed from a remaining EntityTag in handleItemToClient
+                    CompoundTag entityTag = tag.getCompoundTag("EntityTag");
+                    if (entityTag != null && !entityTag.contains("id")) {
+                        entityTag.putString("id", eggEntityId.get());
                     }
                 } else {
                     rawId = IdAndData.getId(oldId) << 16 | oldId & 0xF;
@@ -548,7 +551,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
         }
 
         if (rawId == null) {
-            if (!Via.getConfig().isSuppressConversionWarnings()) {
+            if (Via.getConfig().logOtherConversionWarnings()) {
                 protocol.getLogger().warning("Failed to get old item for " + item.identifier());
             }
             rawId = 0x10000; // Stone
@@ -591,6 +594,10 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     if (patternsTag != null) {
                         for (CompoundTag pattern : patternsTag) {
                             NumberTag colorTag = pattern.getNumberTag("Color");
+                            if (colorTag == null) {
+                                continue;
+                            }
+
                             pattern.putInt("Color", 15 - colorTag.asInt()); // Invert color id
                         }
                     }
@@ -744,6 +751,11 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     }
                     blockEntityTag.put("Items", newListTag);
                 }
+            }
+
+            // Damage, map and the original id are stored in a tag created in handleItemToClient
+            if (tag.isEmpty()) {
+                item.setTag(null);
             }
         }
         return item;

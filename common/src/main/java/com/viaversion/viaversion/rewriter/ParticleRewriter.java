@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -139,6 +139,13 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
         });
     }
 
+    public void registerLevelParticles26_3(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            final Particle particle = wrapper.passthroughAndMap(particleType, mappedParticleType);
+            rewriteParticle(wrapper.user(), particle);
+        });
+    }
+
     public void registerExplode1_20_5(final C packetType) {
         final SoundRewriter<C> soundRewriter = new SoundRewriter<>(protocol);
         protocol.registerClientbound(packetType, wrapper -> {
@@ -228,9 +235,9 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
         } else if (mappings.isItemParticle(id) && itemRewriter != null) {
             final Particle.ParticleData<Item> data = particle.getArgument(0);
             final Item item = itemRewriter.handleItemToClient(connection, data.getValue());
-            if (itemRewriter.mappedItemType() != null && itemRewriter.itemType() != itemRewriter.mappedItemType()) {
+            if (itemRewriter.mappedItemTemplateType() != null && itemRewriter.itemTemplateType() != itemRewriter.mappedItemTemplateType()) {
                 // Replace the type
-                particle.set(0, itemRewriter.mappedItemType(), item);
+                particle.set(0, itemRewriter.mappedItemTemplateType(), item);
             } else {
                 data.setValue(item);
             }

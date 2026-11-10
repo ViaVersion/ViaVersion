@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -133,6 +133,15 @@ public interface ProtocolInfo {
     @Nullable UUID getUuid();
 
     void setUuid(UUID uuid);
+
+    /**
+     * Returns whether compression is enabled for this connection.
+     *
+     * @return whether compression is enabled
+     */
+    boolean compressionEnabled();
+
+    void setCompressionEnabled(boolean compressionEnabled);
 
     /**
      * Returns the user's pipeline.

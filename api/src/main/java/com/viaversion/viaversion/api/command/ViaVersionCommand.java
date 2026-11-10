@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,7 @@ public interface ViaVersionCommand {
     /**
      * Removes a subcommand by name, can be used to unload default subcommands which are not supported
      * on the platform.
+     *
      * @param name Subcommand name
      */
     void removeSubCommand(String name);

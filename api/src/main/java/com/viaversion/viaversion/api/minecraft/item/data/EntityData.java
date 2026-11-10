@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ public record EntityData(int type, CompoundTag tag) implements Rewritable, Copya
         @Override
         public void write(final Ops ops, final EntityData data) {
             ops.writeMap(map -> map
-                .write("id", Types.RESOURCE_LOCATION, ops.context().registryAccess().entity(data.type))
+                .write("id", Types.IDENTIFIER, ops.context().registryAccess().entity(data.type))
                 .writeInlinedMap(Types.COMPOUND_TAG, data.tag)
             );
         }

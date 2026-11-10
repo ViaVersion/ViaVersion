@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,32 +30,32 @@ import com.viaversion.viaversion.util.Key;
 
 public final class RegistryValueType extends VarIntType implements RegistryKey {
 
-    private final Key key;
-    private final String[] names;
+    private final Key registry;
+    private final Key[] keys;
 
-    public RegistryValueType(final Key key, final String... names) {
-        this.key = key;
-        this.names = names;
-        for (int i = 0; i < names.length; i++) {
-            names[i] = Key.namespaced(names[i]);
+    public RegistryValueType(final Key registry, final String... keys) {
+        this.registry = registry;
+        this.keys = new Key[keys.length];
+        for (int i = 0; i < keys.length; i++) {
+            this.keys[i] = Key.of(keys[i]);
         }
     }
 
     @Override
     public void write(final Ops ops, final Integer value) {
-        Types.RESOURCE_LOCATION.write(ops, Key.of(names[value]));
+        Types.IDENTIFIER.write(ops, keys[value]);
     }
 
-    public String[] names() {
-        return names;
+    public Key[] keys() {
+        return keys;
     }
 
-    public String byId(final int id) {
-        return names[id];
+    public Key byId(final int id) {
+        return keys[id];
     }
 
     @Override
-    public Key key() {
-        return key;
+    public Key registry() {
+        return registry;
     }
 }

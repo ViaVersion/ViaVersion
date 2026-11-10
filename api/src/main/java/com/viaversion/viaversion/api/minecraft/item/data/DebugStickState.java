@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,12 +38,12 @@ public record DebugStickState(CompoundTag tag) implements Rewritable, Copyable {
     @Override
     public DebugStickState rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
         CompoundTag updatedTag = tag;
-        if (clientbound && protocol.getMappingData() != null && protocol.getMappingData().changedBlocks() != null) {
+        if (protocol.getMappingData() != null && protocol.getMappingData().changedBlocks() != null) {
             updatedTag = tag.copy();
             // Anything beyond this isn't worth the disk space/handling
             updatedTag.entrySet().removeIf(entry -> {
                 final int blockId = protocol.getMappingData().getFullBlockMappings().id(entry.getKey());
-                return protocol.getMappingData().changedBlocks().contains(blockId);
+                return blockId == -1 || protocol.getMappingData().changedBlocks().contains(blockId);
             });
         }
         return new DebugStickState(updatedTag);

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,8 @@ import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
+
+import static com.viaversion.viaversion.api.type.types.ArrayType.checkLength;
 
 public class FloatArrayType extends Type<float[]> {
 
@@ -55,8 +57,7 @@ public class FloatArrayType extends Type<float[]> {
 
     @Override
     public float[] read(final ByteBuf buffer) {
-        final int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
-        Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
+        final int length = checkLength(this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length, Float.BYTES, buffer.readableBytes());
         final float[] array = new float[length];
         for (int i = 0; i < length; i++) {
             array[i] = buffer.readFloat();

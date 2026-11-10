@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ public class GlobalBlockPositionType extends Type<GlobalBlockPosition> {
     @Override
     public void write(final Ops ops, final GlobalBlockPosition value) {
         ops.writeMap(map -> map
-            .write("dimension", Types.RESOURCE_LOCATION, Key.of(value.dimension()))
+            .write("dimension", Types.IDENTIFIER, Key.of(value.dimension()))
             .write("pos", Types.BLOCK_POSITION1_14, value));
     }
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.Protocol1_19_1To1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.packet.ClientboundPackets1_19_3;
+import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.PlayerHealthStorage;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import java.util.BitSet;
@@ -41,11 +42,9 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_19_1.ADD_ENTITY, EntityTypes1_19_3.FALLING_BLOCK);
         registerTracker(ClientboundPackets1_19_1.ADD_EXPERIENCE_ORB, EntityTypes1_19_3.EXPERIENCE_ORB);
         registerTracker(ClientboundPackets1_19_1.ADD_PLAYER, EntityTypes1_19_3.PLAYER);
         registerSetEntityData(ClientboundPackets1_19_1.SET_ENTITY_DATA, Types1_19.ENTITY_DATA_LIST, Types1_19_3.ENTITY_DATA_LIST);
-        registerRemoveEntities(ClientboundPackets1_19_1.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_19_1.LOGIN, new PacketHandlers() {
             @Override
@@ -77,6 +76,13 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
             }
         });
 
+        protocol.registerClientbound(ClientboundPackets1_19_1.SET_HEALTH, wrapper -> {
+            final float health = wrapper.passthrough(Types.FLOAT);
+            final int food = wrapper.passthrough(Types.VAR_INT);
+            final float saturation = wrapper.passthrough(Types.FLOAT);
+            wrapper.user().get(PlayerHealthStorage.class).update(health, food, saturation);
+        });
+
         protocol.registerClientbound(ClientboundPackets1_19_1.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
@@ -95,6 +101,18 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                         keepDataMask |= 0x01;
                     }
                     wrapper.write(Types.BYTE, keepDataMask);
+                });
+                handler(wrapper -> {
+                    final PlayerHealthStorage healthStorage = wrapper.user().get(PlayerHealthStorage.class);
+                    if (healthStorage.dead()) {
+                        // The client takes over the entity data of the dead player, its health of 0 would instantly re-open the death screen
+                        final PacketWrapper setHealth = wrapper.create(ClientboundPackets1_19_3.SET_HEALTH);
+                        setHealth.write(Types.FLOAT, 20F); // Overwritten by the server right after the respawn
+                        setHealth.write(Types.VAR_INT, healthStorage.food());
+                        setHealth.write(Types.FLOAT, healthStorage.saturation());
+                        setHealth.send(Protocol1_19_1To1_19_3.class);
+                        healthStorage.setDead(false);
+                    }
                 });
             }
         });
@@ -169,11 +187,6 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                 data.setValue(pose + 1);
             }
         });
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

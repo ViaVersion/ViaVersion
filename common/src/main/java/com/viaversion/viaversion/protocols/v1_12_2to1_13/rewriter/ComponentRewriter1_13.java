@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Json
         try {
             tag = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_12);
         } catch (Exception e) {
-            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 Protocol1_12_2To1_13.LOGGER.log(Level.WARNING, "Error reading NBT in show_item: " + StringUtil.forLogging(value), e);
             }
             return;
@@ -96,7 +96,7 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Json
             showItem.addProperty("text", SerializerVersion.V1_13.toSNBT(tag));
             hoverEvent.add("value", newValue);
         } catch (Exception e) {
-            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 Protocol1_12_2To1_13.LOGGER.log(Level.WARNING, "Error writing NBT in show_item: " + StringUtil.forLogging(value), e);
             }
         }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -161,6 +161,7 @@ public final class PipelineUtil {
         return null;
     }
 
+    @Deprecated(forRemoval = true)
     public static @Nullable ChannelHandlerContext getPreviousContext(String name, ChannelPipeline pipeline) {
         String previous = null;
         for (String entry : pipeline.toMap().keySet()) {

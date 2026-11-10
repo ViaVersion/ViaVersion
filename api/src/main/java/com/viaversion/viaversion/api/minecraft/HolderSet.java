@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,12 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
-import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
 /**
  * Set of ids that either holds a string tag key or an array of ids.
@@ -40,6 +41,7 @@ public interface HolderSet {
      * @return a new holder set
      */
     static HolderSet of(final String tagKey) {
+        Preconditions.checkNotNull(tagKey);
         return new HolderSetImpl.Tag(tagKey);
     }
 
@@ -50,22 +52,23 @@ public interface HolderSet {
      * @return a new holder set
      */
     static HolderSet of(final int[] ids) {
+        Preconditions.checkNotNull(ids);
         return new HolderSetImpl.Ids(ids);
     }
 
-    static HolderSet fromTag(final Tag tag, final Function<String, Integer> mappingFunction) {
+    static HolderSet fromTag(final Tag tag, final ToIntFunction<String> mappingFunction) {
         if (tag instanceof StringTag stringTag) {
             if (stringTag.getValue().startsWith("#")) {
                 return HolderSet.of(stringTag.getValue().substring(1));
             }
 
-            final int id = mappingFunction.apply(stringTag.getValue());
+            final int id = mappingFunction.applyAsInt(stringTag.getValue());
             return HolderSet.of(new int[]{id});
         } else if (tag instanceof ListTag<?> listTag) {
             final int[] ids = new int[listTag.size()];
             for (int i = 0; i < listTag.size(); i++) {
                 final String value = ((StringTag) listTag.get(i)).getValue();
-                ids[i] = mappingFunction.apply(value);
+                ids[i] = mappingFunction.applyAsInt(value);
             }
             return HolderSet.of(ids);
         }

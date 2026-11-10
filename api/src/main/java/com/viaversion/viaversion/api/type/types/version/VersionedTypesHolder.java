@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,10 +39,31 @@ import java.util.List;
  */
 public interface VersionedTypesHolder {
 
+    /**
+     * Returns the unmapped item stack type
+     *
+     * @return unmapped item stack type
+     */
     Type<Item> item();
 
-    Type<Item[]> itemArray();
+    ArrayType<Item> itemArray();
 
+    /**
+     * Returns the unmapped item stack template type, used for certain recipes/templates in 26.1+.
+     *
+     * @return unmapped item stack template type
+     */
+    Type<Item> itemTemplate();
+
+    Type<Item> optionalItemTemplate();
+
+    ArrayType<Item> itemTemplateArray();
+
+    /**
+     * Returns the unmapped item cost type, used in merchant offers.
+     *
+     * @return unmapped item cost type
+     */
     Type<Item> itemCost();
 
     Type<Item> optionalItemCost();

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,17 +59,13 @@ public class ParticleType extends DynamicType<Particle> {
         return protocol.getMappingData().getParticleMappings();
     }
 
-    public static DataReader<Particle> itemHandler(final Type<Item> itemType) {
-        return (buf, particle) -> particle.add(itemType, itemType.read(buf));
-    }
-
     public static final class Readers {
 
         public static final DataReader<Particle> BLOCK = (buf, particle) -> {
             particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Flat Block
         };
-        public static final DataReader<Particle> ITEM1_13 = itemHandler(Types.ITEM1_13);
-        public static final DataReader<Particle> ITEM1_13_2 = itemHandler(Types.ITEM1_13_2);
+        public static final DataReader<Particle> ITEM1_13 = item(Types.ITEM1_13);
+        public static final DataReader<Particle> ITEM1_13_2 = item(Types.ITEM1_13_2);
         public static final DataReader<Particle> DUST = (buf, particle) -> {
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Red 0-1
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Green 0-1
@@ -97,31 +93,31 @@ public class ParticleType extends DynamicType<Particle> {
         public static final DataReader<Particle> VIBRATION = (buf, particle) -> {
             particle.add(Types.BLOCK_POSITION1_14, Types.BLOCK_POSITION1_14.read(buf)); // From block pos
 
-            String resourceLocation = Types.STRING.read(buf);
-            particle.add(Types.STRING, resourceLocation);
+            String identifier = Types.STRING.read(buf);
+            particle.add(Types.STRING, identifier);
 
-            resourceLocation = Key.stripMinecraftNamespace(resourceLocation);
-            if (resourceLocation.equals("block")) {
+            identifier = Key.stripMinecraftNamespace(identifier);
+            if (identifier.equals("block")) {
                 particle.add(Types.BLOCK_POSITION1_14, Types.BLOCK_POSITION1_14.read(buf)); // Target block pos
-            } else if (resourceLocation.equals("entity")) {
+            } else if (identifier.equals("entity")) {
                 particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Target entity
             } else {
-                Via.getPlatform().getLogger().warning("Unknown vibration path position source type: " + resourceLocation);
+                Via.getPlatform().getLogger().warning("Unknown vibration path position source type: " + identifier);
             }
             particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Arrival in ticks
         };
         public static final DataReader<Particle> VIBRATION1_19 = (buf, particle) -> {
-            String resourceLocation = Types.STRING.read(buf);
-            particle.add(Types.STRING, resourceLocation);
+            String identifier = Types.STRING.read(buf);
+            particle.add(Types.STRING, identifier);
 
-            resourceLocation = Key.stripMinecraftNamespace(resourceLocation);
-            if (resourceLocation.equals("block")) {
+            identifier = Key.stripMinecraftNamespace(identifier);
+            if (identifier.equals("block")) {
                 particle.add(Types.BLOCK_POSITION1_14, Types.BLOCK_POSITION1_14.read(buf)); // Target block pos
-            } else if (resourceLocation.equals("entity")) {
+            } else if (identifier.equals("entity")) {
                 particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Target entity
                 particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Y offset
             } else {
-                Via.getPlatform().getLogger().warning("Unknown vibration path position source type: " + resourceLocation);
+                Via.getPlatform().getLogger().warning("Unknown vibration path position source type: " + identifier);
             }
             particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Arrival in ticks
         };
@@ -167,9 +163,123 @@ public class ParticleType extends DynamicType<Particle> {
             particle.add(Types.INT, Types.INT.readPrimitive(buf)); // Color
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Power
         };
+        public static final DataReader<Particle> GEYSER_BASE = (buf, particle) -> {
+            particle.add(Types.INT, Types.INT.readPrimitive(buf)); // Water blocks
+            particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Burst impulse base
+        };
+        public static final DataReader<Particle> GEYSER = (buf, particle) -> {
+            particle.add(Types.INT, Types.INT.readPrimitive(buf)); // Water blocks
+        };
 
         public static DataReader<Particle> item(Type<Item> item) {
             return (buf, particle) -> particle.add(item, item.read(buf));
+        }
+    }
+
+    public static final class Fillers {
+
+        public static DynamicType<Particle>.DataFiller fill1_13_2(final Protocol<?, ?, ?, ?> protocol, final ParticleType type, final boolean useMappedNames) {
+            return type.filler(protocol, useMappedNames)
+                .reader("item", Readers.item(protocol.getItemRewriter().mappedItemType()))
+                .reader("block", Readers.BLOCK)
+                .reader("dust", Readers.DUST)
+                .reader("falling_dust", Readers.BLOCK);
+        }
+
+        public static DataFiller fill1_17(final Protocol<?, ?, ?, ?> protocol, final ParticleType type) {
+            return fill1_13_2(protocol, type, true)
+                .reader("dust_color_transition", Readers.DUST_TRANSITION)
+                .reader("vibration", Readers.VIBRATION);
+        }
+
+        public static void fill1_18(final Protocol<?, ?, ?, ?> protocol, final ParticleType type) {
+            fill1_17(protocol, type).reader("block_marker", Readers.BLOCK);
+        }
+
+        public static void fill1_19(final Protocol<?, ?, ?, ?> protocol, final ParticleType type) {
+            type.filler(protocol)
+                .reader("item", Readers.item(protocol.getItemRewriter().mappedItemType()))
+                .reader("block", Readers.BLOCK)
+                .reader("block_marker", Readers.BLOCK)
+                .reader("dust", Readers.DUST)
+                .reader("falling_dust", Readers.BLOCK)
+                .reader("dust_color_transition", Readers.DUST_TRANSITION)
+                .reader("vibration", Readers.VIBRATION1_19)
+                .reader("sculk_charge", Readers.SCULK_CHARGE)
+                .reader("shriek", Readers.SHRIEK);
+        }
+
+        public static DataFiller fill1_20_3(final Protocol<?, ?, ?, ?> protocol, final ParticleType type) {
+            return type.filler(protocol)
+                .reader("item", Readers.item(protocol.getItemRewriter().mappedItemType()))
+                .reader("block", Readers.BLOCK)
+                .reader("block_marker", Readers.BLOCK)
+                .reader("dust", Readers.DUST)
+                .reader("falling_dust", Readers.BLOCK)
+                .reader("dust_color_transition", Readers.DUST_TRANSITION)
+                .reader("vibration", Readers.VIBRATION1_20_3)
+                .reader("sculk_charge", Readers.SCULK_CHARGE)
+                .reader("shriek", Readers.SHRIEK);
+        }
+
+        public static void fill1_20_5(final Protocol<?, ?, ?, ?> protocol, final ParticleType type) {
+            fill1_20_3(protocol, type)
+                .reader("dust_pillar", Readers.BLOCK)
+                .reader("entity_effect", Readers.COLOR);
+        }
+
+        public static void fill1_21_2(final Protocol<?, ?, ?, ?> protocol) {
+            protocol.mappedTypes().particle().filler(protocol)
+                .reader("item", Readers.item(protocol.getItemRewriter().mappedItemType()))
+                .reader("block", Readers.BLOCK)
+                .reader("block_marker", Readers.BLOCK)
+                .reader("dust_pillar", Readers.BLOCK)
+                .reader("falling_dust", Readers.BLOCK)
+                .reader("block_crumble", Readers.BLOCK)
+                .reader("dust", Readers.DUST1_21_2)
+                .reader("dust_color_transition", Readers.DUST_TRANSITION1_21_2)
+                .reader("vibration", Readers.VIBRATION1_20_3)
+                .reader("sculk_charge", Readers.SCULK_CHARGE)
+                .reader("shriek", Readers.SHRIEK)
+                .reader("entity_effect", Readers.COLOR)
+                .reader("trail", Readers.TRAIL1_21_2);
+        }
+
+        public static DataFiller fill1_21_4(final Protocol<?, ?, ?, ?> protocol) {
+            return protocol.mappedTypes().particle().filler(protocol)
+                .reader("item", Readers.item(protocol.getItemRewriter().mappedItemTemplateType()))
+                .reader("block", Readers.BLOCK)
+                .reader("block_marker", Readers.BLOCK)
+                .reader("dust_pillar", Readers.BLOCK)
+                .reader("falling_dust", Readers.BLOCK)
+                .reader("block_crumble", Readers.BLOCK)
+                .reader("dust", Readers.DUST1_21_2)
+                .reader("dust_color_transition", Readers.DUST_TRANSITION1_21_2)
+                .reader("vibration", Readers.VIBRATION1_20_3)
+                .reader("sculk_charge", Readers.SCULK_CHARGE)
+                .reader("shriek", Readers.SHRIEK)
+                .reader("entity_effect", Readers.COLOR)
+                .reader("trail", Readers.TRAIL1_21_4);
+        }
+
+        public static DataFiller fill1_21_5(final Protocol<?, ?, ?, ?> protocol) {
+            return fill1_21_4(protocol).reader("tinted_leaves", Readers.COLOR);
+        }
+
+        public static DataFiller fill1_21_9(final Protocol<?, ?, ?, ?> protocol) {
+            return fill1_21_5(protocol)
+                .reader("dragon_breath", Readers.POWER)
+                .reader("effect", Readers.SPELL)
+                .reader("instant_effect", Readers.SPELL)
+                .reader("flash", Readers.COLOR);
+        }
+
+        public static void fill26_2(final Protocol<?, ?, ?, ?> protocol) {
+            fill1_21_9(protocol)
+                .reader("geyser", Readers.GEYSER)
+                .reader("geyser_base", Readers.GEYSER_BASE)
+                .reader("geyser_poof", Readers.GEYSER_BASE)
+                .reader("geyser_plume", Readers.GEYSER);
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,12 @@ import java.util.TreeSet;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Via API base implementation.
+ *
+ * @param <T> platform player type
+ * @see UserConnectionViaAPI
+ */
 public abstract class ViaAPIBase<T> implements ViaAPI<T> {
 
     private final LegacyAPI<T> legacy = new LegacyAPI<>();

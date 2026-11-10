@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -185,6 +185,7 @@ public enum EntityTypes1_21_9 implements EntityType {
     SNIFFER(ABSTRACT_ANIMAL),
     ARMADILLO(ABSTRACT_ANIMAL),
     HAPPY_GHAST(ABSTRACT_ANIMAL),
+    OCELOT(ABSTRACT_ANIMAL),
 
     ABSTRACT_COW(ABSTRACT_ANIMAL, null),
     COW(ABSTRACT_COW),
@@ -192,7 +193,6 @@ public enum EntityTypes1_21_9 implements EntityType {
 
     TAMABLE_ANIMAL(ABSTRACT_ANIMAL, null),
     CAT(TAMABLE_ANIMAL),
-    OCELOT(TAMABLE_ANIMAL),
     WOLF(TAMABLE_ANIMAL),
     PARROT(TAMABLE_ANIMAL),
 

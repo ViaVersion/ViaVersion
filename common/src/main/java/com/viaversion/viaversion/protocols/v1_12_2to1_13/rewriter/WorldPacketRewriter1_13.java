@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PaintingProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.ProtocolStorables1_13;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Key;
@@ -51,6 +52,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class WorldPacketRewriter1_13 {
     private static final IntSet VALID_BIOMES = new IntOpenHashSet(70);
@@ -88,7 +90,7 @@ public class WorldPacketRewriter1_13 {
                     String motive = wrapper.read(Types.STRING);
 
                     Optional<Integer> id = provider.getIntByIdentifier(motive);
-                    if (id.isEmpty() && !Via.getConfig().isSuppressConversionWarnings()) {
+                    if (id.isEmpty() && Via.getConfig().logOtherConversionWarnings()) {
                         Protocol1_12_2To1_13.LOGGER.warning("Could not find painting motive: " + motive + " falling back to default (0)");
                     }
                     wrapper.write(Types.VAR_INT, id.orElse(0));
@@ -112,7 +114,8 @@ public class WorldPacketRewriter1_13 {
                     int newId = provider.transform(wrapper.user(), position, tag, true);
 
                     if (newId != -1) {
-                        BlockStorage storage = wrapper.user().get(BlockStorage.class);
+                        final ProtocolStorables1_13 storables = wrapper.user().storables(protocol);
+                        final BlockStorage storage = storables.blockStorage();
                         BlockStorage.ReplacementData replacementData = storage.get(position);
                         if (replacementData != null) {
                             replacementData.setReplacement(newId);
@@ -302,13 +305,16 @@ public class WorldPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.FORGET_LEVEL_CHUNK, new PacketHandlers() {
             @Override
             public void register() {
-                if (Via.getConfig().isServersideBlockConnections()) {
-                    handler(wrapper -> {
-                        int x = wrapper.passthrough(Types.INT);
-                        int z = wrapper.passthrough(Types.INT);
+                handler(wrapper -> {
+                    int x = wrapper.passthrough(Types.INT);
+                    int z = wrapper.passthrough(Types.INT);
+
+                    final ProtocolStorables1_13 storables = wrapper.user().storables(protocol);
+                    storables.blockStorage().removeChunk(x, z);
+                    if (Via.getConfig().isServersideBlockConnections()) {
                         ConnectionData.blockConnectionProvider.unloadChunk(wrapper.user(), x, z);
-                    });
-                }
+                    }
+                });
             }
         });
 
@@ -325,8 +331,9 @@ public class WorldPacketRewriter1_13 {
         });
 
         protocol.registerClientbound(ClientboundPackets1_12_1.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_12_2To1_13.class);
-            BlockStorage storage = wrapper.user().get(BlockStorage.class);
+            final ProtocolStorables1_13 storables = wrapper.user().storables(protocol);
+            ClientWorld clientWorld = storables.clientWorld();
+            BlockStorage storage = storables.blockStorage();
 
             ChunkType1_9_3 type = ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment());
             ChunkType1_13 type1_13 = ChunkType1_13.forEnvironment(clientWorld.getEnvironment());
@@ -408,7 +415,7 @@ public class WorldPacketRewriter1_13 {
                     if (!VALID_BIOMES.contains(biome)) {
                         if (biome != 255 // is it generated naturally? *shrug*
                             && latestBiomeWarn != biome) {
-                            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                            if (Via.getConfig().logOtherConversionWarnings()) {
                                 Protocol1_12_2To1_13.LOGGER.warning("Received invalid biome id: " + biome);
                             }
                             latestBiomeWarn = biome;
@@ -510,19 +517,42 @@ public class WorldPacketRewriter1_13 {
                         float speed = wrapper.get(Types.FLOAT, 6);
                         // Only handle for count = 0
                         if (count == 0) {
+                            // Change count and speed
                             wrapper.set(Types.INT, 1, 1);
                             wrapper.set(Types.FLOAT, 6, 0f);
 
                             for (int i = 0; i < 3; i++) {
-                                //RGB values are represented by the X/Y/Z offset
-                                float colorValue = wrapper.get(Types.FLOAT, i + 3) * speed;
-                                if (colorValue == 0 && i == 0) {
-                                    // https://minecraft.gamepedia.com/User:Alphappy/reddust
-                                    colorValue = 1;
-                                }
+                                // RGB values are represented by the X/Y/Z offset
+                                float offset = wrapper.get(Types.FLOAT, i + 3);
+                                float colorValue = redstoneDustColor(speed, offset, i == 0);
                                 particle.<Float>getArgument(i).setValue(colorValue);
                                 wrapper.set(Types.FLOAT, i + 3, 0f);
                             }
+                        } else if (Via.getConfig().isMultiReddustColorFix()) {
+                            wrapper.cancel();
+
+                            final boolean longDistance = wrapper.get(Types.BOOLEAN, 0);
+                            final float x = wrapper.get(Types.FLOAT, 0);
+                            final float y = wrapper.get(Types.FLOAT, 1);
+                            final float z = wrapper.get(Types.FLOAT, 2);
+                            final float offsetX = wrapper.get(Types.FLOAT, 3);
+                            final float offsetY = wrapper.get(Types.FLOAT, 4);
+                            final float offsetZ = wrapper.get(Types.FLOAT, 5);
+                            final ThreadLocalRandom random = ThreadLocalRandom.current();
+                            for (int i = 0; i < count; i++) {
+                                final float particleX = (float) (x + random.nextGaussian() * offsetX);
+                                final float particleY = (float) (y + random.nextGaussian() * offsetY);
+                                final float particleZ = (float) (z + random.nextGaussian() * offsetZ);
+                                sendRedstoneParticle(wrapper,
+                                    longDistance,
+                                    particleX,
+                                    particleY,
+                                    particleZ,
+                                    redstoneDustColor((float) random.nextGaussian(), speed, true),
+                                    redstoneDustColor((float) random.nextGaussian(), speed, false),
+                                    redstoneDustColor((float) random.nextGaussian(), speed, false));
+                            }
+                            return;
                         }
                     }
 
@@ -561,6 +591,34 @@ public class WorldPacketRewriter1_13 {
 
     }
 
+    private static float redstoneDustColor(float speed, float offset, boolean red) {
+        // Vanilla 1.12 substitutes red when the raw red value is zero
+        float color = speed * offset;
+        if (red && color == 0F) {
+            return 1F;
+        }
+        return ((int) (color * 255F) & 255) / 255F;
+    }
+
+    private static void sendRedstoneParticle(PacketWrapper wrapper, boolean longDistance, float x, float y, float z, float red, float green, float blue) {
+        final PacketWrapper particlePacket = wrapper.create(ClientboundPackets1_13.LEVEL_PARTICLES);
+        particlePacket.write(Types.INT, 11);
+        particlePacket.write(Types.BOOLEAN, longDistance);
+        particlePacket.write(Types.FLOAT, x);
+        particlePacket.write(Types.FLOAT, y);
+        particlePacket.write(Types.FLOAT, z);
+        particlePacket.write(Types.FLOAT, 0F);
+        particlePacket.write(Types.FLOAT, 0F);
+        particlePacket.write(Types.FLOAT, 0F);
+        particlePacket.write(Types.FLOAT, 0F);
+        particlePacket.write(Types.INT, 0);
+        particlePacket.write(Types.FLOAT, red);
+        particlePacket.write(Types.FLOAT, green);
+        particlePacket.write(Types.FLOAT, blue);
+        particlePacket.write(Types.FLOAT, 1F);
+        particlePacket.send(Protocol1_12_2To1_13.class);
+    }
+
     public static int toNewId(int oldId) {
         if (oldId < 0) {
             oldId = 0; // Some plugins use negative numbers to clear blocks, remap them to air.
@@ -571,12 +629,12 @@ public class WorldPacketRewriter1_13 {
         }
         newId = Protocol1_12_2To1_13.MAPPINGS.getBlockMappings().getNewId(IdAndData.removeData(oldId)); // Remove data
         if (newId != -1) {
-            if (!Via.getConfig().isSuppressConversionWarnings()) {
+            if (Via.getConfig().logOtherConversionWarnings()) {
                 Protocol1_12_2To1_13.LOGGER.warning("Missing block " + oldId);
             }
             return newId;
         }
-        if (!Via.getConfig().isSuppressConversionWarnings()) {
+        if (Via.getConfig().logOtherConversionWarnings()) {
             Protocol1_12_2To1_13.LOGGER.warning("Missing block completely " + oldId);
         }
         // Default air

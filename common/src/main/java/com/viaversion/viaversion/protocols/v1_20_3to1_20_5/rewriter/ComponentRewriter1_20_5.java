@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,9 +41,9 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrim1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimMaterial1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.AttributeModifier;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.ModifierData;
@@ -62,7 +62,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
-import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
+import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffectData;
@@ -88,6 +88,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Instruments1_20_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Potions1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ProtocolStorables1_20_5;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
@@ -170,7 +171,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         register(StructuredDataKey.NOTE_BLOCK_SOUND, this::noteBlockSoundToTag, this::noteBlockSoundFromTag);
         register(StructuredDataKey.BANNER_PATTERNS, this::bannerPatternsToTag, this::bannerPatternsFromTag);
         register(StructuredDataKey.BASE_COLOR, this::baseColorToTag, this::baseColorFromTag);
-        register(StructuredDataKey.POT_DECORATIONS, this::potDecorationsToTag, this::potDecorationsFromTag);
+        register(StructuredDataKey.POT_DECORATIONS1_20_5, this::potDecorationsToTag, this::potDecorationsFromTag);
         register(StructuredDataKey.V1_20_5.container, this::containerToTag, this::containerFromTag);
         register(StructuredDataKey.BLOCK_STATE, this::blockStateToTag, this::blockStateFromTag);
         register(StructuredDataKey.BEES1_20_5, this::beesToTag, this::beesFromTag);
@@ -218,7 +219,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         try {
             tagTag = tag != null ? (CompoundTag) inputSerializerVersion().toTag(tag.getValue()) : null;
         } catch (final Exception e) {
-            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 protocol.getLogger().log(Level.WARNING, "Error reading NBT in show_item: " + StringUtil.forLogging(itemTag), e);
             }
             return;
@@ -252,7 +253,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
             try {
                 components = toTag(connection, data);
             } catch (final Exception e) {
-                if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+                if (Via.getConfig().logTextComponentConversionErrors()) {
                     protocol.getLogger().log(Level.WARNING, "Error writing components in show_item!", e);
                 }
                 return;
@@ -827,11 +828,12 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
             potionEffectToTag(effectTag, effect);
             customEffects.add(effectTag);
         }
-        tag.put("custom_effects", customEffects);
+        if (!customEffects.isEmpty()) {
+            tag.put("custom_effects", customEffects);
+        }
         if (value.customName() != null) {
             tag.putString("custom_name", value.customName());
         }
-        tag.put("custom_effects", customEffects);
         return tag;
     }
 
@@ -961,15 +963,15 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         return new WrittenBook(title, author, generation, pages.toArray(FilterableComponent[]::new), resolved);
     }
 
-    protected CompoundTag trimToTag(final UserConnection connection, final ArmorTrim value) {
+    protected CompoundTag trimToTag(final UserConnection connection, final ArmorTrim1_20_5 value) {
         final CompoundTag tag = new CompoundTag();
-        final Holder<ArmorTrimMaterial> material = value.material();
-        final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
+        final Holder<ArmorTrimMaterial1_20_5> material = value.material();
+        final ArmorTrimStorage trimStorage = connection.storables(protocol) instanceof ProtocolStorables1_20_5 storables ? storables.armorTrims() : connection.get(ArmorTrimStorage.class);
         if (material.hasId()) {
             final String trimMaterial = trimStorage.trimMaterials().idToKey(material.id());
             tag.putString("material", trimMaterial);
         } else {
-            final ArmorTrimMaterial armorTrimMaterial = material.value();
+            final ArmorTrimMaterial1_20_5 armorTrimMaterial = material.value();
             final CompoundTag materialTag = new CompoundTag();
             final String ingredient = Protocol1_20_3To1_20_5.MAPPINGS.getFullItemMappings().identifier(armorTrimMaterial.itemId());
             if (ingredient == null) {
@@ -1018,12 +1020,12 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         return tag;
     }
 
-    protected ArmorTrim trimFromTag(final UserConnection connection, final Tag tag) {
+    protected ArmorTrim1_20_5 trimFromTag(final UserConnection connection, final Tag tag) {
         final CompoundTag value = (CompoundTag) tag;
 
         final Tag materialTag = value.get("material");
-        Holder<ArmorTrimMaterial> material;
-        final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
+        Holder<ArmorTrimMaterial1_20_5> material;
+        final ArmorTrimStorage trimStorage = connection.storables(protocol) instanceof ProtocolStorables1_20_5 storables ? storables.armorTrims() : connection.get(ArmorTrimStorage.class);
         if (materialTag instanceof StringTag stringTag) {
             material = Holder.of(trimStorage.trimMaterials().keyToId(stringTag.getValue()));
         } else {
@@ -1039,7 +1041,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
                 }
             }
             final Tag description = materialValue.get("description");
-            material = Holder.of(new ArmorTrimMaterial(assetName, ingredient, itemModelIndex, overrideArmorMaterials, description));
+            material = Holder.of(new ArmorTrimMaterial1_20_5(assetName, ingredient, itemModelIndex, overrideArmorMaterials, description));
         }
 
         final Tag patternTag = value.get("pattern");
@@ -1056,7 +1058,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         }
 
         final boolean showInTooltip = value.getBoolean("show_in_tooltip", true);
-        return new ArmorTrim(material, pattern, showInTooltip);
+        return new ArmorTrim1_20_5(material, pattern, showInTooltip);
     }
 
     protected CompoundTag debugStickStateToTag(final DebugStickState value) {
@@ -1292,7 +1294,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         return dyeColorFromTag(tag);
     }
 
-    protected ListTag<StringTag> potDecorationsToTag(final PotDecorations value) {
+    protected ListTag<StringTag> potDecorationsToTag(final PotDecorations1_20_5 value) {
         final ListTag<StringTag> tag = new ListTag<>(StringTag.class);
         for (final int decoration : value.itemIds()) {
             final String identifier = mappedIdentifier(decoration);
@@ -1304,7 +1306,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         return tag;
     }
 
-    protected PotDecorations potDecorationsFromTag(final Tag tag) {
+    protected PotDecorations1_20_5 potDecorationsFromTag(final Tag tag) {
         final ListTag<StringTag> value = (ListTag<StringTag>) tag;
         final int[] itemIds = new int[value.size()];
         for (int i = 0; i < value.size(); i++) {
@@ -1315,7 +1317,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
             }
             itemIds[i] = id;
         }
-        return new PotDecorations(itemIds);
+        return new PotDecorations1_20_5(itemIds);
     }
 
     protected ListTag<CompoundTag> containerToTag(final UserConnection connection, final Item[] value) {
@@ -1549,8 +1551,9 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
     }
 
     protected Item[] itemArrayFromTag(final UserConnection connection, final ListTag<CompoundTag> tag) {
-        final Item[] items = new Item[tag.size()];
-        for (int i = 0; i < tag.size(); i++) {
+        final int size = Math.min(tag.size(), 1024);
+        final Item[] items = new Item[size];
+        for (int i = 0; i < size; i++) {
             items[i] = itemFromTag(connection, tag.get(i));
         }
         return items;

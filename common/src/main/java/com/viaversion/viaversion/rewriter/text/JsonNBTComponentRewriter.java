@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
                 if (actions.get(4)) {
                     wrapper.passthrough(Types.VAR_INT); // Latency
                 }
-                processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
+                processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG));
             }
         });
     }
@@ -134,7 +134,7 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
                 }
             }
 
-            processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
+            processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Unsigned content
 
             final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
             if (filterMaskType == 2) { // Partially filtered
@@ -142,8 +142,8 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
             }
 
             wrapper.passthrough(chatType); // Chat Type
-            processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Name
-            processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Target Name
+            processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_TAG)); // Name
+            processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Target Name
         });
     }
 
@@ -203,9 +203,8 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
     }
 
     @Override
-    protected void handleNestedComponent(final UserConnection connection, final CompoundTag parent, final String key) {
-        final StringTag tag = parent.getStringTag(key);
-        if (tag == null) {
+    protected void handleNestedComponent(final UserConnection connection, @Nullable final Tag tag) {
+        if (!(tag instanceof StringTag stringTag)) {
             return;
         }
 
@@ -213,10 +212,10 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
         final var input = inputSerializerVersion();
         final var output = outputSerializerVersion();
 
-        final Tag asTag = input.toTag(input.toComponent(tag.getValue()));
+        final Tag asTag = input.toTag(input.toComponent(stringTag.getValue()));
         processTag(connection, asTag);
 
-        tag.setValue(output.toString(output.toComponent(asTag)));
+        stringTag.setValue(output.toString(output.toComponent(asTag)));
     }
 
     @Override

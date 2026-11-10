@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,8 @@ public final class ComponentRewriter1_17 extends JsonNBTComponentRewriter<Client
         mappings.put("commands.replaceitem.block.success", "commands.item.block.set.success");
         mappings.put("commands.debug.reportSaved", "Created debug report in %s");
         mappings.put("commands.debug.reportFailed", "Failed to create debug report");
+        mappings.put("commands.locate.success", "The nearest %s is at %s (%s blocks away)");
+        mappings.put("commands.locatebiome.success", "The nearest %s is at %s (%s blocks away)");
     }
 
     @Override

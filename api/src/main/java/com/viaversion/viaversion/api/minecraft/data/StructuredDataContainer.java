@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -160,6 +160,10 @@ public final class StructuredDataContainer implements Copyable {
     }
 
     public <T, V> void replace(final StructuredDataKey<T> key, final StructuredDataKey<V> toKey, final Function<T, @Nullable V> valueMapper) {
+        replace(key, toKey, valueMapper, null);
+    }
+
+    public <T, V> void replace(final StructuredDataKey<T> key, final StructuredDataKey<V> toKey, final Function<T, @Nullable V> valueMapper, final Runnable emptyValueHandler) {
         final StructuredData<?> data = this.data.remove(key);
         if (data == null) {
             return;
@@ -175,6 +179,9 @@ public final class StructuredDataContainer implements Copyable {
         } else {
             // Also replace the key for empty data
             setEmpty(toKey);
+            if (emptyValueHandler != null) {
+                emptyValueHandler.run();
+            }
         }
     }
 
@@ -263,7 +270,7 @@ public final class StructuredDataContainer implements Copyable {
 
     @Override
     public StructuredDataContainer copy() {
-        final Reference2ObjectOpenHashMap<StructuredDataKey<?>, StructuredData<?>> map = new Reference2ObjectOpenHashMap<>();
+        final Reference2ObjectOpenHashMap<StructuredDataKey<?>, StructuredData<?>> map = new Reference2ObjectOpenHashMap<>(data.size());
         for (final StructuredData<?> value : data.values()) {
             map.put(value.key(), value.copy());
         }

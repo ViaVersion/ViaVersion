@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.ItemPacketRewrit
 import com.viaversion.viaversion.protocols.v1_10to1_11.storage.EntityTracker1_11;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPackets1_9_3;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
 
 public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
 
@@ -59,7 +58,15 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
     protected void registerPackets() {
         super.registerPackets();
 
-        new SoundRewriter<>(this, this::getNewSoundId).registerSound(ClientboundPackets1_9_3.SOUND);
+        registerClientbound(ClientboundPackets1_9_3.SOUND, wrapper -> {
+            int soundId = wrapper.read(Types.VAR_INT);
+            int mappedId = getNewSoundId(soundId);
+            if (mappedId == -1) {
+                wrapper.cancel();
+            } else {
+                wrapper.write(Types.VAR_INT, mappedId);
+            }
+        });
 
         registerClientbound(ClientboundPackets1_9_3.SET_TITLES, new PacketHandlers() {
             @Override
@@ -98,7 +105,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
         });
 
         registerClientbound(ClientboundPackets1_9_3.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_10To1_11.class);
+            ClientWorld clientWorld = wrapper.user().storables(this).clientWorld();
 
             Chunk chunk = wrapper.passthrough(ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment()));
 
@@ -212,8 +219,8 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.addEntityTracker(this.getClass(), new EntityTracker1_11(userConnection));
-        userConnection.addClientWorld(this.getClass(), new ClientWorld());
+        addEntityTracker(userConnection, new EntityTracker1_11(userConnection));
+        userConnection.storables(this).setClientWorld(new ClientWorld());
     }
 
     @Override

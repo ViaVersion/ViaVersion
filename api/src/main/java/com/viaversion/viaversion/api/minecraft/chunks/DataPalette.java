@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,11 @@
  * SOFTWARE.
  */
 package com.viaversion.viaversion.api.minecraft.chunks;
+
+import com.viaversion.viaversion.util.CompactArrayUtil;
+import java.util.function.IntConsumer;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
 
 public interface DataPalette {
 
@@ -109,6 +114,21 @@ public interface DataPalette {
     void setPaletteIndexAt(int sectionCoordinate, int index);
 
     /**
+     * Replaces every id in the palette by applying the given mapper.
+     *
+     * @param mapper function from old id to new id
+     */
+    default void replaceIds(IntUnaryOperator mapper) {
+        for (int i = 0; i < this.size(); i++) {
+            final int id = this.idByIndex(i);
+            final int newId = mapper.applyAsInt(id);
+            if (newId != id) {
+                this.setIdByIndex(i, newId);
+            }
+        }
+    }
+
+    /**
      * Adds a new id to the palette.
      *
      * @param id id value
@@ -121,7 +141,34 @@ public interface DataPalette {
      * @param oldId old id
      * @param newId new id
      */
-    void replaceId(int oldId, int newId);
+    default void replaceId(int oldId, int newId) {
+        for (int i = 0; i < this.size(); i++) {
+            if (this.idByIndex(i) == oldId) {
+                this.setIdByIndex(i, newId);
+            }
+        }
+    }
+
+    /**
+     * Runs over all section coordinate indices that match the given predicate.
+     *
+     * @param idPredicate        predicate to test ids
+     * @param coordinateConsumer consumer to run over applicable coordinate indices (not ids!)
+     * @see #idAt(int)
+     */
+    void forEachMatchingCoordinate(IntPredicate idPredicate, IntConsumer coordinateConsumer);
+
+    /**
+     * Packs the section values into a compact long array as used by the protocol.
+     *
+     * @param bitsPerValue bits used per value
+     * @param entries      number of values
+     * @param rawIds       whether to pack raw ids instead of palette indexes (direct palette)
+     * @return compact long array of the values
+     */
+    default long[] createPackedValues(final int bitsPerValue, final int entries, final boolean rawIds) {
+        return CompactArrayUtil.createCompactArrayWithPadding(bitsPerValue, entries, rawIds ? this::idAt : this::paletteIndexAt);
+    }
 
     /**
      * Returns the size of the palette.

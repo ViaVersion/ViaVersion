@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.FloatTag;
 import com.viaversion.nbt.tag.IntTag;
-import com.viaversion.nbt.tag.ListTag;
-import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
@@ -30,21 +27,18 @@ import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
+import com.viaversion.viaversion.api.minecraft.item.data.consumable.Consumable1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
+import com.viaversion.viaversion.api.minecraft.item.data.consumable.ConsumeEffect;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.Protocol1_21_2To1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPacket1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.provider.PickItemProvider;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
-import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
-import com.viaversion.viaversion.util.TagUtil;
 
 public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_4, Protocol1_21_2To1_21_4> {
 
@@ -54,14 +48,6 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
 
     @Override
     public void registerPackets() {
-        final BlockRewriter<ClientboundPacket1_21_2> blockRewriter = BlockRewriter.for1_20_2(protocol);
-        blockRewriter.registerBlockEvent(ClientboundPackets1_21_2.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_21_2.BLOCK_UPDATE);
-        blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_21_2.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerLevelEvent1_21(ClientboundPackets1_21_2.LEVEL_EVENT, 2001);
-        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_21_2.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new, (connection, blockEntity) -> handleBlockEntity(blockEntity.tag()));
-        blockRewriter.registerBlockEntityData(ClientboundPackets1_21_2.BLOCK_ENTITY_DATA, blockEntity -> handleBlockEntity(blockEntity.tag()));
-
         protocol.registerClientbound(ClientboundPackets1_21_2.SET_HELD_SLOT, wrapper -> {
             final byte slot = wrapper.read(Types.BYTE);
             wrapper.write(Types.VAR_INT, (int) slot);
@@ -79,50 +65,6 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
             Via.getManager().getProviders().get(PickItemProvider.class).pickItemFromEntity(wrapper.user(), entityId, includeData);
             wrapper.cancel();
         });
-
-        protocol.registerClientbound(ClientboundPackets1_21_2.SET_CURSOR_ITEM, this::passthroughClientboundItem);
-        registerSetPlayerInventory(ClientboundPackets1_21_2.SET_PLAYER_INVENTORY);
-        registerCooldown1_21_2(ClientboundPackets1_21_2.COOLDOWN);
-        registerSetContent1_21_2(ClientboundPackets1_21_2.CONTAINER_SET_CONTENT);
-        registerSetSlot1_21_2(ClientboundPackets1_21_2.CONTAINER_SET_SLOT);
-        registerAdvancements1_20_3(ClientboundPackets1_21_2.UPDATE_ADVANCEMENTS);
-        registerSetEquipment(ClientboundPackets1_21_2.SET_EQUIPMENT);
-        registerContainerClick1_21_2(ServerboundPackets1_21_4.CONTAINER_CLICK);
-        registerMerchantOffers1_20_5(ClientboundPackets1_21_2.MERCHANT_OFFERS);
-        registerSetCreativeModeSlot(ServerboundPackets1_21_4.SET_CREATIVE_MODE_SLOT);
-
-        final RecipeDisplayRewriter<ClientboundPacket1_21_2> recipeRewriter = new RecipeDisplayRewriter<>(protocol);
-        recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_2.UPDATE_RECIPES);
-        recipeRewriter.registerRecipeBookAdd(ClientboundPackets1_21_2.RECIPE_BOOK_ADD);
-        recipeRewriter.registerPlaceGhostRecipe(ClientboundPackets1_21_2.PLACE_GHOST_RECIPE);
-    }
-
-    private void handleBlockEntity(final CompoundTag tag) {
-        if (tag == null) {
-            return;
-        }
-
-        final CompoundTag item = tag.getCompoundTag("item");
-        if (item == null) {
-            return;
-        }
-
-        final CompoundTag components = item.getCompoundTag("components");
-        if (components == null) {
-            return;
-        }
-
-        // May be displayed in brushable blocks and other block entities
-        final NumberTag customModelData = TagUtil.getNamespacedNumberTag(components, "custom_model_data");
-        if (customModelData != null) {
-            final ListTag<FloatTag> floats = new ListTag<>(FloatTag.class);
-            floats.add(new FloatTag(customModelData.asFloat()));
-
-            final CompoundTag updatedCustomModelData = new CompoundTag();
-            updatedCustomModelData.put("floats", floats);
-            TagUtil.removeNamespaced(components, "custom_model_data");
-            components.put("custom_model_data", updatedCustomModelData);
-        }
     }
 
     @Override
@@ -177,7 +119,7 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
                         3,
                         Holder.of(new SoundEvent("minecraft:intentionally_empty", null)),
                         false,
-                        new Consumable1_21_2.ConsumeEffect[0])
+                        new ConsumeEffect[0])
                 );
             }
         }

@@ -1,0 +1,237 @@
+/*
+ * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
+ * Copyright (C) 2016-2026 ViaVersion and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.viaversion.viaversion.protocols.v26_2to26_3.rewriter;
+
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes26_3;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes26_3;
+import com.viaversion.viaversion.api.minecraft.item.data.EnumTypes;
+import com.viaversion.viaversion.api.minecraft.item.data.SwingAnimation;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPackets26_1;
+import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ClientboundPackets26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ServerboundPackets26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.storage.ProtocolStorables26_3;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
+
+public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPacket26_1, Protocol26_2To26_3> {
+
+    private static final int SINGLE_STEP = 1 << 1;
+    // All entities that care about steps use 3 steps in 26.2. 26.3 still lerps every tick within each step, so this
+    // is equivalent
+    private static final int INTERPOLATION_STEP_TICKS = 3;
+    private static final int MAIN_HAND = 0;
+    private static final int OFF_HAND = 1;
+    private static final int START_DESTROY_BLOCK_ACTION = 0;
+    private static final int CHANGE_DESTROY_DIRECTION_ACTION = 1;
+    private static final int ABORT_DESTROY_BLOCK_ACTION = 2;
+    private static final int STOP_DESTROY_BLOCK_ACTION = 3;
+    private static final int DESTROY_PROGRESS_PARTICLES = 2019;
+    private static final int DESTROY_PROGRESS_PARTICLES_AND_SOUND = 2020;
+    private static final SwingAnimation DEFAULT_SWING_ANIMATION = new SwingAnimation(EnumTypes.SWING_ANIMATION1_21_11.idFromName("whack"), 6);
+
+    public EntityPacketRewriter26_3(final Protocol26_2To26_3 protocol) {
+        super(protocol);
+    }
+
+    @Override
+    public void registerPackets() {
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity id
+            final short xa = wrapper.read(Types.SHORT);
+            final short ya = wrapper.read(Types.SHORT);
+            final short za = wrapper.read(Types.SHORT);
+            final boolean onGround = wrapper.read(Types.BOOLEAN);
+            wrapper.write(Types.VAR_INT, (onGround ? 1 : 0) | SINGLE_STEP); // Only the first bit set, otherwise empty = no step count
+            wrapper.write(Types.VAR_INT, INTERPOLATION_STEP_TICKS);
+            wrapper.write(Types.SHORT, xa);
+            wrapper.write(Types.SHORT, ya);
+            wrapper.write(Types.SHORT, za);
+        });
+
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS_ROT, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity id
+            final short xa = wrapper.read(Types.SHORT);
+            final short ya = wrapper.read(Types.SHORT);
+            final short za = wrapper.read(Types.SHORT);
+            final byte yRot = wrapper.read(Types.BYTE);
+            final byte xRot = wrapper.read(Types.BYTE);
+            final boolean onGround = wrapper.read(Types.BOOLEAN);
+            wrapper.write(Types.VAR_INT, (onGround ? 1 : 0) | SINGLE_STEP); // Only the first bit set, otherwise empty = no extra steps
+            wrapper.write(Types.VAR_INT, INTERPOLATION_STEP_TICKS);
+            wrapper.write(Types.SHORT, xa);
+            wrapper.write(Types.SHORT, ya);
+            wrapper.write(Types.SHORT, za);
+            wrapper.write(Types.BYTE, yRot);
+            wrapper.write(Types.BYTE, xRot);
+        });
+
+        protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_ROT, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
+            final byte yRot = wrapper.read(Types.BYTE);
+            final byte xRot = wrapper.read(Types.BYTE);
+            wrapper.passthrough(Types.BOOLEAN); // on ground stays as boolean; moved up
+            wrapper.write(Types.BYTE, yRot);
+            wrapper.write(Types.BYTE, xRot);
+        });
+
+        protocol.registerClientbound(ClientboundPackets26_1.ENTITY_POSITION_SYNC, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
+
+            wrapper.write(Types.VAR_INT, 1); // Stepped
+            wrapper.write(Types.VAR_INT, 1); // 1 step
+
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+            wrapper.write(Types.VAR_INT, INTERPOLATION_STEP_TICKS);
+
+            wrapper.read(Types.DOUBLE); // Delta x
+            wrapper.read(Types.DOUBLE); // Delta y
+            wrapper.read(Types.DOUBLE); // Delta z
+
+            wrapper.passthrough(Types.FLOAT); // Y rot
+            wrapper.passthrough(Types.FLOAT); // X rot
+        });
+
+        protocol.appendClientbound(ClientboundPackets26_1.LOGIN, wrapper -> {
+            wrapper.rewindReader(1);
+            handleGamemodes(wrapper);
+        });
+        protocol.appendClientbound(ClientboundPackets26_1.RESPAWN, wrapper -> {
+            wrapper.rewindReader(1);
+            handleGamemodes(wrapper);
+        });
+
+        protocol.registerServerbound(ServerboundPackets26_3.ACCEPT_TELEPORTATION, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // ID
+            final double x = wrapper.read(Types.DOUBLE);
+            final double y = wrapper.read(Types.DOUBLE);
+            final double z = wrapper.read(Types.DOUBLE);
+            final float yRot = wrapper.read(Types.FLOAT);
+            final float xRot = wrapper.read(Types.FLOAT);
+            wrapper.sendToServer(Protocol26_2To26_3.class);
+            wrapper.cancel();
+
+            // Older clients send a position packet right after accepting a teleport, make sure anticheats don't explode
+            final PacketWrapper movePlayer = wrapper.create(ServerboundPackets26_1.MOVE_PLAYER_POS_ROT);
+            movePlayer.write(Types.DOUBLE, x);
+            movePlayer.write(Types.DOUBLE, y);
+            movePlayer.write(Types.DOUBLE, z);
+            movePlayer.write(Types.FLOAT, yRot);
+            movePlayer.write(Types.FLOAT, xRot);
+            movePlayer.write(Types.UNSIGNED_BYTE, (short) 0); // Not on ground, no horizontal collision
+            movePlayer.sendToServer(Protocol26_2To26_3.class);
+        });
+
+        protocol.registerServerbound(ServerboundPackets26_3.PUNCH, ServerboundPackets26_1.SWING, wrapper -> {
+            wrapper.write(Types.VAR_INT, 0); // Main hand
+
+            // Sent every tick while destroying a block
+            final ProtocolStorables26_3 storables = wrapper.user().storables(protocol);
+            storables.setPunched();
+        });
+
+        protocol.registerServerbound(ServerboundPackets26_3.CLIENT_TICK_END, wrapper -> {
+            // Needs to be sent by the server every tick after starting now
+            final ProtocolStorables26_3 storables = wrapper.user().storables(protocol);
+            final int ticks = storables.endDestroyTick();
+            if (ticks <= 0) {
+                return;
+            }
+
+            final PacketWrapper levelEvent = wrapper.create(ClientboundPackets26_3.LEVEL_EVENT);
+            levelEvent.write(Types.INT, ticks % 4 == 0 ? DESTROY_PROGRESS_PARTICLES_AND_SOUND : DESTROY_PROGRESS_PARTICLES);
+            levelEvent.write(Types.BLOCK_POSITION1_14, storables.destroyPosition());
+            levelEvent.write(Types.INT, storables.destroyDirection());
+            levelEvent.write(Types.BOOLEAN, false); // Global
+            levelEvent.scheduleSend(Protocol26_2To26_3.class);
+        });
+
+        protocol.registerServerbound(ServerboundPackets26_3.PLAYER_ACTION, wrapper -> {
+            final int action = wrapper.read(Types.VAR_INT);
+            final ProtocolStorables26_3 storables = wrapper.user().storables(protocol);
+            if (action == CHANGE_DESTROY_DIRECTION_ACTION) {
+                wrapper.read(Types.BLOCK_POSITION1_14); // Position
+                storables.setDestroyDirection(wrapper.read(Types.UNSIGNED_BYTE));
+                wrapper.cancel(); // 26.2 has no equivalent and never sends anything here
+                return;
+            }
+
+            wrapper.write(Types.VAR_INT, action > CHANGE_DESTROY_DIRECTION_ACTION ? action - 1 : action);
+            if (action == START_DESTROY_BLOCK_ACTION) {
+                final BlockPosition position = wrapper.passthrough(Types.BLOCK_POSITION1_14);
+                storables.startDestroying(position, wrapper.passthrough(Types.UNSIGNED_BYTE));
+            } else if (action == ABORT_DESTROY_BLOCK_ACTION || action == STOP_DESTROY_BLOCK_ACTION) {
+                storables.stopDestroying();
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets26_1.ANIMATE, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
+            final short action = wrapper.read(Types.UNSIGNED_BYTE);
+            switch (action) {
+                case 0, 3 -> {
+                    // Arm swings
+                    wrapper.setPacketType(ClientboundPackets26_3.SWING_ANIMATION);
+                    wrapper.write(Types.VAR_INT, action == 0 ? MAIN_HAND : OFF_HAND);
+                    wrapper.write(SwingAnimation.TYPE, DEFAULT_SWING_ANIMATION);
+                }
+                case 2 -> wrapper.write(Types.UNSIGNED_BYTE, (short) 0); // Wake up
+                case 4 -> wrapper.write(Types.UNSIGNED_BYTE, (short) 1); // Crit
+                case 5 -> wrapper.write(Types.UNSIGNED_BYTE, (short) 2); // Magic crit
+                default -> wrapper.cancel();
+            }
+        });
+
+        protocol.registerServerbound(ServerboundPackets26_3.SPECTATOR_ACTION, ServerboundPackets26_1.SPECTATE_ENTITY);
+    }
+
+    private void handleGamemodes(final PacketWrapper wrapper) {
+        final byte gamemode = wrapper.read(Types.BYTE);
+        wrapper.write(Types.VAR_INT, (int) gamemode);
+
+        final byte previousGamemode = wrapper.read(Types.BYTE);
+        wrapper.write(Types.OPTIONAL_VAR_INT, previousGamemode == -1 ? null : (int) previousGamemode);
+    }
+
+    @Override
+    protected void registerRewrites() {
+        final EntityDataTypes26_3 entityDataTypes = protocol.mappedTypes().entityDataTypes();
+        dataTypeMapper().register();
+        registerEntityDataTypeHandler(
+            entityDataTypes.itemType,
+            entityDataTypes.blockStateType,
+            entityDataTypes.optionalBlockStateType,
+            entityDataTypes.particleType,
+            entityDataTypes.particlesType,
+            entityDataTypes.componentType,
+            entityDataTypes.optionalComponentType
+        );
+    }
+
+    @Override
+    public EntityType typeFromId(final int type) {
+        return EntityTypes26_3.getTypeFromId(type);
+    }
+}

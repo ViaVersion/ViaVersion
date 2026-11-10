@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ public enum ServerboundPackets1_20_5 implements ServerboundPacket1_20_5 {
     CONTAINER_SLOT_STATE_CHANGED, // 0x10
     COOKIE_RESPONSE, // 0x11
     CUSTOM_PAYLOAD, // 0x12
-    DEBUG_SAMPLE_SUBSCRIPTION, // 0x13
+    DEBUG_SUBSCRIPTION_REQUEST, // 0x13
     EDIT_BOOK, // 0x14
     ENTITY_TAG_QUERY, // 0x15
     INTERACT, // 0x16

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,23 +34,31 @@ import java.util.zip.Inflater;
 
 public class CompressionProvider implements Provider {
     public void handlePlayCompression(UserConnection user, int threshold) {
-        if (!user.isClientSide()) throw new IllegalStateException("PLAY state Compression packet is unsupported");
+        if (!user.isClientSide()) {
+            throw new IllegalStateException("PLAY state Compression packet is unsupported");
+        }
 
         ChannelPipeline pipe = user.getChannel().pipeline();
-
         if (threshold < 0) {
-            if (pipe.get("compress") != null) {
-                pipe.remove("compress");
-                pipe.remove("decompress");
-            }
-        } else {
-            if (pipe.get("compress") == null) {
-                pipe.addBefore(Via.getManager().getInjector().getEncoderName(), "compress", getEncoder(threshold));
-                pipe.addBefore(Via.getManager().getInjector().getDecoderName(), "decompress", getDecoder(threshold));
-            } else {
-                ((CompressionHandler) pipe.get("compress")).setCompressionThreshold(threshold);
-                ((CompressionHandler) pipe.get("decompress")).setCompressionThreshold(threshold);
-            }
+            removeHandlers(pipe);
+            return;
+        }
+
+        if (pipe.get(getCompressName()) instanceof CompressionHandler compressionHandler) {
+            compressionHandler.setCompressionThreshold(threshold);
+            ((CompressionHandler) pipe.get(getDecompressName())).setCompressionThreshold(threshold);
+            return;
+        }
+
+        removeHandlers(pipe);
+        pipe.addBefore(Via.getManager().getInjector().getEncoderName(), getCompressName(), getEncoder(threshold));
+        pipe.addBefore(Via.getManager().getInjector().getDecoderName(), getDecompressName(), getDecoder(threshold));
+    }
+
+    private void removeHandlers(ChannelPipeline pipeline) {
+        if (pipeline.get(getCompressName()) != null) {
+            pipeline.remove(getCompressName());
+            pipeline.remove(getDecompressName());
         }
     }
 
@@ -62,12 +70,20 @@ public class CompressionProvider implements Provider {
         return new Decompressor(threshold);
     }
 
+    protected String getCompressName() {
+        return "compress";
+    }
+
+    protected String getDecompressName() {
+        return "decompress";
+    }
+
     public interface CompressionHandler extends ChannelHandler {
         void setCompressionThreshold(int threshold);
     }
 
     private static class Decompressor extends MessageToMessageDecoder<ByteBuf> implements CompressionHandler {
-        // https://github.com/Gerrygames/ClientViaVersion/blob/master/src/main/java/de/gerrygames/the5zig/clientviaversion/netty/CompressionEncoder.java
+
         private final Inflater inflater;
         private int threshold;
 
@@ -118,7 +134,7 @@ public class CompressionProvider implements Provider {
     }
 
     private static class Compressor extends MessageToByteEncoder<ByteBuf> implements CompressionHandler {
-        // https://github.com/Gerrygames/ClientViaVersion/blob/master/src/main/java/de/gerrygames/the5zig/clientviaversion/netty/CompressionEncoder.java
+
         private final Deflater deflater;
         private int threshold;
 

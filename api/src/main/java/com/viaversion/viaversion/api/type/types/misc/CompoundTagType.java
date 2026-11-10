@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types.misc;
 
+import com.viaversion.nbt.limiter.TagLimiter;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
@@ -41,14 +42,21 @@ import java.util.Map;
  */
 public class CompoundTagType extends Type<CompoundTag> {
 
+    private final int maxBytes;
+
     public CompoundTagType() {
+        this(true);
+    }
+
+    public CompoundTagType(final boolean limitMaxBytes) {
         super(CompoundTag.class);
+        this.maxBytes = limitMaxBytes ? TagLimiter.DEFAULT_MAX_BYTES : Integer.MAX_VALUE;
     }
 
     @Override
     public CompoundTag read(final ByteBuf buffer) {
         try {
-            return NamedCompoundTagType.read(buffer, false);
+            return NamedCompoundTagType.read(buffer, this.maxBytes, false);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -74,8 +82,16 @@ public class CompoundTagType extends Type<CompoundTag> {
 
     public static final class OptionalCompoundTagType extends OptionalType<CompoundTag> {
 
-        public OptionalCompoundTagType() {
-            super(Types.COMPOUND_TAG);
+        private OptionalCompoundTagType(final Type<CompoundTag> tagType) {
+            super(tagType);
+        }
+
+        public static OptionalCompoundTagType type() {
+            return new OptionalCompoundTagType(Types.COMPOUND_TAG);
+        }
+
+        public static OptionalCompoundTagType trustedType() {
+            return new OptionalCompoundTagType(Types.TRUSTED_COMPOUND_TAG);
         }
     }
 }

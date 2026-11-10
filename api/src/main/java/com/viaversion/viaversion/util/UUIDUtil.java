@@ -1,0 +1,80 @@
+/*
+ * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
+ * Copyright (C) 2016-2026 ViaVersion and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package com.viaversion.viaversion.util;
+
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+public final class UUIDUtil {
+
+    public static UUID fromIntArray(final int[] parts) {
+        if (parts.length != 4) {
+            return new UUID(0, 0);
+        }
+        return new UUID((long) parts[0] << 32 | (parts[1] & 0xFFFFFFFFL), (long) parts[2] << 32 | (parts[3] & 0xFFFFFFFFL));
+    }
+
+    public static int[] toIntArray(final UUID uuid) {
+        return toIntArray(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
+    }
+
+    public static int[] toIntArray(final long msb, final long lsb) {
+        return new int[]{(int) (msb >> 32), (int) msb, (int) (lsb >> 32), (int) lsb};
+    }
+
+    public static @Nullable UUID parseUUID(final String uuidString) {
+        // Check the format beforehand instead of catching the exception, exceptions are expensive
+        if (uuidString.length() != 36) {
+            return null;
+        }
+
+        for (int i = 0; i < 36; i++) {
+            final char c = uuidString.charAt(i);
+            if (i == 8 || i == 13 || i == 18 || i == 23) {
+                if (c != '-') {
+                    return null;
+                }
+            } else if ((c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F')) {
+                return null;
+            }
+        }
+        return UUID.fromString(uuidString);
+    }
+
+    /**
+     * Returns a random UUID, similar to {@link UUID#randomUUID()}, but without using {@link java.security.SecureRandom} and its synchronization.
+     * <p>
+     * Should not be used where a UUID should be unpredictable.
+     *
+     * @return random UUID
+     */
+    public static UUID randomUUID() {
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
+        long most = random.nextLong();
+        long least = random.nextLong();
+        most = (most & 0xffffffffffff0fffL) | 0x0000000000004000L; // version 4
+        least = (least & 0x3fffffffffffffffL) | 0x8000000000000000L; // IETF variant
+        return new UUID(most, least);
+    }
+}

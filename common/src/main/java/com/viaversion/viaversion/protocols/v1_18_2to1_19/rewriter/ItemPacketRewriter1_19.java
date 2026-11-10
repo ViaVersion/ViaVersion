@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,11 +26,15 @@ import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.Protocol1_18_2To1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.packet.ServerboundPackets1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.provider.AckSequenceProvider;
+import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.LoomStorage;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import com.viaversion.viaversion.util.Key;
 
 public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPackets1_18, ServerboundPackets1_19, Protocol1_18_2To1_19> {
+
+    private static final int LOOM_MENU_TYPE_ID = 17;
+    private static final int LOOM_SELECTABLE_PATTERNS = 34;
 
     public ItemPacketRewriter1_19(Protocol1_18_2To1_19 protocol) {
         super(protocol, Types.ITEM1_13_2, Types.ITEM1_13_2_ARRAY);
@@ -38,12 +42,7 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
 
     @Override
     public void registerPackets() {
-        registerCooldown(ClientboundPackets1_18.COOLDOWN);
-        registerSetContent1_17_1(ClientboundPackets1_18.CONTAINER_SET_CONTENT);
-        registerSetSlot1_17_1(ClientboundPackets1_18.CONTAINER_SET_SLOT);
-        registerAdvancements(ClientboundPackets1_18.UPDATE_ADVANCEMENTS);
-        registerSetEquipment(ClientboundPackets1_18.SET_EQUIPMENT);
-        protocol.registerClientbound(ClientboundPackets1_18.LEVEL_PARTICLES, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_18.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.INT, Types.VAR_INT); // 0 - Particle ID
@@ -73,12 +72,7 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
             }
         });
 
-        registerContainerClick1_17_1(ServerboundPackets1_19.CONTAINER_CLICK);
-        registerSetCreativeModeSlot(ServerboundPackets1_19.SET_CREATIVE_MODE_SLOT);
-
-        registerContainerSetData(ClientboundPackets1_18.CONTAINER_SET_DATA);
-
-        protocol.registerClientbound(ClientboundPackets1_18.MERCHANT_OFFERS, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_18.MERCHANT_OFFERS, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // Container id
@@ -137,12 +131,53 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
             }
         });
 
+        // The loom's selected pattern changed from the raw pattern id to an index of selectable pattern tags
+        protocol.registerClientbound(ClientboundPackets1_18.CONTAINER_CLOSE, wrapper -> wrapper.user().get(LoomStorage.class).reset());
+        protocol.registerServerbound(ServerboundPackets1_19.CONTAINER_CLOSE, wrapper -> wrapper.user().get(LoomStorage.class).reset());
+        protocol.registerServerbound(ServerboundPackets1_19.CONTAINER_BUTTON_CLICK, wrapper -> {
+            final byte containerId = wrapper.passthrough(Types.BYTE);
+            if (containerId != -1 && containerId == wrapper.user().get(LoomStorage.class).containerId()) {
+                final byte patternIndex = wrapper.read(Types.BYTE);
+                wrapper.write(Types.BYTE, (byte) (patternIndex + 1));
+            }
+        });
+        protocol.registerClientbound(ClientboundPackets1_18.OPEN_SCREEN, wrapper -> {
+            final int containerId = wrapper.passthrough(Types.VAR_INT);
+            final int menuTypeId = wrapper.passthrough(Types.VAR_INT);
+            wrapper.user().get(LoomStorage.class).setContainerId(menuTypeId == LOOM_MENU_TYPE_ID ? containerId : -1);
+        });
+        protocol.appendClientbound(ClientboundPackets1_18.CONTAINER_SET_DATA, wrapper -> {
+            wrapper.resetReader();
+            final short containerId = wrapper.passthrough(Types.UNSIGNED_BYTE);
+            if (containerId == -1 || containerId != wrapper.user().get(LoomStorage.class).containerId()) {
+                return;
+            }
+
+            final short property = wrapper.passthrough(Types.SHORT);
+            if (property == 0) { // Selected pattern
+                final short patternId = wrapper.read(Types.SHORT);
+                final short patternIndex;
+                if (patternId == 0) {
+                    patternIndex = -1; // No pattern selected
+                } else if (patternId <= LOOM_SELECTABLE_PATTERNS) {
+                    patternIndex = (short) (patternId - 1); // Index into the no_item_required tag
+                } else {
+                    patternIndex = 0; // Only entry of its pattern_item tag
+                }
+                wrapper.write(Types.SHORT, patternIndex);
+            }
+        });
+
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_18.UPDATE_RECIPES);
     }
 
     private PacketHandler sequenceHandler() {
         return wrapper -> {
             final int sequence = wrapper.read(Types.VAR_INT);
+            if (sequence < 0) {
+                throw new IllegalArgumentException("Expected packet sequence nr >= 0");
+            }
+
             final AckSequenceProvider provider = Via.getManager().getProviders().get(AckSequenceProvider.class);
             provider.handleSequence(wrapper.user(), sequence);
         };

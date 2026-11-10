@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ public enum ClientboundPackets1_21_9 implements ClientboundPacket1_21_9 {
     EXPLODE, // 0x24
     FORGET_LEVEL_CHUNK, // 0x25
     GAME_EVENT, // 0x26
-    GAME_EVENT_TEST_HIGHLIGHT_POS, // 0x27
+    GAME_TEST_HIGHLIGHT_POS, // 0x27
     HORSE_SCREEN_OPEN, // 0x28
     HURT_ANIMATION, // 0x29
     INITIALIZE_BORDER, // 0x2A

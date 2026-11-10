@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ import java.util.List;
 /**
  * Initial base protocol which is kept always in the pipeline.
  * <p>
- * State tracking for configuration state is done via {@link AbstractProtocol#registerConfigurationChangeHandlers()}
+ * State tracking for configuration state is done via shared registrations.
  */
 public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseClientboundPacket, BaseServerboundPacket, BaseServerboundPacket> {
 
@@ -154,6 +154,9 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
                 info.setState(State.STATUS);
             } else if (state == LOGIN_INTENT || state == TRANSFER_INTENT) {
                 info.setState(State.LOGIN);
+            } else {
+                // Unknown intent, don't handle further packets as handshakes
+                wrapper.user().setActive(false);
             }
         });
     }

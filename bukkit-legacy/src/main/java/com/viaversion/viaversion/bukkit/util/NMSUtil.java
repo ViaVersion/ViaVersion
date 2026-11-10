@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,6 +47,20 @@ public final class NMSUtil {
         } catch (ClassNotFoundException ignored) {
             return Class.forName(fallbackFullClassName);
         }
+    }
+
+    public static Class<?> nms(String className, String... fallbackFullClassNames) throws ClassNotFoundException {
+        try {
+            return Class.forName(NMS + "." + className);
+        } catch (ClassNotFoundException ignored) {
+        }
+        for (final String fallbackFullClassName : fallbackFullClassNames) {
+            try {
+                return Class.forName(fallbackFullClassName);
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+        throw new ClassNotFoundException(className);
     }
 
     public static Class<?> obc(String className) throws ClassNotFoundException {

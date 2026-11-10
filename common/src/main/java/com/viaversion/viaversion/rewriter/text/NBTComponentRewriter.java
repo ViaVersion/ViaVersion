@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,10 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.rewriter.RegistryDataRewriter;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Rewrites nbt serialized components from 1.21.5 upwards. Can also handle json components outside of hover events.
@@ -36,6 +39,16 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
 
     public NBTComponentRewriter(final Protocol<C, ?, ?, ?> protocol) {
         super(protocol, ReadType.NBT);
+    }
+
+    @Override
+    protected void processCompoundTag(final UserConnection connection, final CompoundTag tag) {
+        super.processCompoundTag(connection, tag);
+
+        final CompoundTag clickEvent = tag.getCompoundTag("click_event");
+        if (clickEvent != null) {
+            handleClickEvent(connection, clickEvent);
+        }
     }
 
     @Override
@@ -67,12 +80,32 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
         }
     }
 
-    @Override
-    protected void handleNestedComponent(final UserConnection connection, final CompoundTag parent, final String key) {
-        final Tag tag = parent.get(key);
-        if (tag != null) {
-            processTag(connection, tag);
+    protected void handleClickEvent(final UserConnection connection, final CompoundTag clickEventTag) {
+        // To override if needed (don't forget to call super)
+        final StringTag actionTag = clickEventTag.getStringTag("action");
+        if (actionTag == null) {
+            return;
         }
+
+        final String action = actionTag.getValue();
+        if (!action.equals("show_dialog")) {
+            return;
+        }
+
+        final CompoundTag dialogTag = clickEventTag.getCompoundTag("dialog");
+        if (dialogTag == null) {
+            return;
+        }
+
+        final RegistryDataRewriter registryRewriter = protocol.getRegistryDataRewriter();
+        if (registryRewriter != null) {
+            registryRewriter.updateDialog(connection, dialogTag);
+        }
+    }
+
+    @Override
+    protected void handleNestedComponent(final UserConnection connection, @Nullable final Tag tag) {
+        processTag(connection, tag);
     }
 
     @Override
@@ -81,6 +114,14 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
     }
 
     public void registerPlayerChat1_21_5(final C packetType) {
+        registerPlayerChat(packetType, Types.LONG_ARRAY_PRIMITIVE);
+    }
+
+    public void registerPlayerChat26_3(final C packetType) {
+        registerPlayerChat(packetType, Types.BIT_SET);
+    }
+
+    private void registerPlayerChat(final C packetType, final Type<?> maskType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Index
             wrapper.passthrough(Types.UUID); // Sender
@@ -98,16 +139,16 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
                 }
             }
 
-            processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
+            processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Unsigned content
 
             final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
             if (filterMaskType == 2) { // Partially filtered
-                wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE); // Mask
+                wrapper.passthrough(maskType); // Mask
             }
 
             wrapper.passthrough(ChatType.TYPE); // Chat Type
-            processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Name
-            processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Target Name
+            processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_TAG)); // Name
+            processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Target Name
         });
     }
 }

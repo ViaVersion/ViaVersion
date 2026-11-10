@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Represents an animal variant (e.g. for cows, pigs, chickens).
  *
  * @param modelType model type id
- * @param texture texture path
- * @param biomes biomes this variant can spawn in, if limited to specific biomes
+ * @param texture   texture path
+ * @param biomes    biomes this variant can spawn in, if limited to specific biomes
  */
 public record AnimalVariant(int modelType, String texture, @Nullable HolderSet biomes) {
 

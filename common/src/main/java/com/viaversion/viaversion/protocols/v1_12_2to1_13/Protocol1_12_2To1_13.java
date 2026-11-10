@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.ConnectionData;
@@ -62,10 +61,10 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.ItemPacketRewr
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.WorldPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockConnectionStorage;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.ProtocolStorables1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.TabCompleteTracker;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ServerboundPackets1_12_1;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.GsonUtil;
@@ -181,10 +180,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
         WorldPacketRewriter1_13.register(this);
 
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper -> {
-            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
-        });
-
         registerClientbound(State.STATUS, ClientboundStatusPackets.STATUS_RESPONSE, new PacketHandlers() {
             @Override
             public void register() {
@@ -253,13 +248,11 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         });
 
 
-        componentRewriter.registerBossEvent(ClientboundPackets1_12_1.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.CHAT);
-
         registerClientbound(ClientboundPackets1_12_1.COMMAND_SUGGESTIONS, wrapper -> {
-            wrapper.write(Types.VAR_INT, wrapper.user().get(TabCompleteTracker.class).getTransactionId());
+            final ProtocolStorables1_13 storables = wrapper.user().storables(this);
+            wrapper.write(Types.VAR_INT, storables.tabCompleteTracker().getTransactionId());
 
-            String input = wrapper.user().get(TabCompleteTracker.class).getInput();
+            String input = storables.tabCompleteTracker().getInput();
             // Start & End
             int index;
             int length;
@@ -329,8 +322,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.DISCONNECT);
-
         registerClientbound(ClientboundPackets1_12_1.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
@@ -358,8 +349,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                 handler(wrapper -> wrapper.write(Types.STRING, "viaversion:legacy/" + wrapper.read(Types.VAR_INT)));
             }
         });
-
-        componentRewriter.registerPlayerCombat(ClientboundPackets1_12_1.PLAYER_COMBAT);
 
         registerClientbound(ClientboundPackets1_12_1.MAP_ITEM_DATA, new PacketHandlers() {
             @Override
@@ -510,17 +499,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        componentRewriter.registerTitle(ClientboundPackets1_12_1.SET_TITLES);
-
-        // New 0x4C - Stop Sound
-
-        new SoundRewriter<>(this).registerSound(ClientboundPackets1_12_1.SOUND);
-
-        registerClientbound(ClientboundPackets1_12_1.TAB_LIST, wrapper -> {
-            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
-            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
-        });
-
         registerClientbound(ClientboundPackets1_12_1.UPDATE_ADVANCEMENTS, wrapper -> {
             wrapper.passthrough(Types.BOOLEAN); // Reset/clear
             int size = wrapper.passthrough(Types.VAR_INT); // Mapping size
@@ -573,13 +551,15 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     }
                     int tid = wrapper.read(Types.VAR_INT);
                     // Save transaction id
-                    wrapper.user().get(TabCompleteTracker.class).setTransactionId(tid);
+                    final ProtocolStorables1_13 storables = wrapper.user().storables(Protocol1_12_2To1_13.this);
+                    storables.tabCompleteTracker().setTransactionId(tid);
                 });
                 // Prepend /
                 map(Types.STRING, new ValueTransformer<>(Types.STRING) {
                     @Override
                     public String transform(PacketWrapper wrapper, String inputValue) {
-                        wrapper.user().get(TabCompleteTracker.class).setInput(inputValue);
+                        final ProtocolStorables1_13 storables = wrapper.user().storables(Protocol1_12_2To1_13.this);
+                        storables.tabCompleteTracker().setInput(inputValue);
                         return "/" + inputValue;
                     }
                 });
@@ -589,7 +569,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     final BlockPosition playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(wrapper.user());
                     wrapper.write(Types.OPTIONAL_POSITION1_8, playerLookTarget);
                     if (!wrapper.isCancelled() && Via.getConfig().get1_13TabCompleteDelay() > 0) {
-                        TabCompleteTracker tracker = wrapper.user().get(TabCompleteTracker.class);
+                        final ProtocolStorables1_13 storables = wrapper.user().storables(Protocol1_12_2To1_13.this);
+                        final TabCompleteTracker tracker = storables.tabCompleteTracker();
                         wrapper.cancel();
                         tracker.setTimeToSend(System.currentTimeMillis() + Via.getConfig().get1_13TabCompleteDelay() * 50L);
                         tracker.setLastTabComplete(wrapper.get(Types.STRING, 0));
@@ -701,7 +682,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
                     String stringMode = mode == 0 ? "SEQUENCE"
                         : mode == 1 ? "AUTO"
-                        : "REDSTONE";
+                          : "REDSTONE";
 
                     wrapper.write(Types.BOOLEAN, (flags & 0x1) != 0); // Track output
                     wrapper.write(Types.STRING, stringMode);
@@ -742,8 +723,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     public String transform(PacketWrapper wrapper, Integer mode) {
                         return mode == 0 ? "SAVE"
                             : mode == 1 ? "LOAD"
-                            : mode == 2 ? "CORNER"
-                            : "DATA";
+                              : mode == 2 ? "CORNER"
+                                : "DATA";
                     }
                 });
                 map(Types.STRING); // Name
@@ -758,7 +739,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     public String transform(PacketWrapper wrapper, Integer mirror) {
                         return mirror == 0 ? "NONE"
                             : mirror == 1 ? "LEFT_RIGHT"
-                            : "FRONT_BACK";
+                              : "FRONT_BACK";
                     }
                 });
                 map(Types.VAR_INT, new ValueTransformer<>(Types.STRING) { // Rotation
@@ -766,8 +747,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     public String transform(PacketWrapper wrapper, Integer rotation) {
                         return rotation == 0 ? "NONE"
                             : rotation == 1 ? "CLOCKWISE_90"
-                            : rotation == 2 ? "CLOCKWISE_180"
-                            : "COUNTERCLOCKWISE_90";
+                              : rotation == 2 ? "CLOCKWISE_180"
+                                : "COUNTERCLOCKWISE_90";
                     }
                 });
                 map(Types.STRING);
@@ -868,21 +849,28 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, EntityTypes1_13.EntityType.PLAYER));
-        userConnection.addClientWorld(this.getClass(), new ClientWorld());
-
-        userConnection.put(new TabCompleteTracker());
-        userConnection.put(new BlockStorage());
+        addEntityTracker(userConnection, new EntityTrackerBase(userConnection, EntityTypes1_13.EntityType.PLAYER));
+        final ProtocolStorables1_13 storables = userConnection.storables(this);
+        storables.setClientWorld(new ClientWorld());
+        userConnection.put(storables.tabCompleteTracker());
+        userConnection.put(storables.blockStorage());
         if (Via.getConfig().isServersideBlockConnections()) {
             if (Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider) {
-                userConnection.put(new BlockConnectionStorage());
+                final BlockConnectionStorage blockConnectionStorage = new BlockConnectionStorage();
+                storables.setBlockConnectionStorage(blockConnectionStorage);
+                userConnection.put(blockConnectionStorage);
             }
         }
     }
 
     @Override
+    public ProtocolStorables1_13 createStorables() {
+        return new ProtocolStorables1_13();
+    }
+
+    @Override
     public void register(ViaProviders providers) {
-        providers.register(BlockEntityProvider.class, new BlockEntityProvider());
+        providers.register(BlockEntityProvider.class, new BlockEntityProvider(this));
         providers.register(PaintingProvider.class, new PaintingProvider());
         providers.register(PlayerLookTargetProvider.class, new PlayerLookTargetProvider());
     }

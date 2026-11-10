@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ public interface EitherHolder<T> {
     /**
      * Returns an indirect holder via the resource key.
      *
-     * @param key  the resource key
+     * @param key the resource key
      * @param <T> the type of the value
      * @return a new holder with the given resource key
      */

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,8 +33,8 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimMaterial1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.AttributeModifier;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
@@ -267,7 +267,8 @@ public final class StructuredDataConverter {
 
             final CompoundTag propertiesTag = new CompoundTag();
             for (final GameProfile.Property property : data.properties()) {
-                final ListTag<CompoundTag> values = new ListTag<>(CompoundTag.class);
+                ListTag<CompoundTag> values = propertiesTag.getListTag(property.name(), CompoundTag.class);
+                if (values == null) values = new ListTag<>(CompoundTag.class);
                 final CompoundTag propertyTag = new CompoundTag();
                 propertyTag.putString("Value", property.value());
                 if (property.signature() != null) {
@@ -320,7 +321,7 @@ public final class StructuredDataConverter {
         });
         register(StructuredDataKey.LOCK1_20_5, (data, tag) -> getBlockEntityTag(tag).put("Lock", data));
         register(StructuredDataKey.NOTE_BLOCK_SOUND, (data, tag) -> getBlockEntityTag(tag, "player_head").putString("note_block_sound", data.original()));
-        register(StructuredDataKey.POT_DECORATIONS, (data, tag) -> {
+        register(StructuredDataKey.POT_DECORATIONS1_20_5, (data, tag) -> {
             IntArrayTag originalSherds = null;
 
             final ListTag<StringTag> sherds = new ListTag<>(StringTag.class);
@@ -425,7 +426,9 @@ public final class StructuredDataConverter {
 
                 customPotionEffectsTag.add(effectTag);
             }
-            tag.put("custom_potion_effects", customPotionEffectsTag);
+            if (!customPotionEffectsTag.isEmpty()) {
+                tag.put("custom_potion_effects", customPotionEffectsTag);
+            }
         });
         register(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, (data, tag) -> {
             final ListTag<CompoundTag> effectsTag = new ListTag<>(CompoundTag.class);
@@ -507,7 +510,7 @@ public final class StructuredDataConverter {
             final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
             if (data.material().isDirect()) {
                 final CompoundTag materialTag = new CompoundTag();
-                final ArmorTrimMaterial material = data.material().value();
+                final ArmorTrimMaterial1_20_5 material = data.material().value();
                 materialTag.putString("asset_name", material.assetName());
 
                 final String ingredientName = toMappedItemName(material.itemId());
@@ -548,10 +551,22 @@ public final class StructuredDataConverter {
             } else {
                 final String oldKey = trimStorage.trimPatterns().idToKey(data.pattern().id());
                 if (oldKey != null) {
-                    trimTag.putString("pattern", oldKey);
+                    if (!"flow".equals(oldKey) && !"bolt".equals(oldKey)) {
+                        trimTag.putString("pattern", oldKey);
+                    } else if (backupInconvertibleData) {
+                        final CompoundTag backupTrim = trimTag.copy();
+                        if (!data.material().isDirect()) {
+                            backupTrim.putInt("material", data.material().id());
+                        }
+                        backupTrim.putInt("pattern", data.pattern().id());
+                        backupTrim.putBoolean("show_in_tooltip", data.showInTooltip());
+                        getBackupTag(tag).put("trim", backupTrim);
+                    }
                 }
             }
-            tag.put("Trim", trimTag);
+            if (trimTag.contains("material") && trimTag.contains("pattern")) {
+                tag.put("Trim", trimTag);
+            }
             if (!data.showInTooltip()) {
                 putHideFlag(tag, HIDE_ARMOR_TRIM);
             }
@@ -652,6 +667,10 @@ public final class StructuredDataConverter {
             if (backupInconvertibleData) {
                 getBackupTag(tag).putInt("ominous_bottle_amplifier", data);
             }
+        });
+        register(StructuredDataKey.MAP_POST_PROCESSING, (data, tag) -> {
+        });
+        register(StructuredDataKey.CREATIVE_SLOT_LOCK, (data, tag) -> {
         });
     }
 

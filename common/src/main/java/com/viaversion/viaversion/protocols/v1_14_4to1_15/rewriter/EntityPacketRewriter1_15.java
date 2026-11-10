@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,9 +40,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
 
     @Override
     protected void registerPackets() {
-        registerTrackerWithData(ClientboundPackets1_14_4.ADD_ENTITY, EntityTypes1_15.FALLING_BLOCK);
-
-        protocol.registerClientbound(ClientboundPackets1_14_4.ADD_MOB, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_14_4.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // 0 - Entity ID
@@ -76,7 +74,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
 
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
-                    wrapper.user().getEntityTracker(Protocol1_14_4To1_15.class).addEntity(entityId, EntityTypes1_15.PLAYER);
+                    wrapper.user().getEntityTracker(protocol).addEntity(entityId, EntityTypes1_15.PLAYER);
 
                     sendEntityDataPacket(wrapper, entityId);
                 });
@@ -88,7 +86,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
             public void register() {
                 map(Types.INT);
                 handler(wrapper -> {
-                    final ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_14_4To1_15.class);
+                    final ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 0);
                     if (clientWorld.setEnvironment(dimensionId)) {
                         tracker(wrapper.user()).clearEntities();
@@ -115,7 +113,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
                 handler(wrapper -> wrapper.write(Types.BOOLEAN, !Via.getConfig().is1_15InstantRespawn())); // Show Death Screen
                 handler(wrapper -> {
                     final int dimension = wrapper.get(Types.INT, 1);
-                    final ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_14_4To1_15.class);
+                    final ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
 
                     clientWorld.setEnvironment(dimension);
                 });
@@ -123,7 +121,6 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
         });
 
         registerSetEntityData(ClientboundPackets1_14_4.SET_ENTITY_DATA, Types1_14.ENTITY_DATA_LIST);
-        registerRemoveEntities(ClientboundPackets1_14_4.REMOVE_ENTITIES);
     }
 
     @Override

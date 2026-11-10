@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -145,13 +145,13 @@ public enum EntityTypes1_14 implements EntityType {
     SHEEP(ABSTRACT_ANIMAL),
     TURTLE(ABSTRACT_ANIMAL),
     FOX(ABSTRACT_ANIMAL),
+    OCELOT(ABSTRACT_ANIMAL),
 
     COW(ABSTRACT_ANIMAL),
     MOOSHROOM(COW),
 
     TAMABLE_ANIMAL(ABSTRACT_ANIMAL, null),
     CAT(TAMABLE_ANIMAL),
-    OCELOT(TAMABLE_ANIMAL),
     WOLF(TAMABLE_ANIMAL),
     PARROT(TAMABLE_ANIMAL),
 

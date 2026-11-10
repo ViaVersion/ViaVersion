@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,15 +29,12 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.Protocol1_20_2To1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ServerboundPacket1_20_3;
-import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPacket1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.rewriter.RecipeRewriter1_20_2;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
@@ -54,24 +51,7 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
 
     @Override
     public void registerPackets() {
-        final BlockRewriter<ClientboundPacket1_20_2> blockRewriter = BlockRewriter.for1_20_2(protocol);
-        blockRewriter.registerBlockEvent(ClientboundPackets1_20_2.BLOCK_EVENT);
-        blockRewriter.registerBlockUpdate(ClientboundPackets1_20_2.BLOCK_UPDATE);
-        blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_20_2.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerLevelEvent(ClientboundPackets1_20_2.LEVEL_EVENT, 1010, 2001);
-        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_20_2.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
-        blockRewriter.registerBlockEntityData(ClientboundPackets1_20_2.BLOCK_ENTITY_DATA);
-
-        registerCooldown(ClientboundPackets1_20_2.COOLDOWN);
-        registerSetContent1_17_1(ClientboundPackets1_20_2.CONTAINER_SET_CONTENT);
-        registerSetSlot1_17_1(ClientboundPackets1_20_2.CONTAINER_SET_SLOT);
-        registerSetEquipment(ClientboundPackets1_20_2.SET_EQUIPMENT);
-        registerContainerClick1_17_1(ServerboundPackets1_20_3.CONTAINER_CLICK);
-        registerMerchantOffers1_19(ClientboundPackets1_20_2.MERCHANT_OFFERS);
-        registerSetCreativeModeSlot(ServerboundPackets1_20_3.SET_CREATIVE_MODE_SLOT);
-        registerContainerSetData(ClientboundPackets1_20_2.CONTAINER_SET_DATA);
-
-        protocol.registerClientbound(ClientboundPackets1_20_2.LEVEL_PARTICLES, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_20_2.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // 0 - Particle ID
@@ -157,7 +137,10 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
             final CompoundTag filteredPages = tag.getCompoundTag("filtered_pages");
             if (filteredPages != null) {
                 for (final String string : filteredPages.keySet()) {
-                    updatePageTag(filteredPages.getStringTag(string));
+                    final StringTag pageTag = filteredPages.getStringTag(string);
+                    if (pageTag != null) {
+                        updatePageTag(pageTag);
+                    }
                 }
             }
         }
@@ -169,7 +152,7 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
             final JsonElement updatedComponent = ComponentUtil.convertJson(pageTag.getValue(), SerializerVersion.V1_19_4, SerializerVersion.V1_20_3);
             pageTag.setValue(updatedComponent.toString());
         } catch (final Exception e) {
-            if (!Via.getConfig().isSuppressTextComponentConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 protocol.getLogger().log(Level.SEVERE, "Error during book conversion: " + StringUtil.forLogging(pageTag.getValue()), e);
             }
         }

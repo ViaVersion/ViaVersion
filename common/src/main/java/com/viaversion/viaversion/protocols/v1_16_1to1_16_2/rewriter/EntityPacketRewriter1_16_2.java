@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,11 +35,8 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
 
     @Override
     protected void registerPackets() {
-        registerTrackerWithData(ClientboundPackets1_16.ADD_ENTITY, EntityTypes1_16_2.FALLING_BLOCK);
-        registerTracker(ClientboundPackets1_16.ADD_MOB);
         registerTracker(ClientboundPackets1_16.ADD_PLAYER, EntityTypes1_16_2.PLAYER);
         registerSetEntityData(ClientboundPackets1_16.SET_ENTITY_DATA, Types1_16.ENTITY_DATA_LIST);
-        registerRemoveEntities(ClientboundPackets1_16.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_16.LOGIN, new PacketHandlers() {
             @Override
@@ -94,11 +91,6 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
                 data.setId(15);
             }
         });
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

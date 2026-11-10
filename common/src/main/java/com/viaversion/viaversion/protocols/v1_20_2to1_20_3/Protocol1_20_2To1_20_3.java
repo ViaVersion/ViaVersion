@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_2to1_20_3;
 
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
@@ -30,10 +31,11 @@ import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesP
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.CommandRewriter1_19_4;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPackets1_20_3;
@@ -41,15 +43,16 @@ import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.BlockItemPacketRewriter1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.EntityPacketRewriter1_20_3;
+import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.storage.ProtocolStorables1_20_3;
+import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.storage.ScoreboardStorage;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPacket1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPacket1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPackets1_20_2;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import java.nio.charset.StandardCharsets;
@@ -65,6 +68,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
     private final ParticleRewriter<ClientboundPacket1_20_2> particleRewriter = new ParticleRewriter<>(this);
     private final EntityPacketRewriter1_20_3 entityRewriter = new EntityPacketRewriter1_20_3(this);
     private final TagRewriter<ClientboundPacket1_20_2> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPacket1_20_2> blockRewriter = BlockRewriter.for1_20_2(this, ChunkType1_20_2::new);
 
     public Protocol1_20_2To1_20_3() {
         super(ClientboundPacket1_20_2.class, ClientboundPacket1_20_3.class, ServerboundPacket1_20_2.class, ServerboundPacket1_20_3.class);
@@ -75,16 +79,6 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
         super.registerPackets();
 
         cancelServerbound(ServerboundPackets1_20_3.CONTAINER_SLOT_STATE_CHANGED);
-
-        tagRewriter.registerGeneric(ClientboundPackets1_20_2.UPDATE_TAGS);
-        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
-
-        final SoundRewriter<ClientboundPacket1_20_2> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_2.SOUND);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_2.SOUND_ENTITY);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_20_2.AWARD_STATS);
-        new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_20_2.COMMANDS);
 
         registerClientbound(ClientboundPackets1_20_2.SET_SCORE, wrapper -> {
             wrapper.passthrough(Types.STRING); // Owner
@@ -102,21 +96,45 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
             wrapper.passthrough(Types.VAR_INT); // Score
 
             // Null display and number format
-            wrapper.write(Types.OPTIONAL_TAG, null);
+            wrapper.write(Types.TRUSTED_OPTIONAL_TAG, null);
             wrapper.write(Types.BOOLEAN, false);
         });
         registerClientbound(ClientboundPackets1_20_2.SET_OBJECTIVE, wrapper -> {
-            wrapper.passthrough(Types.STRING); // Objective Name
-            final byte action = wrapper.passthrough(Types.BYTE); // Method
+            final String objectiveName = wrapper.passthrough(Types.STRING);
+            final byte action = wrapper.passthrough(Types.BYTE);
             if (action == 0 || action == 2) {
-                convertComponent(wrapper); // Display Name
-                final int render = wrapper.passthrough(Types.VAR_INT); // Render type
-                if (render == 0 && Via.getConfig().hideScoreboardNumbers()) { // 0 = "integer", 1 = "hearts"
-                    wrapper.write(Types.BOOLEAN, true); // has number format
-                    wrapper.write(Types.VAR_INT, 0); // Blank format
-                } else {
-                    wrapper.write(Types.BOOLEAN, false); // has number format
+                if (!Via.getConfig().hideScoreboardNumbers()) {
+                    convertComponent(wrapper); // Display name
+                    wrapper.passthrough(Types.VAR_INT); // Render type
+                    wrapper.write(Types.BOOLEAN, false); // No number format
+                    return;
                 }
+
+                final Tag displayName = ComponentUtil.jsonToTag(wrapper.read(Types.COMPONENT));
+                wrapper.write(Types.TRUSTED_TAG, displayName);
+
+                final ScoreboardStorage scoreboard = wrapper.user().<ProtocolStorables1_20_3>storables(this).scoreboard();
+                final int render = wrapper.passthrough(Types.VAR_INT);
+                final boolean hideNumberFormat = shouldHideNumberFormat(scoreboard, objectiveName, render);
+                writeNumberFormat(wrapper, hideNumberFormat);
+                scoreboard.putObjective(objectiveName, displayName.copy(), render, hideNumberFormat);
+            } else if (action == 1 && Via.getConfig().hideScoreboardNumbers()) {
+                final ScoreboardStorage scoreboard = wrapper.user().<ProtocolStorables1_20_3>storables(this).scoreboard();
+                scoreboard.removeObjective(objectiveName);
+            }
+        });
+        registerClientbound(ClientboundPackets1_20_2.SET_DISPLAY_OBJECTIVE, wrapper -> {
+            if (!Via.getConfig().hideScoreboardNumbers()) {
+                return;
+            }
+
+            final int slot = wrapper.passthrough(Types.VAR_INT);
+            final String objectiveName = wrapper.passthrough(Types.STRING);
+            final ScoreboardStorage scoreboard = wrapper.user().<ProtocolStorables1_20_3>storables(this).scoreboard();
+            final String previousObjective = scoreboard.setDisplaySlot(slot, objectiveName);
+            updateNumberFormat(wrapper, scoreboard, previousObjective);
+            if (!objectiveName.equals(previousObjective)) {
+                updateNumberFormat(wrapper, scoreboard, objectiveName);
             }
         });
 
@@ -132,7 +150,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
         });
 
         // Components are now (mostly) written as nbt instead of json strings
-        registerClientbound(ClientboundPackets1_20_2.UPDATE_ADVANCEMENTS, wrapper -> {
+        replaceClientbound(ClientboundPackets1_20_2.UPDATE_ADVANCEMENTS, wrapper -> {
             wrapper.passthrough(Types.BOOLEAN); // Reset/clear
             final int size = wrapper.passthrough(Types.VAR_INT); // Mapping size
             for (int i = 0; i < size; i++) {
@@ -250,7 +268,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
             convertOptionalComponent(wrapper); // Target name
         });
         registerClientbound(ClientboundPackets1_20_2.SYSTEM_CHAT, this::convertComponent);
-        registerClientbound(ClientboundPackets1_20_2.OPEN_SCREEN, wrapper -> {
+        replaceClientbound(ClientboundPackets1_20_2.OPEN_SCREEN, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Container id
 
             final int containerTypeId = wrapper.read(Types.VAR_INT);
@@ -338,33 +356,64 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
     }
 
     private void convertComponent(final PacketWrapper wrapper) {
-        wrapper.write(Types.TAG, ComponentUtil.jsonToTag(wrapper.read(Types.COMPONENT)));
+        wrapper.write(Types.TRUSTED_TAG, ComponentUtil.jsonToTag(wrapper.read(Types.COMPONENT)));
     }
 
     private void convertOptionalComponent(final PacketWrapper wrapper) {
-        wrapper.write(Types.OPTIONAL_TAG, ComponentUtil.jsonToTag(wrapper.read(Types.OPTIONAL_COMPONENT)));
+        wrapper.write(Types.TRUSTED_OPTIONAL_TAG, ComponentUtil.jsonToTag(wrapper.read(Types.OPTIONAL_COMPONENT)));
+    }
+
+    private static boolean shouldHideNumberFormat(final ScoreboardStorage scoreboard, final String objectiveName, final int renderType) {
+        return renderType == 0 && scoreboard.isSidebar(objectiveName);
+    }
+
+    private static void writeNumberFormat(final PacketWrapper wrapper, final boolean hideNumberFormat) {
+        wrapper.write(Types.BOOLEAN, hideNumberFormat); // Has number format
+        if (hideNumberFormat) {
+            wrapper.write(Types.VAR_INT, 0); // Blank format
+        }
+    }
+
+    private static void updateNumberFormat(final PacketWrapper wrapper, final ScoreboardStorage scoreboard, final String objectiveName) {
+        if (objectiveName == null || objectiveName.isEmpty()) {
+            return;
+        }
+
+        final ScoreboardStorage.Objective objective = scoreboard.objective(objectiveName);
+        if (objective == null) {
+            return;
+        }
+
+        final boolean hideNumberFormat = shouldHideNumberFormat(scoreboard, objectiveName, objective.renderType());
+        if (hideNumberFormat == objective.numberFormatHidden()) {
+            return;
+        }
+
+        final PacketWrapper objectivePacket = wrapper.create(ClientboundPackets1_20_3.SET_OBJECTIVE);
+        objectivePacket.write(Types.STRING, objectiveName);
+        objectivePacket.write(Types.BYTE, (byte) 2); // Update objective
+        objectivePacket.write(Types.TRUSTED_TAG, objective.displayName().copy());
+        objectivePacket.write(Types.VAR_INT, objective.renderType());
+        writeNumberFormat(objectivePacket, hideNumberFormat);
+        objectivePacket.send(Protocol1_20_2To1_20_3.class);
+        scoreboard.setNumberFormatHidden(objectiveName, hideNumberFormat);
     }
 
     @Override
     protected void onMappingDataLoaded() {
         EntityTypes1_20_3.initialize(this);
-        Types1_20_3.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.item(Types.ITEM1_20_2))
-            .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
-            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK);
-
+        ParticleType.Fillers.fill1_20_3(this, Types1_20_3.PARTICLE);
         super.onMappingDataLoaded();
     }
 
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_3.PLAYER));
+    }
+
+    @Override
+    public ProtocolStorablesBase createStorables() {
+        return new ProtocolStorables1_20_3();
     }
 
     @Override
@@ -375,6 +424,11 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
     @Override
     public BlockItemPacketRewriter1_20_3 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPacket1_20_2> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

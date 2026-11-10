@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,10 +42,10 @@ public final class SynchronizedRegistryEitherType extends EitherType<Integer, St
     @Override
     public void write(final Ops ops, final Either<Integer, String> value) {
         if (value.isLeft()) {
-            final Key key = ops.context().registryAccess().registryKey(this.registryKey.key().toString(), value.left());
-            Types.RESOURCE_LOCATION.write(ops, key);
+            final Key key = ops.context().registryAccess().registryKey(this.registryKey.registry().toString(), value.left());
+            Types.IDENTIFIER.write(ops, key);
         } else {
-            Types.RESOURCE_LOCATION.write(ops, Key.of(value.right()));
+            Types.IDENTIFIER.write(ops, Key.of(value.right()));
         }
     }
 }

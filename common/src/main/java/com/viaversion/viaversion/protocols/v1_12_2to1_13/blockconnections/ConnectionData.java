@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 
-import com.viaversion.nbt.tag.ByteArrayTag;
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.IntArrayTag;
-import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
-import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -35,12 +31,15 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.BlockConnectionProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.PacketBlockConnectionProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.UserBlockData;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.BlockStates1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
+import com.viaversion.viaversion.api.data.IdRanges;
 import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -162,16 +161,14 @@ public final class ConnectionData {
     }
 
     public static void init() {
-        if (!Via.getConfig().isServersideBlockConnections()) {
+        final ProtocolVersion version = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
+        if (!Via.getConfig().isServersideBlockConnections() || (version.isKnown() && version.newerThan(ProtocolVersion.v1_12_2))) {
             return;
         }
 
         Via.getPlatform().getLogger().info("Loading block connection mappings ...");
-        ListTag<StringTag> blockStates = MappingDataLoader.INSTANCE.loadNBT("blockstates-1.13.nbt").getListTag("blockstates", StringTag.class);
-        for (int id = 0; id < blockStates.size(); id++) {
-            String key = blockStates.get(id).getValue();
-            KEY_TO_ID.put(key, id);
-        }
+        CompoundTag blockStatesData = MappingDataLoader.INSTANCE.loadNBT("blockstates-1.13.nbt");
+        BlockStates1_13.forEach(blockStatesData, KEY_TO_ID::put);
 
         connectionHandlerMap = new Int2ObjectOpenHashMap<>(3650);
 
@@ -179,41 +176,28 @@ public final class ConnectionData {
             blockConnectionData = new Int2ObjectOpenHashMap<>(2048);
 
             CompoundTag data = MappingDataLoader.INSTANCE.loadNBT("blockConnections.nbt");
-            ListTag<CompoundTag> blockConnectionMappings = data.getListTag("data", CompoundTag.class);
-            for (CompoundTag blockTag : blockConnectionMappings) {
+            for (CompoundTag profileTag : data.getListTag("profiles", CompoundTag.class)) {
                 BlockData blockData = new BlockData();
-                for (Entry<String, Tag> entry : blockTag.entrySet()) {
+                for (Entry<String, Tag> entry : profileTag.entrySet()) {
                     String key = entry.getKey();
-                    if (key.equals("id") || key.equals("ids")) {
+                    if (key.equals("ids")) {
                         continue;
                     }
 
-
+                    byte connections = ((NumberTag) entry.getValue()).asByte();
                     boolean[] attachingFaces = new boolean[4];
-                    ByteArrayTag connections = (ByteArrayTag) entry.getValue();
-                    for (byte blockFaceId : connections.getValue()) {
-                        attachingFaces[blockFaceId] = true;
+                    for (int i = 0; i < attachingFaces.length; i++) {
+                        attachingFaces[i] = (connections & (1 << i)) != 0;
                     }
 
                     int connectionTypeId = Integer.parseInt(key);
                     blockData.put(connectionTypeId, attachingFaces);
                 }
 
-                NumberTag idTag = blockTag.getNumberTag("id");
-                if (idTag != null) {
-                    blockConnectionData.put(idTag.asInt(), blockData);
-                } else {
-                    IntArrayTag idsTag = blockTag.getIntArrayTag("ids");
-                    for (int id : idsTag.getValue()) {
-                        blockConnectionData.put(id, blockData);
-                    }
-                }
+                IdRanges.forEachId(profileTag.getByteArrayTag("ids"), id -> blockConnectionData.put(id, blockData));
             }
 
-            IntArrayTag occludingStatesArray = data.getIntArrayTag("occluding-states");
-            for (final int blockStateId : occludingStatesArray.getValue()) {
-                OCCLUDING_STATES.add(blockStateId);
-            }
+            IdRanges.forEachId(data.getByteArrayTag("occluding-states"), OCCLUDING_STATES::add);
         }
 
         List<ConnectorInitAction> initActions = new ArrayList<>();

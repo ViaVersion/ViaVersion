@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -72,9 +72,9 @@ public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher
     public static final class BlockPredicateType1_21_5 extends Type<BlockPredicate> {
         private final Type<DataComponentMatchers> matchersType;
 
-        public BlockPredicateType1_21_5(final Type<StructuredData<?>[]> dataArrayType) {
+        public BlockPredicateType1_21_5(final Type<StructuredData<?>[]> dataArrayType, final Type<DataComponentPredicate[]> predicateArrayType) {
             super(BlockPredicate.class);
-            this.matchersType = new DataComponentMatchersType(dataArrayType);
+            this.matchersType = new DataComponentMatchersType(dataArrayType, predicateArrayType);
         }
 
         @Override

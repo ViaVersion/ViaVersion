@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,10 @@ package com.viaversion.viaversion.api.minecraft;
 
 import com.viaversion.viaversion.util.Key;
 
-record SimpleRegistryKey(Key key) implements RegistryKey {
+record SimpleRegistryKey(Key registry) implements RegistryKey {
 
     @Override
     public String toString() {
-        return key.toString();
+        return registry.toString();
     }
 }

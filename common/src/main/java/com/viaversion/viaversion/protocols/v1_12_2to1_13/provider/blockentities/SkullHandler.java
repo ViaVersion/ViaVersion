@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,14 +41,14 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
 
         int id = storage.get(position).getOriginal();
         if (id >= SKULL_WALL_START && id <= SKULL_END) {
+            NumberTag rot = tag.getNumberTag("Rot");
+            if (rot != null) {
+                id += rot.asInt() & 0xF;
+            }
+
             NumberTag skullType = tag.getNumberTag("SkullType");
             if (skullType != null) {
                 id += skullType.asInt() * 20;
-            }
-
-            NumberTag rot = tag.getNumberTag("Rot");
-            if (rot != null) {
-                id += rot.asInt();
             }
         } else {
             Protocol1_12_2To1_13.LOGGER.warning("Why does this block have the skull block entity? " + tag);

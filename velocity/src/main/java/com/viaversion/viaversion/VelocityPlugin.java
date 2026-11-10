@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package com.viaversion.viaversion;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -80,21 +81,10 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
 
     @Subscribe
     public void onProxyInit(ProxyInitializeEvent e) {
-        if (!hasConnectionEvent()) {
-            // No way to disable the plugin :(
-            Logger logger = this.loggerslf4j;
-            logger.error("      / \\");
-            logger.error("     /   \\");
-            logger.error("    /  |  \\");
-            logger.error("   /   |   \\        VELOCITY 3.0.0 IS REQUIRED");
-            logger.error("  /         \\   VIAVERSION WILL NOT WORK AS INTENDED");
-            logger.error(" /     o     \\");
-            logger.error("/_____________\\");
-        }
-
         PROXY = proxy;
         VelocityCommandHandler commandHandler = new VelocityCommandHandler();
-        PROXY.getCommandManager().register("viaver", commandHandler, "vvvelocity", "viaversion");
+        CommandManager commandManager = PROXY.getCommandManager();
+        commandManager.register(commandManager.metaBuilder("viaver").aliases("vvvelocity", "viaversion").plugin(this).build(), commandHandler);
         api = new VelocityViaAPI();
         logger = new LoggerWrapper(loggerslf4j);
         conf = new VelocityViaConfig(configDir.toFile(), logger);
@@ -106,6 +96,7 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
         conf.reload();
     }
 
+    @SuppressWarnings("deprecation")
     @Subscribe(order = PostOrder.LAST)
     public void onProxyLateInit(ProxyInitializeEvent e) {
         final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
@@ -128,11 +119,6 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     @Override
     public boolean isProxy() {
         return true;
-    }
-
-    @Override
-    public String getPluginVersion() {
-        return VersionInfo.VERSION;
     }
 
     @Override
@@ -181,8 +167,17 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     }
 
     @Override
+    public void sendCustomPayloadToClient(final UserConnection connection, final String channel, final byte[] message) {
+        final UUID uuid = connection.getProtocolInfo().getUuid();
+        PROXY.getPlayer(uuid).ifPresent(player -> player.sendPluginMessage(MinecraftChannelIdentifier.from(channel), message));
+    }
+
+    @Override
     public boolean kickPlayer(UserConnection connection, String message) {
         final UUID uuid = connection.getProtocolInfo().getUuid();
+        if (uuid == null) {
+            return false;
+        }
         return PROXY.getPlayer(uuid).map(it -> {
             it.disconnect(LegacyComponentSerializer.legacySection().deserialize(message));
             return true;
@@ -235,14 +230,5 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     @Override
     public ProtocolDetectorService protocolDetectorService() {
         return protocolDetectorService;
-    }
-
-    private boolean hasConnectionEvent() {
-        try {
-            Class.forName("com.velocitypowered.proxy.protocol.VelocityConnectionEvent");
-            return true;
-        } catch (ClassNotFoundException ignored) {
-            return false;
-        }
     }
 }

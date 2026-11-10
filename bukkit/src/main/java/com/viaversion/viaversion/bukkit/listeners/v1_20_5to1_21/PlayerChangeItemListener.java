@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.ProtocolStorables1_21;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -55,7 +56,12 @@ public class PlayerChangeItemListener extends ViaBukkitListener {
     }
 
     protected EfficiencyAttributeStorage getEfficiencyStorage(final UserConnection connection) {
-        return connection != null ? connection.get(EfficiencyAttributeStorage.class) : null;
+        if (connection == null || !connection.isActive()) {
+            return null;
+        }
+
+        final ProtocolStorables1_21 storables = connection.storables(Protocol1_20_5To1_21.class);
+        return storables.efficiencyAttributes();
     }
 
     void sendAttributeUpdate(final Player player, @Nullable final ItemStack item, final Slot slot) {

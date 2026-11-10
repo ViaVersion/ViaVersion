@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -81,10 +81,10 @@ public final class ResolvableProfileType extends Type<ResolvableProfile> {
         final String modelType = value.modelType() != null ? (value.modelType() == 0 ? "slim" : "wide") : null;
         ops.writeMap(map -> map
             .writeInlinedMap(Types.GAME_PROFILE, value.profile())
-            .writeOptional("texture", Types.RESOURCE_LOCATION, value.bodyTexture() != null ? Key.of(value.bodyTexture()) : null)
-            .writeOptional("cape", Types.RESOURCE_LOCATION, value.capeTexture() != null ? Key.of(value.capeTexture()) : null)
-            .writeOptional("elytra", Types.RESOURCE_LOCATION, value.elytraTexture() != null ? Key.of(value.elytraTexture()) : null)
+            .writeOptional("texture", Types.IDENTIFIER, value.bodyTexture() != null ? Key.of(value.bodyTexture()) : null)
+            .writeOptional("cape", Types.IDENTIFIER, value.capeTexture() != null ? Key.of(value.capeTexture()) : null)
+            .writeOptional("elytra", Types.IDENTIFIER, value.elytraTexture() != null ? Key.of(value.elytraTexture()) : null)
             .writeOptional("model", Types.OPTIONAL_STRING, modelType)
         );
     }
-};
+}

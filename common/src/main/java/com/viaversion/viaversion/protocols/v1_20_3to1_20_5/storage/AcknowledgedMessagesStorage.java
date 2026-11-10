@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
@@ -43,7 +42,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *     gap with dummy 'last seen', and it will never be checked.</li>
  * </ul>
  */
-public final class AcknowledgedMessagesStorage implements StorableObject {
+public final class AcknowledgedMessagesStorage {
     private static final int MAX_HISTORY = 20;
     private static final int MINIMUM_DELAYED_ACK_COUNT = MAX_HISTORY;
     private static final BitSet DUMMY_LAST_SEEN_MESSAGES = new BitSet();

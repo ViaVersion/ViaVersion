@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -126,6 +126,11 @@ public class ClientboundBaseProtocol1_7 extends AbstractProtocol<BaseClientbound
                     }
                 });
             }
+        });
+
+        registerClientbound(ClientboundLoginPackets.LOGIN_COMPRESSION, wrapper -> {
+            final int threshold = wrapper.passthrough(Types.VAR_INT);
+            wrapper.user().getProtocolInfo().setCompressionEnabled(threshold >= 0);
         });
 
         // Track player name/uuid and setup connection + track state

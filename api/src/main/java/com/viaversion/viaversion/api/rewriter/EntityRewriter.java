@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter<T> {
 
@@ -38,6 +39,8 @@ public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter
      * @return entity type
      */
     EntityType typeFromId(int type);
+
+    @Nullable EntityType typeFromId(String type);
 
     /**
      * Returns the entity type from the given id.
@@ -70,9 +73,9 @@ public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter
     /**
      * Handles and transforms entity data of an entity.
      *
-     * @param entityId     entity id
-     * @param dataList full, mutable list of entity data
-     * @param connection   user connection
+     * @param entityId   entity id
+     * @param dataList   full, mutable list of entity data
+     * @param connection user connection
      */
     void handleEntityData(int entityId, List<EntityData> dataList, UserConnection connection);
 
@@ -84,6 +87,6 @@ public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter
      * @return entity tracker
      */
     default <E extends EntityTracker> E tracker(UserConnection connection) {
-        return connection.getEntityTracker(protocol().getClass());
+        return connection.getEntityTracker(protocol());
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,11 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.FloatTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
+import com.viaversion.viaversion.api.minecraft.ResolvableProfile;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -42,9 +44,10 @@ import com.viaversion.viaversion.codec.CodecRegistryContext;
 import com.viaversion.viaversion.codec.hash.HashFunction;
 import com.viaversion.viaversion.codec.hash.HashOps;
 import com.viaversion.viaversion.common.PlatformTestBase;
+import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.protocols.v1_21_6to1_21_7.Protocol1_21_6To1_21_7;
-import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.util.KeyMappings;
+import com.viaversion.viaversion.util.UUIDUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,9 +61,11 @@ public class ItemHashTest extends PlatformTestBase {
 
     @BeforeAll
     static void loadContext() {
+        final UserConnectionImpl dummyConnection = new UserConnectionImpl(null);
         protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_21_6To1_21_7.class);
-        context = new CodecRegistryContext(null, CodecContext.RegistryAccess.of(protocol), false);
-        hasher = new HashOps(context, HashFunction.CRC32C);
+        protocol.init(dummyConnection);
+        context = new CodecRegistryContext(null, CodecContext.RegistryAccess.of(protocol, dummyConnection), false);
+        hasher = new HashOps(context, HashFunction.crc32c());
     }
 
     @BeforeEach
@@ -104,13 +109,13 @@ public class ItemHashTest extends PlatformTestBase {
 
     @Test
     void testMapInList2() {
-        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys.container.type(), new Item[]{new StructuredItem(1, 1)});
+        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys().container.type(), new Item[]{new StructuredItem(1, 1)});
         Assertions.assertEquals(231516551, hasher.hash(), "container hash mismatch");
     }
 
     @Test
     void testContainerWithEmptyItem() {
-        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys.container.type(), new Item[]{StructuredItem.empty(), new StructuredItem(1, 1)});
+        hasher.write(VersionedTypes.V1_21_6.structuredDataKeys().container.type(), new Item[]{StructuredItem.empty(), new StructuredItem(1, 1)});
         Assertions.assertEquals(1506540737, hasher.hash(), "container hash mismatch");
     }
 
@@ -129,9 +134,25 @@ public class ItemHashTest extends PlatformTestBase {
 
     @Test
     void testRegistryHolderId() {
-        ((RegistryDataRewriter) protocol.getRegistryDataRewriter()).registryKeyMappings().put("banner_pattern", new KeyMappings("base"));
+        protocol.getEntityRewriter().tracker(context.connection()).addRegistryKeys("banner_pattern", new KeyMappings("base"));
         hasher.write(BannerPatternLayer.ARRAY_TYPE, new BannerPatternLayer[]{new BannerPatternLayer(Holder.of(0), 0)});
         Assertions.assertEquals(606382024, hasher.hash(), "banner_pattern hash mismatch");
+    }
+
+    @Test
+    void testResolableProfile() {
+        final GameProfile profile = new GameProfile(
+            "",
+            UUIDUtil.fromIntArray(new int[]{431522009, 458574629, -1388245934, -172269387}),
+            new GameProfile.Property[]{
+                new GameProfile.Property(
+                    "textures",
+                    "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjk1OWFjMjg0ZGZhY2NhNWE4ZTZjMTc5NjA5ODI1ODc1YTc2OGFmMzI5MWM3N2U4YTY4YmQ5MDM0ZGEzZWM2NCJ9fX0="
+                )
+            }
+        );
+        hasher.write(Types.RESOLVABLE_PROFILE, new ResolvableProfile(profile));
+        Assertions.assertEquals(-1192115620, hasher.hash(), "Resolvable profile hash mismatch");
     }
 
     private CompoundTag createCompoundTag() {

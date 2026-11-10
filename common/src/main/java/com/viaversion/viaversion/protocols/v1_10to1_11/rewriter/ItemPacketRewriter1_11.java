@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,10 +67,7 @@ public class ItemPacketRewriter1_11 extends ItemRewriter<ClientboundPackets1_9_3
         if (enchTag != null && enchTag.isEmpty()) {
             tag.putBoolean(nbtTagName("clearEnch"), true);
 
-            CompoundTag dummyTag = new CompoundTag();
-            dummyTag.putShort("id", Short.MAX_VALUE);
-
-            enchTag.add(dummyTag);
+            enchTag.add(new CompoundTag());
         }
         return item;
     }

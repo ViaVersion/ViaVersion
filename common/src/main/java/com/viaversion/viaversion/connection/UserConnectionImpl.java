@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
  */
 package com.viaversion.viaversion.connection;
 
-import com.google.common.cache.CacheBuilder;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
+import com.viaversion.viaversion.api.connection.ProtocolStorables;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
@@ -36,37 +36,39 @@ import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.util.ChatColorUtil;
-import com.viaversion.viaversion.util.PipelineUtil;
+import com.viaversion.viaversion.util.NestingLimiter;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelInboundHandler;
 import io.netty.handler.codec.CodecException;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
+import java.nio.channels.ClosedChannelException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.SplittableRandom;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class UserConnectionImpl implements UserConnection {
-    private static final int PASSTHROUGH_DATA_BYTES = Long.BYTES * 2 + 2;
+    private static final int PASSTHROUGH_DATA_BYTES = Long.BYTES + 2;
+    private static final int MAX_SERVERBOUND_NESTING_DEPTH = 128;
     private static final AtomicLong IDS = new AtomicLong();
     private final long id = IDS.incrementAndGet();
-    private final Map<Class<?>, StorableObject> storedObjects = new ConcurrentHashMap<>();
-    private final Map<Class<? extends Protocol>, EntityTracker> entityTrackers = new Reference2ObjectOpenHashMap<>();
-    private final Map<Class<? extends Protocol>, ItemHasher> itemHashers = new Reference2ObjectOpenHashMap<>();
-    private final Map<Class<? extends Protocol>, ClientWorld> clientWorlds = new Reference2ObjectOpenHashMap<>();
+    private final SplittableRandom random = new SplittableRandom();
+    private final Map<Class<?>, StorableObject> storedObjects = new ConcurrentHashMap<>(8);
+    private final ProtocolStorables[] protocolStorables = new ProtocolStorables[Via.getManager().getProtocolManager().registeredProtocolCount()];
     private final PacketTracker packetTracker = new PacketTracker(this);
-    private final Set<UUID> passthroughTokens = Collections.newSetFromMap(CacheBuilder.newBuilder()
-        .expireAfterWrite(10, TimeUnit.SECONDS)
-        .<UUID, Boolean>build().asMap());
+    private final LongSet passthroughTokens = new LongOpenHashSet(4);
     private final ProtocolInfo protocolInfo = new ProtocolInfoImpl();
     private final Channel channel;
     private final boolean clientSide;
@@ -74,7 +76,7 @@ public class UserConnectionImpl implements UserConnection {
     private boolean pendingDisconnect;
 
     /**
-     * Creates an UserConnection. When it's a client-side connection, some method behaviors are modified.
+     * Creates a UserConnection. When it's a client-side connection, some method behaviors are modified.
      *
      * @param channel    netty channel.
      * @param clientSide true if it's a client-side connection
@@ -120,37 +122,90 @@ public class UserConnectionImpl implements UserConnection {
 
     @Override
     public Collection<EntityTracker> getEntityTrackers() {
-        return entityTrackers.values();
+        final List<EntityTracker> trackers = new ArrayList<>();
+        for (final ProtocolStorables storable : protocolStorables) {
+            if (storable != null && storable.entityTracker() != null) {
+                trackers.add(storable.entityTracker());
+            }
+        }
+        return trackers;
     }
 
     @Override
     public @Nullable <T extends EntityTracker> T getEntityTracker(Class<? extends Protocol> protocolClass) {
-        return (T) entityTrackers.get(protocolClass);
+        final ProtocolStorables storables = storablesByClassIfPresent(protocolClass);
+        return storables != null ? (T) storables.entityTracker() : null;
     }
 
     @Override
     public void addEntityTracker(Class<? extends Protocol> protocolClass, EntityTracker tracker) {
-        entityTrackers.putIfAbsent(protocolClass, tracker);
+        storables(protocolClass).setEntityTracker(tracker);
     }
 
     @Override
     public void addItemHasher(final Class<? extends Protocol> protocolClass, final ItemHasher itemHasher) {
-        itemHashers.putIfAbsent(protocolClass, itemHasher);
+        storables(protocolClass).setItemHasher(itemHasher);
     }
 
     @Override
     public @Nullable <T extends ItemHasher> T getItemHasher(Class<? extends Protocol> protocolClass) {
-        return (T) itemHashers.get(protocolClass);
+        final ProtocolStorables storables = storablesByClassIfPresent(protocolClass);
+        return storables != null ? (T) storables.itemHasher() : null;
     }
 
     @Override
     public @Nullable <T extends ClientWorld> T getClientWorld(final Class<? extends Protocol> protocolClass) {
-        return (T) clientWorlds.get(protocolClass);
+        final ProtocolStorables storables = storablesByClassIfPresent(protocolClass);
+        return storables != null ? (T) storables.clientWorld() : null;
     }
 
     @Override
     public void addClientWorld(final Class<? extends Protocol> protocolClass, final ClientWorld clientWorld) {
-        clientWorlds.putIfAbsent(protocolClass, clientWorld);
+        storables(protocolClass).setClientWorld(clientWorld);
+    }
+
+    private @Nullable ProtocolStorables storablesByClassIfPresent(final Class<? extends Protocol> protocolClass) {
+        final int index = protocolIndex(protocolClass);
+        return index >= 0 && index < protocolStorables.length ? protocolStorables[index] : null;
+    }
+
+    private static int protocolIndex(final Class<? extends Protocol> protocolClass) {
+        final Protocol<?, ?, ?, ?> protocol = Via.getManager().getProtocolManager().getProtocol(protocolClass);
+        return protocol != null ? protocol.index() : -1;
+    }
+
+    @Override
+    public @Nullable <T extends EntityTracker> T getEntityTracker(final Protocol<?, ?, ?, ?> protocol) {
+        final ProtocolStorables storables = storablesIfPresent(protocol);
+        //noinspection unchecked
+        return storables != null ? (T) storables.entityTracker() : null;
+    }
+
+    @Override
+    public @Nullable <T extends ItemHasher> T getItemHasher(final Protocol<?, ?, ?, ?> protocol) {
+        final ProtocolStorables storables = storablesIfPresent(protocol);
+        //noinspection unchecked
+        return storables != null ? (T) storables.itemHasher() : null;
+    }
+
+    @Override
+    public <T extends ProtocolStorables> T storables(final Protocol<?, ?, ?, ?> protocol) {
+        T storables = storablesIfPresent(protocol);
+        if (storables == null) {
+            //noinspection unchecked
+            storables = (T) protocol.createStorables();
+            protocolStorables[protocol.index()] = storables;
+        }
+        return storables;
+    }
+
+    public <T extends ProtocolStorables> T storablesIfPresent(final Protocol<?, ?, ?, ?> protocol) {
+        final int index = protocol.index();
+        if (index == -1) {
+            throw new IllegalArgumentException("Provided protocol does not have a valid index: " + index);
+        }
+        //noinspection unchecked
+        return (T) protocolStorables[index];
     }
 
     @Override
@@ -159,9 +214,7 @@ public class UserConnectionImpl implements UserConnection {
             object.onRemove();
         }
         storedObjects.clear();
-        entityTrackers.clear();
-        itemHashers.clear();
-        clientWorlds.clear();
+        Arrays.fill(protocolStorables, null);
     }
 
     @Override
@@ -176,10 +229,10 @@ public class UserConnectionImpl implements UserConnection {
 
     private void sendRawPacket(final ByteBuf packet, final boolean currentThread) {
         if (currentThread) {
-            sendRawPacketNow(packet);
+            sendRawPacketFuture(packet);
         } else {
             try {
-                channel.eventLoop().execute(() -> sendRawPacketNow(packet));
+                channel.eventLoop().execute(() -> sendRawPacketFuture(packet));
             } catch (Throwable e) {
                 packet.release(); // Couldn't schedule
                 e.printStackTrace();
@@ -187,25 +240,22 @@ public class UserConnectionImpl implements UserConnection {
         }
     }
 
-    private void sendRawPacketNow(final ByteBuf buf) {
-        final ChannelPipeline pipeline = getChannel().pipeline();
-        final ViaInjector injector = Via.getManager().getInjector();
-        if (clientSide) {
-            // We'll just assume that Via decoder isn't wrapping the original decoder
-            pipeline.context(injector.getDecoderName()).fireChannelRead(buf);
-        } else {
-            pipeline.context(injector.getEncoderName()).writeAndFlush(buf);
-        }
-    }
-
     @Override
     public ChannelFuture sendRawPacketFuture(final ByteBuf packet) {
+        final ViaInjector injector = Via.getManager().getInjector();
+        final ChannelHandlerContext context = channel.pipeline().context(clientSide ? injector.getDecoderName() : injector.getEncoderName());
+        if (context == null) {
+            // Handlers are removed once the channel is closed
+            packet.release();
+            return channel.newFailedFuture(new ClosedChannelException());
+        }
+
         if (clientSide) {
             // Assume that decoder isn't wrapping
-            getChannel().pipeline().context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(packet);
-            return getChannel().newSucceededFuture();
+            context.fireChannelRead(packet);
+            return channel.newSucceededFuture();
         } else {
-            return channel.pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
+            return context.writeAndFlush(packet);
         }
     }
 
@@ -254,38 +304,53 @@ public class UserConnectionImpl implements UserConnection {
         final int initialCapacity = active ? packet.readableBytes() + PASSTHROUGH_DATA_BYTES : packet.readableBytes();
         final ByteBuf buf = packet.alloc().buffer(initialCapacity);
         try {
-            // We'll use passing through because there are some encoder wrappers
-            ChannelHandlerContext context = PipelineUtil
-                .getPreviousContext(Via.getManager().getInjector().getDecoderName(), channel.pipeline());
-
             if (shouldTransformPacket()) {
                 // Bypass serverbound packet decoder transforming
                 Types.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
-                Types.UUID.write(buf, generatePassthroughToken());
+                Types.LONG.writePrimitive(buf, generatePassthroughToken());
             }
 
             buf.writeBytes(packet);
-            if (currentThread) {
-                fireChannelRead(context, buf);
-            } else {
-                try {
-                    channel.eventLoop().execute(() -> fireChannelRead(context, buf));
-                } catch (Throwable t) {
-                    // Couldn't schedule
-                    buf.release();
-                    throw t;
-                }
-            }
+        } catch (Throwable t) {
+            buf.release();
+            throw t;
         } finally {
             packet.release();
         }
+
+        if (currentThread && channel.eventLoop().inEventLoop()) {
+            fireChannelRead(buf);
+        } else {
+            try {
+                channel.eventLoop().execute(() -> fireChannelRead(buf));
+            } catch (Throwable t) {
+                // Couldn't schedule
+                buf.release();
+                throw t;
+            }
+        }
     }
 
-    private void fireChannelRead(@Nullable final ChannelHandlerContext context, final ByteBuf buf) {
-        if (context != null) {
-            context.fireChannelRead(buf);
-        } else {
-            channel.pipeline().fireChannelRead(buf);
+    private void fireChannelRead(final ByteBuf buf) {
+        final ChannelHandlerContext context = channel.pipeline().context(Via.getManager().getInjector().getDecoderName());
+        if (context == null) {
+            buf.release();
+            return;
+        }
+
+        // Directly invoke the decoder, copied from Netty's fireChannelRead of the previous handler
+        final ChannelHandler handler = context.handler();
+        try {
+            ((ChannelInboundHandler) handler).channelRead(context, buf);
+        } catch (Throwable t) {
+            try {
+                handler.exceptionCaught(context, t);
+            } catch (Throwable e) {
+                if (e != t) {
+                    e.addSuppressed(t);
+                }
+                Via.getPlatform().getLogger().log(Level.WARNING, "Exception thrown by exceptionCaught of " + handler, e);
+            }
         }
     }
 
@@ -294,7 +359,7 @@ public class UserConnectionImpl implements UserConnection {
             writeAndFlush(packet);
         } else {
             try {
-                getChannel().eventLoop().execute(() -> writeAndFlush(packet));
+                channel.eventLoop().execute(() -> writeAndFlush(packet));
             } catch (Throwable e) {
                 e.printStackTrace();
                 packet.release(); // Couldn't schedule
@@ -303,7 +368,12 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     private void writeAndFlush(final ByteBuf buf) {
-        getChannel().pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(buf);
+        final ChannelHandlerContext context = channel.pipeline().context(Via.getManager().getInjector().getEncoderName());
+        if (context == null) {
+            buf.release();
+            return;
+        }
+        context.writeAndFlush(buf);
     }
 
     @Override
@@ -346,19 +416,24 @@ public class UserConnectionImpl implements UserConnection {
         }
 
         final int id = Types.VAR_INT.readPrimitive(buf);
-        if (id == PacketWrapper.PASSTHROUGH_ID) {
-            if (!passthroughTokens.remove(Types.UUID.read(buf))) {
-                throw new IllegalArgumentException("Invalid token");
+        if (id == PacketWrapper.PASSTHROUGH_ID && buf.readableBytes() >= Long.BYTES) {
+            if (removePassthroughToken(buf.readLong())) {
+                return;
             }
-            return;
+
+            // Move reader back and treat it like a regular packet
+            buf.readerIndex(buf.readerIndex() - Long.BYTES);
         }
 
         final int valuesReaderIndex = buf.readerIndex();
         final PacketWrapperImpl wrapper = new PacketWrapperImpl(id, buf, this);
+        final int previousMaxDepth = NestingLimiter.setMaxDepth(direction == Direction.SERVERBOUND ? MAX_SERVERBOUND_NESTING_DEPTH : -1);
         try {
             protocolInfo.getPipeline().transform(direction, protocolInfo.getState(direction), wrapper);
         } catch (final CancelException ex) {
             throw cancelSupplier.apply(ex);
+        } finally {
+            NestingLimiter.setMaxDepth(previousMaxDepth);
         }
 
         writeToBuffer(wrapper, buf, id, valuesReaderIndex);
@@ -443,10 +518,22 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public UUID generatePassthroughToken() {
-        UUID token = UUID.randomUUID();
-        passthroughTokens.add(token);
-        return token;
+    public long generatePassthroughToken() {
+        // Don't use TLR so it's not entirely predictable; use SplittableRandom over Random since it actually has a 64 bit seed
+        while (true) {
+            synchronized (passthroughTokens) {
+                final long token = random.nextLong();
+                if (passthroughTokens.add(token)) {
+                    return token;
+                }
+            }
+        }
+    }
+
+    private boolean removePassthroughToken(final long token) {
+        synchronized (passthroughTokens) {
+            return passthroughTokens.remove(token);
+        }
     }
 
     @Override

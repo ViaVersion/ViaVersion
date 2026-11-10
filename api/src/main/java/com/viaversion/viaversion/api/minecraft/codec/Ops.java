@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -58,7 +58,9 @@ public interface Ops {
 
     void writeMap(Consumer<MapSerializer> consumer);
 
-    <V> void write(final Type<V> type, final V value);
+    default <V> void write(final Type<V> type, final V value) {
+        type.write(this, value);
+    }
 
     interface ListSerializer {
 
@@ -81,12 +83,12 @@ public interface Ops {
         /**
          * Writes the given value or default value if the value is null.
          *
-         * @param key map key
-         * @param type type of the value
+         * @param key   map key
+         * @param type  type of the value
          * @param value the value to write, or null
-         * @param def default value to write if the value is null
+         * @param def   default value to write if the value is null
+         * @param <V>   value type
          * @return self
-         * @param <V> value type
          */
         default <V> MapSerializer write(final String key, final Type<V> type, @Nullable final V value, final V def) {
             write(Types.STRING, key, type, value != null ? value : def);
@@ -96,11 +98,11 @@ public interface Ops {
         /**
          * Writes the given value if it is not null.
          *
-         * @param key map key
-         * @param type type of the value
+         * @param key   map key
+         * @param type  type of the value
          * @param value the value to write, or null
+         * @param <V>   value type
          * @return self
-         * @param <V> value type
          */
         default <V> MapSerializer writeOptional(final String key, final Type<V> type, @Nullable final V value) {
             if (value != null) {
@@ -112,12 +114,12 @@ public interface Ops {
         /**
          * Writes the given value if it is not null and not equal to the default value.
          *
-         * @param key map key
-         * @param type type of the value
+         * @param key   map key
+         * @param type  type of the value
          * @param value the value to write, or null
-         * @param def default value to compare against
+         * @param def   default value to compare against
+         * @param <V>   value type
          * @return self
-         * @param <V> value type
          */
         default <V> MapSerializer writeOptional(final String key, final Type<V> type, @Nullable final V value, final V def) {
             if (value != null && !Objects.deepEquals(value, def)) {

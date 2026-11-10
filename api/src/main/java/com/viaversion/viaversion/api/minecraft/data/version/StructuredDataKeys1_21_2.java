@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,9 +35,9 @@ public class StructuredDataKeys1_21_2 extends VersionedStructuredDataKeys {
     public final StructuredDataKey<Item> useRemainder;
 
     public StructuredDataKeys1_21_2(final VersionedTypesHolder types) {
-        this.container = add("container", new ContainerContentsType(types.item()));
-        this.chargedProjectiles = add("charged_projectiles", types.itemArray());
-        this.bundleContents = add("bundle_contents", types.itemArray());
-        this.useRemainder = add("use_remainder", types.item());
+        this.container = add("container", new ContainerContentsType(types.optionalItemTemplate()));
+        this.chargedProjectiles = add("charged_projectiles", types.itemTemplateArray().withMaxLength(1024));
+        this.bundleContents = add("bundle_contents", types.itemTemplateArray().withMaxLength(1024));
+        this.useRemainder = add("use_remainder", types.itemTemplate());
     }
 }

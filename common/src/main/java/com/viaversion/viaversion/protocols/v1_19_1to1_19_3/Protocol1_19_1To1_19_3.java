@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
@@ -38,6 +39,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -49,14 +51,16 @@ import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.ComponentRew
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.EntityPacketRewriter1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.ItemPacketRewriter1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.NonceStorage1_19_3;
+import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.PlayerHealthStorage;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.ReceivedMessagesStorage;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ServerboundPackets1_19_1;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Pair;
 import java.security.SignatureException;
 import java.util.List;
@@ -68,11 +72,23 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     public static final MappingData MAPPINGS = new MappingDataBase("1.19", "1.19.3");
     private static final UUID ZERO_UUID = new UUID(0, 0);
     private static final byte[] EMPTY_BYTES = new byte[0];
+    private static final int SOUND_SOURCE_BLOCKS = 4;
+    private static final int SOUND_IRON_DOOR_CLOSE = 614;
+    private static final int SOUND_IRON_DOOR_OPEN = 615;
+    private static final int SOUND_IRON_TRAPDOOR_CLOSE = 622;
+    private static final int SOUND_IRON_TRAPDOOR_OPEN = 623;
+    private static final int SOUND_FENCE_GATE_CLOSE = 110;
+    private static final int SOUND_FENCE_GATE_OPEN = 111;
+    private static final int SOUND_WOODEN_DOOR_CLOSE = 1345;
+    private static final int SOUND_WOODEN_DOOR_OPEN = 1346;
+    private static final int SOUND_WOODEN_TRAPDOOR_CLOSE = 1347;
+    private static final int SOUND_WOODEN_TRAPDOOR_OPEN = 1348;
     private final EntityPacketRewriter1_19_3 entityRewriter = new EntityPacketRewriter1_19_3(this);
     private final ItemPacketRewriter1_19_3 itemRewriter = new ItemPacketRewriter1_19_3(this);
     private final ParticleRewriter<ClientboundPackets1_19_1> particleRewriter = new ParticleRewriter<>(this);
     private final ComponentRewriter1_19_3 componentRewriter = new ComponentRewriter1_19_3(this);
     private final TagRewriter<ClientboundPackets1_19_1> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPackets1_19_1> blockRewriter = BlockRewriter.for1_18(this, ChunkType1_18::new);
 
     public Protocol1_19_1To1_19_3() {
         super(ClientboundPackets1_19_1.class, ClientboundPackets1_19_3.class, ServerboundPackets1_19_1.class, ServerboundPackets1_19_3.class);
@@ -80,12 +96,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void registerPackets() {
-        tagRewriter.registerGeneric(ClientboundPackets1_19_1.UPDATE_TAGS);
-
-        particleRewriter.registerLevelParticles1_19(ClientboundPackets1_19_1.LEVEL_PARTICLES);
-
-        entityRewriter.register();
-        itemRewriter.register();
+        super.registerPackets();
 
         // Rewrite sounds as holders
         final PacketHandler soundHandler = wrapper -> {
@@ -98,26 +109,37 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
 
             wrapper.write(Types.SOUND_EVENT, Holder.of(soundId));
         };
-        registerClientbound(ClientboundPackets1_19_1.SOUND_ENTITY, soundHandler);
-        registerClientbound(ClientboundPackets1_19_1.SOUND, soundHandler);
+        replaceClientbound(ClientboundPackets1_19_1.SOUND_ENTITY, soundHandler);
+        replaceClientbound(ClientboundPackets1_19_1.SOUND, soundHandler);
         registerClientbound(ClientboundPackets1_19_1.CUSTOM_SOUND, ClientboundPackets1_19_3.SOUND, wrapper -> {
             final String soundIdentifier = wrapper.read(Types.STRING);
             wrapper.write(Types.SOUND_EVENT, Holder.of(new SoundEvent(soundIdentifier, null)));
         });
+        appendClientbound(ClientboundPackets1_19_1.LEVEL_EVENT, wrapper -> {
+            wrapper.resetReader();
 
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_1.AWARD_STATS);
+            final int eventId = wrapper.read(Types.INT);
+            final int soundId = levelEventSoundId(eventId);
+            if (soundId == -1) {
+                wrapper.write(Types.INT, eventId);
+                return;
+            }
 
-        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.SYSTEM_CHAT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.SET_ACTION_BAR_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.SET_TITLE_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.SET_SUBTITLE_TEXT);
-        componentRewriter.registerBossEvent(ClientboundPackets1_19_1.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_19_1.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets1_19_1.TAB_LIST);
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_19_1.OPEN_SCREEN);
-        componentRewriter.registerPlayerCombatKill(ClientboundPackets1_19_1.PLAYER_COMBAT_KILL);
-        componentRewriter.registerSetPlayerTeam1_13(ClientboundPackets1_19_1.SET_PLAYER_TEAM);
-        componentRewriter.registerPing();
+            final BlockPosition position = wrapper.read(Types.BLOCK_POSITION1_14);
+            wrapper.read(Types.INT); // Data
+            wrapper.read(Types.BOOLEAN); // Global event
+
+            // These level events were removed, instead send them as sounds directly
+            wrapper.setPacketType(ClientboundPackets1_19_3.SOUND);
+            wrapper.write(Types.SOUND_EVENT, Holder.of(soundId));
+            wrapper.write(Types.VAR_INT, SOUND_SOURCE_BLOCKS);
+            wrapper.write(Types.INT, position.x() * 8 + 4);
+            wrapper.write(Types.INT, position.y() * 8 + 4);
+            wrapper.write(Types.INT, position.z() * 8 + 4);
+            wrapper.write(Types.FLOAT, 1F); // Volume
+            wrapper.write(Types.FLOAT, ThreadLocalRandom.current().nextFloat() * 0.1F + 0.9F); // Pitch
+            wrapper.write(Types.LONG, ThreadLocalRandom.current().nextLong()); // Seed
+        });
 
         final CommandRewriter<ClientboundPackets1_19_1> commandRewriter = new CommandRewriter<>(this) {
             @Override
@@ -129,21 +151,10 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
                     default -> super.handleArgument(wrapper, argumentType);
                 }
             }
-
-            @Override
-            public String handleArgumentType(final String argumentType) {
-                return switch (argumentType) {
-                    case "minecraft:resource" -> "minecraft:resource_key";
-                    case "minecraft:resource_or_tag" -> "minecraft:resource_or_tag_key";
-                    case "minecraft:entity_summon", "minecraft:item_enchantment", "minecraft:mob_effect" ->
-                        "minecraft:resource";
-                    default -> argumentType;
-                };
-            }
         };
-        commandRewriter.registerDeclareCommands1_19(ClientboundPackets1_19_1.COMMANDS);
+        replaceClientbound(ClientboundPackets1_19_1.COMMANDS, commandRewriter::handle1_19);
 
-        registerClientbound(ClientboundPackets1_19_1.SERVER_DATA, new PacketHandlers() {
+        replaceClientbound(ClientboundPackets1_19_1.SERVER_DATA, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.OPTIONAL_COMPONENT); // Motd
@@ -211,7 +222,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
                     final ChatSession1_19_1 chatSession = wrapper.user().get(ChatSession1_19_1.class);
                     final ReceivedMessagesStorage messagesStorage = wrapper.user().get(ReceivedMessagesStorage.class);
 
-                    final int signatures = wrapper.read(Types.VAR_INT);
+                    final int signatures = Limit.max(wrapper.read(Types.VAR_INT), 8);
                     for (int i = 0; i < signatures; i++) {
                         wrapper.read(Types.STRING); // Argument name
                         wrapper.read(Types.SIGNATURE_BYTES); // Signature
@@ -359,17 +370,8 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void onMappingDataLoaded() {
-        Types1_19_3.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.ITEM1_13_2)
-            .reader("vibration", ParticleType.Readers.VIBRATION1_19)
-            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK);
         EntityTypes1_19_3.initialize(this);
+        ParticleType.Fillers.fill1_19(this, Types1_19_3.PARTICLE);
 
         tagRewriter.removeTag(RegistryType.ITEM, "minecraft:overworld_natural_logs");
         tagRewriter.removeTag(RegistryType.BLOCK, "minecraft:non_flammable_wood");
@@ -380,6 +382,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     public void init(final UserConnection user) {
         user.put(new ReceivedMessagesStorage());
+        user.put(new PlayerHealthStorage());
         addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19_3.PLAYER));
     }
 
@@ -399,6 +402,11 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     }
 
     @Override
+    public BlockRewriter<ClientboundPackets1_19_1> getBlockRewriter() {
+        return blockRewriter;
+    }
+
+    @Override
     public ParticleRewriter<ClientboundPackets1_19_1> getParticleRewriter() {
         return particleRewriter;
     }
@@ -411,5 +419,21 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     public TagRewriter<ClientboundPackets1_19_1> getTagRewriter() {
         return tagRewriter;
+    }
+
+    private static int levelEventSoundId(final int eventId) {
+        return switch (eventId) {
+            case 1005 -> SOUND_IRON_DOOR_OPEN;
+            case 1006 -> SOUND_WOODEN_DOOR_OPEN;
+            case 1007 -> SOUND_WOODEN_TRAPDOOR_OPEN;
+            case 1008 -> SOUND_FENCE_GATE_OPEN;
+            case 1011 -> SOUND_IRON_DOOR_CLOSE;
+            case 1012 -> SOUND_WOODEN_DOOR_CLOSE;
+            case 1013 -> SOUND_WOODEN_TRAPDOOR_CLOSE;
+            case 1014 -> SOUND_FENCE_GATE_CLOSE;
+            case 1036 -> SOUND_IRON_TRAPDOOR_CLOSE;
+            case 1037 -> SOUND_IRON_TRAPDOOR_OPEN;
+            default -> -1;
+        };
     }
 }

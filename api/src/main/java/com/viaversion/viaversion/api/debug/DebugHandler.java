@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ public interface DebugHandler {
     void addPacketTypeNameToLog(String packetTypeName);
 
     /**
-     * Adds a packet id to the list of packet types to log.
+     * Adds a packet type to the list of packet types to log.
      * Packets will be checked on each protocol transformer, so this is best used on single protocol pipes.
      *
      * @param packetType packet type
@@ -65,6 +65,13 @@ public interface DebugHandler {
      * @param packetTypeName packet type name
      */
     boolean removePacketTypeNameToLog(String packetTypeName);
+
+    /**
+     * Removes a packet type from the list of packet types to log.
+     *
+     * @param packetType Packet type to remove
+     */
+    boolean removePacketTypeToLog(PacketType packetType);
 
     /**
      * Resets packet type filters.
@@ -121,7 +128,12 @@ public interface DebugHandler {
      */
     boolean shouldLog(PacketWrapper wrapper, Direction direction);
 
-    default void enableAndLogIds(final PacketType... packetTypes) {
+    /**
+     * Enables debug mode and adds the given packet types to the log list.
+     *
+     * @param packetTypes packet types to log
+     */
+    default void enableAndLogTypes(final PacketType... packetTypes) {
         setEnabled(true);
         for (final PacketType packetType : packetTypes) {
             addPacketTypeToLog(packetType);
@@ -135,7 +147,7 @@ public interface DebugHandler {
      * @param t     thrown exception
      */
     default void error(final String error, final Throwable t) {
-        if (!Via.getConfig().isSuppressConversionWarnings() || enabled()) {
+        if (Via.getConfig().logOtherConversionWarnings() || enabled()) {
             Via.getPlatform().getLogger().log(Level.SEVERE, error, t);
         }
     }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
+import java.util.concurrent.TimeUnit;
 
 public interface ViaVersionConfig extends Config {
 
@@ -67,11 +68,16 @@ public interface ViaVersionConfig extends Config {
     boolean isShowNewDeathMessages();
 
     /**
-     * Get if entity data errors will be suppressed
+     * Get if entity data errors will be logged
      *
-     * @return true if entity data errors suppression is enabled
+     * @return true if entity data error logging is enabled
      */
-    boolean isSuppressMetadataErrors();
+    boolean logEntityDataErrors();
+
+    @Deprecated(forRemoval = true)
+    default boolean isSuppressMetadataErrors() {
+        return !logEntityDataErrors();
+    }
 
     /**
      * Get if blocking in 1.9 &amp; 1.10 appears as a player holding a shield
@@ -148,7 +154,9 @@ public interface ViaVersionConfig extends Config {
      * @return The number of packets a client can send per second.
      */
     @Deprecated(forRemoval = true)
-    int getMaxPPS();
+    default int getMaxPPS() {
+        return getPacketTrackerConfig().maxRate();
+    }
 
     /**
      * Get the kick message sent if the user hits the max packets per second.
@@ -156,7 +164,9 @@ public interface ViaVersionConfig extends Config {
      * @return Kick message, with colour codes using '&amp;amp;'
      */
     @Deprecated(forRemoval = true)
-    String getMaxPPSKickMessage();
+    default String getMaxPPSKickMessage() {
+        return getPacketTrackerConfig().maxRateKickMessage();
+    }
 
     /**
      * The time in seconds that should be tracked for warnings
@@ -164,7 +174,9 @@ public interface ViaVersionConfig extends Config {
      * @return Time in seconds that should be tracked for warnings
      */
     @Deprecated(forRemoval = true)
-    int getTrackingPeriod();
+    default int getTrackingPeriod() {
+        return (int) TimeUnit.NANOSECONDS.toSeconds(getPacketTrackerConfig().trackingPeriodNanos());
+    }
 
     /**
      * The number of packets per second to count as a warning
@@ -172,7 +184,9 @@ public interface ViaVersionConfig extends Config {
      * @return The number of packets per second to count as a warning.
      */
     @Deprecated(forRemoval = true)
-    int getWarningPPS();
+    default int getWarningPPS() {
+        return getPacketTrackerConfig().warningRate();
+    }
 
     /**
      * Get the maximum number of warnings the client can have in the interval
@@ -180,7 +194,9 @@ public interface ViaVersionConfig extends Config {
      * @return The number of packets a client can send per second.
      */
     @Deprecated(forRemoval = true)
-    int getMaxWarnings();
+    default int getMaxWarnings() {
+        return getPacketTrackerConfig().maxWarnings();
+    }
 
     /**
      * Get the kick message sent if the user goes over the warnings in the interval
@@ -188,7 +204,9 @@ public interface ViaVersionConfig extends Config {
      * @return Kick message, with colour codes using '&amp;amp;'
      */
     @Deprecated(forRemoval = true)
-    String getMaxWarningsKickMessage();
+    default String getMaxWarningsKickMessage() {
+        return getPacketTrackerConfig().warningKickMessage();
+    }
 
     RateLimitConfig getPacketTrackerConfig();
 
@@ -243,6 +261,8 @@ public interface ViaVersionConfig extends Config {
      */
     boolean isChunkBorderFix();
 
+    boolean isMultiReddustColorFix();
+
     /**
      * Should we make team colours based on the last colour in team prefix
      *
@@ -284,18 +304,28 @@ public interface ViaVersionConfig extends Config {
     String getReloadDisconnectMsg();
 
     /**
-     * Should we hide errors that occur when trying to convert block and item data over versions?
+     * Should we log warnings on issues when trying to convert data over versions?
      *
      * @return true if enabled
      */
-    boolean isSuppressConversionWarnings();
+    boolean logOtherConversionWarnings();
 
     /**
-     * Should we hide errors that occur when trying to convert text components?
+     * Should we log errors that occur when trying to convert text components?
      *
      * @return true if enabled
      */
-    boolean isSuppressTextComponentConversionWarnings();
+    boolean logTextComponentConversionErrors();
+
+    @Deprecated(forRemoval = true)
+    default boolean isSuppressConversionWarnings() {
+        return !logOtherConversionWarnings();
+    }
+
+    @Deprecated(forRemoval = true)
+    default boolean isSuppressTextComponentConversionWarnings() {
+        return !logTextComponentConversionErrors();
+    }
 
     /**
      * Should we disable the 1.13 auto-complete feature to stop spam kicks? (for any server lower than 1.13)
@@ -471,6 +501,13 @@ public interface ViaVersionConfig extends Config {
     boolean handleInvalidItemCount();
 
     /**
+     * Backs up the original data of nested items (e.g. in containers or bundles) for 1.20.5+ clients on 1.20.4 and older servers.
+     *
+     * @return true if enabled
+     */
+    boolean backupNestedItems();
+
+    /**
      * Tries to cancel block break/place sounds sent by 1.8 servers to 1.9+ clients to prevent them from playing twice
      *
      * @return true if enabled
@@ -478,7 +515,7 @@ public interface ViaVersionConfig extends Config {
     boolean cancelBlockSounds();
 
     /**
-     * Hides scoreboard numbers for 1.20.3+ clients on older server versions.
+     * Hides sidebar scoreboard numbers for 1.20.3+ clients on older server versions.
      *
      * @return true if enabled
      */
@@ -498,4 +535,33 @@ public interface ViaVersionConfig extends Config {
      * @return true if enabled
      */
     boolean cancelSwingInInventory();
+
+    /**
+     * Returns the max length of error messages. Longer messages will be truncated unless in debug mode.
+     *
+     * @return the max length of error messages
+     */
+    int maxErrorLength();
+
+    /**
+     * If enabled, 1.21.11+ clients on 1.8 (or older) servers will get wider entity hitboxes,
+     * but only when attacking with an item.
+     *
+     * @return true if enabled
+     */
+    boolean use1_8HitboxMargin();
+
+    /**
+     * If enabled, ViaVersion will send the native client version to the server on connect via a plugin message.
+     *
+     * @return true if enabled
+     */
+    boolean sendPlayerDetails();
+
+    /**
+     * If enabled, ViaVersion will send the native server version to a player on connect via a plugin message.
+     *
+     * @return true if enabled
+     */
+    boolean sendServerDetails();
 }

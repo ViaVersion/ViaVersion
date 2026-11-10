@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -34,10 +35,10 @@ import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.EntityPacketRewriter1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.ItemPacketRewriter1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.storage.PlayerVehicleTracker;
+import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.storage.ProtocolStorables1_19_4;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import java.nio.charset.StandardCharsets;
@@ -50,6 +51,7 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
     private final ItemPacketRewriter1_19_4 itemRewriter = new ItemPacketRewriter1_19_4(this);
     private final ParticleRewriter<ClientboundPackets1_19_3> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_19_3> tagRewriter = new TagRewriter<>(this);
+    private final BlockRewriter<ClientboundPackets1_19_3> blockRewriter = BlockRewriter.for1_18(this, ChunkType1_18::new);
 
     public Protocol1_19_3To1_19_4() {
         super(ClientboundPackets1_19_3.class, ClientboundPackets1_19_4.class, ServerboundPackets1_19_3.class, ServerboundPackets1_19_4.class);
@@ -59,16 +61,7 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
     protected void registerPackets() {
         super.registerPackets();
 
-        tagRewriter.registerGeneric(ClientboundPackets1_19_3.UPDATE_TAGS);
-        particleRewriter.registerLevelParticles1_19(ClientboundPackets1_19_3.LEVEL_PARTICLES);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_3.AWARD_STATS);
-
-        final SoundRewriter<ClientboundPackets1_19_3> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_19_3.SOUND_ENTITY);
-        soundRewriter.registerSound1_19_3(ClientboundPackets1_19_3.SOUND);
-
-        new CommandRewriter<>(this) {
+        final CommandRewriter<ClientboundPackets1_19_3> commandRewriter = new CommandRewriter<>(this) {
             @Override
             public void handleArgument(final PacketWrapper wrapper, final String argumentType) {
                 if (argumentType.equals("minecraft:time")) {
@@ -78,7 +71,22 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
                     super.handleArgument(wrapper, argumentType);
                 }
             }
-        }.registerDeclareCommands1_19(ClientboundPackets1_19_3.COMMANDS);
+        };
+        replaceClientbound(ClientboundPackets1_19_3.COMMANDS, commandRewriter::handle1_19);
+
+        registerClientbound(ClientboundPackets1_19_3.UPDATE_MOB_EFFECT, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // entity id
+            wrapper.passthrough(Types.VAR_INT); // effect id
+            wrapper.passthrough(Types.BYTE); // amplifier
+
+            int duration = wrapper.read(Types.VAR_INT);
+
+            if (duration >= Short.MAX_VALUE) { // Anything at or above this would display as infinite on 1.19.2 and below, and on 1.19.4+, infinite is -1
+                wrapper.write(Types.VAR_INT, -1);
+            } else {
+                wrapper.write(Types.VAR_INT, duration);
+            }
+        });
 
         registerClientbound(ClientboundPackets1_19_3.SERVER_DATA, wrapper -> {
             JsonElement element = wrapper.read(Types.OPTIONAL_COMPONENT);
@@ -100,16 +108,7 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
     @Override
     protected void onMappingDataLoaded() {
         EntityTypes1_19_4.initialize(this);
-        Types1_19_4.PARTICLE.filler(this)
-            .reader("block", ParticleType.Readers.BLOCK)
-            .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST)
-            .reader("falling_dust", ParticleType.Readers.BLOCK)
-            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.ITEM1_13_2)
-            .reader("vibration", ParticleType.Readers.VIBRATION1_19)
-            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK);
+        ParticleType.Fillers.fill1_19(this, Types1_19_4.PARTICLE);
 
         super.onMappingDataLoaded();
     }
@@ -117,8 +116,11 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
     @Override
     public void init(final UserConnection user) {
         addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19_4.PLAYER));
+    }
 
-        user.put(new PlayerVehicleTracker());
+    @Override
+    public ProtocolStorables1_19_4 createStorables() {
+        return new ProtocolStorables1_19_4();
     }
 
     @Override
@@ -134,6 +136,11 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
     @Override
     public ItemPacketRewriter1_19_4 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public BlockRewriter<ClientboundPackets1_19_3> getBlockRewriter() {
+        return blockRewriter;
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,13 +31,17 @@ import com.google.gson.JsonSyntaxException;
 import com.viaversion.nbt.io.NBTIO;
 import com.viaversion.nbt.io.TagReader;
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.GsonUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.io.BufferedInputStream;
@@ -51,6 +55,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -59,15 +64,16 @@ public class MappingDataLoader {
     public static final MappingDataLoader INSTANCE = new MappingDataLoader(MappingDataLoader.class, "assets/viaversion/data/");
     public static final TagReader<CompoundTag> MAPPINGS_READER = NBTIO.reader(CompoundTag.class).named();
     private static final Map<String, String[]> GLOBAL_IDENTIFIER_INDEXES = new HashMap<>();
+    private static final int VERSION = 2;
     private static final byte DIRECT_ID = 0;
     private static final byte SHIFTS_ID = 1;
     private static final byte CHANGES_ID = 2;
     private static final byte IDENTITY_ID = 3;
 
-    private final Map<String, CompoundTag> mappingsCache = new HashMap<>();
+    private final Map<String, CompoundTag> mappingsCache = new ConcurrentHashMap<>();
     private final Class<?> dataLoaderClass;
     private final String dataPath;
-    private boolean cacheValid = true;
+    private volatile boolean cacheValid = true;
 
     public MappingDataLoader(final Class<?> dataLoaderClass, final String dataPath) {
         this.dataLoaderClass = dataLoaderClass;
@@ -81,8 +87,9 @@ public class MappingDataLoader {
         for (final Map.Entry<String, Tag> entry : globalIdentifiers.entrySet()) {
             //noinspection unchecked
             final ListTag<StringTag> value = (ListTag<StringTag>) entry.getValue();
-            final String[] array = new String[value.size()];
-            for (int i = 0, size = value.size(); i < size; i++) {
+            final int size = value.size();
+            final String[] array = new String[size];
+            for (int i = 0; i < size; i++) {
                 array[i] = value.get(i).getValue();
             }
             GLOBAL_IDENTIFIER_INDEXES.put(entry.getKey(), array);
@@ -103,14 +110,14 @@ public class MappingDataLoader {
             throw new IllegalArgumentException("Unknown global identifier key: " + registry);
         }
         if (globalId < 0 || globalId >= array.length) {
-            throw new IllegalArgumentException("Unknown global identifier index: " + globalId);
+            throw new IllegalArgumentException("Unknown global identifier index: " + registry + "/" + globalId);
         }
         return array[globalId];
     }
 
     public void clearCache() {
-        mappingsCache.clear();
         cacheValid = false;
+        mappingsCache.clear();
     }
 
     /**
@@ -159,17 +166,14 @@ public class MappingDataLoader {
             return loadNBTFromFile(name);
         }
 
-        CompoundTag data = mappingsCache.get(name);
-        if (data != null) {
-            return data;
+        if (cache) {
+            // Also blocks concurrent loaders of the same file until the first one has finished
+            return mappingsCache.computeIfAbsent(name, this::loadNBTFromFile);
         }
 
-        data = loadNBTFromFile(name);
-
-        if (cache && data != null) {
-            mappingsCache.put(name, data);
-        }
-        return data;
+        // Still do a lookup, but don't store it
+        final CompoundTag data = mappingsCache.get(name);
+        return data != null ? data : loadNBTFromFile(name);
     }
 
     public @Nullable CompoundTag loadNBT(final String name) {
@@ -210,15 +214,29 @@ public class MappingDataLoader {
             return null;
         }
 
+        final int version = mappingsTag.getInt("version", -1);
+        if (version != VERSION) {
+            throw new IllegalArgumentException("Invalid version: " + version);
+        }
+
         final int mappedSize = tag.getInt("mappedSize", -1);
         final byte strategy = tag.getByteTag("id").asByte();
         final V mappings;
         if (strategy == DIRECT_ID) {
-            final IntArrayTag valuesTag = tag.getIntArrayTag("val");
-            return IntArrayMappings.of(valuesTag.getValue(), mappedSize);
+            // Zigzag varints of the difference to the previous mapped id
+            final int size = tag.getIntTag("size").asInt();
+            final ByteBuf buf = Unpooled.wrappedBuffer(tag.getByteArrayTag("val").getValue());
+            final int[] values = new int[size];
+            int prev = 0;
+            for (int i = 0; i < size; i++) {
+                prev += readZigZagVarInt(buf);
+                values[i] = prev;
+            }
+            return IntArrayMappings.of(values, mappedSize);
         } else if (strategy == SHIFTS_ID) {
-            final int[] shiftsAt = tag.getIntArrayTag("at").getValue();
-            final int[] shiftsTo = tag.getIntArrayTag("to").getValue();
+            final ValuePairs pairs = readAtValuePairs(tag);
+            final int[] shiftsAt = pairs.first;
+            final int[] shiftsTo = pairs.second;
             final int size = tag.getIntTag("size").asInt();
             mappings = holderSupplier.get(size);
 
@@ -241,8 +259,9 @@ public class MappingDataLoader {
                 }
             }
         } else if (strategy == CHANGES_ID) {
-            final int[] changesAt = tag.getIntArrayTag("at").getValue();
-            final int[] values = tag.getIntArrayTag("val").getValue();
+            final ValuePairs pairs = readAtValuePairs(tag);
+            final int[] changesAt = pairs.first;
+            final int[] values = pairs.second;
             final int size = tag.getIntTag("size").asInt();
             final boolean fillBetween = tag.get("nofill") == null;
             mappings = holderSupplier.get(size);
@@ -261,6 +280,13 @@ public class MappingDataLoader {
                 // Assign the changed value
                 addConsumer.addTo(mappings, changedId, values[i]);
             }
+
+            // Fill the remainder
+            if (fillBetween && nextUnhandledId != size) {
+                for (int id = nextUnhandledId; id < size; id++) {
+                    addConsumer.addTo(mappings, id, id);
+                }
+            }
         } else if (strategy == IDENTITY_ID) {
             final IntTag sizeTag = tag.getIntTag("size");
             return new IdentityMappings(sizeTag.asInt(), mappedSize);
@@ -270,15 +296,98 @@ public class MappingDataLoader {
         return mappingsSupplier.create(mappings, mappedSize);
     }
 
+    /**
+     * Reads alternating id and value pairs from varints. The id as the difference to the previous id,
+     * the value as the zigzag difference to the previous value.
+     *
+     * @param tag tag to read the packed values from
+     * @return array of ids and array of values
+     */
+    private static ValuePairs readAtValuePairs(final CompoundTag tag) {
+        final ByteBuf buf = Unpooled.wrappedBuffer(tag.getByteArrayTag("val").getValue());
+        final IntList at = new IntArrayList();
+        final IntList values = new IntArrayList();
+        int prevAt = -1;
+        int prevValue = 0;
+        while (buf.isReadable()) {
+            prevAt = prevAt + 1 + Types.VAR_INT.readPrimitive(buf);
+            prevValue += readZigZagVarInt(buf);
+            at.add(prevAt);
+            values.add(prevValue);
+        }
+        return new ValuePairs(at.toIntArray(), values.toIntArray());
+    }
+
+    private static int readZigZagVarInt(final ByteBuf buf) {
+        // https://lemire.me/blog/2022/11/25/making-all-your-integers-positive-with-zigzag-encoding/
+        // In short, using deltas to previous ids makes the numbers small, and using zigzag encoding means they're all positive.
+        // Being all positive means we can use varints to make most of the data much shorter than 8 bytes.
+        // All of that combined ends up having a decent effect when compressed in the jar file as well.
+        final int value = Types.VAR_INT.readPrimitive(buf);
+        return (value >>> 1) ^ -(value & 1);
+    }
+
     public @Nullable List<String> identifiersFromGlobalIds(final CompoundTag mappingsTag, final String key) {
         final Mappings mappings = loadMappings(mappingsTag, key);
-        if (mappings == null) {
+        return mappings != null ? identifiers(mappings, key) : null;
+
+    }
+
+    /**
+     * Returns a pair of identifier lists, also keeping track of whether the two lists are equal.
+     *
+     * @param unmappedTag unmapped mappings tag
+     * @param mappedTag   mapped mappings tag
+     * @param key         mappings key
+     * @return pair of identifier lists
+     */
+    public @Nullable IdentifiersPair identifiersFromGlobalIds(final CompoundTag unmappedTag, final CompoundTag mappedTag, final String key) {
+        final Mappings unmapped = loadMappings(unmappedTag, key);
+        if (unmapped == null) {
             return null;
         }
 
-        final List<String> identifiers = new ArrayList<>(mappings.size());
-        for (int i = 0; i < mappings.size(); i++) {
-            identifiers.add(identifierFromGlobalId(key, mappings.getNewId(i)));
+        final Mappings mapped = loadMappings(mappedTag, key);
+        if (mapped == null) {
+            return null;
+        }
+
+        final int size = unmapped.size();
+        if (size != mapped.size()) {
+            return new IdentifiersPair(identifiers(unmapped, key), identifiers(mapped, key), false);
+        }
+
+        // Small optimization to only load one array and reduce loading for full mappings
+        final List<String> unmappedIdentifiers = new ArrayList<>(size);
+        final List<String> mappedIdentifiers = new ArrayList<>(size);
+        boolean identity = true;
+        for (int i = 0; i < size; i++) {
+            final int unmappedGlobalId = unmapped.getNewId(i);
+            final int mappedGlobalId = mapped.getNewId(i);
+            final String unmappedIdentifier = identifierFromGlobalId(key, unmappedGlobalId);
+            if (unmappedGlobalId == mappedGlobalId) {
+                unmappedIdentifiers.add(unmappedIdentifier);
+                mappedIdentifiers.add(unmappedIdentifier);
+                continue;
+            }
+
+            if (mappedGlobalId == -1) {
+                throw new IllegalArgumentException("Mapped global id -1 for unmapped global id: " + key + "/" + unmappedIdentifier + " (" + unmappedGlobalId + ")");
+            }
+
+            identity = false;
+            unmappedIdentifiers.add(unmappedIdentifier);
+            mappedIdentifiers.add(identifierFromGlobalId(key, mappedGlobalId));
+        }
+        return identity ? new IdentifiersPair(unmappedIdentifiers) : new IdentifiersPair(unmappedIdentifiers, mappedIdentifiers);
+    }
+
+    private List<String> identifiers(final Mappings mappings, final String key) {
+        final int size = mappings.size();
+        final List<String> identifiers = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            final int globalId = mappings.getNewId(i);
+            identifiers.add(identifierFromGlobalId(key, globalId));
         }
         return identifiers;
     }
@@ -341,5 +450,19 @@ public class MappingDataLoader {
     public interface MappingsSupplier<T extends Mappings, V> {
 
         T create(V mappings, int mappedSize);
+    }
+
+    public record IdentifiersPair(List<String> unmapped, List<String> mapped, boolean identity) {
+
+        public IdentifiersPair(final List<String> unmapped, final List<String> mapped) {
+            this(unmapped, mapped, false);
+        }
+
+        public IdentifiersPair(final List<String> identifiers) {
+            this(identifiers, identifiers, true);
+        }
+    }
+
+    private record ValuePairs(int[] first, int[] second) {
     }
 }

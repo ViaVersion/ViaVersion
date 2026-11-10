@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -92,6 +92,10 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     public static final ProtocolVersion v1_21_6 = register(771, "1.21.6");
     public static final ProtocolVersion v1_21_7 = register(772, "1.21.7-1.21.8", new SubVersionRange("1.21", 7, 8));
     public static final ProtocolVersion v1_21_9 = register(773, "1.21.9-1.21.10", new SubVersionRange("1.21", 9, 10));
+    public static final ProtocolVersion v1_21_11 = register(774, "1.21.11");
+    public static final ProtocolVersion v26_1 = register(775, "26.1-26.1.2", new SubVersionRange("26.1", 0, 2));
+    public static final ProtocolVersion v26_2 = register(776, "26.2");
+    public static final ProtocolVersion v26_3 = register(777, "26.3");
     public static final ProtocolVersion unknown = new ProtocolVersion(VersionType.SPECIAL, -1, -1, "UNKNOWN", null);
 
     static {
@@ -191,6 +195,17 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      */
     public static List<ProtocolVersion> getProtocols() {
         return Collections.unmodifiableList(VERSION_LIST);
+    }
+
+    /**
+     * Returns an immutable list of registered protocol versions from newest to oldest.
+     *
+     * @return immutable list of registered protocol versions from newest to oldest
+     */
+    public static List<ProtocolVersion> getReversedProtocols() {
+        final List<ProtocolVersion> protocolVersions = new ArrayList<>(getProtocols());
+        Collections.reverse(protocolVersions);
+        return Collections.unmodifiableList(protocolVersions);
     }
 
     /**

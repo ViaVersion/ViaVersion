@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -76,4 +76,23 @@ public interface Item extends ItemBase {
      */
     @Override
     Item copy();
+
+    /**
+     * Returns whether the item is a template item.
+     *
+     * @return whether the item is a template item
+     */
+    default boolean isTemplate() {
+        return false;
+    }
+
+    /**
+     * Returns whether the item is null or empty.
+     *
+     * @param item item
+     * @return whether the item is null or empty
+     */
+    static boolean isEmpty(@Nullable final Item item) {
+        return item == null || item.isEmpty();
+    }
 }

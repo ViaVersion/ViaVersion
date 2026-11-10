@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ConfigurationState implements StorableObject {
 
+    private static final int MAX_SERVERBOUND_QUEUED_PACKETS = Integer.getInteger("viaversion.maxQueuedServerboundConfigPackets", 1000);
+    private static final int MAX_SERVERBOUND_QUEUED_BYTES = Integer.getInteger("viaversion.maxQueuedServerboundConfigPacketBytes", 1048576);
     private static final QueuedPacket[] EMPTY_PACKET_ARRAY = new QueuedPacket[0];
     private final List<QueuedPacket> packetQueue = new ArrayList<>();
     private BridgePhase bridgePhase = BridgePhase.NONE;
@@ -41,6 +43,8 @@ public class ConfigurationState implements StorableObject {
     private boolean queuedJoinGame;
     private CompoundTag lastDimensionRegistry;
     private ClientInformation clientInformation;
+    private int queuedServerboundBytes;
+    private int queuedServerboundPackets;
 
     public BridgePhase bridgePhase() {
         return bridgePhase;
@@ -70,8 +74,20 @@ public class ConfigurationState implements StorableObject {
         this.clientInformation = clientInformation;
     }
 
-    public void addPacketToQueue(final PacketWrapper wrapper, final boolean clientbound) {
-        packetQueue.add(toQueuedPacket(wrapper, clientbound, false));
+    public void addClientboundPacketToQueue(final PacketWrapper wrapper) {
+        packetQueue.add(toQueuedPacket(wrapper, true, false));
+    }
+
+    public void addServerboundPacketToQueue(final PacketWrapper wrapper) {
+        final QueuedPacket queued = toQueuedPacket(wrapper, false, false);
+        final int bytes = queued.buf().readableBytes();
+        if (queuedServerboundPackets >= MAX_SERVERBOUND_QUEUED_PACKETS || queuedServerboundBytes + bytes > MAX_SERVERBOUND_QUEUED_BYTES) {
+            wrapper.user().disconnect("Sent too many packets during config phase");
+            return;
+        }
+        queuedServerboundPackets++;
+        queuedServerboundBytes += bytes;
+        packetQueue.add(queued);
     }
 
     private QueuedPacket toQueuedPacket(final PacketWrapper wrapper, final boolean clientbound, final boolean skipCurrentPipeline) {
@@ -113,10 +129,10 @@ public class ConfigurationState implements StorableObject {
             packetQueue.add(hasJoinGamePacket ? 1 : 0, toQueuedPacket(clientInformationPacket, false, true));
         }
 
-        final ConfigurationState.QueuedPacket[] queuedPackets = packetQueue.toArray(EMPTY_PACKET_ARRAY);
+        final QueuedPacket[] queuedPackets = packetQueue.toArray(EMPTY_PACKET_ARRAY);
         packetQueue.clear();
 
-        for (final ConfigurationState.QueuedPacket packet : queuedPackets) {
+        for (final QueuedPacket packet : queuedPackets) {
             final PacketWrapper queuedWrapper;
             try {
                 if (packet.packetType() != null) {
@@ -141,6 +157,7 @@ public class ConfigurationState implements StorableObject {
         packetQueue.clear();
         bridgePhase = BridgePhase.NONE;
         queuedJoinGame = false;
+        queuedServerboundBytes = 0;
     }
 
     public boolean queuedOrSentJoinGame() {
@@ -176,7 +193,7 @@ public class ConfigurationState implements StorableObject {
         private final int packetId;
         private final boolean skipCurrentPipeline;
 
-        private QueuedPacket(final ByteBuf buf, final boolean clientbound, final PacketType packetType,
+        private QueuedPacket(final ByteBuf buf, final boolean clientbound, @Nullable final PacketType packetType,
                              final int packetId, final boolean skipCurrentPipeline) {
             this.buf = buf;
             this.clientbound = clientbound;

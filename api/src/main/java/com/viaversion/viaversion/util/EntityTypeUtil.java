@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -71,6 +71,7 @@ public final class EntityTypeUtil {
 
             final int id = mappings.mappedId(type.identifier());
             Preconditions.checkArgument(id != -1, "Entity type %s has no id", type.identifier());
+            Preconditions.checkArgument(id < typesToFill.length, "Types array too small (missing enum entry?). Tried setting id %s into array of size %s", id, typesToFill.length);
             idSetter.setId(type, id);
             typesToFill[id] = type;
         }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,10 @@
 package com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet;
 
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
+import com.viaversion.viaversion.protocols.v26_2to26_3.packet.ServerboundPacket26_3;
 
-public enum ServerboundConfigurationPackets1_21_9 implements ServerboundPacket1_21_9 {
+public enum ServerboundConfigurationPackets1_21_9 implements ServerboundPacket1_21_9, ServerboundPacket26_1, ServerboundPacket26_3 {
 
     CLIENT_INFORMATION, // 0x00
     COOKIE_RESPONSE, // 0x01

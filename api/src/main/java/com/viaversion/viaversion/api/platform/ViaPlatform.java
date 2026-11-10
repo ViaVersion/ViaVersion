@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +23,15 @@
 package com.viaversion.viaversion.api.platform;
 
 import com.google.gson.JsonObject;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.util.VersionInfo;
 import java.io.File;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 /**
@@ -44,6 +47,16 @@ public interface ViaPlatform<T> {
      * @return Java Logger (may be a wrapper)
      */
     Logger getLogger();
+
+    /**
+     * Creates a logger for the given name. Returns the main platform logger by default
+     *
+     * @param name The name of the logger
+     * @return The logger
+     */
+    default Logger createLogger(String name) {
+        return getLogger();
+    }
 
     /**
      * Get the platform name
@@ -69,11 +82,13 @@ public interface ViaPlatform<T> {
     }
 
     /**
-     * Get the plugin version
+     * Get the plugin version.
      *
      * @return Plugin version as a semver string
      */
-    String getPluginVersion();
+    default String getPluginVersion() {
+        return VersionInfo.getVersion();
+    }
 
     /**
      * Run a task Async
@@ -81,7 +96,9 @@ public interface ViaPlatform<T> {
      * @param runnable The task to run
      * @return The Task ID
      */
-    PlatformTask runAsync(Runnable runnable);
+    default PlatformTask runAsync(Runnable runnable) {
+        return new ViaPlatformTask(Via.getManager().getScheduler().execute(runnable));
+    }
 
     /**
      * Run a task async at a repeating interval.
@@ -90,7 +107,9 @@ public interface ViaPlatform<T> {
      * @param ticks    The interval to run it at
      * @return The Task ID
      */
-    PlatformTask runRepeatingAsync(Runnable runnable, long ticks);
+    default PlatformTask runRepeatingAsync(Runnable runnable, long ticks) {
+        return new ViaPlatformTask(Via.getManager().getScheduler().scheduleRepeating(runnable, ticks * 50, ticks * 50, TimeUnit.MILLISECONDS));
+    }
 
     /**
      * Run a task Sync
@@ -98,7 +117,9 @@ public interface ViaPlatform<T> {
      * @param runnable The task to run
      * @return The Task ID
      */
-    PlatformTask runSync(Runnable runnable);
+    default PlatformTask runSync(Runnable runnable) {
+        return runAsync(runnable);
+    }
 
     /**
      * Runs a synchronous task after a delay in ticks.
@@ -107,7 +128,9 @@ public interface ViaPlatform<T> {
      * @param delay    delay in ticks to run it after
      * @return created task
      */
-    PlatformTask runSync(Runnable runnable, long delay);
+    default PlatformTask runSync(Runnable runnable, long delay) {
+        return new ViaPlatformTask(Via.getManager().getScheduler().schedule(runnable, delay * 50, TimeUnit.MILLISECONDS));
+    }
 
     /**
      * Runs a synchronous task at a repeating interval.
@@ -116,7 +139,9 @@ public interface ViaPlatform<T> {
      * @param period   period in ticks to run at
      * @return created task
      */
-    PlatformTask runRepeatingSync(Runnable runnable, long period);
+    default PlatformTask runRepeatingSync(Runnable runnable, long period) {
+        return runRepeatingAsync(runnable, period);
+    }
 
     /**
      * Send a message to a player
@@ -125,7 +150,7 @@ public interface ViaPlatform<T> {
      * @param message    The message to send
      */
     default void sendMessage(UserConnection connection, String message) {
-        throw new UnsupportedOperationException("ViaPlatform#sendMessage is not implemented on this platform.");
+        // To be overridden if needed
     }
 
     /**
@@ -136,7 +161,32 @@ public interface ViaPlatform<T> {
      * @return True if it was successful
      */
     default boolean kickPlayer(UserConnection connection, String message) {
-        throw new UnsupportedOperationException("ViaPlatform#kickPlayer is not implemented on this platform.");
+        // To be overridden if needed
+        return false;
+    }
+
+    /**
+     * Modify the player details payload before it is sent.
+     * This method allows adding, changing, or removing fields from the payload.
+     * It is only called if {@link ViaVersionConfig#sendPlayerDetails()} is true.
+     *
+     * @param connection The UserConnection
+     * @param payload    The constructed payload to modify
+     */
+    default void modifyPlayerDetails(UserConnection connection, JsonObject payload) {
+        // To be overridden if needed
+    }
+
+    /**
+     * Modify the server details payload before it is sent.
+     * This method allows adding, changing, or removing fields from the payload.
+     * It is only called if {@link ViaVersionConfig#sendServerDetails()} is true.
+     *
+     * @param connection The UserConnection
+     * @param payload    The constructed payload to modify
+     */
+    default void modifyServerDetails(UserConnection connection, JsonObject payload) {
+        // To be overridden if needed
     }
 
     /**
@@ -147,7 +197,18 @@ public interface ViaPlatform<T> {
      * @param message    The data to send
      */
     default void sendCustomPayload(UserConnection connection, String channel, byte[] message) {
-        throw new UnsupportedOperationException("ViaPlatform#sendCustomPayload is not implemented on this platform.");
+        // To be overridden if needed
+    }
+
+    /**
+     * Send a custom payload from the server to a player.
+     *
+     * @param connection The UserConnection
+     * @param channel    The channel to send the payload on
+     * @param message    The data to send
+     */
+    default void sendCustomPayloadToClient(UserConnection connection, String channel, byte[] message) {
+        // To be overridden if needed
     }
 
     /**
@@ -176,6 +237,7 @@ public interface ViaPlatform<T> {
      * is loaded as a plugin which can be reloaded.
      */
     default void onReload() {
+        // To be overridden if needed
     }
 
     /**
@@ -195,7 +257,7 @@ public interface ViaPlatform<T> {
      * @return immutable collection of unsupported software to be checked
      */
     default Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
-        return Collections.emptyList();
+        return List.of();
     }
 
     /**
@@ -204,7 +266,9 @@ public interface ViaPlatform<T> {
      * @param name plugin or identifier
      * @return whether the platform has a plugin/mod with the given name
      */
-    boolean hasPlugin(String name);
+    default boolean hasPlugin(String name) {
+        return false;
+    }
 
     /**
      * Returns whether the platform might be reloading.
@@ -212,6 +276,6 @@ public interface ViaPlatform<T> {
      * @return whether the platform might be reloading
      */
     default boolean couldBeReloading() {
-        return true;
+        return false;
     }
 }

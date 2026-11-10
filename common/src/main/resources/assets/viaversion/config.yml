@@ -21,17 +21,35 @@ block-versions: []
 block-protocols: []
 # Change the blocked disconnect message
 block-disconnect-msg: "You are using an unsupported Minecraft version!"
-# Whether to log more info about kicks due to blocked protocol versions to the console.
-log-blocked-joins: false
 # If you use ProtocolLib, we can't reload without kicking the players.
 # (We don't suggest using reload either, use a plugin manager)
 # You can customize the message we kick people with if you use ProtocolLib here.
 reload-disconnect-msg: "Server reload, please rejoin!"
-# We warn when there's an error converting item/block or component/nbt data over versions, should we suppress these? (Only suggested if spamming)
-suppress-conversion-warnings: false
-# This can be disabled for debugging purposes if text in chat/entities/items shows an error tag.
-suppress-text-component-conversion-warnings: true
+# Settings for logging behavior. When debugging issues, we may ask you to change some of these.
+# Most of these are disabled by default to prevent log spam from bad user input.
+logging:
+  # Whether to log more info about kicks due to blocked protocol versions to the console.
+  log-blocked-joins: false
+  # Whether to log errors during entity data conversion.
+  log-entity-data-errors: true
+  # Whether to log errors during text component conversion.
+  log-text-component-conversion-errors: false
+  # Whether to warn for other issues when converting items, blocks, or other data between server and client.
+  log-other-conversion-warnings: false
+  # Maximum length of error messages in the console.
+  max-error-length: 1500
 #
+# Used for auto updating config files. Do not touch.
+config-version: 1
+init-config-version: 1
+# Whether to update config values that were left on their default to newly changed defaults. Recommended to keep enabled.
+migrate-default-config-changes: true
+# If enabled, ViaVersion will send the native player version to the server on connect via a plugin message.
+# See the wiki for more info: https://github.com/ViaVersion/ViaVersion/wiki/Server-and-Player-Details-Protocol
+send-player-details: true
+# If enabled, ViaVersion will send the native server version to a player on connect via a plugin message.
+# See the wiki above for more info.
+send-server-details: true
 #----------------------------------------------------------#
 #                    VELOCITY OPTIONS                      #
 #----------------------------------------------------------#
@@ -70,9 +88,9 @@ packet-limiter:
   max-per-second-kick-message: "You are sending too many packets!"
   #
   # We can also kick them if they repeatedly send too many packets over a longer period of time.
-  # E.g. if a player sends over 150 packets per second for 4 out of 7 seconds, we kick them.
+  # E.g. if a player sends over 200 packets per second for 4 out of 7 seconds, we kick them.
   # The maximum packets per second a client can send over a longer period of time.
-  sustained-max-per-second: 150
+  sustained-max-per-second: 200
   # Period to track in seconds.
   sustained-period-seconds: 7
   # The number of seconds within the interval that the client can exceed the limit before being kicked.
@@ -105,6 +123,8 @@ register-userconnections-on-join: true
 piston-animation-patch: false
 # Experimental - Should we fix shift quick move action for 1.12 clients (causes shift + double click not to work when moving items) (only works on 1.8-1.11.2 bukkit based servers)
 quick-move-action-fix: false
+# Should we fix the client-randomized reddust color for 1.13+ clients? This will result in an extra packet per count, so enabling this may spam clients.
+multi-reddust-color-fix: false
 # Should we use prefix for team color on 1.13 and above clients?
 team-colour-fix: true
 # 1.13 introduced new auto complete which can trigger "Kicked for spamming" for servers older than 1.13, the following option will disable it completely.
@@ -174,7 +194,11 @@ enforce-secure-chat: false
 # Handles items with invalid count values (higher than max stack size) on 1.20.3 servers.
 handle-invalid-item-count: false
 #
-# Hides scoreboard numbers for 1.20.3+ clients on older server versions.
+# Backs up the original data of nested items (e.g. in shulker boxes or bundles) for 1.20.5+ clients on 1.20.4 and older servers.
+# This keeps their data intact when taken out individually in creative mode, but greatly increases the size of deeply nested items.
+backup-nested-items: false
+#
+# Hides sidebar scoreboard numbers for 1.20.3+ clients on older server versions.
 hide-scoreboard-numbers: false
 #
 # Fixes 1.21+ clients on 1.20.5 servers placing water/lava buckets at the wrong location when moving fast, NOTE: This may cause issues with anti-cheat plugins.
@@ -192,8 +216,6 @@ cancel-swing-in-inventory: true
 prevent-collision: true
 # If the above is true, should we automatically team players until you do?
 auto-team: true
-# When enabled if certain entity data can't be read, we won't tell you about it
-suppress-metadata-errors: false
 # When enabled, 1.9+ will be able to block by using shields
 shield-blocking: true
 # If this setting is active, the main hand is used instead of the off-hand to trigger the blocking of the player.
@@ -228,3 +250,5 @@ chunk-border-fix: false
 left-handed-handling: true
 # Tries to cancel block break/place sounds sent by 1.8 servers to 1.9+ clients to prevent them from playing twice
 cancel-block-sounds: true
+# If enabled, 1.21.11+ clients on 1.8 servers will get wider entity hitboxes when attacking with items
+use-1_8-hitbox-margin: true

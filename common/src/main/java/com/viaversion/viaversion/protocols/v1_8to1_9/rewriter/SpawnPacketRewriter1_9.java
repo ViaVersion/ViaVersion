@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ public class SpawnPacketRewriter1_9 {
 
                 handler(wrapper -> {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     wrapper.write(Types.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
                 });
                 map(Types.BYTE); // 2 - Type
@@ -71,7 +71,7 @@ public class SpawnPacketRewriter1_9 {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     int typeID = wrapper.get(Types.BYTE, 0);
                     int data = wrapper.get(Types.INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
 
                     EntityType entityType = EntityTypes1_9.ObjectType.getEntityType(typeID, data);
                     if (entityType != null) {
@@ -131,7 +131,7 @@ public class SpawnPacketRewriter1_9 {
                 // Parse this info
                 handler(wrapper -> {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.addEntity(entityID, EntityTypes1_9.EntityType.EXPERIENCE_ORB);
                 });
 
@@ -152,7 +152,7 @@ public class SpawnPacketRewriter1_9 {
                 handler(wrapper -> {
                     // Currently only lightning uses this
                     int entityID = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.addEntity(entityID, EntityTypes1_9.EntityType.LIGHTNING_BOLT);
                 });
 
@@ -169,7 +169,7 @@ public class SpawnPacketRewriter1_9 {
 
                 handler(wrapper -> {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     wrapper.write(Types.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
                 });
                 map(Types.UNSIGNED_BYTE); // 2 - Type
@@ -178,7 +178,7 @@ public class SpawnPacketRewriter1_9 {
                 handler(wrapper -> {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     int typeID = wrapper.get(Types.UNSIGNED_BYTE, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
 
                     EntityType entityType = EntityTypes1_9.EntityType.findById(typeID);
                     if (entityType != null) {
@@ -202,7 +202,7 @@ public class SpawnPacketRewriter1_9 {
                 handler(wrapper -> {
                     List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_9, 0);
                     int entityId = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     if (tracker.hasEntity(entityId)) {
                         protocol.getEntityRewriter().handleEntityData(entityId, entityDataList, wrapper.user());
                     } else {
@@ -214,8 +214,13 @@ public class SpawnPacketRewriter1_9 {
                 handler(wrapper -> {
                     List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_9, 0);
                     int entityID = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.handleEntityData(entityID, entityDataList);
+
+                    // dragon default phase on 1.9+ is 10 (hovering), so we set it to match the only phase 1.8 had, which was 0 (circling)
+                    if (tracker.entityType(entityID) == EntityTypes1_9.EntityType.ENDER_DRAGON) {
+                        entityDataList.add(new EntityData(11, EntityDataTypes1_9.VAR_INT, 0)); // 11 = dragon phase id
+                    }
                 });
             }
         });
@@ -228,12 +233,12 @@ public class SpawnPacketRewriter1_9 {
                 // Parse this info
                 handler(wrapper -> {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.addEntity(entityID, EntityTypes1_9.EntityType.PAINTING);
                 });
                 handler(wrapper -> {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     wrapper.write(Types.UUID, tracker.getEntityUUID(entityID)); // 1 - UUID
                 });
 
@@ -252,7 +257,7 @@ public class SpawnPacketRewriter1_9 {
                 // Parse this info
                 handler(wrapper -> {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.addEntity(entityID, EntityTypes1_9.EntityType.PLAYER);
                 });
 
@@ -280,7 +285,7 @@ public class SpawnPacketRewriter1_9 {
                 handler(wrapper -> {
                     List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_9, 0);
                     int entityId = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     if (tracker.hasEntity(entityId)) {
                         protocol.getEntityRewriter().handleEntityData(entityId, entityDataList, wrapper.user());
                     } else {
@@ -293,7 +298,7 @@ public class SpawnPacketRewriter1_9 {
                 handler(wrapper -> {
                     List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_9, 0);
                     int entityID = wrapper.get(Types.VAR_INT, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.handleEntityData(entityID, entityDataList);
                 });
             }
@@ -307,7 +312,7 @@ public class SpawnPacketRewriter1_9 {
 
                 handler(wrapper -> {
                     int[] entities = wrapper.get(Types.VAR_INT_ARRAY_PRIMITIVE, 0);
-                    EntityTracker tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker tracker = wrapper.user().getEntityTracker(protocol);
                     for (int entity : entities) {
                         // EntityTracker
                         tracker.removeEntity(entity);

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -83,5 +83,9 @@ public final class Via {
     private static ViaManager manager() {
         Preconditions.checkArgument(manager != null, "ViaVersion has not loaded the platform yet");
         return manager;
+    }
+
+    public static boolean isLoaded() {
+        return manager != null;
     }
 }

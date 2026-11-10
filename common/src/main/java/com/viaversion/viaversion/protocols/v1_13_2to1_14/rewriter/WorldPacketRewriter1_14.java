@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.Protocol1_13_2To1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.storage.EntityTracker1_14;
-import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import java.util.Arrays;
 
@@ -53,8 +52,6 @@ public class WorldPacketRewriter1_14 {
     }
 
     public static void register(Protocol1_13_2To1_14 protocol) {
-        BlockRewriter<ClientboundPackets1_13> blockRewriter = BlockRewriter.for1_14(protocol);
-
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_DESTRUCTION, new PacketHandlers() {
             @Override
             public void register() {
@@ -69,7 +66,7 @@ public class WorldPacketRewriter1_14 {
                 map(Types.BLOCK_POSITION1_8, Types.BLOCK_POSITION1_14);
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_EVENT, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_13.BLOCK_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.BLOCK_POSITION1_8, Types.BLOCK_POSITION1_14); // Location
@@ -79,7 +76,7 @@ public class WorldPacketRewriter1_14 {
                 handler(wrapper -> wrapper.set(Types.VAR_INT, 0, protocol.getMappingData().getNewBlockId(wrapper.get(Types.VAR_INT, 0))));
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_UPDATE, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_13.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.BLOCK_POSITION1_8, Types.BLOCK_POSITION1_14);
@@ -102,8 +99,6 @@ public class WorldPacketRewriter1_14 {
             }
         });
 
-        blockRewriter.registerChunkBlocksUpdate(ClientboundPackets1_13.CHUNK_BLOCKS_UPDATE);
-
         protocol.registerClientbound(ClientboundPackets1_13.EXPLODE, new PacketHandlers() {
             @Override
             public void register() {
@@ -125,7 +120,7 @@ public class WorldPacketRewriter1_14 {
         });
 
         protocol.registerClientbound(ClientboundPackets1_13.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13_2To1_14.class);
+            ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
             Chunk chunk = wrapper.read(ChunkType1_13.forEnvironment(clientWorld.getEnvironment()));
             wrapper.write(ChunkType1_14.TYPE, chunk);
 
@@ -223,7 +218,7 @@ public class WorldPacketRewriter1_14 {
                 lightPacket.write(Types.BYTE_ARRAY_PRIMITIVE, section.getLight().getBlockLight());
             }
 
-            EntityTracker1_14 entityTracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
+            EntityTracker1_14 entityTracker = wrapper.user().getEntityTracker(protocol);
             int diffX = Math.abs(entityTracker.getChunkCenterX() - chunk.getX());
             int diffZ = Math.abs(entityTracker.getChunkCenterZ() - chunk.getZ());
             if (entityTracker.isForceSendCenterChunk()
@@ -247,7 +242,7 @@ public class WorldPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.LEVEL_EVENT, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_13.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.INT); // Effect Id
@@ -284,14 +279,14 @@ public class WorldPacketRewriter1_14 {
                 handler(wrapper -> {
                     short difficulty = wrapper.read(Types.UNSIGNED_BYTE); // 19w11a removed difficulty from respawn
 
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13_2To1_14.class);
+                    ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 0);
 
                     if (!clientWorld.setEnvironment(dimensionId)) {
                         return;
                     }
 
-                    EntityTracker1_14 entityTracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
+                    EntityTracker1_14 entityTracker = wrapper.user().getEntityTracker(protocol);
                     entityTracker.clearEntities();
 
                     // The client may reset the center chunk if dimension is changed

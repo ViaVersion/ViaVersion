@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,8 +43,6 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData(ClientboundPackets1_16_2.ADD_ENTITY, EntityTypes1_17.FALLING_BLOCK);
-        registerTracker(ClientboundPackets1_16_2.ADD_MOB);
         registerTracker(ClientboundPackets1_16_2.ADD_PLAYER, EntityTypes1_17.PLAYER);
         registerSetEntityData(ClientboundPackets1_16_2.SET_ENTITY_DATA, Types1_16.ENTITY_DATA_LIST, Types1_17.ENTITY_DATA_LIST);
 
@@ -76,7 +74,7 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
             int[] entityIds = wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE);
             wrapper.cancel();
 
-            EntityTracker entityTracker = wrapper.user().getEntityTracker(Protocol1_16_4To1_17.class);
+            EntityTracker entityTracker = wrapper.user().getEntityTracker(protocol);
             for (int entityId : entityIds) {
                 entityTracker.removeEntity(entityId);
 
@@ -188,11 +186,6 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
 
         // Attachment position removed
         filter().type(EntityTypes1_17.SHULKER).removeIndex(17);
-    }
-
-    @Override
-    public void onMappingDataLoaded() {
-        mapTypes();
     }
 
     @Override

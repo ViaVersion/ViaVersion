@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,13 +40,13 @@ import java.util.Map;
 public class BlockEntityProvider implements Provider {
     private final Map<String, BlockEntityHandler> handlers = new HashMap<>();
 
-    public BlockEntityProvider() {
+    public BlockEntityProvider(final Protocol1_12_2To1_13 protocol) {
         handlers.put("minecraft:flower_pot", new FlowerPotHandler());
         handlers.put("minecraft:bed", new BedHandler());
         handlers.put("minecraft:banner", new BannerHandler());
         handlers.put("minecraft:skull", new SkullHandler());
         handlers.put("minecraft:mob_spawner", new SpawnerHandler());
-        handlers.put("minecraft:command_block", new CommandBlockHandler());
+        handlers.put("minecraft:command_block", new CommandBlockHandler(protocol));
 
         final BlockEntityHandler customNameHandler = (user, tag) -> {
             final StringTag name = tag.getStringTag("CustomName");

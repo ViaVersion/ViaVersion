@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ public record ChatType(ChatTypeDecoration chatDecoration, ChatTypeDecoration nar
             public ChatTypeDecoration read(final ByteBuf buffer) {
                 final String translationKey = Types.STRING.read(buffer);
                 final int[] parameters = Types.INT_ARRAY_PRIMITIVE.read(buffer);
-                final Tag style = Types.TAG.read(buffer);
+                final Tag style = Types.TRUSTED_TAG.read(buffer);
                 return new ChatTypeDecoration(translationKey, parameters, style);
             }
 
@@ -67,7 +67,7 @@ public record ChatType(ChatTypeDecoration chatDecoration, ChatTypeDecoration nar
             public void write(final ByteBuf buffer, final ChatTypeDecoration value) {
                 Types.STRING.write(buffer, value.translationKey());
                 Types.INT_ARRAY_PRIMITIVE.write(buffer, value.parameters());
-                Types.TAG.write(buffer, value.style());
+                Types.TRUSTED_TAG.write(buffer, value.style());
             }
         };
 

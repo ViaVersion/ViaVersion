@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,10 +22,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
@@ -41,6 +41,7 @@ public abstract class Config extends ConfigSection {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setPrettyFlow(false);
+        options.setSplitLines(false);
         options.setIndent(2);
         return new Yaml(new CustomSafeConstructor(), new Representer(options), options);
     });
@@ -138,9 +139,9 @@ public abstract class Config extends ConfigSection {
 
         handleConfig(mergedConfig);
 
-        if (!mergedConfig.equals(existingConfig)) {
-            originalRoot = existingConfig != null ? new ConfigSection(this, "", existingConfig) : null;
+        originalRoot = existingConfig != null ? new ConfigSection(this, "", existingConfig) : null;
 
+        if (!mergedConfig.equals(existingConfig)) {
             // Also updates comments once values need to be saved
             save(location, mergedConfig);
         }
@@ -164,7 +165,9 @@ public abstract class Config extends ConfigSection {
         }
     }
 
-    protected abstract void handleConfig(Map<String, Object> config);
+    protected void handleConfig(Map<String, Object> config) {
+        // Can be overridden
+    }
 
     public synchronized void save(File location, Map<String, Object> config) {
         try {
@@ -180,7 +183,9 @@ public abstract class Config extends ConfigSection {
      *
      * @return list of options to remove from the config
      */
-    public abstract List<String> getUnsupportedOptions();
+    public List<String> getUnsupportedOptions() {
+        return List.of();
+    }
 
     /**
      * Returns a set of section keys that will have custom entry keys.
@@ -207,7 +212,7 @@ public abstract class Config extends ConfigSection {
         if (this.configFile.getParentFile() != null) {
             this.configFile.getParentFile().mkdirs();
         }
-        this.values = new ConcurrentSkipListMap<>(loadConfig(this.configFile));
+        this.values = Collections.synchronizedMap(loadConfig(this.configFile));
     }
 
     @Override
@@ -223,7 +228,7 @@ public abstract class Config extends ConfigSection {
     /**
      * Returns the pre-modification root section of the config if present.
      *
-     * @return pre-modification root section, or null if no config existed or it did not require changes on load
+     * @return pre-modification root section, or null if no config existed
      */
     public @Nullable ConfigSection originalRootSection() {
         return originalRoot;

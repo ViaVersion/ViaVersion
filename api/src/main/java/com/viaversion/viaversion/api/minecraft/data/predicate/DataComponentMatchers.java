@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,23 +30,25 @@ public record DataComponentMatchers(StructuredData<?>[] exactPredicates, DataCom
 
     public static final class DataComponentMatchersType extends Type<DataComponentMatchers> {
         private final Type<StructuredData<?>[]> dataArrayType;
+        private final Type<DataComponentPredicate[]> predicateArrayType;
 
-        public DataComponentMatchersType(final Type<StructuredData<?>[]> dataArrayType) {
+        public DataComponentMatchersType(final Type<StructuredData<?>[]> dataArrayType, final Type<DataComponentPredicate[]> predicateArrayType) {
             super(DataComponentMatchers.class);
             this.dataArrayType = dataArrayType;
+            this.predicateArrayType = predicateArrayType;
         }
 
         @Override
         public DataComponentMatchers read(final ByteBuf buffer) {
             final StructuredData<?>[] exactPredicates = dataArrayType.read(buffer);
-            final DataComponentPredicate[] partialPredicates = DataComponentPredicate.ARRAY_TYPE.read(buffer);
+            final DataComponentPredicate[] partialPredicates = predicateArrayType.read(buffer);
             return new DataComponentMatchers(exactPredicates, partialPredicates);
         }
 
         @Override
         public void write(final ByteBuf buffer, final DataComponentMatchers value) {
             dataArrayType.write(buffer, value.exactPredicates());
-            DataComponentPredicate.ARRAY_TYPE.write(buffer, value.predicates());
+            predicateArrayType.write(buffer, value.predicates());
         }
     }
 }

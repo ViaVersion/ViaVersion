@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.ChunkPosition;
-import java.util.HashSet;
-import java.util.Set;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 
-public class ChunkLoadTracker implements StorableObject {
+public class ChunkLoadTracker {
 
-    private final Set<Long> loadedChunks = new HashSet<>();
+    private final LongSet loadedChunks = new LongOpenHashSet();
 
     public void addChunk(final int x, final int z) {
         this.loadedChunks.add(ChunkPosition.chunkKey(x, z));

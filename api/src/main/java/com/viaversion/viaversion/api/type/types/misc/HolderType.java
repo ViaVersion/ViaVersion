@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -71,7 +71,7 @@ public abstract class HolderType<T> extends Type<Holder<T>> {
     @Override
     public void write(final Ops ops, final Holder<T> value) {
         if (value.hasId()) {
-            ops.write(Types.RESOURCE_LOCATION, identifier(ops, value.id()));
+            ops.write(Types.IDENTIFIER, identifier(ops, value.id()));
         } else {
             writeDirect(ops, value.value());
         }

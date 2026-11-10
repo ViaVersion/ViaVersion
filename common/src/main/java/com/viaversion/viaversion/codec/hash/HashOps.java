@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class HashOps extends OpsBase implements Hasher {
+/**
+ * Re-usable (but not thread-safe) ops for writing hashes.
+ */
+public final class HashOps extends OpsBase implements Hasher {
 
     private static final byte TAG_MAP_START = 2;
     private static final byte TAG_MAP_END = 3;
@@ -90,7 +93,7 @@ public class HashOps extends OpsBase implements Hasher {
 
     @Override
     public void writeString(final CharSequence sequence) {
-        hashBuilder.preSize(sequence.length() + Byte.BYTES + Integer.BYTES)
+        hashBuilder.preSize((sequence.length() * Character.BYTES) + Byte.BYTES + Integer.BYTES)
             .writeByte(TAG_STRING)
             .writeInt(sequence.length())
             .writeString(sequence);
@@ -156,11 +159,6 @@ public class HashOps extends OpsBase implements Hasher {
         final MapHashBuilder mapHasher = new MapHashBuilder();
         consumer.accept(mapHasher);
         mapHasher.applyHashToParent();
-    }
-
-    @Override
-    public <V> void write(final Type<V> type, final V value) {
-        type.write(this, value);
     }
 
     @Override

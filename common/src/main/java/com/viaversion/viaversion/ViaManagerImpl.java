@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ import com.viaversion.viaversion.commands.ViaCommandHandler;
 import com.viaversion.viaversion.configuration.ConfigurationProviderImpl;
 import com.viaversion.viaversion.connection.ConnectionManagerImpl;
 import com.viaversion.viaversion.debug.DebugHandlerImpl;
+import com.viaversion.viaversion.platform.UserConnectionViaVersionPlatform;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionRange;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
@@ -51,8 +52,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ViaManagerImpl implements ViaManager {
     private final ProtocolManagerImpl protocolManager = new ProtocolManagerImpl();
@@ -76,6 +75,26 @@ public class ViaManagerImpl implements ViaManager {
         this.injector = injector;
         this.commandHandler = commandHandler;
         this.loader = loader;
+    }
+
+    /**
+     * Initialized and completes the full loading process of ViaVersion.
+     *
+     * @param platform       platform
+     * @param injector       platform injector
+     * @param commandHandler command handler
+     * @return the initialized and loaded manager
+     */
+    public static ViaManager initAndLoad(ViaPlatform<?> platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader, Runnable... enableListeners) {
+        final ViaManagerImpl manager = new ViaManagerImpl(platform, injector, commandHandler, loader);
+        Via.init(manager);
+        platform.getConf().reload();
+        for (final Runnable listener : enableListeners) {
+            manager.addEnableListener(listener);
+        }
+        manager.init();
+        manager.onServerLoaded();
+        return manager;
     }
 
     public static ViaManagerBuilder builder() {
@@ -185,6 +204,10 @@ public class ViaManagerImpl implements ViaManager {
         // Refresh Versions
         protocolManager.refreshVersions();
 
+        if (protocolVersion.isKnown() && !(platform instanceof UserConnectionViaVersionPlatform)) {
+            exploitableVersionsWarning(protocolVersion);
+        }
+
         for (final Runnable listener : postEnableListeners) {
             listener.run();
         }
@@ -225,28 +248,35 @@ public class ViaManagerImpl implements ViaManager {
         platform.getLogger().info("ViaVersion has been disabled; uninjected the platform and shut down the scheduler.");
     }
 
-    private void checkJavaVersion() { // Stolen from Paper
-        String javaVersion = System.getProperty("java.version");
-        Matcher matcher = Pattern.compile("(?:1\\.)?(\\d+)").matcher(javaVersion);
-        if (!matcher.find()) {
-            platform.getLogger().warning("Failed to determine Java version; could not parse: " + javaVersion);
+    private void exploitableVersionsWarning(final ServerProtocolVersion serverProtocolVersion) {
+        if (!platform.isProxy() && isExploitableVersion(serverProtocolVersion.highestSupportedProtocolVersion())) {
+            platform.getLogger().warning("The Vanilla protocol of Minecraft 1.20.5-1.21.4 is exploitable easily. Please consider updating your server to at least 1.21.5.");
             return;
         }
 
-        String versionString = matcher.group(1);
-        int version;
-        try {
-            version = Integer.parseInt(versionString);
-        } catch (NumberFormatException e) {
-            platform.getLogger().log(Level.WARNING, "Failed to determine Java version; could not parse: " + versionString, e);
-            return;
+        final List<String> versions = new ArrayList<>();
+        for (final ProtocolVersion version : protocolManager.getSupportedVersions()) {
+            if (isExploitableVersion(version) && !platform.getConf().blockedProtocolVersions().contains(version)) {
+                versions.add('"' + version.getName() + '"');
+            }
         }
+        if (!versions.isEmpty()) {
+            platform.getLogger().warning("The Vanilla protocol of Minecraft 1.20.5-1.21.4 is easily exploitable. "
+                + "If you don't need to support these versions, consider adding them to block-versions in the ViaVersion config: " + String.join(", ", versions));
+        }
+    }
 
-        if (version < 17) {
+    private static boolean isExploitableVersion(final ProtocolVersion version) {
+        return version.betweenInclusive(ProtocolVersion.v1_20_5, ProtocolVersion.v1_21_4);
+    }
+
+    private void checkJavaVersion() {
+        int javaVersion = Runtime.version().feature();
+        if (javaVersion < 17) {
             platform.getLogger().warning("You are running an outdated Java version, please update it to at least Java 21 (your version is " + javaVersion + ").");
             platform.getLogger().warning("ViaVersion no longer officially supports this version of Java, only offering unsupported compatibility builds.");
             platform.getLogger().warning("See https://github.com/ViaVersion/ViaVersion/releases/tag/5.0.0 for more information.");
-        } else if (version < 21) {
+        } else if (javaVersion < 21) {
             platform.getLogger().warning("Please update your Java runtime to at least Java 21 (your version is " + javaVersion + ").");
             platform.getLogger().warning("At some point in the future, ViaVersion will no longer be compatible with this version of Java.");
         }
@@ -350,10 +380,10 @@ public class ViaManagerImpl implements ViaManager {
     }
 
     public static final class ViaManagerBuilder {
+        private ViaPlatformLoader loader = ViaPlatformLoader.NOOP;
         private ViaPlatform<?> platform;
         private ViaInjector injector;
         private ViaCommandHandler commandHandler;
-        private ViaPlatformLoader loader;
 
         public ViaManagerBuilder platform(ViaPlatform<?> platform) {
             this.platform = platform;

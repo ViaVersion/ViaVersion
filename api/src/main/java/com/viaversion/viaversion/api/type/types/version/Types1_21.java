@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ public final class Types1_21 extends Types1_20_5<StructuredDataKeys1_20_5, Entit
 
     public final Type<Item> optionalItem; // Optional as in boolean prefixed, not via the amount
 
-    public Types1_21(final Function<Types1_20_5<?, ?>, StructuredDataKeys1_20_5> keysSupplier, final Function<Types1_20_5<?, ?>, EntityDataTypes1_21> entityDataTypesSupplier) {
+    public Types1_21(final Function<VersionedTypesHolder, StructuredDataKeys1_20_5> keysSupplier, final Function<VersionedTypesHolder, EntityDataTypes1_21> entityDataTypesSupplier) {
         super(keysSupplier, entityDataTypesSupplier);
         this.optionalItem = ((ItemType1_20_5) item).new OptionalItemType();
     }

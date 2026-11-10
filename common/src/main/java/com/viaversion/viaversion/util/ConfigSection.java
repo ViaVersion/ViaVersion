@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -117,12 +117,10 @@ public class ConfigSection {
     }
 
     public @Nullable JsonElement getSerializedComponent(final String key) {
-        final Object o = this.values.get(key);
-        if (o != null && !((String) o).isEmpty()) {
-            return ComponentUtil.legacyToJson((String) o);
-        } else {
-            return null;
+        if (this.values.get(key) instanceof final String s && !s.isEmpty()) {
+            return ComponentUtil.legacyToJson(s);
         }
+        return null;
     }
 
     public @Nullable ConfigSection getSection(final String key) {

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     // Check if it is the inventory of the player
                     if (showShieldWhenSwordInHand) {
                         InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
 
                         short slotID = wrapper.get(Types.SHORT, 0);
                         byte windowId = wrapper.get(Types.BYTE, 0);
@@ -157,7 +157,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
 
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                    EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
 
                     boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
                         && Via.getConfig().isShieldBlocking();
@@ -242,7 +242,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
 
                     if (showShieldWhenSwordInHand) {
                         InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
                         short slotID = wrapper.get(Types.SHORT, 0);
 
                         // Update item in slot
@@ -358,7 +358,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                         boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
                             && Via.getConfig().isShieldBlocking();
 
-                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
                         if (entityTracker.isBlocking()) {
                             entityTracker.setBlocking(false);
 
@@ -382,12 +382,37 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
     @Override
     public @Nullable Item handleItemToClient(final UserConnection connection, @Nullable final Item item) {
         if (item == null) return null;
+        if (item.identifier() == 62) {
+            item.setIdentifier(61);
+            CompoundTag tag = item.tag();
+            if (tag == null) {
+                tag = new CompoundTag();
+            }
+            tag.putBoolean(nbtTagName("lit_furnace"), true);
+
+            CompoundTag display = tag.getCompoundTag("display");
+            if (display == null) {
+                tag.put("display", display = new CompoundTag());
+                display.putBoolean(nbtTagName(), true);
+            }
+
+            StringTag nameTag = display.getStringTag("Name");
+            if (nameTag == null) {
+                nameTag = new StringTag("1.8 Lit Furnace");
+                display.put("Name", nameTag);
+                display.putBoolean(nbtTagName("custom_name"), true);
+            }
+            item.setTag(tag);
+        }
         if (item.identifier() == 383 && item.data() != 0) { // Monster Egg
             CompoundTag tag = item.tag();
             if (tag == null) {
                 tag = new CompoundTag();
             }
-            CompoundTag entityTag = new CompoundTag();
+            CompoundTag entityTag = tag.getCompoundTag("EntityTag");
+            if (entityTag == null) {
+                entityTag = new CompoundTag();
+            }
             String entityName = EntityIds1_8.ENTITY_ID_TO_NAME.get((int) item.data());
             if (entityName != null) {
                 StringTag id = new StringTag(entityName);
@@ -442,6 +467,24 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
     @Override
     public @Nullable Item handleItemToServer(final UserConnection connection, @Nullable final Item item) {
         if (item == null) return null;
+        if (item.identifier() == 61) {
+            CompoundTag tag = item.tag();
+            if (tag != null && tag.remove(nbtTagName("lit_furnace")) != null) {
+                item.setIdentifier(62);
+                CompoundTag display = tag.getCompoundTag("display");
+                if (display != null) {
+                    if (display.remove(nbtTagName("custom_name")) != null) {
+                        display.remove("Name");
+                    }
+                    if (display.remove(nbtTagName()) != null) {
+                        tag.remove("display");
+                        if (tag.isEmpty()) {
+                            item.setTag(null);
+                        }
+                    }
+                }
+            }
+        }
         if (item.identifier() == 383 && item.data() == 0) { // Monster Egg
             CompoundTag tag = item.tag();
             int data = 0;
@@ -453,7 +496,13 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                         data = EntityIds1_8.ENTITY_NAME_TO_ID.get(id.getValue());
                     }
                 }
-                tag.remove("EntityTag");
+                entityTag.remove("id");
+                if (entityTag.isEmpty()) {
+                    tag.remove("EntityTag");
+                }
+            }
+            if (tag != null && tag.isEmpty()) {
+                tag = null;
             }
             item.setTag(tag);
             item.setData((short) data);
@@ -468,6 +517,9 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     data = PotionIdMappings1_9.POTION_NAME_TO_ID.get(potionName);
                 }
                 tag.remove("Potion");
+            }
+            if (tag != null && tag.isEmpty()) {
+                tag = null;
             }
             item.setTag(tag);
             item.setData((short) data);
@@ -484,6 +536,9 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     data = PotionIdMappings1_9.POTION_NAME_TO_ID.get(potionName) + 8192;
                 }
                 tag.remove("Potion");
+            }
+            if (tag != null && tag.isEmpty()) {
+                tag = null;
             }
             item.setTag(tag);
             item.setData((short) data);

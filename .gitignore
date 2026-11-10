@@ -19,6 +19,8 @@ classes/
 *.ipr
 *.iws
 
+benchmark/
+
 # VSCode
 
 .settings/
@@ -34,3 +36,6 @@ bin/
 # Misc
 
 run/
+AGENTS.override.md
+.claude/
+!.claude/CLAUDE.md

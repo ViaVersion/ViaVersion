@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@ public record UseCooldown(float seconds, @Nullable String cooldownGroup) impleme
             final Key cooldownGroup = value.cooldownGroup != null ? Key.of(value.cooldownGroup) : null;
             ops.writeMap(map -> map
                 .write("seconds", Types.FLOAT, value.seconds())
-                .writeOptional("cooldown_group", Types.RESOURCE_LOCATION, cooldownGroup));
+                .writeOptional("cooldown_group", Types.IDENTIFIER, cooldownGroup));
         }
     };
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,13 +32,6 @@ public class ItemPacketRewriter1_16_2 extends ItemRewriter<ClientboundPackets1_1
 
     @Override
     public void registerPackets() {
-        registerCooldown(ClientboundPackets1_16.COOLDOWN);
-        registerSetContent(ClientboundPackets1_16.CONTAINER_SET_CONTENT);
-        registerMerchantOffers(ClientboundPackets1_16.MERCHANT_OFFERS);
-        registerSetSlot(ClientboundPackets1_16.CONTAINER_SET_SLOT);
-        registerSetEquipment(ClientboundPackets1_16.SET_EQUIPMENT);
-        registerAdvancements(ClientboundPackets1_16.UPDATE_ADVANCEMENTS);
-
         protocol.registerClientbound(ClientboundPackets1_16.RECIPE, wrapper -> {
             wrapper.passthrough(Types.VAR_INT);
             wrapper.passthrough(Types.BOOLEAN); // Open
@@ -54,8 +47,6 @@ public class ItemPacketRewriter1_16_2 extends ItemRewriter<ClientboundPackets1_1
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_16.UPDATE_RECIPES);
 
-        registerContainerClick(ServerboundPackets1_16_2.CONTAINER_CLICK);
-        registerSetCreativeModeSlot(ServerboundPackets1_16_2.SET_CREATIVE_MODE_SLOT);
         protocol.registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)));
     }
 }

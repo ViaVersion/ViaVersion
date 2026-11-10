@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
         });
 
         registerClientbound(ClientboundPackets1_9.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_9_1To1_9_3.class);
+            ClientWorld clientWorld = wrapper.user().storables(Protocol1_9_1To1_9_3.this).clientWorld();
 
             Chunk chunk = wrapper.read(ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment()));
             wrapper.write(ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment()), chunk);
@@ -98,17 +98,13 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
                 if (section == null) continue;
                 DataPalette blocks = section.palette(PaletteType.BLOCKS);
 
-                for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
-                    int id = blocks.idAt(idx) >> 4;
-                    if (FakeTileEntities1_9_1.isTileEntity(id)) {
-                        tags.add(FakeTileEntities1_9_1.createTileEntity(
-                            ChunkSection.xFromIndex(idx) + (chunk.getX() << 4),
-                            ChunkSection.yFromIndex(idx) + (s << 4),
-                            ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4),
-                            id
-                        ));
-                    }
-                }
+                final int ySection = s;
+                blocks.forEachMatchingCoordinate(id -> FakeTileEntities1_9_1.isTileEntity(id >> 4), idx -> tags.add(FakeTileEntities1_9_1.createTileEntity(
+                    ChunkSection.xFromIndex(idx) + (chunk.getX() << 4),
+                    ChunkSection.yFromIndex(idx) + (ySection << 4),
+                    ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4),
+                    blocks.idAt(idx) >> 4
+                )));
             }
         });
 
@@ -120,7 +116,7 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
                 map(Types.INT); // 2 - Dimension
 
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_9_1To1_9_3.class);
+                    ClientWorld clientWorld = wrapper.user().storables(Protocol1_9_1To1_9_3.this).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 1);
                     clientWorld.setEnvironment(dimensionId);
                 });
@@ -132,7 +128,7 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
             public void register() {
                 map(Types.INT); // 0 - Dimension ID
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_9_1To1_9_3.class);
+                    ClientWorld clientWorld = wrapper.user().storables(Protocol1_9_1To1_9_3.this).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 0);
                     clientWorld.setEnvironment(dimensionId);
                 });
@@ -156,6 +152,6 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
 
     @Override
     public void init(UserConnection user) {
-        user.addClientWorld(this.getClass(), new ClientWorld());
+        user.storables(this).setClientWorld(new ClientWorld());
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,11 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.UUIDUtil;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 
@@ -43,6 +45,11 @@ public class UUIDType extends Type<UUID> {
     public void write(ByteBuf buffer, UUID object) {
         buffer.writeLong(object.getMostSignificantBits());
         buffer.writeLong(object.getLeastSignificantBits());
+    }
+
+    @Override
+    public void write(final Ops ops, final UUID value) {
+        ops.write(Types.INT_ARRAY_PRIMITIVE, UUIDUtil.toIntArray(value));
     }
 
     public static final class OptionalUUIDType extends OptionalType<UUID> {

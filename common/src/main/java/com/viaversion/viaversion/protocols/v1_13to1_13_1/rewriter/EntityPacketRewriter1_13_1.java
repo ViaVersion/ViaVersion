@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPacket
 
                 handler(wrapper -> {
                     // Store the player
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13To1_13_1.class);
+                    ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 1);
                     clientWorld.setEnvironment(dimensionId);
                 });
@@ -56,7 +56,7 @@ public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPacket
             public void register() {
                 map(Types.INT); // 0 - Dimension ID
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13To1_13_1.class);
+                    ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
                     int dimensionId = wrapper.get(Types.INT, 0);
                     if (clientWorld.setEnvironment(dimensionId)) {
                         tracker(wrapper.user()).clearEntities();
@@ -90,7 +90,7 @@ public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPacket
                             wrapper.set(Types.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                         }
                         // Register Type ID
-                        wrapper.user().getEntityTracker(Protocol1_13To1_13_1.class).addEntity(entityId, entType);
+                        wrapper.user().getEntityTracker(protocol).addEntity(entityId, entType);
                     }
                 });
             }
@@ -133,7 +133,6 @@ public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPacket
             }
         });
 
-        registerRemoveEntities(ClientboundPackets1_13.REMOVE_ENTITIES);
         registerSetEntityData(ClientboundPackets1_13.SET_ENTITY_DATA, Types1_13.ENTITY_DATA_LIST);
     }
 

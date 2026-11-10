@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ import com.viaversion.viaversion.util.Key;
  */
 public interface RegistryKey {
 
-    Key key();
+    Key registry();
 
     static RegistryKey of(final String key) {
         return new SimpleRegistryKey(Key.of(key));

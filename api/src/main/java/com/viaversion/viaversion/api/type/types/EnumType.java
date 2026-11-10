@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -75,5 +75,17 @@ public final class EnumType extends VarIntType {
 
     public enum Fallback {
         ZERO, WRAP, CLAMP
+    }
+
+    public final class EnumArrayType extends VarIntArrayType {
+
+        @Override
+        public void write(final Ops ops, final int[] value) {
+            ops.writeList(list -> {
+                for (final int ordinal : value) {
+                    list.write(Types.STRING, nameFromId(ordinal));
+                }
+            });
+        }
     }
 }

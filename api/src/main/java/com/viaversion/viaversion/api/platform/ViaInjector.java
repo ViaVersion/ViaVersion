@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2025 ViaVersion and contributors
+ * Copyright (C) 2016-2026 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,14 +30,16 @@ import java.util.SortedSet;
 public interface ViaInjector {
 
     /**
-     * Inject into the current Platform
+     * Inject into the current Platform. May be empty on platforms not having to inject their pipeline
+     * or using alternative ways such as Mixin.
      *
      * @throws Exception if there is an error with injecting
      */
     void inject() throws Exception;
 
     /**
-     * Uninject into the current Platform
+     * Uninject into the current Platform. May be empty on platforms not having to inject their pipeline
+     * or using alternative ways such as Mixin.
      *
      * @throws Exception if there is an error with uninjecting
      */
@@ -77,7 +79,7 @@ public interface ViaInjector {
     }
 
     /**
-     * Get the name of the encoder for then netty pipeline for this platform.
+     * Get the name of the encoder for the netty pipeline for this platform.
      *
      * @return The name
      */
@@ -86,7 +88,7 @@ public interface ViaInjector {
     }
 
     /**
-     * Get the name of the decoder for then netty pipeline for this platform.
+     * Get the name of the decoder for the netty pipeline for this platform.
      *
      * @return The name
      */
