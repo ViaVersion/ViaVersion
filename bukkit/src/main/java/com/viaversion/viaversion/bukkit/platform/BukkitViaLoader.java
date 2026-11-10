@@ -35,6 +35,7 @@ import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.BlockListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.DeathListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.HandItemCache;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.PaperPatch;
+import com.viaversion.viaversion.bukkit.listeners.v26_2to26_3.PlayerSwingAnimationListener;
 import com.viaversion.viaversion.bukkit.providers.BukkitAckSequenceProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitBlockConnectionProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
@@ -56,6 +57,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -139,6 +141,10 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             new ArmorToggleListener(plugin).register();
         }
 
+        if (serverProtocolVersion.olderThan(ProtocolVersion.v26_3) && hasSwingHandMethod()) {
+            new PlayerSwingAnimationListener(plugin).register();
+        }
+
         /* Providers */
         if (serverProtocolVersion.olderThan(ProtocolVersion.v1_9)) {
             Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BukkitViaMovementTransmitter());
@@ -200,6 +206,17 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             Material.class.getMethod("getEquipmentSlot");
             return true;
         } catch (NoSuchMethodException e) {
+            return false;
+        }
+    }
+
+    private boolean hasSwingHandMethod() {
+        try {
+            BlockPlaceEvent.class.getDeclaredMethod("getHand");
+            Player.class.getMethod("swingMainHand");
+            Player.class.getMethod("swingOffHand");
+            return true;
+        } catch (final NoSuchMethodException e) {
             return false;
         }
     }
