@@ -21,12 +21,14 @@ public final class ClientVehicleStorage {
 
     private final int vehicleId;
 
+    private final int[] passengers;
     private float sidewaysMovement;
     private float forwardMovement;
     private byte flags;
 
-    public ClientVehicleStorage(final int vehicleId) {
+    public ClientVehicleStorage(final int vehicleId, final int[] passengers) {
         this.vehicleId = vehicleId;
+        this.passengers = passengers;
     }
 
     public void storeMovement(final float sidewaysMovement, final float forwardMovement, final byte flags) {
@@ -37,6 +39,10 @@ public final class ClientVehicleStorage {
 
     public int vehicleId() {
         return vehicleId;
+    }
+
+    public int[] passengers() {
+        return passengers;
     }
 
     public float sidewaysMovement() {
