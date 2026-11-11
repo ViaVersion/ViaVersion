@@ -31,6 +31,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIdMappings1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ArmorTracker;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.InventoryTracker;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
@@ -111,6 +112,15 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                 map(Types.ITEM1_8); // 2 - Slot Value
                 handler(wrapper -> {
                     Item stack = wrapper.get(Types.ITEM1_8, 0);
+                    byte windowId = wrapper.get(Types.BYTE, 0);
+                    short slot = wrapper.get(Types.SHORT, 0);
+                    int armorSlot = windowId == 0 && slot >= 5 && slot <= 8 ? slot - 5
+                        : windowId == -2 && slot >= 36 && slot <= 39 ? 39 - slot : -1;
+                    if (armorSlot != -1) {
+                        ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
+                        armorTracker.setArmor(armorSlot, stack == null ? 0 : stack.identifier());
+                        armorTracker.sendArmorUpdate(wrapper.user());
+                    }
 
                     boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
                         && Via.getConfig().isShieldBlocking();
@@ -121,7 +131,6 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                         EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
 
                         short slotID = wrapper.get(Types.SHORT, 0);
-                        byte windowId = wrapper.get(Types.BYTE, 0);
 
                         // Store item in slot
                         inventoryTracker.setItemId(windowId, slotID, stack == null ? 0 : stack.identifier());
@@ -155,6 +164,15 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                 handler(wrapper -> {
                     Item[] stacks = wrapper.get(Types.ITEM1_8_SHORT_ARRAY, 0);
                     short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
+
+                    if (windowId == 0 && stacks.length >= 9) {
+                        ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
+                        for (int slot = 5; slot <= 8; slot++) {
+                            Item armor = stacks[slot];
+                            armorTracker.setArmor(slot - 5, armor == null ? 0 : armor.identifier());
+                        }
+                        armorTracker.sendArmorUpdate(wrapper.user());
+                    }
 
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                     EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(protocol);
