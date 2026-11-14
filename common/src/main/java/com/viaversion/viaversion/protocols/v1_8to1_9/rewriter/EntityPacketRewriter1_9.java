@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.EntityDataIndex1_9;
@@ -107,8 +108,8 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 map(Types.INT, SpawnPacketRewriter1_9.toNewDouble); // 2 - Y - Needs to be divided by 32
                 map(Types.INT, SpawnPacketRewriter1_9.toNewDouble); // 3 - Z - Needs to be divided by 32
 
-                map(Types.BYTE); // 4 - Pitch
-                map(Types.BYTE); // 5 - Yaw
+                map(Types.BYTE); // 4 - Yaw
+                map(Types.BYTE); // 5 - Pitch
 
                 map(Types.BOOLEAN); // 6 - On Ground
 
@@ -122,6 +123,37 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                             wrapper.set(Types.DOUBLE, 1, newValue);
                         }
                     }
+                });
+
+                handler(wrapper -> {
+                    // 1.9-1.14.4 clients interpolate living entities over 0 steps (1.8: 3) if the teleport target is
+                    // within 1/32 of a block (1/64 vertically) of their current position, so the rotation is never applied.
+                    // Follow up with a rotation-only move packet, which always interpolates towards the teleported position.
+                    if (wrapper.user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_15)) {
+                        return;
+                    }
+
+                    int entityId = wrapper.get(Types.VAR_INT, 0);
+                    EntityType type = wrapper.user().getEntityTracker(protocol).entityType(entityId);
+                    if (type == null || !type.isOrHasParent(EntityTypes1_9.EntityType.LIVING_ENTITY_BASE)) {
+                        return;
+                    }
+
+                    // Read before sending, as sending passes this wrapper through the remaining protocols
+                    byte yaw = wrapper.get(Types.BYTE, 0);
+                    byte pitch = wrapper.get(Types.BYTE, 1);
+                    boolean onGround = wrapper.get(Types.BOOLEAN, 0);
+
+                    // The teleport has to arrive first, its 0 steps would otherwise reset the rotation's interpolation
+                    wrapper.send(Protocol1_8To1_9.class);
+                    wrapper.cancel();
+
+                    PacketWrapper rotation = wrapper.create(ClientboundPackets1_9.MOVE_ENTITY_ROT);
+                    rotation.write(Types.VAR_INT, entityId);
+                    rotation.write(Types.BYTE, yaw);
+                    rotation.write(Types.BYTE, pitch);
+                    rotation.write(Types.BOOLEAN, onGround);
+                    rotation.send(Protocol1_8To1_9.class);
                 });
 
 
