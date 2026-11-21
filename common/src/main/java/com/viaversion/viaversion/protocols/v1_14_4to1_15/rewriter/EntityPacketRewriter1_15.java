@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.v1_14_3to1_14_4.packet.ClientboundPackets1_14_4;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.Protocol1_14_4To1_15;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPackets1_15;
+import com.viaversion.viaversion.protocols.v1_14_4to1_15.storage.DeadStatusStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import java.util.List;
 
@@ -130,6 +131,27 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
 
         filter().type(EntityTypes1_15.LIVING_ENTITY).addIndex(12);
         filter().type(EntityTypes1_15.WOLF).removeIndex(18);
+
+        filter().type(EntityTypes1_15.PLAYER).index(8).handler((event, data) -> {
+            final float health = data.value();
+            final boolean isDead = health <= 0.0F;
+
+            final DeadStatusStorage deadStatus = event.trackedEntity().get(DeadStatusStorage.class);
+            if (deadStatus == null) {
+                event.trackedEntity().put(new DeadStatusStorage(isDead));
+                // if they are dead the first time it gets tracked, that means they were already dying when starting to be tracked, so we don't send the "died right now" event
+                return;
+            }
+
+            if (isDead && !deadStatus.wasDead()) {
+                final PacketWrapper entityEvent = PacketWrapper.create(ClientboundPackets1_15.ENTITY_EVENT, event.user());
+                entityEvent.write(Types.INT, event.entityId()); // Entity ID
+                entityEvent.write(Types.BYTE, (byte) 3); // Event ID (3 = Death)
+                entityEvent.send(Protocol1_14_4To1_15.class);
+            }
+
+            deadStatus.setDead(isDead);
+        });
     }
 
 
