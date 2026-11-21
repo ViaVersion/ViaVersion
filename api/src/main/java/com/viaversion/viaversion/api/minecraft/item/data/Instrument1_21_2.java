@@ -67,7 +67,7 @@ public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration,
                 .write("sound_event", Types.SOUND_EVENT, value.soundEvent())
                 .write("use_duration", Types.FLOAT, value.useDuration())
                 .write("range", Types.FLOAT, value.range())
-                .write("description", Types.TAG, value.description()));
+                .write("description", Types.TEXT_COMPONENT_TAG, value.description()));
         }
 
         @Override
@@ -103,8 +103,8 @@ public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration,
                 .write("sound_event", Types.SOUND_EVENT, value.soundEvent())
                 .write("use_duration", Types.FLOAT, value.useDuration())
                 .write("range", Types.FLOAT, value.range())
-                .write("durability_damage", Types.VAR_INT, value.durabilityDamage())
-                .write("description", Types.TAG, value.description()));
+                .writeOptional("durability_damage", Types.VAR_INT, value.durabilityDamage(), 0)
+                .write("description", Types.TEXT_COMPONENT_TAG, value.description()));
         }
 
         @Override

@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArrayType<T> extends Type<T[]> {
+    private static final int MAX_PRESIZED_LENGTH = 128;
     protected final Type<T> elementType;
     private final int maxLength;
 
@@ -63,7 +64,7 @@ public class ArrayType<T> extends Type<T[]> {
             throw new IllegalArgumentException("Array length " + amount + " is longer than maximum " + maxLength);
         }
 
-        return amount < Short.MAX_VALUE ? readArray(buffer, amount) : readList(buffer, amount);
+        return amount <= MAX_PRESIZED_LENGTH ? readArray(buffer, amount) : readList(buffer, amount);
     }
 
     protected T[] readArray(ByteBuf buffer, int length) {
@@ -110,5 +111,15 @@ public class ArrayType<T> extends Type<T[]> {
 
     public ArrayType<T> withMaxLength(final int maxLength) {
         return new ArrayType<>(this.getOutputClass(), this.elementType, maxLength);
+    }
+
+    static int checkLength(final int length, final int elementBytes, final int readable) {
+        if (length < 0) {
+            throw new IllegalArgumentException("Length " + length + " is negative");
+        }
+        if ((long) length * elementBytes > readable) {
+            throw new IllegalArgumentException("Length " + length + " is larger than readable bytes");
+        }
+        return length;
     }
 }

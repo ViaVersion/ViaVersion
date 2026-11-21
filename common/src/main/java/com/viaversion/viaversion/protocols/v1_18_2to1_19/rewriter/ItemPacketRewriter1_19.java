@@ -174,6 +174,10 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
     private PacketHandler sequenceHandler() {
         return wrapper -> {
             final int sequence = wrapper.read(Types.VAR_INT);
+            if (sequence < 0) {
+                throw new IllegalArgumentException("Expected packet sequence nr >= 0");
+            }
+
             final AckSequenceProvider provider = Via.getManager().getProviders().get(AckSequenceProvider.class);
             provider.handleSequence(wrapper.user(), sequence);
         };

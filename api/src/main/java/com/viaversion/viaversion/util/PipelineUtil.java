@@ -161,6 +161,7 @@ public final class PipelineUtil {
         return null;
     }
 
+    @Deprecated(forRemoval = true)
     public static @Nullable ChannelHandlerContext getPreviousContext(String name, ChannelPipeline pipeline) {
         String previous = null;
         for (String entry : pipeline.toMap().keySet()) {

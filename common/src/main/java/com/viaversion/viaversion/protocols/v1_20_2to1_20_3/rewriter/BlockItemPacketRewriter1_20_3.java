@@ -137,7 +137,10 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
             final CompoundTag filteredPages = tag.getCompoundTag("filtered_pages");
             if (filteredPages != null) {
                 for (final String string : filteredPages.keySet()) {
-                    updatePageTag(filteredPages.getStringTag(string));
+                    final StringTag pageTag = filteredPages.getStringTag(string);
+                    if (pageTag != null) {
+                        updatePageTag(pageTag);
+                    }
                 }
             }
         }

@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.rewriter.MappingDataListener;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.MathUtil;
@@ -44,7 +45,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class BlockRewriter<C extends ClientboundPacketType> {
+public class BlockRewriter<C extends ClientboundPacketType> implements MappingDataListener {
     protected final Protocol<C, ?, ?, ?> protocol;
     private final Type<BlockPosition> positionType;
     private final Type<CompoundTag> compoundTagType;

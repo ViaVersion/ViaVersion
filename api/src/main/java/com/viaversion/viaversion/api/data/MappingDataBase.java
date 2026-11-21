@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.data;
 
+import com.viaversion.nbt.tag.ByteArrayTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.ListTag;
@@ -198,8 +199,14 @@ public class MappingDataBase implements MappingData {
 
         final List<TagData> tagsList = new ArrayList<>(tags.size());
         for (final Map.Entry<String, Tag> entry : tag.entrySet()) {
-            final IntArrayTag entries = (IntArrayTag) entry.getValue();
-            tagsList.add(new TagData(entry.getKey(), entries.getValue()));
+            final int[] entries;
+            if (entry.getValue() instanceof final ByteArrayTag rangesTag) {
+                entries = IdRanges.decodeAsList(rangesTag).toIntArray();
+            } else {
+                // Old format / if the values need to be sorted
+                entries = ((IntArrayTag) entry.getValue()).getValue();
+            }
+            tagsList.add(new TagData(entry.getKey(), entries));
         }
 
         this.tags.put(type, tagsList);

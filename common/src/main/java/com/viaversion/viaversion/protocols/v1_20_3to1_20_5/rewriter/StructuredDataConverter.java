@@ -551,10 +551,22 @@ public final class StructuredDataConverter {
             } else {
                 final String oldKey = trimStorage.trimPatterns().idToKey(data.pattern().id());
                 if (oldKey != null) {
-                    trimTag.putString("pattern", oldKey);
+                    if (!"flow".equals(oldKey) && !"bolt".equals(oldKey)) {
+                        trimTag.putString("pattern", oldKey);
+                    } else if (backupInconvertibleData) {
+                        final CompoundTag backupTrim = trimTag.copy();
+                        if (!data.material().isDirect()) {
+                            backupTrim.putInt("material", data.material().id());
+                        }
+                        backupTrim.putInt("pattern", data.pattern().id());
+                        backupTrim.putBoolean("show_in_tooltip", data.showInTooltip());
+                        getBackupTag(tag).put("trim", backupTrim);
+                    }
                 }
             }
-            tag.put("Trim", trimTag);
+            if (trimTag.contains("material") && trimTag.contains("pattern")) {
+                tag.put("Trim", trimTag);
+            }
             if (!data.showInTooltip()) {
                 putHideFlag(tag, HIDE_ARMOR_TRIM);
             }

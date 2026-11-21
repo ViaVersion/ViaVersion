@@ -379,7 +379,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             tag.putBoolean(nbtTagName(), true);
             structuredItem.dataContainer().set(StructuredDataKey.CUSTOM_DATA, tag);
         }
+        return handleStructuredItemToClient(connection, structuredItem);
+    }
 
+    private Item handleStructuredItemToClient(final UserConnection connection, final Item structuredItem) {
         // Add data components to fix issues in older protocols
         appendItemDataFixComponents(connection, structuredItem);
 
@@ -429,6 +432,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     public Item toStructuredItem(final UserConnection connection, final Item old) {
+        return toStructuredItem(connection, old, false);
+    }
+
+    // Nested items are converted from a copy made by the root item, no need to copy again
+    private Item toStructuredItem(final UserConnection connection, final Item old, final boolean copied) {
         final CompoundTag tag = old.tag();
         final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new StructuredDataContainer());
         final StructuredDataContainer data = item.dataContainer();
@@ -482,7 +490,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
         if (blockEntityTag != null) {
-            final CompoundTag clonedTag = blockEntityTag.copy();
+            final CompoundTag clonedTag = copied ? blockEntityTag : blockEntityTag.copy();
             // Same as above
             updateBlockEntityTag(connection, data, clonedTag);
             CompoundTag spawnData = clonedTag.getCompoundTag("SpawnData");
@@ -571,9 +579,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         updateMobTags(data, tag);
 
-        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.V1_20_5.chargedProjectiles);
+        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.V1_20_5.chargedProjectiles, copied);
         if (old.identifier() == 927) {
-            updateItemList(connection, data, tag, "Items", StructuredDataKey.V1_20_5.bundleContents);
+            updateItemList(connection, data, tag, "Items", StructuredDataKey.V1_20_5.bundleContents, copied);
         }
 
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS1_20_5, (hideFlagsValue & StructuredDataConverter.HIDE_ENCHANTMENTS) == 0);
@@ -692,6 +700,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (bannerPatterns != null) {
             restoreBannerPatternsFromBackup(bannerPatterns, data);
         }
+
+        final CompoundTag trim = backupTag.getCompoundTag("trim");
+        if (trim != null) {
+            restoreArmorTrimFromBackup(trim, data);
+        }
     }
 
     private void restoreInstrumentFromBackup(final CompoundTag instrument, final StructuredDataContainer data) {
@@ -797,6 +810,25 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             patternLayer.add(new BannerPatternLayer(pattern, dyeColor));
         }
         data.set(StructuredDataKey.BANNER_PATTERNS, patternLayer.toArray(new BannerPatternLayer[0]));
+    }
+
+    private void restoreArmorTrimFromBackup(final CompoundTag trim, final StructuredDataContainer data) {
+        final Tag materialTag = trim.get("material");
+        final Holder<ArmorTrimMaterial1_20_5> materialHolder;
+        if (materialTag instanceof IntTag materialIntTag) {
+            materialHolder = Holder.of(materialIntTag.asInt());
+        } else if (materialTag instanceof CompoundTag materialCompoundTag) {
+            ArmorTrimMaterial1_20_5 material = readTrimMaterial(materialCompoundTag);
+            if (material == null) {
+                return;
+            }
+            materialHolder = Holder.of(material);
+        } else return;
+
+        final Holder<ArmorTrimPattern> patternHolder = Holder.of(trim.getInt("pattern"));
+        final boolean showInTooltip = trim.getBoolean("show_in_tooltip");
+
+        data.set(StructuredDataKey.TRIM1_20_5, new ArmorTrim1_20_5(materialHolder, patternHolder, showInTooltip));
     }
 
     private AdventureModePredicate updateBlockPredicates(final UserConnection connection, final ListTag<StringTag> tag, final boolean showInTooltip) {
@@ -969,8 +1001,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private void updateArmorTrim(final UserConnection connection, final StructuredDataContainer data, final CompoundTag trimTag, final boolean showInTooltip) {
         final Tag materialTag = trimTag.get("material");
         final Holder<ArmorTrimMaterial1_20_5> materialHolder;
-        final ProtocolStorables1_20_5 storables = connection.storables(protocol);
-        final ArmorTrimStorage trimStorage = storables.armorTrims();
+        final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
         if (materialTag instanceof StringTag materialStringTag) {
             final int id = trimStorage.trimMaterials().keyToId(materialStringTag.getValue());
             if (id == -1) {
@@ -979,39 +1010,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             materialHolder = Holder.of(id);
         } else if (materialTag instanceof CompoundTag materialCompoundTag) {
-            final StringTag assetNameTag = materialCompoundTag.getStringTag("asset_name");
-            final StringTag ingredientTag = materialCompoundTag.getStringTag("ingredient");
-            if (assetNameTag == null || ingredientTag == null) {
+            ArmorTrimMaterial1_20_5 material = readTrimMaterial(materialCompoundTag);
+            if (material == null) {
                 return;
             }
-
-            final int ingredientId = StructuredDataConverter.removeItemBackupTag(materialCompoundTag, toMappedItemId(ingredientTag.getValue()));
-            if (ingredientId == -1) {
-                return;
-            }
-
-            final NumberTag itemModelIndexTag = materialCompoundTag.getNumberTag("item_model_index");
-            final CompoundTag overrideArmorMaterialsTag = materialCompoundTag.getCompoundTag("override_armor_materials");
-            final Tag descriptionTag = materialCompoundTag.get("description");
-
-            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
-            if (overrideArmorMaterialsTag != null) {
-                for (final Map.Entry<String, Tag> entry : overrideArmorMaterialsTag.entrySet()) {
-                    if (!(entry.getValue() instanceof StringTag valueTag)) {
-                        continue;
-                    }
-
-                    overrideArmorMaterials.put(entry.getKey(), valueTag.getValue());
-                }
-            }
-
-            materialHolder = Holder.of(new ArmorTrimMaterial1_20_5(
-                assetNameTag.getValue(),
-                ingredientId,
-                itemModelIndexTag != null ? itemModelIndexTag.asFloat() : 0,
-                overrideArmorMaterials,
-                descriptionTag
-            ));
+            materialHolder = Holder.of(material);
         } else return;
 
         final Tag patternTag = trimTag.get("pattern");
@@ -1046,6 +1049,42 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         } else return;
 
         data.set(StructuredDataKey.TRIM1_20_5, new ArmorTrim1_20_5(materialHolder, patternHolder, showInTooltip));
+    }
+
+    private ArmorTrimMaterial1_20_5 readTrimMaterial(final CompoundTag tag) {
+        final StringTag assetNameTag = tag.getStringTag("asset_name");
+        final StringTag ingredientTag = tag.getStringTag("ingredient");
+        if (assetNameTag == null || ingredientTag == null) {
+            return null;
+        }
+
+        final int ingredientId = StructuredDataConverter.removeItemBackupTag(tag, toMappedItemId(ingredientTag.getValue()));
+        if (ingredientId == -1) {
+            return null;
+        }
+
+        final NumberTag itemModelIndexTag = tag.getNumberTag("item_model_index");
+        final CompoundTag overrideArmorMaterialsTag = tag.getCompoundTag("override_armor_materials");
+        final Tag descriptionTag = tag.get("description");
+
+        final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
+        if (overrideArmorMaterialsTag != null) {
+            for (final Map.Entry<String, Tag> entry : overrideArmorMaterialsTag.entrySet()) {
+                if (!(entry.getValue() instanceof StringTag valueTag)) {
+                    continue;
+                }
+
+                overrideArmorMaterials.put(entry.getKey(), valueTag.getValue());
+            }
+        }
+
+        return new ArmorTrimMaterial1_20_5(
+                assetNameTag.getValue(),
+                ingredientId,
+                itemModelIndexTag != null ? itemModelIndexTag.asFloat() : 0,
+                overrideArmorMaterials,
+                descriptionTag
+        );
     }
 
     private void updateMobTags(final StructuredDataContainer data, final CompoundTag tag) {
@@ -1230,12 +1269,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateItemList(final UserConnection connection, final StructuredDataContainer data, final CompoundTag tag,
-                                final String key, final StructuredDataKey<Item[]> dataKey) {
+                                final String key, final StructuredDataKey<Item[]> dataKey, final boolean copied) {
         final ListTag<CompoundTag> itemsTag = tag.getListTag(key, CompoundTag.class);
         if (itemsTag != null) {
             final Item[] items = itemsTag.stream()
                 .limit(256)
-                .map(item -> itemFromTag(connection, item))
+                .map(item -> itemFromTag(connection, copied ? item : item.copy()))
                 .filter(item -> !item.isEmpty())
                 .toArray(Item[]::new);
             data.set(dataKey, items);
@@ -1255,7 +1294,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final byte count = item.getByte("Count", (byte) 1);
         final CompoundTag tag = item.getCompoundTag("tag");
-        return handleItemToClient(connection, new DataItem(itemId, count, tag));
+        final DataItem dataItem = new DataItem(itemId, count, tag);
+        if (Via.getConfig().backupNestedItems()) {
+            return handleItemToClient(connection, dataItem);
+        }
+        return handleStructuredItemToClient(connection, toStructuredItem(connection, dataItem, true));
     }
 
     private void updateEnchantments(final StructuredDataContainer data, final CompoundTag tag, final String key,
@@ -1494,11 +1537,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             final ListTag<CompoundTag> itemsTag = tag.getListTag("Items", CompoundTag.class);
             if (itemsTag != null) {
+                // Only convert once, items can contain further containers
+                final int size = Math.min(itemsTag.size(), 256);
+                final Item[] items = new Item[size];
                 int highestSlot = 0;
 
-                for (int i = 0, size = Math.min(itemsTag.size(), 256); i < size; i++) {
+                for (int i = 0; i < size; i++) {
                     final CompoundTag itemTag = itemsTag.get(i);
                     final Item item = itemFromTag(connection, itemTag);
+                    items[i] = item;
                     if (item.isEmpty()) {
                         continue;
                     }
@@ -1509,18 +1556,19 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
                 final Item[] filteredItems = new Item[highestSlot + 1];
                 Arrays.fill(filteredItems, StructuredItem.empty());
-                for (final CompoundTag itemTag : itemsTag) {
-                    final Item item = itemFromTag(connection, itemTag);
+                for (int i = 0; i < size; i++) {
+                    final Item item = items[i];
                     if (item.isEmpty()) {
                         continue;
                     }
 
-                    final int slot = itemTag.getByte("Slot");
+                    final int slot = itemsTag.get(i).getByte("Slot");
                     if (slot >= 0 && slot < filteredItems.length) {
                         filteredItems[slot] = item;
                     }
                 }
 
+                tag.remove("Items");
                 data.set(StructuredDataKey.V1_20_5.container, filteredItems);
                 addBlockEntityId(tag, "shulker_box");
             }

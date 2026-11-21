@@ -29,16 +29,19 @@ import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Copyable;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Rewritable;
 
 public record PotDecorations1_20_5(int[] itemIds) implements Copyable, Rewritable {
 
+    private static final Key BRICK = Key.ofPath("brick");
     public static final Type<PotDecorations1_20_5> TYPE = new TransformingType<>(Types.VAR_INT_ARRAY_PRIMITIVE, PotDecorations1_20_5.class, PotDecorations1_20_5::new, PotDecorations1_20_5::itemIds) {
         @Override
         public void write(final Ops ops, final PotDecorations1_20_5 value) {
+            // Vanilla always encodes all 4 sides, filling missing ones with bricks
             ops.writeList(list -> {
-                for (final int itemId : value.itemIds) {
-                    list.write(Types.IDENTIFIER, ops.context().registryAccess().item(itemId));
+                for (int i = 0; i < 4; i++) {
+                    list.write(Types.IDENTIFIER, i < value.itemIds.length ? ops.context().registryAccess().item(value.itemIds[i]) : BRICK);
                 }
             });
         }

@@ -26,6 +26,8 @@ import com.viaversion.nbt.tag.ByteArrayTag;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.function.IntConsumer;
@@ -45,6 +47,12 @@ public final class IdRanges {
      */
     public static IntSet decode(final ByteArrayTag rangesTag) {
         final IntSet ids = new IntOpenHashSet();
+        forEachId(rangesTag, ids::add);
+        return ids;
+    }
+
+    public static IntList decodeAsList(final ByteArrayTag rangesTag) {
+        final IntList ids = new IntArrayList();
         forEachId(rangesTag, ids::add);
         return ids;
     }

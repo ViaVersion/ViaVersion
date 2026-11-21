@@ -329,7 +329,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
         List<ProtocolPathEntry> path = calculateProtocolPath(clientVersion, serverVersion);
         if (path == null) {
             // Also cache that there is no path
-            pathCache.put(protocolKey, List.of());
+            if (clientVersion.isKnown() && serverVersion.isKnown()) {
+                pathCache.put(protocolKey, List.of());
+            }
             return null;
         }
 

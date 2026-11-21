@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
@@ -42,7 +43,7 @@ public record TooltipDisplay(boolean hideTooltip,
         public TooltipDisplay read(final ByteBuf buffer) {
             final boolean hideTooltip = buffer.readBoolean();
             final IntSortedSet hiddenComponents = new IntLinkedOpenHashSet();
-            final int size = Types.VAR_INT.readPrimitive(buffer);
+            final int size = Limit.max(Types.VAR_INT.readPrimitive(buffer), 256);
             for (int i = 0; i < size; i++) {
                 hiddenComponents.add(Types.VAR_INT.readPrimitive(buffer));
             }

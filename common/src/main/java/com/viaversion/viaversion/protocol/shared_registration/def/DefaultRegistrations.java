@@ -27,8 +27,8 @@ public final class DefaultRegistrations {
         SharedRegistrations.defaultRegistrations().registrations()
             .ranges(EntityRegistrations::entity, ProtocolVersion.v1_13, b -> b
                 .to(ProtocolVersion.v1_14_4, EntityRegistrations::registerEntityPackets1_13)
-                .to(ProtocolVersion.v1_16_2, EntityRegistrations::registerEntityPackets1_14_4)
-                .to(ProtocolVersion.v1_17_1, EntityRegistrations::registerEntityPackets1_16_2)
+                .to(ProtocolVersion.v1_17, EntityRegistrations::registerEntityPackets1_14_4)
+                .to(ProtocolVersion.v1_17_1, EntityRegistrations::registerEntityPackets1_17)
                 .to(ProtocolVersion.v1_19, EntityRegistrations::registerEntityPackets1_17_1)
                 .to(ProtocolVersion.v1_20_5, EntityRegistrations::registerEntityPackets1_19)
                 .to(ProtocolVersion.v1_21_4, EntityRegistrations::registerEntityPackets1_20_5)

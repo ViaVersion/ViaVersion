@@ -1,6 +1,6 @@
 plugins {
+    id("me.modmuss50.mod-publish-plugin") version "2.2.1"
     id("io.papermc.hangar-publish-plugin") version "0.1.4"
-    id("com.modrinth.minotaur") version "2.+"
 
     // A nice no-conflict comment for patching in downgrading
 }
@@ -44,32 +44,37 @@ if (runNumber != null && (!isRelease || isMainBranch)) { // Only publish release
         "[$commitHash](https://github.com/ViaVersion/ViaVersion/commit/$commitHash) ${rootProject.latestCommitMessage()}"
     }
 
-    modrinth {
-        val mcVersions: List<String> = (property("mcVersions") as String)
-            .split(",")
-            .map { it.trim() }
-        token.set(System.getenv("MODRINTH_TOKEN"))
-        projectId.set("viaversion")
-        versionType.set(if (isRelease) "release" else if (isMainBranch) "beta" else "alpha")
-        versionNumber.set(suffixedVersion)
-        versionName.set(suffixedVersion)
+    val mcVersionRange = property("mcVersionRange") as String
+    val (mcVersionStart, mcVersionEnd) = mcVersionRange.split("-", limit = 2)
+    publishMods {
+        file.set(tasks.shadowJar.flatMap { it.archiveFile })
+        type.set(if (isRelease) STABLE else if (isMainBranch) BETA else ALPHA)
+        version.set(suffixedVersion)
+        displayName.set(suffixedVersion)
         changelog.set(changelogContent)
-        uploadFile.set(tasks.shadowJar.flatMap { it.archiveFile })
-        gameVersions.set(mcVersions)
-        loaders.add("fabric")
-        loaders.add("paper")
-        loaders.add("folia")
-        loaders.add("velocity")
-        autoAddDependsOn.set(false)
-        detectLoaders.set(false)
-        dependencies {
-            optional.project("viafabric")
-            optional.project("viabackwards")
-            optional.project("viarewind")
+
+        val modrinthOptions = modrinthOptions {
+            accessToken.set(providers.environmentVariable("MODRINTH_TOKEN"))
+            projectId.set("P1OZGk5p")
+            optional("viafabric", "viabackwards", "viarewind")
         }
-    }
-    tasks.modrinth {
-        notCompatibleWithConfigurationCache("")
+        modrinth {
+            from(modrinthOptions)
+            modLoaders.addAll("paper", "folia", "velocity")
+            minecraftVersionRange {
+                start.set(mcVersionStart)
+                end.set(mcVersionEnd)
+            }
+        }
+        // Fabric requires 1.14+ (18w43b), so it is uploaded separately with only the supported versions
+        modrinth("modrinthFabric") {
+            from(modrinthOptions)
+            modLoaders.add("fabric")
+            minecraftVersionRange {
+                start.set("1.14")
+                end.set(mcVersionEnd)
+            }
+        }
     }
 
     hangarPublish {
@@ -82,7 +87,7 @@ if (runNumber != null && (!isRelease || isMainBranch)) { // Only publish release
             platforms {
                 paper {
                     jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                    platformVersions.set(listOf(property("mcVersionRange") as String))
+                    platformVersions.set(listOf(mcVersionRange))
                     dependencies {
                         hangar("ViaBackwards") {
                             required = false
@@ -106,8 +111,5 @@ if (runNumber != null && (!isRelease || isMainBranch)) { // Only publish release
                 }
             }
         }
-    }
-    tasks.named("publishPluginPublicationToHangar") {
-        notCompatibleWithConfigurationCache("")
     }
 }

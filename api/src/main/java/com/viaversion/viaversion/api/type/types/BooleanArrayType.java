@@ -57,7 +57,7 @@ public class BooleanArrayType extends Type<boolean[]> {
     @Override
     public boolean[] read(final ByteBuf buffer) {
         final int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
-        Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
+        Preconditions.checkArgument(buffer.isReadable(length), "Length is larger than readable bytes");
         final boolean[] array = new boolean[length];
         for (int i = 0; i < length; i++) {
             array[i] = buffer.readBoolean();

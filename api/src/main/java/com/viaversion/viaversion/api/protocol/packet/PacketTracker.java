@@ -165,7 +165,7 @@ public class PacketTracker {
 
         // Warning system
         private long warningPeriodStart = System.nanoTime();
-        private long lastWarning = Long.MIN_VALUE;
+        private long lastWarning = warningPeriodStart - SECOND_NANOS;
         private int warnings;
 
         public RateTracker(int windowSize) {

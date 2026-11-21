@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types.item;
 
+import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
@@ -53,6 +54,16 @@ public class ItemTemplateType26_1 extends ItemType1_20_5 {
         Types.VAR_INT.writePrimitive(buffer, object.identifier());
         Types.VAR_INT.writePrimitive(buffer, object.amount());
         writeData(buffer, object);
+    }
+
+    @Override
+    public void write(final Ops ops, final Item item) {
+        // Unlike item stacks, templates omit the default count
+        ops.writeMap(map -> {
+            map.write("id", Types.IDENTIFIER, ops.context().registryAccess().item(item.identifier()))
+                .writeOptional("count", Types.VAR_INT, item.amount(), 1);
+            writeComponents(map, item);
+        });
     }
 
     public static final class OptionalItemTemplateType extends OptionalType<Item> {

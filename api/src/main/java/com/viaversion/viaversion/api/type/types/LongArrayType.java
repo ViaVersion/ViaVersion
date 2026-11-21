@@ -27,9 +27,17 @@ import com.viaversion.viaversion.api.minecraft.codec.Ops;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
+import static com.viaversion.viaversion.api.type.types.ArrayType.checkLength;
 
 public class LongArrayType extends Type<long[]> {
 
+    private static final VarHandle LONG_BIG_ENDIAN = MethodHandles.byteBufferViewVarHandle(long[].class, ByteOrder.BIG_ENDIAN);
+    private static final int MIN_BULK_WRITE_LENGTH = 32;
     private final int length;
 
     public LongArrayType(final int length) {
@@ -43,8 +51,7 @@ public class LongArrayType extends Type<long[]> {
 
     @Override
     public long[] read(final ByteBuf buffer) {
-        final int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
-        Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
+        final int length = checkLength(this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length, Long.BYTES, buffer.readableBytes());
         return readFixedLength(buffer, length);
     }
 
@@ -67,6 +74,23 @@ public class LongArrayType extends Type<long[]> {
     }
 
     public static void writeFixedLength(final ByteBuf buffer, final long[] object) {
+        final int len = object.length;
+        if (len >= MIN_BULK_WRITE_LENGTH && buffer.order() == ByteOrder.BIG_ENDIAN) {
+            final int bytes = len * Long.BYTES;
+            buffer.ensureWritable(bytes);
+            if (buffer.nioBufferCount() == 1) {
+                // Write directly into the buffer's memory instead of calling writeLong for each
+                final int writerIndex = buffer.writerIndex();
+                final ByteBuffer nioBuffer = buffer.internalNioBuffer(writerIndex, bytes);
+                final int offset = nioBuffer.position();
+                for (int i = 0; i < len; i++) {
+                    LONG_BIG_ENDIAN.set(nioBuffer, offset + i * Long.BYTES, object[i]);
+                }
+                buffer.writerIndex(writerIndex + bytes);
+                return;
+            }
+        }
+
         for (final long l : object) {
             buffer.writeLong(l);
         }

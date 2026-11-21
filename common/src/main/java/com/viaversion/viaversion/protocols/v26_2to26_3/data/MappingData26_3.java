@@ -28,7 +28,8 @@ public final class MappingData26_3 extends MappingDataBase {
     private static final String[] BREWING_INPUTS = {
         "potion",
         "splash_potion",
-        "lingering_potion"
+        "lingering_potion",
+        "glass_bottle"
     };
     private static final String[] BREWING_REAGENTS = {
         "blaze_powder",

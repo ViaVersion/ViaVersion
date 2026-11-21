@@ -52,10 +52,10 @@ public record SignText(Tag[] messages, Tag @Nullable [] filteredMessages, int co
         @Override
         public void write(final Ops ops, final SignText value) {
             ops.writeMap(map -> map
-                .write("messages", Types.SIGN_TEXT, value.messages)
-                .writeOptional("filtered_messages", Types.SIGN_TEXT, value.filteredMessages)
-                .write("color", Types.VAR_INT, value.color, 15)
-                .write("has_glowing_text", Types.BOOLEAN, value.hasGlowingText, false));
+                .write("messages", Types.TEXT_COMPONENT_TAG_ARRAY, value.messages)
+                .writeOptional("filtered_messages", Types.TEXT_COMPONENT_TAG_ARRAY, value.filteredMessages)
+                .write("color", EnumTypes.DYE_COLOR, value.color)
+                .write("has_glowing_text", Types.BOOLEAN, value.hasGlowingText));
         }
     };
 }

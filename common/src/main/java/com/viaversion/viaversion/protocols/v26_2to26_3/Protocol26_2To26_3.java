@@ -21,8 +21,10 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_2;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_3;
@@ -38,6 +40,7 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
+import com.viaversion.viaversion.connection.ProtocolStorablesBase;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPackets26_1;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ServerboundPacket26_1;
@@ -56,6 +59,7 @@ import com.viaversion.viaversion.protocols.v26_2to26_3.rewriter.ComponentRewrite
 import com.viaversion.viaversion.protocols.v26_2to26_3.rewriter.EntityPacketRewriter26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.rewriter.RecipeDisplayRewriter26_3;
 import com.viaversion.viaversion.protocols.v26_2to26_3.rewriter.RegistryDataRewriter26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.storage.ProtocolStorables26_3;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
@@ -69,6 +73,10 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket26_1, ClientboundPacket26_3, ServerboundPacket26_1, ServerboundPacket26_3> {
 
     public static final MappingData26_3 MAPPINGS = new MappingData26_3();
+    private static final int SPLASH_POTION_SOUND = 1053;
+    private static final int INSTANT_SPLASH_POTION_SOUND = 1054;
+    private static final int SPLASH_POTION_PARTICLES = 2002;
+    private static final int INSTANT_SPLASH_POTION_PARTICLES = 2007;
     private static final String[] POT_PATTERNS = {
         "angler",
         "archer",
@@ -172,6 +180,27 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
             componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TRUSTED_OPTIONAL_TAG)); // Target Name
         });
 
+        // 26.3 plays the potion splash sound through its own level event, older clients played it together with the particles
+        appendClientbound(ClientboundPackets26_1.LEVEL_EVENT, wrapper -> {
+            final int id = wrapper.get(Types.INT, 0);
+            final BlockPosition position = wrapper.get(Types.BLOCK_POSITION1_14, 0);
+            final int soundId;
+            if (id == SPLASH_POTION_PARTICLES) {
+                soundId = SPLASH_POTION_SOUND;
+            } else if (id == INSTANT_SPLASH_POTION_PARTICLES) {
+                soundId = INSTANT_SPLASH_POTION_SOUND;
+            } else {
+                return;
+            }
+
+            final PacketWrapper soundPacket = wrapper.create(ClientboundPackets26_3.LEVEL_EVENT);
+            soundPacket.write(Types.INT, soundId);
+            soundPacket.write(Types.BLOCK_POSITION1_14, position);
+            soundPacket.write(Types.INT, 0); // Data
+            soundPacket.write(Types.BOOLEAN, false); // Global
+            soundPacket.scheduleSend(Protocol26_2To26_3.class);
+        });
+
         // 26.3 reads the items the brewing stand slots accept from the server, older clients have them hardcoded
         appendClientbound(ClientboundPackets26_1.UPDATE_RECIPES, wrapper -> {
             wrapper.resetReader();
@@ -221,7 +250,15 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
             StructuredDataKey.PROVIDES_POTTERY_PATTERN, StructuredDataKey.BLOCK_TRANSFORMER, StructuredDataKey.COMPOSTABLE, StructuredDataKey.VILLAGER_FOOD,
             StructuredDataKey.COOKING_FUEL, StructuredDataKey.BREWING_FUEL, StructuredDataKey.MOB_VISIBILITY, StructuredDataKey.SIGN_TEXT_BACK, StructuredDataKey.SIGN_TEXT_FRONT,
             StructuredDataKey.WAXED, StructuredDataKey.CUSHION_COLOR, StructuredDataKey.ATTACK_ANIMATION, StructuredDataKey.INTERACT_ANIMATION);
+
+        tagRewriter.renameTag(RegistryType.BLOCK, "convertable_to_mud", "convertible_to_mud");
+
         super.onMappingDataLoaded();
+    }
+
+    @Override
+    public ProtocolStorablesBase createStorables() {
+        return new ProtocolStorables26_3();
     }
 
     @Override

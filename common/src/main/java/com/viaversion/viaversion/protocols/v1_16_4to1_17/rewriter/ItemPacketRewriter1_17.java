@@ -31,6 +31,7 @@ import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.Limit;
 
 public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPackets1_16_2, ServerboundPackets1_17, Protocol1_16_4To1_17> {
 
@@ -55,7 +56,7 @@ public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPacket
 
                 handler(wrapper -> {
                     // Affected items - throw them away!
-                    int length = wrapper.read(Types.VAR_INT);
+                    int length = Limit.max(wrapper.read(Types.VAR_INT), 128);
                     for (int i = 0; i < length; i++) {
                         wrapper.read(Types.SHORT); // Slot
                         wrapper.read(Types.ITEM1_13_2);
@@ -125,10 +126,27 @@ public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPacket
             }
             if (tag.getNumberTag("map") == null) {
                 tag.put("map", new IntTag(0));
+                tag.putBoolean(nbtTagName("map"), true);
             }
         }
 
         item.setIdentifier(this.protocol.getMappingData().getNewItemId(item.identifier()));
+        return item;
+    }
+
+    @Override
+    public Item handleItemToServer(UserConnection connection, Item item) {
+        if (item == null) return null;
+
+        super.handleItemToServer(connection, item);
+
+        CompoundTag tag = item.tag();
+        if (item.identifier() == 733 && tag != null && tag.remove(nbtTagName("map")) != null) {
+            tag.remove("map");
+            if (tag.isEmpty()) {
+                item.setTag(null);
+            }
+        }
         return item;
     }
 

@@ -14,18 +14,23 @@ or as [a standalone proxy](https://github.com/ViaVersion/ViaProxy) to join from 
 any server version from the past decade. **See [HERE](https://viaversion.com) for an overview of the different Via\*
 projects.**
 
-Note that ViaVersion will be able to **run best on either Paper servers or
-through [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus?tab=readme-ov-file#viafabricplus)** due to having
-direct access to client/server state and more extensive API.
+**Note:** While ViaVersion works reliably across all listed platforms, it has the highest performance and state accuracy on **Paper** servers and through **[ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus)** on clients, since both offer more extensive APIs and direct access to client/server state.
 
-Supported Versions:
+### Supported Versions
 
-![Table (https://ci.viaversion.com/userContent/images/T.png)](https://ci.viaversion.com/userContent/images/T.png)
+| Players joining with…                           | Install    |
+| :--- | :--- |
+| **Newer** versions than the server              | ViaVersion |
+| **Older** versions than the server, down to 1.9 | ViaVersion + [ViaBackwards](https://github.com/ViaVersion/ViaBackwards)                                                        |
+| **1.7.x – 1.8.x**                               | ViaVersion + [ViaBackwards](https://github.com/ViaVersion/ViaBackwards) + [ViaRewind](https://github.com/ViaVersion/ViaRewind) |
 
-**User Docs:** https://docs.viaversion.com
+If you're stuck, try [this tool](https://viaversion.com/setup) to work out what plugins you need.
 
-Snapshot support
---------
+**User Docs:** [docs.viaversion.com](https://docs.viaversion.com)
+
+Snapshot Support
+----------
+
 **ViaVersion will only be released a few days *after* a Minecraft update** unless the protocol changes of the update
 were trivial. If you want early-access, usually days or even weeks before the final release, you can subscribe to
 either:

@@ -86,11 +86,14 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
 
         switch (key) {
             case "enchantment" -> updateEnchantments(connection, entries);
-            case "trim_material" -> updateTrimMaterials(entries);
-            case "jukebox_song" -> updateJukeboxSongs(entries);
+            case "trim_material" -> updateTrimMaterials(connection, entries);
+            case "jukebox_song" -> updateJukeboxSongs(connection, entries);
+            case "trim_pattern", "instrument" -> updateTextComponents(connection, entries, "description");
+            case "painting_variant" -> updateTextComponents(connection, entries, "title", "author");
             case "worldgen/biome" -> updateBiomes(entries);
             case "worldgen/block_state_provider" -> updateBlockStateProviders(entries);
             case "dimension_type" -> updateDimensionTypes(entries);
+            case "timeline" -> updateTimelines(entries);
             case "dialog" -> updateDialogs(connection, entries);
         }
 
@@ -291,6 +294,18 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         updateTextComponent(connection, tag, "tooltip");
     }
 
+    protected void updateTextComponents(final UserConnection connection, final RegistryEntry[] entries, final String... keys) {
+        for (final RegistryEntry entry : entries) {
+            if (!(entry.tag() instanceof final CompoundTag tag)) {
+                continue;
+            }
+
+            for (final String key : keys) {
+                updateTextComponent(connection, tag, key);
+            }
+        }
+    }
+
     protected void updateTextComponent(final UserConnection connection, @Nullable final CompoundTag tag, final String key) {
         if (tag != null && protocol.getComponentRewriter() != null) {
             protocol.getComponentRewriter().processTag(connection, tag.get(key));
@@ -333,6 +348,7 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
             }
 
             final CompoundTag tag = (CompoundTag) entry.tag();
+            updateTextComponent(connection, tag, "description");
             if (!Mappings.isFullIdentity(protocol.getMappingData().getFullItemMappings())) {
                 updateItemList(tag.getListTag("supported_items", StringTag.class));
                 updateItemList(tag.getListTag("primary_items", StringTag.class));
@@ -365,7 +381,8 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         }
     }
 
-    public void updateTrimMaterials(final RegistryEntry[] entries) {
+    public void updateTrimMaterials(final UserConnection connection, final RegistryEntry[] entries) {
+        updateTextComponents(connection, entries, "description");
         if (Mappings.isFullIdentity(protocol.getMappingData().getFullItemMappings())) {
             return;
         }
@@ -384,7 +401,8 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         }
     }
 
-    public void updateJukeboxSongs(final RegistryEntry[] entries) {
+    public void updateJukeboxSongs(final UserConnection connection, final RegistryEntry[] entries) {
+        updateTextComponents(connection, entries, "description");
         // can be overridden
     }
 
@@ -442,15 +460,65 @@ public class RegistryDataRewriter implements com.viaversion.viaversion.api.rewri
         if (ambientParticles instanceof CompoundTag modifierTag) {
             ambientParticles = modifierTag.get("argument");
         }
-        if (ambientParticles instanceof ListTag<?> ambientParticlesList) {
-            for (final Tag ambientParticle : ambientParticlesList) {
-                if (!(ambientParticle instanceof CompoundTag ambientParticleTag)) {
-                    continue;
-                }
+        handleAmbientParticles(ambientParticles);
 
-                final CompoundTag particle = ambientParticleTag.getCompoundTag("particle");
-                if (particle != null) {
-                    handleParticleData(particle);
+        Tag dripstoneParticle = TagUtil.getNamespacedTag(tag, "visual/default_dripstone_particle");
+        if (dripstoneParticle instanceof CompoundTag modifierTag && modifierTag.contains("argument")) {
+            dripstoneParticle = modifierTag.get("argument");
+        }
+        if (dripstoneParticle instanceof CompoundTag particle) {
+            handleParticleData(particle);
+        }
+    }
+
+    private void handleAmbientParticles(final @Nullable Tag ambientParticles) {
+        if (!(ambientParticles instanceof ListTag<?> ambientParticlesList)) {
+            return;
+        }
+
+        for (final Tag ambientParticle : ambientParticlesList) {
+            if (!(ambientParticle instanceof CompoundTag ambientParticleTag)) {
+                continue;
+            }
+
+            final CompoundTag particle = ambientParticleTag.getCompoundTag("particle");
+            if (particle != null) {
+                handleParticleData(particle);
+            }
+        }
+    }
+
+    public void updateTimelines(final RegistryEntry[] entries) {
+        final MappingData mappings = protocol.getMappingData();
+        if (mappings == null) {
+            return;
+        }
+
+        for (final RegistryEntry entry : entries) {
+            if (entry.tag() == null) {
+                continue;
+            }
+
+            final CompoundTag tracks = ((CompoundTag) entry.tag()).getCompoundTag("tracks");
+            if (tracks == null) {
+                continue;
+            }
+
+            if (mappings.changedEnvironmentAttributes() != null) {
+                for (final String attribute : mappings.changedEnvironmentAttributes()) {
+                    TagUtil.removeNamespaced(tracks, attribute);
+                }
+            }
+
+            final CompoundTag ambientParticlesTrack = TagUtil.getNamespacedCompoundTag(tracks, "visual/ambient_particles");
+            if (ambientParticlesTrack == null) {
+                continue;
+            }
+
+            final ListTag<CompoundTag> keyframes = ambientParticlesTrack.getListTag("keyframes", CompoundTag.class);
+            if (keyframes != null) {
+                for (final CompoundTag keyframe : keyframes) {
+                    handleAmbientParticles(keyframe.get("value"));
                 }
             }
         }

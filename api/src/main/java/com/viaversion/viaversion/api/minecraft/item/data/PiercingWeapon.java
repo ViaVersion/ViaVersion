@@ -22,16 +22,19 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.codec.Ops;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.util.Rewritable;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record PiercingWeapon(boolean dealsKnockback, boolean dismounts,
-                             @Nullable Holder<SoundEvent> sound, @Nullable Holder<SoundEvent> hitSound) {
+                             @Nullable Holder<SoundEvent> sound, @Nullable Holder<SoundEvent> hitSound) implements Rewritable {
 
     public static final Type<PiercingWeapon> TYPE = new Type<>(PiercingWeapon.class) {
         @Override
@@ -61,4 +64,11 @@ public record PiercingWeapon(boolean dealsKnockback, boolean dismounts,
             );
         }
     };
+
+    @Override
+    public PiercingWeapon rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        final Holder<SoundEvent> sound = SoundEvent.rewriteOptionalHolder(this.sound, Rewritable.soundRewriteFunction(protocol, clientbound));
+        final Holder<SoundEvent> hitSound = SoundEvent.rewriteOptionalHolder(this.hitSound, Rewritable.soundRewriteFunction(protocol, clientbound));
+        return sound == this.sound && hitSound == this.hitSound ? this : new PiercingWeapon(dealsKnockback, dismounts, sound, hitSound);
+    }
 }

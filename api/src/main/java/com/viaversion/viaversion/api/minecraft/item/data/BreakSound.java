@@ -22,18 +22,22 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.TransformingType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.EitherType;
-import com.viaversion.viaversion.util.Either;
+import com.viaversion.viaversion.util.Rewritable;
 
-/**
- * 1.21.11-only damage type.
- *
- * @param id registry int or string id
- */
-public record DamageType(Either<Integer, String> id) {
+public record BreakSound(Holder<SoundEvent> sound) implements Rewritable {
 
-    public static final Type<DamageType> TYPE1_21_11 = TransformingType.of(new EitherType<>(Types.VAR_INT, Types.STRING), DamageType.class, DamageType::new, DamageType::id);
+    public static final Type<BreakSound> TYPE = TransformingType.of(Types.SOUND_EVENT, BreakSound.class, BreakSound::new, BreakSound::sound);
+
+    @Override
+    public BreakSound rewrite(final UserConnection connection, final Protocol<?, ?, ?, ?> protocol, final boolean clientbound) {
+        final Holder<SoundEvent> sound = SoundEvent.rewriteHolder(this.sound, Rewritable.soundRewriteFunction(protocol, clientbound));
+        return this.sound == sound ? this : new BreakSound(sound);
+    }
 }

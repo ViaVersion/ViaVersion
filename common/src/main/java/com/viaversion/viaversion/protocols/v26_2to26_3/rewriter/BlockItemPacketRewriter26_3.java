@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v26_2to26_3.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -36,6 +37,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrim26_3;
 import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimMaterial1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimMaterial26_3;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_21_11to26_1.packet.ClientboundPacket26_1;
@@ -201,6 +203,10 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
     @Override
     protected void handleItemDataComponentsToClient(final UserConnection connection, final Item item, final StructuredDataContainer container) {
         upgradeData(container);
+
+        // Add data components to fix issues in older protocols
+        appendItemDataFixComponents(connection, item, container);
+
         super.handleItemDataComponentsToClient(connection, item, container);
     }
 
@@ -210,10 +216,31 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         super.handleItemDataComponentsToServer(connection, item, container);
     }
 
+    private void appendItemDataFixComponents(final UserConnection connection, final Item item, final StructuredDataContainer container) {
+        final ProtocolVersion serverVersion = connection.getProtocolInfo().serverProtocolVersion();
+        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+            // Axes only started stripping logs in 1.13
+            if (item.identifier() == 1043 || item.identifier() == 1033 || item.identifier() == 1053 || item.identifier() == 1058 || item.identifier() == 1048 || item.identifier() == 1038 || item.identifier() == 1028) {
+                container.setEmpty(StructuredDataKey.BLOCK_TRANSFORMER);
+            }
+        }
+        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+            // Shovels only started creating dirt paths in 1.9
+            if (item.identifier() == 1036 || item.identifier() == 1046 || item.identifier() == 1041 || item.identifier() == 1026 || item.identifier() == 1056 || item.identifier() == 1031 || item.identifier() == 1051) {
+                container.setEmpty(StructuredDataKey.BLOCK_TRANSFORMER);
+            }
+        }
+    }
+
     public static void upgradeData(final StructuredDataContainer container) {
         container.remove(StructuredDataKey.MAP_COLOR);
 
         container.replaceKey(StructuredDataKey.INSTRUMENT26_1, StructuredDataKey.INSTRUMENT26_3);
+        if (container.hasEmpty(StructuredDataKey.SWING_ANIMATION)) {
+            container.remove(StructuredDataKey.SWING_ANIMATION);
+            container.setEmpty(StructuredDataKey.ATTACK_ANIMATION);
+            container.setEmpty(StructuredDataKey.INTERACT_ANIMATION);
+        }
         container.replace(StructuredDataKey.SWING_ANIMATION, animation -> {
             container.set(StructuredDataKey.ATTACK_ANIMATION, animation);
             container.set(StructuredDataKey.INTERACT_ANIMATION, animation);
@@ -272,7 +299,7 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
             for (final Map.Entry<String, Tag> entry : mapDecorations.entrySet()) {
                 final StringTag typeTag = ((CompoundTag) entry.getValue()).getStringTag("type");
                 if (NEW_MAP_DECORATION_TYPES.contains(Key.stripMinecraftNamespace(typeTag.getValue()))) {
-                    typeTag.setValue("village_plains");
+                    typeTag.setValue("target_x");
                 }
             }
         }
@@ -352,6 +379,11 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         }
 
         backupTrimMaterial(backupTag, "provides_trim_material", container.get(StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1));
+
+        final Integer mapColor = container.get(StructuredDataKey.MAP_COLOR);
+        if (mapColor != null) {
+            backupTag.putInt("map_color", mapColor);
+        }
     }
 
     private void backupTrimMaterial(final CompoundTag tag, final String key, @Nullable final Holder<ArmorTrimMaterial1_20_5> materialHolder) {
@@ -385,6 +417,11 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         final CompoundTag providesTrimMaterialTag = backupTag.getCompoundTag("provides_trim_material");
         if (providesTrimMaterialTag != null) {
             container.replace(StructuredDataKey.PROVIDES_TRIM_MATERIAL26_3, StructuredDataKey.PROVIDES_TRIM_MATERIAL26_1, material -> restoreTrimMaterial(material, providesTrimMaterialTag));
+        }
+
+        final IntTag mapColorTag = backupTag.getIntTag("map_color");
+        if (mapColorTag != null) {
+            container.set(StructuredDataKey.MAP_COLOR, mapColorTag.asInt());
         }
     }
 

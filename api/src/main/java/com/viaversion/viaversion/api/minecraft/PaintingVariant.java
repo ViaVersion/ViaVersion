@@ -79,8 +79,8 @@ public record PaintingVariant(int width, int height, String assetId, @Nullable T
                 .write("width", Types.INT, value.width())
                 .write("height", Types.INT, value.height())
                 .write("asset_id", Types.IDENTIFIER, Key.of(value.assetId()))
-                .writeOptional("title", Types.TRUSTED_TAG, value.title())
-                .writeOptional("author", Types.TRUSTED_TAG, value.author()));
+                .writeOptional("title", Types.TEXT_COMPONENT_TAG, value.title())
+                .writeOptional("author", Types.TEXT_COMPONENT_TAG, value.author()));
         }
 
         @Override

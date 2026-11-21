@@ -44,11 +44,22 @@ public final class UUIDUtil {
     }
 
     public static @Nullable UUID parseUUID(final String uuidString) {
-        try {
-            return UUID.fromString(uuidString);
-        } catch (final IllegalArgumentException e) {
+        // Check the format beforehand instead of catching the exception, exceptions are expensive
+        if (uuidString.length() != 36) {
             return null;
         }
+
+        for (int i = 0; i < 36; i++) {
+            final char c = uuidString.charAt(i);
+            if (i == 8 || i == 13 || i == 18 || i == 23) {
+                if (c != '-') {
+                    return null;
+                }
+            } else if ((c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F')) {
+                return null;
+            }
+        }
+        return UUID.fromString(uuidString);
     }
 
     /**

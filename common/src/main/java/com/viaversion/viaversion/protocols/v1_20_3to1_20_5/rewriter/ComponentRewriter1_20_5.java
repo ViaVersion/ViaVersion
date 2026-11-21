@@ -966,8 +966,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
     protected CompoundTag trimToTag(final UserConnection connection, final ArmorTrim1_20_5 value) {
         final CompoundTag tag = new CompoundTag();
         final Holder<ArmorTrimMaterial1_20_5> material = value.material();
-        final ProtocolStorables1_20_5 storables = connection.storables(protocol);
-        final ArmorTrimStorage trimStorage = storables.armorTrims();
+        final ArmorTrimStorage trimStorage = connection.storables(protocol) instanceof ProtocolStorables1_20_5 storables ? storables.armorTrims() : connection.get(ArmorTrimStorage.class);
         if (material.hasId()) {
             final String trimMaterial = trimStorage.trimMaterials().idToKey(material.id());
             tag.putString("material", trimMaterial);
@@ -1026,8 +1025,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
 
         final Tag materialTag = value.get("material");
         Holder<ArmorTrimMaterial1_20_5> material;
-        final ProtocolStorables1_20_5 storables = connection.storables(protocol);
-        final ArmorTrimStorage trimStorage = storables.armorTrims();
+        final ArmorTrimStorage trimStorage = connection.storables(protocol) instanceof ProtocolStorables1_20_5 storables ? storables.armorTrims() : connection.get(ArmorTrimStorage.class);
         if (materialTag instanceof StringTag stringTag) {
             material = Holder.of(trimStorage.trimMaterials().keyToId(stringTag.getValue()));
         } else {

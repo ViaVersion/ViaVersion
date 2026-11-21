@@ -302,6 +302,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         final StructuredDataContainer dataContainer = item.dataContainer();
         dataContainer.replaceKey(StructuredDataKey.TOOL1_20_5, StructuredDataKey.TOOL1_21_5);
         dataContainer.replaceKey(StructuredDataKey.EQUIPPABLE1_21_2, StructuredDataKey.EQUIPPABLE1_21_5);
+        dataContainer.replaceKey(StructuredDataKey.CONSUMABLE1_21_2, StructuredDataKey.CONSUMABLE1_21_5);
         dataContainer.replace(StructuredDataKey.INSTRUMENT1_21_2, StructuredDataKey.INSTRUMENT1_21_5, EitherHolder::of);
 
         // Collect hidden tooltips
@@ -408,6 +409,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         final StructuredDataContainer dataContainer = item.dataContainer();
         dataContainer.replaceKey(StructuredDataKey.TOOL1_21_5, StructuredDataKey.TOOL1_20_5);
         dataContainer.replaceKey(StructuredDataKey.EQUIPPABLE1_21_5, StructuredDataKey.EQUIPPABLE1_21_2);
+        dataContainer.replaceKey(StructuredDataKey.CONSUMABLE1_21_5, StructuredDataKey.CONSUMABLE1_21_2);
         dataContainer.replace(StructuredDataKey.INSTRUMENT1_21_5, StructuredDataKey.INSTRUMENT1_21_2, instrument -> instrument.hasHolder() ? instrument.holder() : null);
 
         final TooltipDisplay tooltipDisplay = dataContainer.get(StructuredDataKey.TOOLTIP_DISPLAY);
@@ -417,7 +419,8 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             }
 
             final FullMappings mappings = Protocol1_21_4To1_21_5.MAPPINGS.getDataComponentSerializerMappings();
-            if (tooltipDisplay.hiddenComponents().containsAll(HIDE_ADDITIONAL_KEYS.stream().map(key -> mappings.id(key.identifier())).toList())) {
+            // Components added in 1.21.5 don't have an id here and have already been dropped from the hidden set
+            if (tooltipDisplay.hiddenComponents().containsAll(HIDE_ADDITIONAL_KEYS.stream().map(key -> mappings.id(key.identifier())).filter(id -> id != -1).toList())) {
                 dataContainer.set(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP);
             }
         }
@@ -478,7 +481,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         final ProtocolVersion serverVersion = connection.getProtocolInfo().serverProtocolVersion();
         if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             if (item.identifier() == 858 || item.identifier() == 863 || item.identifier() == 873 || item.identifier() == 868 || item.identifier() == 878) { // swords
-                item.dataContainer().remove(StructuredDataKey.CONSUMABLE1_21_2);
+                item.dataContainer().remove(StructuredDataKey.CONSUMABLE1_21_5);
                 item.dataContainer().set(StructuredDataKey.BLOCKS_ATTACKS1_21_5,
                     new BlocksAttacks(
                         0F,

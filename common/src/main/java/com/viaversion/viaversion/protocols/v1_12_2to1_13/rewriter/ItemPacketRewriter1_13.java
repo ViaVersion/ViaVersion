@@ -494,9 +494,12 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     if (tag == null)
                         item.setTag(tag = new CompoundTag());
                     if (!tag.contains("EntityTag")) {
-                        CompoundTag entityTag = new CompoundTag();
-                        entityTag.put("id", new StringTag(eggEntityId.get()));
-                        tag.put("EntityTag", entityTag);
+                        tag.put("EntityTag", new CompoundTag());
+                    }
+                    // The id is removed from a remaining EntityTag in handleItemToClient
+                    CompoundTag entityTag = tag.getCompoundTag("EntityTag");
+                    if (entityTag != null && !entityTag.contains("id")) {
+                        entityTag.putString("id", eggEntityId.get());
                     }
                 } else {
                     rawId = IdAndData.getId(oldId) << 16 | oldId & 0xF;
@@ -548,6 +551,10 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     if (patternsTag != null) {
                         for (CompoundTag pattern : patternsTag) {
                             NumberTag colorTag = pattern.getNumberTag("Color");
+                            if (colorTag == null) {
+                                continue;
+                            }
+
                             pattern.putInt("Color", 15 - colorTag.asInt()); // Invert color id
                         }
                     }
@@ -658,6 +665,11 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     }
                 }
                 tag.put("CanDestroy", newCanDestroy);
+            }
+
+            // Damage, map and the original id are stored in a tag created in handleItemToClient
+            if (tag.isEmpty()) {
+                item.setTag(null);
             }
         }
         return item;

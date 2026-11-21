@@ -38,7 +38,7 @@ public final class ComponentRewriter1_21_11 extends NBTComponentRewriter<Clientb
         final StringTag sprite = tag.getStringTag("sprite");
         if (sprite != null) {
             final String strippedSprite = Key.stripNamespace(sprite.getValue());
-            if (strippedSprite.startsWith("item/")) {
+            if (strippedSprite.startsWith("item/") || strippedSprite.startsWith("trims/items/")) {
                 tag.putString("atlas", "items");
             } else if (strippedSprite.startsWith("block/")) {
                 tag.putString("atlas", "blocks");

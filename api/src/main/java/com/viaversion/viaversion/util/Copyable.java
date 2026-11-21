@@ -39,9 +39,7 @@ public interface Copyable {
             final int length = Array.getLength(object);
             final Object copy = Array.newInstance(componentType, length);
             if (componentType.isPrimitive()) {
-                for (int i = 0; i < length; i++) {
-                    Array.set(copy, i, Array.get(object, i));
-                }
+                System.arraycopy(object, 0, copy, 0, length);
             } else {
                 // See if we need to copy elements, too
                 for (int i = 0; i < length; i++) {

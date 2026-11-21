@@ -26,9 +26,12 @@ import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.ByteArrayType;
 import io.netty.buffer.ByteBuf;
 
 public class ProfileKeyType extends Type<ProfileKey> {
+    private static final ByteArrayType PUBLIC_KEY_TYPE = ByteArrayType.withMaxLength(512);
+    private static final ByteArrayType KEY_SIGNATURE_TYPE = ByteArrayType.withMaxLength(4096);
 
     public ProfileKeyType() {
         super(ProfileKey.class);
@@ -36,14 +39,14 @@ public class ProfileKeyType extends Type<ProfileKey> {
 
     @Override
     public ProfileKey read(final ByteBuf buffer) {
-        return new ProfileKey(buffer.readLong(), Types.BYTE_ARRAY_PRIMITIVE.read(buffer), Types.BYTE_ARRAY_PRIMITIVE.read(buffer));
+        return new ProfileKey(buffer.readLong(), PUBLIC_KEY_TYPE.read(buffer), KEY_SIGNATURE_TYPE.read(buffer));
     }
 
     @Override
     public void write(final ByteBuf buffer, final ProfileKey object) {
         buffer.writeLong(object.expiresAt());
-        Types.BYTE_ARRAY_PRIMITIVE.write(buffer, object.publicKey());
-        Types.BYTE_ARRAY_PRIMITIVE.write(buffer, object.keySignature());
+        PUBLIC_KEY_TYPE.write(buffer, object.publicKey());
+        KEY_SIGNATURE_TYPE.write(buffer, object.keySignature());
     }
 
     public static final class OptionalProfileKeyType extends OptionalType<ProfileKey> {

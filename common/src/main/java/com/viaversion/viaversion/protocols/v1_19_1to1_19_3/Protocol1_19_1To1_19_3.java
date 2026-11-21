@@ -51,6 +51,7 @@ import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.ComponentRew
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.EntityPacketRewriter1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.ItemPacketRewriter1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.NonceStorage1_19_3;
+import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.PlayerHealthStorage;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.ReceivedMessagesStorage;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ServerboundPackets1_19_1;
@@ -59,6 +60,7 @@ import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Pair;
 import java.security.SignatureException;
 import java.util.List;
@@ -220,7 +222,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
                     final ChatSession1_19_1 chatSession = wrapper.user().get(ChatSession1_19_1.class);
                     final ReceivedMessagesStorage messagesStorage = wrapper.user().get(ReceivedMessagesStorage.class);
 
-                    final int signatures = wrapper.read(Types.VAR_INT);
+                    final int signatures = Limit.max(wrapper.read(Types.VAR_INT), 8);
                     for (int i = 0; i < signatures; i++) {
                         wrapper.read(Types.STRING); // Argument name
                         wrapper.read(Types.SIGNATURE_BYTES); // Signature
@@ -380,6 +382,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     public void init(final UserConnection user) {
         user.put(new ReceivedMessagesStorage());
+        user.put(new PlayerHealthStorage());
         addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19_3.PLAYER));
     }
 
