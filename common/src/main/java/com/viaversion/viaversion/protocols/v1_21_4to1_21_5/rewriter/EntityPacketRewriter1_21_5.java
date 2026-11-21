@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_5;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
@@ -37,7 +38,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacke
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
 import com.viaversion.viaversion.util.UUIDUtil;
-import java.util.UUID;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class EntityPacketRewriter1_21_5 extends EntityRewriter<ClientboundPacket1_21_2, Protocol1_21_4To1_21_5> {
@@ -45,6 +46,13 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
     private static final int SHIELD_DISABLED_ENTITY_EVENT = 30;
     private static final int SADDLE_ITEM_ID = 800;
     private static final byte SADDLE_EQUIPMENT_SLOT = 7;
+    // Vanilla is 3.0. 1.21.5 changed the formula to floor the resulting damage, the value before the last sum applied
+    // to the formula gives 0 damage for 3.0, and 1 damage for 3.0 + 1ulp. This works because in 1.21.5, safe fall
+    // distance is off by one (see MC-312495). Additionally, versions below 1.21.5 are a tick behind in calculating
+    // distance, which usually means your safe fall distance is ~0.35-0.5 higher. We can only estimate a guess here,
+    // and it's also slightly inaccurate with blocks that reduce fall damage, but it's still a lot better than
+    // being off by almost a full block
+    private static final double SAFE_FALL_DISTANCE = 2.0 + 1e-6 - Math.ulp(2.0 + 1e-6) + 0.347;
 
     public EntityPacketRewriter1_21_5(final Protocol1_21_4To1_21_5 protocol) {
         super(protocol);
@@ -87,6 +95,11 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
 
         protocol.appendClientbound(ClientboundPackets1_21_2.LOGIN, wrapper -> {
             wrapper.user().get(MessageIndexStorage.class).setIndex(0);
+            sendSafeFallDistance(wrapper, wrapper.get(Types.INT, 0));
+        });
+
+        protocol.appendClientbound(ClientboundPackets1_21_2.RESPAWN, wrapper -> {
+            sendSafeFallDistance(wrapper, tracker(wrapper.user()).clientEntityId());
         });
 
         protocol.registerClientbound(ClientboundPackets1_21_2.UPDATE_MOB_EFFECT, wrapper -> {
@@ -271,6 +284,16 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         equipmentPacket.write(Types.BYTE, SADDLE_EQUIPMENT_SLOT);
         equipmentPacket.write(VersionedTypes.V1_21_5.item, saddled ? new StructuredItem(SADDLE_ITEM_ID, 1) : StructuredItem.empty());
         equipmentPacket.send(Protocol1_21_4To1_21_5.class);
+    }
+
+    private void sendSafeFallDistance(final PacketWrapper after, int clientEntityId) {
+        final PacketWrapper attribute = after.create(ClientboundPackets1_21_5.UPDATE_ATTRIBUTES);
+        attribute.write(Types.VAR_INT, clientEntityId);
+        attribute.write(Types.VAR_INT, 1); // One entry
+        attribute.write(Types.VAR_INT, 23); // Safe fall distance
+        attribute.write(Types.DOUBLE, SAFE_FALL_DISTANCE);
+        attribute.write(Types.VAR_INT, 0); // No modifiers
+        attribute.scheduleSend(Protocol1_21_4To1_21_5.class);
     }
 
     @Override
