@@ -97,13 +97,17 @@ public class SpawnPacketRewriter1_9 {
                     wrapper.write(Types.SHORT, vZ);
                 });
 
-                // Handle potions
+                // Handle arrows and potions
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Types.VAR_INT, 0);
                     final int data = wrapper.get(Types.INT, 0);
 
                     int typeID = wrapper.get(Types.BYTE, 0);
-                    if (EntityTypes1_8.ObjectType.findById(typeID, data) == EntityTypes1_8.ObjectType.POTION) {
+                    final EntityTypes1_8.ObjectType objectType = EntityTypes1_8.ObjectType.findById(typeID, data);
+                    if (objectType == EntityTypes1_8.ObjectType.TIPPED_ARROW) {
+                        // 1.9 sends the shooter id + 1
+                        wrapper.set(Types.INT, 0, data + 1);
+                    } else if (objectType == EntityTypes1_8.ObjectType.POTION) {
                         // Convert this to entity data, woo!
                         PacketWrapper entityDataPacket = wrapper.create(ClientboundPackets1_9.SET_ENTITY_DATA, wrapper1 -> {
                             wrapper1.write(Types.VAR_INT, entityID);
@@ -114,6 +118,9 @@ public class SpawnPacketRewriter1_9 {
                             entityData.add(potion);
                             wrapper1.write(Types.ENTITY_DATA_LIST1_9, entityData);
                         });
+                        // The potion item now lives in entity data, 1.9 sends 0 here
+                        wrapper.set(Types.INT, 0, 0);
+
                         // Fix packet order
                         wrapper.send(Protocol1_8To1_9.class);
                         entityDataPacket.send(Protocol1_8To1_9.class);
