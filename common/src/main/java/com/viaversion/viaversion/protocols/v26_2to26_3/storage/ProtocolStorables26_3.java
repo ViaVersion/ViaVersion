@@ -19,14 +19,21 @@ package com.viaversion.viaversion.protocols.v26_2to26_3.storage;
 
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.connection.ProtocolStorablesBase;
+import java.util.HashSet;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ProtocolStorables26_3 extends ProtocolStorablesBase {
 
+    private final Set<String> referencedDamageTypeTags = new HashSet<>();
     private BlockPosition destroyPosition;
     private short destroyDirection;
     private int destroyTicks;
     private boolean punched;
+
+    public Set<String> referencedDamageTypeTags() {
+        return referencedDamageTypeTags;
+    }
 
     public @Nullable BlockPosition destroyPosition() {
         return destroyPosition;

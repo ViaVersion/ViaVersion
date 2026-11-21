@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
+import com.viaversion.viaversion.api.minecraft.TagData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_2;
 import com.viaversion.viaversion.api.minecraft.data.version.StructuredDataKeys26_3;
@@ -66,7 +67,9 @@ import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
@@ -107,7 +110,27 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
     private final BlockItemPacketRewriter26_3 itemRewriter = new BlockItemPacketRewriter26_3(this);
     private final BlockRewriter<ClientboundPacket26_1> blockRewriter = new BlockPacketRewriter26_3(this);
     private final ParticleRewriter<ClientboundPacket26_1> particleRewriter = new ParticleRewriter<>(this);
-    private final TagRewriter<ClientboundPacket26_1> tagRewriter = new TagRewriter<>(this);
+    private final TagRewriter<ClientboundPacket26_1> tagRewriter = new TagRewriter<>(this) {
+        @Override
+        public void handle(final PacketWrapper wrapper, final RegistryType registryType) {
+            final ProtocolStorables26_3 storables = wrapper.user().storables(Protocol26_2To26_3.this);
+            if (registryType != RegistryType.DAMAGE_TYPE || storables.referencedDamageTypeTags().isEmpty()) {
+                super.handle(wrapper, registryType);
+                return;
+            }
+
+            // Unknown tags never matched before 26.3, so bind the referenced tags the server doesn't send as empty
+            final List<TagData> newTags = new ArrayList<>();
+            final List<TagData> registeredNewTags = getNewTags(registryType);
+            if (registeredNewTags != null) {
+                newTags.addAll(registeredNewTags);
+            }
+            for (final String tag : storables.referencedDamageTypeTags()) {
+                newTags.add(new TagData(tag, new int[0]));
+            }
+            handle(wrapper, getRewriter(registryType), newTags, null, null);
+        }
+    };
     private final NBTComponentRewriter<ClientboundPacket26_1> componentRewriter = new ComponentRewriter26_3(this);
     private final RecipeDisplayRewriter<ClientboundPacket26_1> recipeRewriter = new RecipeDisplayRewriter26_3<>(this) {
         @Override
