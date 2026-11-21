@@ -45,6 +45,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_17> {
@@ -56,7 +57,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
     private final ComponentRewriter1_17 componentRewriter = new ComponentRewriter1_17(this);
     private final TagRewriter<ClientboundPackets1_16_2> tagRewriter = new TagRewriter<>(this);
     private final BlockRewriter<ClientboundPackets1_16_2> blockRewriter = BlockRewriter.for1_14(this);
-    private final Map<Integer, Set<UserConnection>> dyingEntities = new ConcurrentHashMap<>();
+    private final Map<Integer, Set<UUID>> dyingEntities = new ConcurrentHashMap<>();
 
     public Protocol1_16_4To1_17() {
         super(ClientboundPackets1_16_2.class, ClientboundPackets1_17.class, ServerboundPackets1_16_2.class, ServerboundPackets1_17.class);
@@ -179,22 +180,29 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
                 return;
             }
 
-            Set<UserConnection> currentViewers = this.dyingEntities.get(entityId);
+            Set<UUID> currentViewers = this.dyingEntities.get(entityId);
+            UUID viewerUUID = wrapper.user().getProtocolInfo().getUuid();
 
             // if say, 50 people are on 1.17+ and saw this entity dying, we don't need to schedule 50 tasks, which has a noticeable effect on performance
             if (currentViewers != null) {
-                currentViewers.add(wrapper.user());
+                currentViewers.add(viewerUUID);
                 return;
             }
 
-            Set<UserConnection> viewers = ConcurrentHashMap.newKeySet();
-            viewers.add(wrapper.user());
+            Set<UUID> viewers = ConcurrentHashMap.newKeySet();
+            viewers.add(viewerUUID);
 
             this.dyingEntities.put(entityId, viewers);
 
             Via.getPlatform().runSync(() -> {
-                for (UserConnection viewer : viewers) {
-                    PacketWrapper deathSmokePacket = PacketWrapper.create(ClientboundPackets1_17.ENTITY_EVENT, null, viewer);
+                for (UUID viewer : viewers) {
+                    UserConnection connection = Via.getManager().getConnectionManager().getServerConnection(viewer);
+
+                    if (connection == null) {
+                        continue; // logged off probably
+                    }
+
+                    PacketWrapper deathSmokePacket = PacketWrapper.create(ClientboundPackets1_17.ENTITY_EVENT, null, connection);
                     deathSmokePacket.write(Types.INT, entityId); // Entity ID
                     deathSmokePacket.write(Types.BYTE, (byte) 60); // Event ID (60 = Death Smoke)
 
