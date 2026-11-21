@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.storage;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.ArmorTypes1_8;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ public class InventoryTracker implements StorableObject {
     private String inventory;
 
     private final Int2ObjectMap<Map<Short, Integer>> windowItemCache = new Int2ObjectOpenHashMap<>();
+    private final int[] armorItemIds = new int[4];
     private int itemIdInCursor;
     private boolean dragging;
 
@@ -60,6 +62,27 @@ public class InventoryTracker implements StorableObject {
         }
 
         return itemMap.getOrDefault(slot, 0);
+    }
+
+    /**
+     * Stores the item in one of the player's armor slots (5-8 of the player inventory).
+     *
+     * @return whether the slot is an armor slot
+     */
+    public boolean setArmorItemId(int windowId, int slot, int itemId) {
+        if (windowId != 0 || slot < 5 || slot > 8) {
+            return false;
+        }
+        this.armorItemIds[slot - 5] = itemId;
+        return true;
+    }
+
+    public int getArmorPoints() {
+        int armor = 0;
+        for (int itemId : this.armorItemIds) {
+            armor += ArmorTypes1_8.findById(itemId).getArmorPoints();
+        }
+        return armor;
     }
 
     public void setItemId(int windowId, short slot, int itemId) {

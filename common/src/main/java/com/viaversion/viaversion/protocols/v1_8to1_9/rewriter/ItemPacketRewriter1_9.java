@@ -23,6 +23,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
@@ -38,9 +39,12 @@ import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.Collections;
+import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, ServerboundPackets1_9, Protocol1_8To1_9> {
+
+    private static final UUID ARMOR_ATTRIBUTE = UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150");
 
     public ItemPacketRewriter1_9(final Protocol1_8To1_9 protocol) {
         super(protocol, Types.ITEM1_8, Types.ITEM1_8_SHORT_ARRAY);
@@ -130,6 +134,12 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                         entityTracker.syncShieldWithSword();
                     }
 
+                    // 1.9+ clients show armor from the generic.armor attribute, which 1.8 servers never send
+                    InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
+                    if (inventoryTracker.setArmorItemId(wrapper.get(Types.BYTE, 0), wrapper.get(Types.SHORT, 0), stack == null ? 0 : stack.identifier())) {
+                        sendArmorUpdate(wrapper);
+                    }
+
                     handleItemToClient(wrapper.user(), stack);
                 });
                 // Brewing patch
@@ -169,6 +179,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                         if (showShieldWhenSwordInHand) {
                             inventoryTracker.setItemId(windowId, i, stack == null ? 0 : stack.identifier());
                         }
+                        inventoryTracker.setArmorItemId(windowId, i, stack == null ? 0 : stack.identifier());
 
                         handleItemToClient(wrapper.user(), stack);
                     }
@@ -176,6 +187,10 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     // Sync shield item in offhand with main hand
                     if (showShieldWhenSwordInHand) {
                         entityTracker.syncShieldWithSword();
+                    }
+
+                    if (windowId == 0) {
+                        sendArmorUpdate(wrapper);
                     }
                 });
                 // Brewing Patch
@@ -578,5 +593,28 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
             item.setData((short) 0);
         }
         return item;
+    }
+
+    /**
+     * Sends the player's armor points as the generic.armor attribute after the current packet, so the armor bar
+     * matches the armor slots however they were changed (e.g. by a plugin).
+     */
+    private void sendArmorUpdate(final PacketWrapper wrapper) {
+        final EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+        if (!entityTracker.hasClientEntityId()) {
+            return;
+        }
+
+        final int armor = wrapper.user().get(InventoryTracker.class).getArmorPoints();
+        final PacketWrapper attributes = wrapper.create(ClientboundPackets1_9.UPDATE_ATTRIBUTES);
+        attributes.write(Types.VAR_INT, entityTracker.clientEntityId());
+        attributes.write(Types.INT, 1); // Number of properties
+        attributes.write(Types.STRING, "generic.armor");
+        attributes.write(Types.DOUBLE, 0D); // Base value
+        attributes.write(Types.VAR_INT, 1); // Number of modifiers
+        attributes.write(Types.UUID, ARMOR_ATTRIBUTE);
+        attributes.write(Types.DOUBLE, (double) armor);
+        attributes.write(Types.BYTE, (byte) 0); // Add
+        attributes.scheduleSend(Protocol1_8To1_9.class);
     }
 }
