@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v26_2to26_3.rewriter;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes26_3;
@@ -40,6 +41,8 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
     // All entities that care about steps use 3 steps in 26.2. 26.3 still lerps every tick within each step, so this
     // is equivalent
     private static final int INTERPOLATION_STEP_TICKS = 3;
+    // Allays and mannequins use a 2 tick update interval
+    private static final int SHORT_INTERPOLATION_STEP_TICKS = 2;
     private static final int MAIN_HAND = 0;
     private static final int OFF_HAND = 1;
     private static final int START_DESTROY_BLOCK_ACTION = 0;
@@ -57,20 +60,20 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
     @Override
     public void registerPackets() {
         protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Entity id
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
             final short xa = wrapper.read(Types.SHORT);
             final short ya = wrapper.read(Types.SHORT);
             final short za = wrapper.read(Types.SHORT);
             final boolean onGround = wrapper.read(Types.BOOLEAN);
             wrapper.write(Types.VAR_INT, (onGround ? 1 : 0) | SINGLE_STEP); // Only the first bit set, otherwise empty = no step count
-            wrapper.write(Types.VAR_INT, INTERPOLATION_STEP_TICKS);
+            wrapper.write(Types.VAR_INT, interpolationStepTicks(wrapper.user(), entityId));
             wrapper.write(Types.SHORT, xa);
             wrapper.write(Types.SHORT, ya);
             wrapper.write(Types.SHORT, za);
         });
 
         protocol.registerClientbound(ClientboundPackets26_1.MOVE_ENTITY_POS_ROT, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Entity id
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
             final short xa = wrapper.read(Types.SHORT);
             final short ya = wrapper.read(Types.SHORT);
             final short za = wrapper.read(Types.SHORT);
@@ -78,7 +81,7 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
             final byte xRot = wrapper.read(Types.BYTE);
             final boolean onGround = wrapper.read(Types.BOOLEAN);
             wrapper.write(Types.VAR_INT, (onGround ? 1 : 0) | SINGLE_STEP); // Only the first bit set, otherwise empty = no extra steps
-            wrapper.write(Types.VAR_INT, INTERPOLATION_STEP_TICKS);
+            wrapper.write(Types.VAR_INT, interpolationStepTicks(wrapper.user(), entityId));
             wrapper.write(Types.SHORT, xa);
             wrapper.write(Types.SHORT, ya);
             wrapper.write(Types.SHORT, za);
@@ -96,7 +99,7 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
         });
 
         protocol.registerClientbound(ClientboundPackets26_1.ENTITY_POSITION_SYNC, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Entity ID
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
 
             wrapper.write(Types.VAR_INT, 1); // Stepped
             wrapper.write(Types.VAR_INT, 1); // 1 step
@@ -104,7 +107,7 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
-            wrapper.write(Types.VAR_INT, INTERPOLATION_STEP_TICKS);
+            wrapper.write(Types.VAR_INT, interpolationStepTicks(wrapper.user(), entityId));
 
             wrapper.read(Types.DOUBLE); // Delta x
             wrapper.read(Types.DOUBLE); // Delta y
@@ -228,6 +231,11 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
             entityDataTypes.componentType,
             entityDataTypes.optionalComponentType
         );
+    }
+
+    private int interpolationStepTicks(final UserConnection connection, final int entityId) {
+        final EntityType type = tracker(connection).entityType(entityId);
+        return type == EntityTypes26_3.MANNEQUIN || type == EntityTypes26_3.ALLAY ? SHORT_INTERPOLATION_STEP_TICKS : INTERPOLATION_STEP_TICKS;
     }
 
     @Override
