@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
@@ -42,6 +43,11 @@ import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_17> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.16.2", "1.17");
@@ -51,6 +57,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
     private final ComponentRewriter1_17 componentRewriter = new ComponentRewriter1_17(this);
     private final TagRewriter<ClientboundPackets1_16_2> tagRewriter = new TagRewriter<>(this);
     private final BlockRewriter<ClientboundPackets1_16_2> blockRewriter = BlockRewriter.for1_14(this);
+    private final Map<Integer, Set<UUID>> dyingEntities = new ConcurrentHashMap<>();
 
     public Protocol1_16_4To1_17() {
         super(ClientboundPackets1_16_2.class, ClientboundPackets1_17.class, ServerboundPackets1_16_2.class, ServerboundPackets1_17.class);
@@ -163,6 +170,47 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
                 map(Types.VAR_INT); // Main hand
                 read(Types.BOOLEAN); // Text filtering
             }
+        });
+
+        registerClientbound(ClientboundPackets1_16_2.ENTITY_EVENT, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.INT);
+            final byte eventId = wrapper.passthrough(Types.BYTE);
+
+            if (eventId != (byte) 3) { // 3 = Death
+                return;
+            }
+
+            Set<UUID> currentViewers = this.dyingEntities.get(entityId);
+            UUID viewerUUID = wrapper.user().getProtocolInfo().getUuid();
+
+            // if say, 50 people are on 1.17+ and saw this entity dying, we don't need to schedule 50 tasks, which has a noticeable effect on performance
+            if (currentViewers != null) {
+                currentViewers.add(viewerUUID);
+                return;
+            }
+
+            Set<UUID> viewers = ConcurrentHashMap.newKeySet();
+            viewers.add(viewerUUID);
+
+            this.dyingEntities.put(entityId, viewers);
+
+            Via.getPlatform().runSync(() -> {
+                for (UUID viewer : viewers) {
+                    UserConnection connection = Via.getManager().getConnectionManager().getServerConnection(viewer);
+
+                    if (connection == null) {
+                        continue; // logged off probably
+                    }
+
+                    PacketWrapper deathSmokePacket = PacketWrapper.create(ClientboundPackets1_17.ENTITY_EVENT, null, connection);
+                    deathSmokePacket.write(Types.INT, entityId); // Entity ID
+                    deathSmokePacket.write(Types.BYTE, (byte) 60); // Event ID (60 = Death Smoke)
+
+                    deathSmokePacket.scheduleSend(Protocol1_16_4To1_17.class);
+                }
+
+                this.dyingEntities.remove(entityId);
+            }, 20L); // 1.16.5 and below would handle this client side 20 ticks after death
         });
     }
 
