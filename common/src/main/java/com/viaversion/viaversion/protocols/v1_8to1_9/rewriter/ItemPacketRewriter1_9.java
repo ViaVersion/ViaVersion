@@ -114,11 +114,9 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     Item stack = wrapper.get(Types.ITEM1_8, 0);
                     byte windowId = wrapper.get(Types.BYTE, 0);
                     short slot = wrapper.get(Types.SHORT, 0);
-                    int armorSlot = windowId == 0 && slot >= 5 && slot <= 8 ? slot - 5
-                        : windowId == -2 && slot >= 36 && slot <= 39 ? 39 - slot : -1;
-                    if (armorSlot != -1) {
+                    if (windowId == 0 && slot >= 5 && slot <= 8) {
                         ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
-                        armorTracker.setArmor(armorSlot, stack == null ? 0 : stack.identifier());
+                        armorTracker.setArmor(slot - 5, stack == null ? 0 : stack.identifier());
                         armorTracker.sendArmorUpdate(wrapper.user());
                     }
 
