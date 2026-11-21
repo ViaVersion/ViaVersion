@@ -38,10 +38,10 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPacket26_1, Protocol26_2To26_3> {
 
     private static final int SINGLE_STEP = 1 << 1;
-    // Only living entities interpolate with the steps from the packet, and 26.3 paces their interpolation by the update
-    // interval of the entity type, so the step ticks have to match it to avoid a growing backlog
+    // All entities that care about steps use 3 steps in 26.2. 26.3 still lerps every tick within each step, so this
+    // is equivalent
     private static final int INTERPOLATION_STEP_TICKS = 3;
-    // Allay, mannequin and player are the only living entities updating every 2 ticks
+    // Allays and mannequins use a 2 tick update interval
     private static final int SHORT_INTERPOLATION_STEP_TICKS = 2;
     private static final int MAIN_HAND = 0;
     private static final int OFF_HAND = 1;
@@ -235,10 +235,7 @@ public final class EntityPacketRewriter26_3 extends EntityRewriter<ClientboundPa
 
     private int interpolationStepTicks(final UserConnection connection, final int entityId) {
         final EntityType type = tracker(connection).entityType(entityId);
-        if (type == null) {
-            return INTERPOLATION_STEP_TICKS;
-        }
-        return type.isOrHasParent(EntityTypes26_3.AVATAR) || type == EntityTypes26_3.ALLAY ? SHORT_INTERPOLATION_STEP_TICKS : INTERPOLATION_STEP_TICKS;
+        return type == EntityTypes26_3.MANNEQUIN || type == EntityTypes26_3.ALLAY ? SHORT_INTERPOLATION_STEP_TICKS : INTERPOLATION_STEP_TICKS;
     }
 
     @Override
