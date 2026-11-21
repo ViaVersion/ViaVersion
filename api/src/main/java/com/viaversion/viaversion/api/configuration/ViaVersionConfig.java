@@ -552,6 +552,14 @@ public interface ViaVersionConfig extends Config {
     boolean use1_8HitboxMargin();
 
     /**
+     * If enabled, 1.20.5+ clients on 1.20.4 (or older) servers can't jump with negative jump boost,
+     * emulated through the jump strength attribute while hiding the effect.
+     *
+     * @return true if enabled
+     */
+    boolean emulateNegativeJumpBoost();
+
+    /**
      * If enabled, ViaVersion will send the native client version to the server on connect via a plugin message.
      *
      * @return true if enabled
