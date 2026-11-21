@@ -48,7 +48,6 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.BannerPatterns1_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ProtocolStorables1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ScoreboardTeamStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
@@ -71,6 +70,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     private static final UUID CREATIVE_ENTITY_INTERACTION_RANGE = UUID.fromString("98491ef6-97b1-4584-ae82-71a8cc85cf73");
     private static final UUID NEGATIVE_JUMP_BOOST = UUID.fromString("5d0a3b8e-2f6c-4b1e-9a47-c3e1f0b7d264");
     private static final int JUMP_BOOST_EFFECT = 7;
+    // 1.20.5+ skips jumps (and the sprint boost) at a jump power <= 1e-5F, keep it slightly above to mimic the old jump into the ground
+    private static final double MIN_JUMP_BOOST = -0.4199D;
 
     public EntityPacketRewriter1_20_5(final Protocol1_20_3To1_20_5 protocol) {
         super(protocol);
@@ -321,7 +322,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                     removeEffect.write(Types.VAR_INT, effectId);
                     removeEffect.send(Protocol1_20_3To1_20_5.class);
 
-                    sendJumpStrength(wrapper.user(), 0.1D * (amplifier + 1));
+                    sendJumpStrength(wrapper.user(), Math.max(0.1D * (amplifier + 1), MIN_JUMP_BOOST));
                     wrapper.cancel();
                     return;
                 }
