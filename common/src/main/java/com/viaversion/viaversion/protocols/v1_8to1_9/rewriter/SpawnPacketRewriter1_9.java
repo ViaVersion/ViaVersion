@@ -97,23 +97,29 @@ public class SpawnPacketRewriter1_9 {
                     wrapper.write(Types.SHORT, vZ);
                 });
 
-                // Handle potions
+                // Handle arrows and potions
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Types.VAR_INT, 0);
                     final int data = wrapper.get(Types.INT, 0);
 
                     int typeID = wrapper.get(Types.BYTE, 0);
-                    if (EntityTypes1_8.ObjectType.findById(typeID, data) == EntityTypes1_8.ObjectType.POTION) {
+                    final EntityTypes1_8.ObjectType objectType = EntityTypes1_8.ObjectType.findById(typeID, data);
+                    if (objectType == EntityTypes1_8.ObjectType.TIPPED_ARROW) {
+                        // 1.9 sends the shooter id + 1
+                        wrapper.set(Types.INT, 0, data + 1);
+                    } else if (objectType == EntityTypes1_8.ObjectType.POTION) {
                         // Convert this to entity data, woo!
                         PacketWrapper entityDataPacket = wrapper.create(ClientboundPackets1_9.SET_ENTITY_DATA, wrapper1 -> {
                             wrapper1.write(Types.VAR_INT, entityID);
                             List<EntityData> entityData = new ArrayList<>();
                             Item item = new DataItem(373, (byte) 1, (short) data, null); // Potion
-                            protocol.getItemRewriter().handleItemToClient(wrapper.user(), item); // Rewrite so that it gets the right nbt
+                            protocol.getItemRewriter().handleItemToClient(wrapper.user(), item);
                             EntityData potion = new EntityData(6, EntityDataTypes1_9.ITEM, item); // Would be 5, except Vanilla uses the wrong entity class when registering
                             entityData.add(potion);
                             wrapper1.write(Types.ENTITY_DATA_LIST1_9, entityData);
                         });
+                        wrapper.set(Types.INT, 0, 0);
+
                         // Fix packet order
                         wrapper.send(Protocol1_8To1_9.class);
                         entityDataPacket.send(Protocol1_8To1_9.class);
