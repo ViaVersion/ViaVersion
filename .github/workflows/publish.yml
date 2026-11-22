@@ -20,12 +20,12 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6.4.0
+        uses: gradle/actions/setup-gradle@v6.4.1
         with:
           cache-disabled: false
           cache-provider: basic
       - name: Set up JDK 17
-        uses: actions/setup-java@v6.1.0
+        uses: actions/setup-java@v6.3.0
         with:
           distribution: 'temurin'
           java-version: 17
