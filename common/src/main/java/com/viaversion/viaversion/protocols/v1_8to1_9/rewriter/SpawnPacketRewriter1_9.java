@@ -113,12 +113,11 @@ public class SpawnPacketRewriter1_9 {
                             wrapper1.write(Types.VAR_INT, entityID);
                             List<EntityData> entityData = new ArrayList<>();
                             Item item = new DataItem(373, (byte) 1, (short) data, null); // Potion
-                            protocol.getItemRewriter().handleItemToClient(wrapper.user(), item); // Rewrite so that it gets the right nbt
+                            protocol.getItemRewriter().handleItemToClient(wrapper.user(), item);
                             EntityData potion = new EntityData(6, EntityDataTypes1_9.ITEM, item); // Would be 5, except Vanilla uses the wrong entity class when registering
                             entityData.add(potion);
                             wrapper1.write(Types.ENTITY_DATA_LIST1_9, entityData);
                         });
-                        // The potion item now lives in entity data, 1.9 sends 0 here
                         wrapper.set(Types.INT, 0, 0);
 
                         // Fix packet order
