@@ -38,6 +38,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.consumable.ApplyStatusEffects;
 import com.viaversion.viaversion.api.minecraft.item.data.consumable.Consumable1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant1_21_2;
@@ -141,6 +142,10 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         protocol.registerServerbound(ServerboundPackets1_21_2.CONTAINER_CLOSE, this::varIntToByte);
         protocol.replaceServerbound(ServerboundPackets1_21_2.CONTAINER_CLICK, wrapper -> {
             varIntToByte(wrapper);
+            if (ignore1_20_5ClickItems(wrapper, itemType(), StructuredItem::empty)) {
+                return;
+            }
+
             wrapper.passthrough(Types.VAR_INT); // State id
             wrapper.passthrough(Types.SHORT); // Slot
             wrapper.passthrough(Types.BYTE); // Button

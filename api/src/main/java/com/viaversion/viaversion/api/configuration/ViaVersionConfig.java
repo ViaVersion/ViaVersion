@@ -560,6 +560,14 @@ public interface ViaVersionConfig extends Config {
     boolean emulateNegativeJumpBoost();
 
     /**
+     * If enabled, item data sent by 1.20.5-1.21.4 clients in container clicks is skipped without being read,
+     * forcing the server to resync the inventory instead.
+     *
+     * @return true if enabled
+     */
+    boolean ignore1_20_5To1_21_4ClickItems();
+
+    /**
      * If enabled, ViaVersion will send the native client version to the server on connect via a plugin message.
      *
      * @return true if enabled

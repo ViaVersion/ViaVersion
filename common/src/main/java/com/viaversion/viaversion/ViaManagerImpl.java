@@ -168,7 +168,7 @@ public class ViaManagerImpl implements ViaManager {
                 platform.getLogger().warning("Get setup help at https://viaversion.com/setup or download ViaBackwards/ViaRewind directly at https://ci.viaversion.com/");
                 platform.getLogger().warning("Need more help? Join our Discord at https://viaversion.com/discord");
             } else if (protocolVersion.highestSupportedProtocolVersion().olderThan(ProtocolVersion.v1_16)) {
-                platform.getLogger().warning("This version of Minecraft is extremely outdated and support for it has reached its end of life. "
+                platform.getLogger().info("This version of Minecraft is extremely outdated and support for it has reached its end of life. "
                     + "You will still be able to run Via on this Minecraft version, but we will prioritize issues with legacy Minecraft versions less. "
                     + "Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
             }
@@ -261,8 +261,11 @@ public class ViaManagerImpl implements ViaManager {
             }
         }
         if (!versions.isEmpty()) {
-            platform.getLogger().warning("The Vanilla protocol of Minecraft 1.20.5-1.21.4 is easily exploitable. "
-                + "If you don't need to support these versions, consider adding them to block-versions in the ViaVersion config: " + String.join(", ", versions));
+            platform.getLogger().log(
+                Via.getConfig().ignore1_20_5To1_21_4ClickItems() ? Level.INFO : Level.WARNING,
+                "The Vanilla protocol of Minecraft 1.20.5-1.21.4 is easily exploitable. "
+                    + "If you don't need to support these versions, consider adding them to block-versions in the ViaVersion config: " + String.join(", ", versions)
+            );
         }
     }
 
@@ -276,8 +279,8 @@ public class ViaManagerImpl implements ViaManager {
             platform.getLogger().warning("You are running an outdated Java version, please update it to at least Java 21 (your version is " + javaVersion + ").");
             platform.getLogger().warning("ViaVersion no longer officially supports this version of Java, only offering unsupported compatibility builds.");
             platform.getLogger().warning("See https://github.com/ViaVersion/ViaVersion/releases/tag/5.0.0 for more information.");
-        } else if (javaVersion < 21) {
-            platform.getLogger().warning("Please update your Java runtime to at least Java 21 (your version is " + javaVersion + ").");
+        } else if (javaVersion < 25) {
+            platform.getLogger().warning("Please update your Java runtime to at least Java 25 (your version is " + javaVersion + ").");
             platform.getLogger().warning("At some point in the future, ViaVersion will no longer be compatible with this version of Java.");
         }
     }

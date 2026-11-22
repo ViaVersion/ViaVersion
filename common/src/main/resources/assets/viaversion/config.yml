@@ -207,6 +207,13 @@ fix-1_21-placement-rotation: true
 # If enabled, cancel swing packets sent while having an inventory opened on 1.15.2 and below servers. This can cause false positives with anti-cheat plugins.
 cancel-swing-in-inventory: true
 #
+# If enabled, 1.20.5+ clients on 1.20.4 or older servers can't jump with negative jump boost levels (the effect icon is hidden while active)
+emulate-negative-jump-boost: true
+#
+# If enabled, item data sent by 1.20.5-1.21.4 clients when clicking in inventories is dropped without being read, making the server always resync the inventory instead, working around protocol exploits.
+# Even with this option enabled, it's recommended to instead block the full range of clients instead.
+ignore-1_20_5-1_21_4-click-items: true
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#
@@ -252,5 +259,3 @@ left-handed-handling: true
 cancel-block-sounds: true
 # If enabled, 1.21.11+ clients on 1.8 servers will get wider entity hitboxes when attacking with items
 use-1_8-hitbox-margin: true
-# If enabled, 1.20.5+ clients on 1.20.4 or older servers can't jump with negative jump boost levels (the effect icon is hidden while active)
-emulate-negative-jump-boost: true

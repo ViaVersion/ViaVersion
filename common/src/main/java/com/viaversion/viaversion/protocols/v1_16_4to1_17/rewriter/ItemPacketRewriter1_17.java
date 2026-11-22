@@ -76,6 +76,19 @@ public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPacket
                     }
 
                     wrapper.write(Types.ITEM1_13_2, item);
+
+                    if (shouldIgnore1_20_5ClickItems(wrapper.user())) {
+                        // Servers before 1.17 wil ignore all further clicks until the rejection is acknowledged
+                        final byte containerId = wrapper.get(Types.BYTE, 0);
+                        wrapper.sendToServer(Protocol1_16_4To1_17.class);
+                        wrapper.cancel();
+
+                        final PacketWrapper acknowledgement = wrapper.create(ServerboundPackets1_16_2.CONTAINER_ACK);
+                        acknowledgement.write(Types.BYTE, containerId);
+                        acknowledgement.write(Types.SHORT, (short) 0); // Action
+                        acknowledgement.write(Types.BOOLEAN, true); // Accept
+                        acknowledgement.sendToServer(Protocol1_16_4To1_17.class);
+                    }
                 });
             }
         });

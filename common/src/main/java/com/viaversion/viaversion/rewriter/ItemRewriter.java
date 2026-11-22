@@ -19,6 +19,7 @@ package com.viaversion.viaversion.rewriter;
 
 import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
@@ -26,15 +27,18 @@ import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.item.ItemHasher;
 import com.viaversion.viaversion.api.minecraft.item.HashedItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.item.ItemType1_20_5;
 import com.viaversion.viaversion.api.type.types.version.VersionedTypesHolder;
 import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.data.item.OriginalHashedItem;
@@ -42,6 +46,7 @@ import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.Rewritable;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import java.util.function.Supplier;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
@@ -289,6 +294,10 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     public void registerContainerClick1_17_1(S packetType, Type<? extends Number> containerIdType) {
         protocol.registerServerbound(packetType, wrapper -> {
             wrapper.passthrough(containerIdType); // Container id
+            if (ignore1_20_5ClickItems(wrapper, itemType, itemType instanceof ItemType1_20_5 ? StructuredItem::empty : () -> null)) {
+                return;
+            }
+
             wrapper.passthrough(Types.VAR_INT); // State id
             wrapper.passthrough(Types.SHORT); // Slot
             wrapper.passthrough(Types.BYTE); // Button
@@ -304,6 +313,44 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             // Carried item
             wrapper.write(itemType, handleItemToServer(wrapper.user(), wrapper.read(mappedItemType)));
         });
+    }
+
+    /**
+     * Drops the item data of container clicks sent by 1.20.5-1.21.4 clients without reading it,
+     * so the click still goes through, but the server resyncs the whole container afterwards.
+     * <p>
+     * Has to be called right after the container id has been handled.
+     * If this returns true, the packet is already in a fully read state.
+     *
+     * @param wrapper          container click packet wrapper
+     * @param carriedItemType  type of the carried item in the written packet
+     * @param emptyCarriedItem supplier of an empty carried item for the given type
+     * @param <T>              carried item type
+     * @return true if the item data has been dropped
+     */
+    public static <T> boolean ignore1_20_5ClickItems(final PacketWrapper wrapper, final Type<T> carriedItemType, final Supplier<@Nullable T> emptyCarriedItem) {
+        if (!shouldIgnore1_20_5ClickItems(wrapper.user())) {
+            return false;
+        }
+
+        // Replace the state ID with an invalid one. The server only ever uses positive numbers in the short range
+        wrapper.read(Types.VAR_INT);
+        wrapper.write(Types.VAR_INT, -1);
+
+        wrapper.passthrough(Types.SHORT); // Slot
+        wrapper.passthrough(Types.BYTE); // Button
+        wrapper.passthrough(Types.VAR_INT); // Mode
+
+        // Clear all the items
+        wrapper.clearInputBuffer();
+        wrapper.write(Types.VAR_INT, 0); // Changed slots
+        wrapper.write(carriedItemType, emptyCarriedItem.get()); // Carried item
+        return true;
+    }
+
+    public static boolean shouldIgnore1_20_5ClickItems(final UserConnection connection) {
+        return Via.getConfig().ignore1_20_5To1_21_4ClickItems()
+            && connection.getProtocolInfo().protocolVersion().betweenInclusive(ProtocolVersion.v1_20_5, ProtocolVersion.v1_21_4);
     }
 
     public void registerContainerClick1_21_5(S packetType) {
