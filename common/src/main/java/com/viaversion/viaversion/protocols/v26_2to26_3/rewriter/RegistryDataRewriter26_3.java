@@ -23,15 +23,62 @@ import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.protocols.v26_2to26_3.Protocol26_2To26_3;
+import com.viaversion.viaversion.protocols.v26_2to26_3.storage.ProtocolStorables26_3;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 import com.viaversion.viaversion.util.Key;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 
 public final class RegistryDataRewriter26_3 extends RegistryDataRewriter {
 
     public RegistryDataRewriter26_3(final Protocol26_2To26_3 protocol) {
         super(protocol);
+    }
+
+    @Override
+    public void updateEnchantments(final UserConnection connection, final RegistryEntry[] entries) {
+        super.updateEnchantments(connection, entries);
+
+        // 26.3 resolves the tag predicates as holder sets, so tags the server never sends fail the client's registry freeze
+        final ProtocolStorables26_3 storables = connection.storables(protocol);
+        for (final RegistryEntry entry : entries) {
+            if (entry.tag() != null) {
+                collectDamageTypeTags(entry.tag(), storables.referencedDamageTypeTags());
+            }
+        }
+    }
+
+    private static void collectDamageTypeTags(final Tag tag, final Set<String> tagKeys) {
+        if (tag instanceof final ListTag<?> listTag) {
+            for (final Tag element : listTag) {
+                collectDamageTypeTags(element, tagKeys);
+            }
+            return;
+        }
+        if (!(tag instanceof final CompoundTag compoundTag)) {
+            return;
+        }
+
+        if (Key.equals(compoundTag.getString("type"), "damage_source_properties")) {
+            final CompoundTag predicate = compoundTag.getCompoundTag("predicate");
+            final ListTag<CompoundTag> tags = predicate != null ? predicate.getListTag("tags", CompoundTag.class) : null;
+            if (tags != null) {
+                for (final CompoundTag tagPredicate : tags) {
+                    final String id = tagPredicate.getString("id");
+                    if (id != null && id.startsWith("#")) {
+                        tagKeys.add(id.substring(1));
+                    }
+                }
+            }
+        }
+
+        for (final Map.Entry<String, Tag> entry : compoundTag.entrySet()) {
+            collectDamageTypeTags(entry.getValue(), tagKeys);
+        }
     }
 
     @Override
