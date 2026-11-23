@@ -212,7 +212,7 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
             wrapper.write(Types.STRING, "minecraft:brewing_input");
             wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, MAPPINGS.brewingInputIds().clone());
             final ProtocolVersion serverVersion = wrapper.user().getProtocolInfo().serverProtocolVersion();
-            final int[] reagentIds = serverVersion.isKnown() && serverVersion.olderThan(ProtocolVersion.v1_21) ? MAPPINGS.legacyBrewingReagentIds() : MAPPINGS.brewingReagentIds();
+            final int[] reagentIds = serverVersion.olderThan(ProtocolVersion.v1_21) ? MAPPINGS.legacyBrewingReagentIds() : MAPPINGS.brewingReagentIds();
             wrapper.write(Types.STRING, "minecraft:brewing_reagent");
             wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, reagentIds.clone());
         });
