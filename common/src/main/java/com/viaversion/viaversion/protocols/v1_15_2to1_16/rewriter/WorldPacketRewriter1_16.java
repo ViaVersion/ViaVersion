@@ -39,19 +39,6 @@ import java.util.UUID;
 public class WorldPacketRewriter1_16 {
 
     public static void register(Protocol1_15_2To1_16 protocol) {
-        protocol.registerClientbound(ClientboundPackets1_15.CUSTOM_SOUND, wrapper -> {
-            final String sound = Key.stripMinecraftNamespace(wrapper.read(Types.STRING));
-            final String mappedSound = switch (sound) {
-                case "entity.zombie_pigman.ambient" -> "entity.zombified_piglin.ambient";
-                case "entity.zombie_pigman.angry" -> "entity.zombified_piglin.angry";
-                case "entity.zombie_pigman.death" -> "entity.zombified_piglin.death";
-                case "entity.zombie_pigman.hurt" -> "entity.zombified_piglin.hurt";
-                case "music.nether" -> "music.nether.nether_wastes";
-                default -> sound;
-            };
-            wrapper.write(Types.STRING, mappedSound);
-        });
-
         protocol.getBlockRewriter().registerLevelChunk(ClientboundPackets1_15.LEVEL_CHUNK, ChunkType1_15.TYPE, ChunkType1_16.TYPE, (connection, chunk) -> {
             chunk.setIgnoreOldLightData(chunk.isFullChunk());
 

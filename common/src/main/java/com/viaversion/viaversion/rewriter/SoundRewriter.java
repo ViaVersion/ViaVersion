@@ -43,6 +43,17 @@ public class SoundRewriter<C extends ClientboundPacketType> {
         });
     }
 
+    public void registerNamedSound(C packetType) {
+        if (protocol.getMappingData() == null || Mappings.isFullIdentity(protocol.getMappingData().getFullSoundMappings())) {
+            return;
+        }
+        protocol.registerClientbound(packetType, wrapper -> {
+            final String sound = wrapper.read(Types.STRING);
+            final String mappedSound = protocol.getMappingData().getFullSoundMappings().mappedIdentifier(sound);
+            wrapper.write(Types.STRING, mappedSound != null ? mappedSound : sound);
+        });
+    }
+
     public void registerSound1_19_3(C packetType) {
         if (protocol.getMappingData() != null && !Mappings.isFullIdentity(protocol.getMappingData().getFullSoundMappings())) {
             protocol.registerClientbound(packetType, soundHolderHandler());

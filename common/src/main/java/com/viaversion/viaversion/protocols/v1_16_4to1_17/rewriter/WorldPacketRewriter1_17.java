@@ -32,7 +32,6 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_17;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.Protocol1_16_4To1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17;
-import com.viaversion.viaversion.util.Key;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -40,11 +39,6 @@ import java.util.List;
 public final class WorldPacketRewriter1_17 {
 
     public static void register(Protocol1_16_4To1_17 protocol) {
-        protocol.registerClientbound(ClientboundPackets1_16_2.CUSTOM_SOUND, wrapper -> {
-            final String sound = Key.stripMinecraftNamespace(wrapper.read(Types.STRING));
-            wrapper.write(Types.STRING, sound.equals("item.sweet_berries.pick_from_bush") ? "block.sweet_berry_bush.pick_berries" : sound);
-        });
-
         protocol.registerClientbound(ClientboundPackets1_16_2.SET_BORDER, null, wrapper -> {
             // Border packet actions have been split into individual packets (the content hasn't changed)
             int type = wrapper.read(Types.VAR_INT);
