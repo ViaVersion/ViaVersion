@@ -37,6 +37,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
@@ -233,8 +234,10 @@ public final class Protocol26_2To26_3 extends AbstractProtocol<ClientboundPacket
             // Copies, as later protocols rewrite the ids in place
             wrapper.write(Types.STRING, "minecraft:brewing_input");
             wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, MAPPINGS.brewingInputIds().clone());
+            final ProtocolVersion serverVersion = wrapper.user().getProtocolInfo().serverProtocolVersion();
+            final int[] reagentIds = serverVersion.olderThan(ProtocolVersion.v1_21) ? MAPPINGS.legacyBrewingReagentIds() : MAPPINGS.brewingReagentIds();
             wrapper.write(Types.STRING, "minecraft:brewing_reagent");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, MAPPINGS.brewingReagentIds().clone());
+            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, reagentIds.clone());
         });
     }
 
