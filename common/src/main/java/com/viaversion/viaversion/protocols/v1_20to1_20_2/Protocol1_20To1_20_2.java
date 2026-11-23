@@ -195,7 +195,16 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         });
 
         // If these are not queued, they may be received before the server switched its listener state to play
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.CUSTOM_PAYLOAD));
+        final PacketHandler queueCustomPayload = queueServerboundPacket(ServerboundPackets1_20_2.CUSTOM_PAYLOAD);
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, wrapper -> {
+            final String channel = Key.namespaced(wrapper.passthrough(Types.STRING));
+            if (channel.equals("minecraft:brand")) {
+                // Store it to re-send it when another ClientboundLoginPacket is sent, older clients sent it after every one
+                final ProtocolStorables1_20_2 storables = wrapper.user().storables(this);
+                storables.configurationState().setQueuedBrand(wrapper.passthrough(Types.STRING));
+            }
+            queueCustomPayload.handle(wrapper);
+        });
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.KEEP_ALIVE.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.KEEP_ALIVE));
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.PONG.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PONG));
 
