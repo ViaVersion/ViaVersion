@@ -1620,11 +1620,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
     private void removeEmptyItem(final CompoundTag tag, final String key) {
         final CompoundTag itemTag = tag.getCompoundTag(key);
-        if (itemTag != null) {
-            final int id = itemTag.getInt("id");
-            if (id == 0) {
-                tag.remove(key);
-            }
+        if (itemTag != null && Key.stripMinecraftNamespace(itemTag.getString("id", "air")).equals("air")) {
+            tag.remove(key);
         }
     }
 
