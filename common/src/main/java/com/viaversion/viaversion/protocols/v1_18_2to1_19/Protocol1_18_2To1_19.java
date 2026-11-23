@@ -106,7 +106,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                 handler(soundRewriter.getSoundHandler());
             }
         });
-        registerClientbound(ClientboundPackets1_18.CUSTOM_SOUND, new PacketHandlers() {
+        replaceClientbound(ClientboundPackets1_18.CUSTOM_SOUND, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.STRING); // Sound name

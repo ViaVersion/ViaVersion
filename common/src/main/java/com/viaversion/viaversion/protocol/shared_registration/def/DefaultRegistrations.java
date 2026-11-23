@@ -104,7 +104,8 @@ public final class DefaultRegistrations {
                 .to(ProtocolVersion.v1_19_3, RegistryRegistrations::registerSounds1_14)
                 .since(RegistryRegistrations::registerSounds1_19_3)
             )
-            .range(ProtocolVersion.v1_13, ProtocolVersion.v1_18_2, RegistryRegistrations::registerNamedSounds1_13)
+            .range(ProtocolVersion.v1_10, ProtocolVersion.v1_19_3, RegistryRegistrations::registerNamedSound1_10)
+            .since(ProtocolVersion.v1_14, RegistryRegistrations::registerStopSound1_14)
 
             .since(ProtocolVersion.v1_13, RegistryRegistrations::registerStatistics1_13)
             .since(ProtocolVersion.v1_19, RegistryRegistrations::registerCommands1_19)
