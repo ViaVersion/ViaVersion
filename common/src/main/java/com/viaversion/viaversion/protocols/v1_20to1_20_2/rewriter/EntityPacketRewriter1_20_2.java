@@ -101,6 +101,12 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                     final ConfigurationState configurationBridge = storables.configurationState();
                     if (!configurationBridge.setLastDimensionRegistry(dimensionRegistry)) {
                         // No change, so no need to re-enter the configuration state - just let this one through
+                        final PacketWrapper brandPacket = configurationBridge.brandPacket(wrapper.user());
+                        if (brandPacket != null) {
+                            // Older clients sent their brand after every join game, proxies rely on it when switching servers
+                            brandPacket.scheduleSendToServer(Protocol1_20To1_20_2.class);
+                        }
+
                         final PacketWrapper clientInformationPacket = configurationBridge.clientInformationPacket(wrapper.user());
                         if (clientInformationPacket != null) {
                             // Schedule the sending to ensure it arrives later, this fixes an issue where on
