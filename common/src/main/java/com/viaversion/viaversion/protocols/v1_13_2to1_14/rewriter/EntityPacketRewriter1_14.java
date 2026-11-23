@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
@@ -96,13 +97,15 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                         if (type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
                             wrapper.set(Types.INT, 0, data - 1);
                         }
-                        // send velocity in separate packet, 1.14 is now ignoring the velocity
-                        PacketWrapper velocity = wrapper.create(ClientboundPackets1_14.SET_ENTITY_MOTION);
-                        velocity.write(Types.VAR_INT, entityId);
-                        velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 0));
-                        velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 1));
-                        velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 2));
-                        velocity.scheduleSend(Protocol1_13_2To1_14.class);
+                        // Send velocity in a separate packet, 1.14 up to 1.21.4 ignore the velocity of the spawn packet
+                        if (wrapper.user().getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_21_5)) {
+                            PacketWrapper velocity = wrapper.create(ClientboundPackets1_14.SET_ENTITY_MOTION);
+                            velocity.write(Types.VAR_INT, entityId);
+                            velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 0));
+                            velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 1));
+                            velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 2));
+                            velocity.scheduleSend(Protocol1_13_2To1_14.class);
+                        }
                     }
 
                     // Register Type ID
