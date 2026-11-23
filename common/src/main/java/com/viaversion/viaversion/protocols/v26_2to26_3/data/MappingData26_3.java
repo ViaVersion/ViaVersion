@@ -22,6 +22,8 @@ import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import java.util.Arrays;
+import java.util.Set;
 
 public final class MappingData26_3 extends MappingDataBase {
 
@@ -54,10 +56,17 @@ public final class MappingData26_3 extends MappingDataBase {
         "sugar",
         "turtle_helmet"
     };
+    private static final Set<String> BREWING_REAGENTS_1_21 = Set.of(
+        "breeze_rod",
+        "cobweb",
+        "slime_block",
+        "stone"
+    );
 
     private CompoundTag blockTransformerRegistry;
     private int[] brewingInputIds;
     private int[] brewingReagentIds;
+    private int[] legacyBrewingReagentIds;
 
     public MappingData26_3() {
         super("26.2", "26.3");
@@ -69,6 +78,7 @@ public final class MappingData26_3 extends MappingDataBase {
 
         brewingInputIds = itemIds(BREWING_INPUTS);
         brewingReagentIds = itemIds(BREWING_REAGENTS);
+        legacyBrewingReagentIds = itemIds(Arrays.stream(BREWING_REAGENTS).filter(reagent -> !BREWING_REAGENTS_1_21.contains(reagent)).toArray(String[]::new));
     }
 
     private int[] itemIds(final String[] identifiers) {
@@ -92,5 +102,9 @@ public final class MappingData26_3 extends MappingDataBase {
 
     public int[] brewingReagentIds() {
         return brewingReagentIds;
+    }
+
+    public int[] legacyBrewingReagentIds() {
+        return legacyBrewingReagentIds;
     }
 }
