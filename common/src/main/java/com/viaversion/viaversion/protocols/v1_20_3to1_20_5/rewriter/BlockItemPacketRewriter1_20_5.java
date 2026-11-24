@@ -83,6 +83,7 @@ import com.viaversion.viaversion.api.type.types.version.VersionedTypes;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.ArmorMaterials1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.DyeColors;
@@ -857,8 +858,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private @Nullable BlockPredicate deserializeBlockPredicate(final UserConnection connection, final String rawPredicate) {
-        final int propertiesStartIndex = rawPredicate.indexOf('[');
         final int tagStartIndex = rawPredicate.indexOf('{');
+        int propertiesStartIndex = rawPredicate.indexOf('[');
+        if (tagStartIndex != -1 && propertiesStartIndex > tagStartIndex) {
+            // Part of the tag
+            propertiesStartIndex = -1;
+        }
+
         int idLength = rawPredicate.length();
         if (propertiesStartIndex != -1) {
             idLength = propertiesStartIndex;
@@ -886,24 +892,24 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             holders = HolderSet.of(tagKey);
         }
 
-        final int propertiesEndIndex = rawPredicate.indexOf(']');
+        final int propertiesEndIndex = propertiesStartIndex != -1 ? rawPredicate.indexOf(']', propertiesStartIndex) : -1;
         final List<StatePropertyMatcher> propertyMatchers = new ArrayList<>();
-        if (propertiesStartIndex != -1 && propertiesEndIndex != -1) {
+        if (propertiesEndIndex != -1) {
             for (final String property : rawPredicate.substring(propertiesStartIndex + 1, propertiesEndIndex).split(",")) {
                 final int propertySplitIndex = property.indexOf('=');
                 if (propertySplitIndex == -1) {
                     continue;
                 }
 
-                final String propertyId = property.substring(0, propertySplitIndex).trim();
-                final String propertyValue = property.substring(propertySplitIndex + 1).trim();
+                final String propertyId = limit(property.substring(0, propertySplitIndex).trim(), Short.MAX_VALUE);
+                final String propertyValue = limit(property.substring(propertySplitIndex + 1).trim(), Short.MAX_VALUE);
                 propertyMatchers.add(new StatePropertyMatcher(propertyId, Either.left(propertyValue)));
             }
         }
 
-        final int tagEndIndex = rawPredicate.indexOf('}');
+        final int tagEndIndex = rawPredicate.lastIndexOf('}');
         CompoundTag tag = null;
-        if (tagStartIndex != -1 && tagEndIndex != -1) {
+        if (tagStartIndex != -1 && tagEndIndex > tagStartIndex) {
             tag = (CompoundTag) SerializerVersion.V1_20_3.toTag(rawPredicate.substring(tagStartIndex, tagEndIndex + 1));
         }
 
@@ -1049,9 +1055,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
 
             final Tag descriptionTag = patternCompoundTag.get("description");
+            if (descriptionTag == null) {
+                return;
+            }
+
             final boolean decal = patternCompoundTag.getBoolean("decal");
             patternHolder = Holder.of(new ArmorTrimPattern(
-                assetId,
+                limit(assetId, Short.MAX_VALUE),
                 templateItemId,
                 descriptionTag,
                 decal
@@ -1076,20 +1086,24 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final NumberTag itemModelIndexTag = tag.getNumberTag("item_model_index");
         final CompoundTag overrideArmorMaterialsTag = tag.getCompoundTag("override_armor_materials");
         final Tag descriptionTag = tag.get("description");
+        if (descriptionTag == null) {
+            return null;
+        }
 
         final Map<String, String> overrideArmorMaterials = new HashMap<>();
         if (overrideArmorMaterialsTag != null) {
             for (final Map.Entry<String, Tag> entry : overrideArmorMaterialsTag.entrySet()) {
-                if (!(entry.getValue() instanceof StringTag valueTag)) {
+                final int armorMaterialId = armorMaterialId(entry.getKey());
+                if (armorMaterialId == -1 || !(entry.getValue() instanceof StringTag valueTag)) {
                     continue;
                 }
 
-                overrideArmorMaterials.put(entry.getKey(), valueTag.getValue());
+                overrideArmorMaterials.put(Integer.toString(armorMaterialId), limit(valueTag.getValue(), Short.MAX_VALUE));
             }
         }
 
         return new ArmorTrimMaterial1_20_5(
-            assetNameTag.getValue(),
+            limit(assetNameTag.getValue(), Short.MAX_VALUE),
             ingredientId,
             itemModelIndexTag != null ? itemModelIndexTag.asFloat() : 0,
             overrideArmorMaterials,
@@ -1117,9 +1131,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             // Only String and IntTags are valid
             final Tag value = entry.getValue();
             if (value instanceof StringTag valueStringTag) {
-                properties.put(entry.getKey(), valueStringTag.getValue());
+                properties.put(limit(entry.getKey(), Short.MAX_VALUE), limit(valueStringTag.getValue(), Short.MAX_VALUE));
             } else if (value instanceof IntTag valueIntTag) {
-                properties.put(entry.getKey(), Integer.toString(valueIntTag.asInt()));
+                properties.put(limit(entry.getKey(), Short.MAX_VALUE), Integer.toString(valueIntTag.asInt()));
             }
         }
         data.set(StructuredDataKey.BLOCK_STATE, new BlockStateProperties(properties));
@@ -1155,7 +1169,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
     private void updateLodestoneTracker(final boolean tracked, final CompoundTag lodestonePosTag, final String lodestoneDimension, final StructuredDataContainer data) {
         GlobalBlockPosition position = null;
-        if (lodestonePosTag != null && lodestoneDimension != null) {
+        if (lodestonePosTag != null && lodestoneDimension != null && isValidIdentifier(lodestoneDimension)) {
             final int x = lodestonePosTag.getInt("X");
             final int y = lodestonePosTag.getInt("Y");
             final int z = lodestonePosTag.getInt("Z");
@@ -1164,8 +1178,35 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(StructuredDataKey.LODESTONE_TRACKER, new LodestoneTracker(position, tracked));
     }
 
+    private static int armorMaterialId(final String key) {
+        final int id = ArmorMaterials1_20_5.keyToId(key);
+        if (id != -1) {
+            return id;
+        }
+
+        // Numeric ids as written by VB
+        if (key.isEmpty() || key.length() > 2) {
+            return -1;
+        }
+        for (int i = 0; i < key.length(); i++) {
+            if (!Character.isDigit(key.charAt(i))) {
+                return -1;
+            }
+        }
+
+        final int numericId = Integer.parseInt(key);
+        return ArmorMaterials1_20_5.idToKey(numericId) != null ? numericId : -1;
+    }
+
+    private static boolean isValidIdentifier(final String identifier) {
+        return identifier.length() <= Short.MAX_VALUE && Key.isValid(identifier);
+    }
+
     private FireworkExplosion readExplosion(final CompoundTag tag) {
-        final int shape = tag.getInt("Type");
+        int shape = tag.getInt("Type");
+        if (shape < 0 || shape >= FireworkExplosion.SHAPES.length) {
+            shape = 0; // Small ball
+        }
         final IntArrayTag colors = tag.getIntArrayTag("Colors");
         final IntArrayTag fadeColors = tag.getIntArrayTag("FadeColors");
         final boolean trail = tag.getBoolean("Trail");
@@ -1268,7 +1309,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final boolean resolved = tag.getBoolean("resolved");
         final WrittenBook writtenBook = new WrittenBook(
             new FilterableString(limit(title == null ? "" : title, 32), limit(filteredTitle, 32)),
-            author == null ? "" : author,
+            author == null ? "" : limit(author, Short.MAX_VALUE),
             clamp(generation, 0, 3),
             pages.toArray(new FilterableComponent[0]),
             resolved
@@ -1433,7 +1474,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 final String signature = compoundTag.getString("Signature");
                 properties.add(new GameProfile.Property(
                     limit(entry.getKey(), 64),
-                    value,
+                    limit(value, Short.MAX_VALUE),
                     limit(signature, 1024)
                 ));
 
@@ -1545,7 +1586,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
 
             final StringTag noteBlockSoundTag = tag.getStringTag("note_block_sound");
-            if (noteBlockSoundTag != null) {
+            if (noteBlockSoundTag != null && isValidIdentifier(noteBlockSoundTag.getValue())) {
                 data.set(StructuredDataKey.NOTE_BLOCK_SOUND, Key.of(noteBlockSoundTag.getValue()));
                 addBlockEntityId(tag, "player_head");
             }
