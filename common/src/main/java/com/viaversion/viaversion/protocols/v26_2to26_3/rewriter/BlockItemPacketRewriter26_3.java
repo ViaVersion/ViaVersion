@@ -282,10 +282,10 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
         });
         container.replace(StructuredDataKey.POT_DECORATIONS1_20_5, VersionedTypes.V26_3.structuredDataKeys().potDecorations, decorations -> {
             return new PotDecorations26_3(
-                new StructuredItemTemplate(decorations.backItem(), 1),
-                new StructuredItemTemplate(decorations.leftItem(), 1),
-                new StructuredItemTemplate(decorations.rightItem(), 1),
-                new StructuredItemTemplate(decorations.frontItem(), 1)
+                potDecorationTemplate(decorations.backItem()),
+                potDecorationTemplate(decorations.leftItem()),
+                potDecorationTemplate(decorations.rightItem()),
+                potDecorationTemplate(decorations.frontItem())
             );
         });
         container.replace(StructuredDataKey.CONSUMABLE1_21_2, StructuredDataKey.CONSUMABLE26_3, consumable -> {
@@ -380,6 +380,11 @@ public final class BlockItemPacketRewriter26_3 extends StructuredItemRewriter<Cl
                 effects[i] = new ConsumeEffect<>(TELEPORT_RANDOMLY_EFFECT, ConsumeEffect.TELEPORT_RANDOMLY_TYPE1_21_2, effect.diameter());
             }
         }
+    }
+
+    private static @Nullable Item potDecorationTemplate(final int id) {
+        // Templates cannot be air, absent sides are bricks
+        return id > 0 ? new StructuredItemTemplate(id, 1) : null;
     }
 
     private static int potDecorationId(final @Nullable Item decoration) {
