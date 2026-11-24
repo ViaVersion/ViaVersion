@@ -43,6 +43,60 @@ public class SoundRewriter<C extends ClientboundPacketType> {
         });
     }
 
+    public void registerNamedSound(final C packetType) {
+        if (protocol.getMappingData() == null || Mappings.isFullIdentity(protocol.getMappingData().getFullSoundMappings())) {
+            return;
+        }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.STRING); // Sound identifier
+            getNamedSoundHandler().handle(wrapper);
+        });
+    }
+
+    public void registerStopSound(final C packetType) {
+        if (protocol.getMappingData() == null || Mappings.isFullIdentity(protocol.getMappingData().getFullSoundMappings())) {
+            return;
+        }
+        protocol.registerClientbound(packetType, wrapper -> {
+            final byte flags = wrapper.passthrough(Types.BYTE);
+            if ((flags & 0x01) != 0) {
+                wrapper.passthrough(Types.VAR_INT); // Source
+            }
+
+            if ((flags & 0x02) == 0) return; // No sound specified
+            final String soundId = wrapper.read(Types.STRING);
+            final String mappedId = protocol.getMappingData().getFullSoundMappings().mappedIdentifier(soundId);
+            if (mappedId == null) {
+                // No mapping found
+                wrapper.write(Types.STRING, soundId);
+                return;
+            }
+
+            if (!mappedId.isEmpty()) {
+                wrapper.write(Types.STRING, mappedId);
+            } else {
+                // Cancel if set to empty
+                wrapper.cancel();
+            }
+        });
+    }
+
+    public PacketHandler getNamedSoundHandler() {
+        return wrapper -> {
+            final String soundId = wrapper.get(Types.STRING, 0);
+            final String mappedId = protocol.getMappingData().getFullSoundMappings().mappedIdentifier(soundId);
+            if (mappedId == null) {
+                return;
+            }
+
+            if (!mappedId.isEmpty()) {
+                wrapper.set(Types.STRING, 0, mappedId);
+            } else {
+                wrapper.cancel();
+            }
+        };
+    }
+
     public void registerSound1_19_3(C packetType) {
         if (protocol.getMappingData() != null && !Mappings.isFullIdentity(protocol.getMappingData().getFullSoundMappings())) {
             protocol.registerClientbound(packetType, soundHolderHandler());

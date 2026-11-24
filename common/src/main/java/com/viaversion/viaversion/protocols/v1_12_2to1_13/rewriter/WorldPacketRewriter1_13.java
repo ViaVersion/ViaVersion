@@ -318,7 +318,7 @@ public class WorldPacketRewriter1_13 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.CUSTOM_SOUND, new PacketHandlers() {
+        protocol.replaceClientbound(ClientboundPackets1_12_1.CUSTOM_SOUND, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.STRING);

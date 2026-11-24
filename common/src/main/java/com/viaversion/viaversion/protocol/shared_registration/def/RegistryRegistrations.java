@@ -84,6 +84,14 @@ final class RegistryRegistrations {
         ctx.clientbound(ClientboundPackets1_14.SOUND_ENTITY, sr::registerSound, PacketBound.ADDED_AT_MIN);
     }
 
+    static <CU extends ClientboundPacketType> void registerNamedSound1_10(final RegistrationContext<CU, ?> ctx) {
+        ctx.clientbound(ClientboundPackets1_9_3.CUSTOM_SOUND, new SoundRewriter<>(ctx.protocol())::registerNamedSound, PacketBound.REMOVED_AT_MAX);
+    }
+
+    static <CU extends ClientboundPacketType> void registerStopSound1_14(final RegistrationContext<CU, ?> ctx) {
+        ctx.clientbound(ClientboundPackets1_14.STOP_SOUND, new SoundRewriter<>(ctx.protocol())::registerStopSound);
+    }
+
     static <CU extends ClientboundPacketType> void registerSounds1_19_3(final RegistrationContext<CU, ?> ctx) {
         final SoundRewriter<CU> sr = new SoundRewriter<>(ctx.protocol());
         ctx.clientbound(ClientboundPackets1_19_3.SOUND, sr::registerSound1_19_3);
