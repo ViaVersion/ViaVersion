@@ -547,8 +547,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
             CompoundTag tag = item.tag();
             if (tag != null) {
                 // Prefer saved pages since they are more likely to be accurate
-                ListTag<StringTag> backup = tag.removeUnchecked(nbtTagName("pages"));
-                if (backup != null) {
+                if (tag.remove(nbtTagName("pages")) instanceof final ListTag<?> backup) {
                     if (!backup.isEmpty()) {
                         tag.put("pages", backup);
                     } else {

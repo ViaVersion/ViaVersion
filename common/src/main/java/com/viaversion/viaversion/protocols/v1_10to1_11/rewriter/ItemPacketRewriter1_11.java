@@ -17,9 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.v1_10to1_11.rewriter;
 
-import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Types;
@@ -79,8 +79,8 @@ public class ItemPacketRewriter1_11 extends ItemRewriter<ClientboundPackets1_9_3
         }
         CompoundTag tag = item.tag();
         if (tag != null) {
-            if (tag.contains(nbtTagName())) {
-                item.setAmount(tag.<ByteTag>removeUnchecked(nbtTagName()).asByte());
+            if (tag.remove(nbtTagName()) instanceof final NumberTag amountTag) {
+                item.setAmount(amountTag.asByte());
                 if (tag.isEmpty()) {
                     item.setTag(null);
                 }

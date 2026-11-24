@@ -21,6 +21,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.LongArrayTag;
+import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
@@ -307,8 +308,16 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             return;
         }
 
+        if (attributeModifiers.modifiers().length > 4) {
+            return; // Only needed for default attribute modifiers
+        }
+
         final ListTag<CompoundTag> modifiersTag = new ListTag<>(CompoundTag.class);
         for (final AttributeModifiers1_21.AttributeModifier modifier : attributeModifiers.modifiers()) {
+            if (modifier.modifier().id().length() > 64) {
+                return;
+            }
+
             final CompoundTag modifierTag = new CompoundTag();
             modifierTag.putInt("attribute", modifier.attribute());
             modifierTag.putString("id", modifier.modifier().id());
@@ -443,12 +452,12 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             return;
         }
 
-        final IntTag bucketVariantTag = bucketEntityData.removeUnchecked("BucketVariantTag");
-        if (bucketVariantTag == null) {
+        if (!(bucketEntityData.get("BucketVariantTag") instanceof final NumberTag bucketVariantTag)) {
             return;
         }
 
         // Unpack into new item components
+        bucketEntityData.remove("BucketVariantTag");
         final int packedVariant = bucketVariantTag.asInt();
         dataContainer.set(StructuredDataKey.TROPICAL_FISH_BASE_COLOR, packedVariant >> 16 & 0xFF);
         dataContainer.set(StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR, packedVariant >> 24 & 0xFF);
