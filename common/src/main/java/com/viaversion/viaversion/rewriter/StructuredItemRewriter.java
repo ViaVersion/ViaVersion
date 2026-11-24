@@ -76,6 +76,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             return item;
         }
 
+        removeServerBackupData(item);
         final ItemHasherBase itemHasher = itemHasher(connection); // get the original hashed item and store it later if there are any changes that could affect the data hashes
         final HashedItem originalHashedItem = hashItemIfNeeded(connection, item, itemHasher); // non-null if tracking is actually necessary here
 
@@ -120,15 +121,20 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         final CompoundTag customData = item.dataContainer().get(StructuredDataKey.CUSTOM_DATA);
-        final CompoundTag originalHashes;
-        if (customData != null && (originalHashes = customData.getCompoundTag(ORIGINAL_HASHES_KEY)) != null) {
+        final CompoundTag originalHashes = customData != null ? customData.getCompoundTag(ORIGINAL_HASHES_KEY) : null;
+        if (originalHashes != null) {
             if (isFirstServerbound(connection)) {
                 // Get the item that was originally saved when there was the first hash change to cache in this protocol,
                 // so that it can be cached in the hasher
-                return backedUpOriginalHashes(originalHashes, item);
+                final OriginalHashedItem backedUpItem = backedUpOriginalHashes(connection, originalHashes, item);
+                if (backedUpItem != null) {
+                    return backedUpItem;
+                }
+            } else if (backupProtocol(connection, originalHashes.getString("backup_tag")) != null) {
+                // If the original has already been saved and this isn't the final clientbound protocol, no need to do anything else
+                return null;
             }
-            // If the original has already been saved and this isn't the final clientbound protocol, no need to do anything else
-            return null;
+            // Otherwise not written in this pipeline, e.g. by another instance behind a proxy
         }
         return hasher.toHashedItem(item, false);
     }
@@ -195,6 +201,15 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         updateHashedItemDataComponentIds(item, mappingData.getDataComponentSerializerMappings().inverse());
     }
 
+    protected void removeServerBackupData(final Item item) {
+        final CompoundTag customData = item.dataContainer().get(StructuredDataKey.CUSTOM_DATA);
+        if (customData != null) {
+            // Backups of this protocol are removed before reaching the server, so the server should not send any
+            final String backupPrefix = nbtTagName() + "|";
+            customData.keySet().removeIf(key -> key.startsWith(backupPrefix));
+        }
+    }
+
     protected boolean isFirstServerbound(final UserConnection connection) {
         // Only actually cache the original item once in the final clientbound/first serverbound protocol
         for (final Protocol<?, ?, ?, ?> protocol : connection.getProtocolInfo().getPipeline().pipes()) {
@@ -205,20 +220,23 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         return false;
     }
 
-    protected @Nullable OriginalHashedItem backedUpOriginalHashes(final CompoundTag originalHashes, final Item item) {
+    protected @Nullable OriginalHashedItem backedUpOriginalHashes(final UserConnection connection, final CompoundTag originalHashes, final Item item) {
         final IntTag idTag = originalHashes.getIntTag("id");
         final String backupTagName = originalHashes.getString("backup_tag");
         if (idTag == null || backupTagName == null) {
             return null;
         }
 
-        final MappingData mappingData = protocol.getMappingData();
+        // Only accept hashes written by a protocol of this pipeline
+        final Protocol<?, ?, ?, ?> backupProtocol = backupProtocol(connection, backupTagName);
+        final MappingData mappingData = backupProtocol != null ? backupProtocol.getMappingData() : null;
+        final Mappings itemMappings = mappingData != null ? mappingData.getItemMappings() : null;
         final FullMappings dataComponentMappings = mappingData != null ? mappingData.getDataComponentSerializerMappings() : null;
-        if (dataComponentMappings == null) {
+        if (itemMappings == null || dataComponentMappings == null || idTag.asInt() < 0 || idTag.asInt() >= itemMappings.size()) {
             return null;
         }
 
-        final int dataComponentTypes = Math.max(dataComponentMappings.size(), dataComponentMappings.mappedSize());
+        final int dataComponentTypes = dataComponentMappings.size();
         final OriginalHashedItem hashedItem = new OriginalHashedItem(idTag.asInt(), item.amount(), backupTagName);
         try {
             for (final Map.Entry<String, Tag> entry : originalHashes.entrySet()) {
@@ -247,6 +265,20 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             }
         }
         return hashedItem;
+    }
+
+    private @Nullable Protocol<?, ?, ?, ?> backupProtocol(final UserConnection connection, @Nullable final String backupTagName) {
+        if (backupTagName == null) {
+            return null;
+        }
+
+        for (final Protocol<?, ?, ?, ?> protocol : connection.getProtocolInfo().getPipeline().pipes()) {
+            if (!protocol.isBaseProtocol() && connection.getItemHasher(protocol) instanceof ItemHasherBase
+                && protocol.getItemRewriter() != null && protocol.getItemRewriter().nbtTagName().equals(backupTagName)) {
+                return protocol;
+            }
+        }
+        return null;
     }
 
     @Override

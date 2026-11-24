@@ -268,6 +268,8 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             return item;
         }
 
+        removeServerBackupData(item);
+
         final MappingData mappingData = protocol.getMappingData();
         if (mappingData != null && mappingData.getItemMappings() != null) {
             item.setIdentifier(mappingData.getNewItemId(item.identifier()));
