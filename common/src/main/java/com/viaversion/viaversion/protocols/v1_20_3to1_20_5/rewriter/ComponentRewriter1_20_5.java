@@ -110,6 +110,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends JsonNBTComponentRewriter<C> {
 
+    private static final ThreadLocal<Boolean> CONVERTING_HOVER_ITEM = ThreadLocal.withInitial(() -> false);
+
     protected final Map<StructuredDataKey<?>, ConverterPair<?>> converters = new Reference2ObjectOpenHashMap<>();
     protected final StructuredDataType structuredDataType;
 
@@ -214,15 +216,17 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
             itemId = 1;
         }
 
+        // Don't unnecessarily convert item data of hovers within hovered items, they are not displayed
+        final boolean nested = CONVERTING_HOVER_ITEM.get();
         final StringTag tag = (StringTag) itemTag.remove("tag");
-        final CompoundTag tagTag;
+        CompoundTag tagTag;
         try {
-            tagTag = tag != null ? (CompoundTag) inputSerializerVersion().toTag(tag.getValue()) : null;
+            tagTag = tag != null && !nested ? (CompoundTag) inputSerializerVersion().toTag(tag.getValue()) : null;
         } catch (final Exception e) {
             if (Via.getConfig().logTextComponentConversionErrors()) {
                 protocol.getLogger().log(Level.WARNING, "Error reading NBT in show_item: " + StringUtil.forLogging(itemTag), e);
             }
-            return;
+            tagTag = null;
         }
 
         final Item dataItem = new DataItem();
@@ -231,7 +235,13 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
             dataItem.setTag(tagTag);
         }
 
-        final Item structuredItem = protocol.getItemRewriter().handleItemToClient(connection, dataItem);
+        final Item structuredItem;
+        CONVERTING_HOVER_ITEM.set(true);
+        try {
+            structuredItem = protocol.getItemRewriter().handleItemToClient(connection, dataItem);
+        } finally {
+            CONVERTING_HOVER_ITEM.set(nested);
+        }
         if (structuredItem.amount() < 1) {
             // Cannot be empty
             structuredItem.setAmount(1);

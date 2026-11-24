@@ -106,7 +106,6 @@ import com.viaversion.viaversion.util.MathUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1067,7 +1066,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final CompoundTag overrideArmorMaterialsTag = tag.getCompoundTag("override_armor_materials");
         final Tag descriptionTag = tag.get("description");
 
-        final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
+        final Map<String, String> overrideArmorMaterials = new HashMap<>();
         if (overrideArmorMaterialsTag != null) {
             for (final Map.Entry<String, Tag> entry : overrideArmorMaterialsTag.entrySet()) {
                 if (!(entry.getValue() instanceof StringTag valueTag)) {
@@ -1644,11 +1643,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         final ListTag<CompoundTag> propertiesListTag = new ListTag<>(CompoundTag.class);
+        profileTag.put("properties", propertiesListTag);
         for (final Map.Entry<String, Tag> entry : propertiesTag.entrySet()) {
             if (!(entry.getValue() instanceof ListTag<?> entryValue)) {
                 continue;
             }
 
+            final String propertyName = limit(entry.getKey(), 64);
             for (final Tag propertyTag : entryValue) {
                 if (!(propertyTag instanceof CompoundTag propertyCompoundTag)) {
                     continue;
@@ -1657,16 +1658,19 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 final CompoundTag updatedPropertyTag = new CompoundTag();
                 final String value = propertyCompoundTag.getString("Value", "");
                 final String signature = propertyCompoundTag.getString("Signature");
-                updatedPropertyTag.putString("name", entry.getKey());
+                updatedPropertyTag.putString("name", propertyName);
                 updatedPropertyTag.putString("value", value);
                 if (signature != null) {
                     updatedPropertyTag.putString("signature", signature);
                 }
                 propertiesListTag.add(updatedPropertyTag);
+
+                if (propertiesListTag.size() == 16) {
+                    // Max 16 properties
+                    return;
+                }
             }
         }
-
-        profileTag.put("properties", propertiesListTag);
     }
 
     private boolean isValidName(final String name) {
