@@ -33,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class LegacyFullStringMappingsBase extends FullMappingsBase {
     private final String[] idToString;
     private final String[] mappedIdToString;
+    private FullMappings inverse;
 
     public LegacyFullStringMappingsBase(final IdentifiersPair identifiersPair, final Mappings mappings) {
         super(toInverseMap(identifiersPair.unmapped()), toInverseMap(identifiersPair.mapped()), new Key[0], new Key[0], mappings);
@@ -106,6 +107,9 @@ public class LegacyFullStringMappingsBase extends FullMappingsBase {
 
     @Override
     public FullMappings inverse() {
-        return new LegacyFullStringMappingsBase(mappedStringToId, stringToId, mappedIdToString, idToString, mappings.inverse());
+        if (inverse == null) {
+            inverse = new LegacyFullStringMappingsBase(mappedStringToId, stringToId, mappedIdToString, idToString, mappings.inverse());
+        }
+        return inverse;
     }
 }

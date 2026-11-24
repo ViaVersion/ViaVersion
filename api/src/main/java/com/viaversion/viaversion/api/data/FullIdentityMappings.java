@@ -28,6 +28,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class FullIdentityMappings extends FullMappingsBase {
+    private FullIdentityMappings inverse;
 
     public FullIdentityMappings(final IdentifiersPair identifiersPair, final Mappings mappings) {
         this(toInverseMap(identifiersPair.unmapped()), identifiersPair.unmapped().stream().map(Key::of).toArray(Key[]::new), mappings);
@@ -59,6 +60,9 @@ public class FullIdentityMappings extends FullMappingsBase {
 
     @Override
     public FullIdentityMappings inverse() {
-        return new FullIdentityMappings(stringToId, idToKey, mappings.inverse());
+        if (inverse == null) {
+            inverse = new FullIdentityMappings(stringToId, idToKey, mappings.inverse());
+        }
+        return inverse;
     }
 }
