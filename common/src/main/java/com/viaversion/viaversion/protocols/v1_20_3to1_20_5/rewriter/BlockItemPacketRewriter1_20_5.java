@@ -43,9 +43,6 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
-import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrim1_20_5;
-import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimMaterial1_20_5;
-import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.AttributeModifier;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.ModifierData;
@@ -76,6 +73,9 @@ import com.viaversion.viaversion.api.minecraft.item.data.ToolRule;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.WritableBook;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrim1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimMaterial1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.trim.ArmorTrimPattern;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
@@ -600,12 +600,18 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final ListTag<StringTag> canPlaceOnTag = tag.getListTag("CanPlaceOn", StringTag.class);
         if (canPlaceOnTag != null) {
-            data.set(StructuredDataKey.CAN_PLACE_ON1_20_5, updateBlockPredicates(connection, canPlaceOnTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_PLACE_ON) == 0));
+            final AdventureModePredicate canPlaceOn = updateBlockPredicates(connection, canPlaceOnTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_PLACE_ON) == 0);
+            if (canPlaceOn != null) {
+                data.set(StructuredDataKey.CAN_PLACE_ON1_20_5, canPlaceOn);
+            }
         }
 
         final ListTag<StringTag> canDestroyTag = tag.getListTag("CanDestroy", StringTag.class);
         if (canDestroyTag != null) {
-            data.set(StructuredDataKey.CAN_BREAK1_20_5, updateBlockPredicates(connection, canDestroyTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_DESTROY) == 0));
+            final AdventureModePredicate canDestroy = updateBlockPredicates(connection, canDestroyTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_DESTROY) == 0);
+            if (canDestroy != null) {
+                data.set(StructuredDataKey.CAN_BREAK1_20_5, canDestroy);
+            }
         }
 
         // Only for VB, but kept here for simplicity; In VV we back up the original tag and later restore it, in VB
@@ -830,13 +836,22 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(StructuredDataKey.TRIM1_20_5, new ArmorTrim1_20_5(materialHolder, patternHolder, showInTooltip));
     }
 
-    private AdventureModePredicate updateBlockPredicates(final UserConnection connection, final ListTag<StringTag> tag, final boolean showInTooltip) {
-        final BlockPredicate[] predicates = tag.stream()
-            .map(StringTag::getValue)
-            .map(rawPredicate -> deserializeBlockPredicate(connection, rawPredicate))
-            .filter(Objects::nonNull)
-            .toArray(BlockPredicate[]::new);
-        return new AdventureModePredicate(predicates, showInTooltip);
+    private @Nullable AdventureModePredicate updateBlockPredicates(final UserConnection connection, final ListTag<StringTag> tag, final boolean showInTooltip) {
+        try {
+            return new AdventureModePredicate(
+                tag.stream()
+                    .map(StringTag::getValue)
+                    .map(rawPredicate -> deserializeBlockPredicate(connection, rawPredicate))
+                    .filter(Objects::nonNull)
+                    .toArray(BlockPredicate[]::new),
+                showInTooltip
+            );
+        } catch (final Exception e) {
+            if (Via.getManager().isDebug()) {
+                Protocol1_20_3To1_20_5.LOGGER.log(Level.SEVERE, "Failed to parse block predicate tag", e);
+            }
+            return null;
+        }
     }
 
     private @Nullable BlockPredicate deserializeBlockPredicate(final UserConnection connection, final String rawPredicate) {
@@ -887,13 +902,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final int tagEndIndex = rawPredicate.indexOf('}');
         CompoundTag tag = null;
         if (tagStartIndex != -1 && tagEndIndex != -1) {
-            try {
-                tag = (CompoundTag) SerializerVersion.V1_20_3.toTag(rawPredicate.substring(tagStartIndex, tagEndIndex + 1));
-            } catch (final Exception e) {
-                if (Via.getManager().isDebug()) {
-                    Protocol1_20_3To1_20_5.LOGGER.log(Level.SEVERE, "Failed to parse block predicate tag: " + rawPredicate.substring(tagStartIndex, tagEndIndex + 1), e);
-                }
-            }
+            tag = (CompoundTag) SerializerVersion.V1_20_3.toTag(rawPredicate.substring(tagStartIndex, tagEndIndex + 1));
         }
 
         return new BlockPredicate(
@@ -1078,11 +1087,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         return new ArmorTrimMaterial1_20_5(
-                assetNameTag.getValue(),
-                ingredientId,
-                itemModelIndexTag != null ? itemModelIndexTag.asFloat() : 0,
-                overrideArmorMaterials,
-                descriptionTag
+            assetNameTag.getValue(),
+            ingredientId,
+            itemModelIndexTag != null ? itemModelIndexTag.asFloat() : 0,
+            overrideArmorMaterials,
+            descriptionTag
         );
     }
 
@@ -1119,7 +1128,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final Fireworks fireworks = new Fireworks(
             flightDuration,
             explosionsTag != null ? explosionsTag.stream().limit(256).
-                                    map(this::readExplosion).toArray(FireworkExplosion[]::new) : new FireworkExplosion[0]
+                map(this::readExplosion).toArray(FireworkExplosion[]::new) : new FireworkExplosion[0]
         );
         data.set(StructuredDataKey.FIREWORKS, fireworks);
     }
@@ -1216,6 +1225,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             for (int i = 0; i < pagesTag.size(); i++) {
                 final StringTag page = pagesTag.get(i);
+                boolean invalid = false;
                 Tag filtered = null;
                 if (filteredPagesTag != null) {
                     final StringTag filteredPage = filteredPagesTag.getStringTag(String.valueOf(i));
@@ -1223,21 +1233,25 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                         try {
                             filtered = jsonToTag(connection, filteredPage);
                         } catch (final Exception e) {
-                            // A 1.20.4 client would display the broken json raw, but a 1.20.5 client would die
-                            continue;
+                            filtered = textTag(filteredPage.getValue());
+                            invalid = true;
                         }
                     }
                 }
 
-                final Tag parsedPage;
+                Tag parsedPage;
                 try {
                     parsedPage = jsonToTag(connection, page);
                 } catch (final Exception e) {
-                    // Same as above
-                    continue;
+                    parsedPage = textTag(page.getValue());
+                    invalid = true;
                 }
 
                 pages.add(new FilterableComponent(parsedPage, filtered));
+                if (invalid) {
+                    // 1.20.4 displays broken json raw, but don't try parsing more, as exceptions are expensive
+                    break;
+                }
             }
         } else {
             final CompoundTag invalidPage = new CompoundTag();
@@ -1258,6 +1272,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             resolved
         );
         data.set(StructuredDataKey.WRITTEN_BOOK_CONTENT, writtenBook);
+    }
+
+    private static CompoundTag textTag(final String text) {
+        final CompoundTag tag = new CompoundTag();
+        tag.putString("text", text);
+        return tag;
     }
 
     private Tag jsonToTag(final UserConnection connection, final StringTag stringTag) {
