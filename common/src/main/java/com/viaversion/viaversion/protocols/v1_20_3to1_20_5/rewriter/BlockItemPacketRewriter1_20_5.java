@@ -616,9 +616,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         // Only for VB, but kept here for simplicity; In VV we back up the original tag and later restore it, in VB
         // we use the converted data and manually restore what broke during the conversion
-        final CompoundTag backupTag = StructuredDataConverter.removeBackupTag(tag);
-        if (backupTag != null) {
-            restoreFromBackupTag(backupTag, data);
+        if (restoreBackups(connection)) {
+            final CompoundTag backupTag = StructuredDataConverter.removeBackupTag(tag);
+            if (backupTag != null) {
+                restoreFromBackupTag(backupTag, data);
+            }
         }
         return item;
     }
@@ -823,7 +825,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (materialTag instanceof IntTag materialIntTag) {
             materialHolder = Holder.of(materialIntTag.asInt());
         } else if (materialTag instanceof CompoundTag materialCompoundTag) {
-            ArmorTrimMaterial1_20_5 material = readTrimMaterial(materialCompoundTag);
+            ArmorTrimMaterial1_20_5 material = readTrimMaterial(materialCompoundTag, true);
             if (material == null) {
                 return;
             }
@@ -1018,7 +1020,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             materialHolder = Holder.of(id);
         } else if (materialTag instanceof CompoundTag materialCompoundTag) {
-            ArmorTrimMaterial1_20_5 material = readTrimMaterial(materialCompoundTag);
+            ArmorTrimMaterial1_20_5 material = readTrimMaterial(materialCompoundTag, restoreBackups(connection));
             if (material == null) {
                 return;
             }
@@ -1041,7 +1043,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 return;
             }
 
-            final int templateItemId = StructuredDataConverter.removeItemBackupTag(patternCompoundTag, toMappedItemId(templateItem));
+            final int templateItemId = itemIdOrBackup(patternCompoundTag, toMappedItemId(templateItem), restoreBackups(connection));
             if (templateItemId == -1) {
                 return;
             }
@@ -1059,14 +1061,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(StructuredDataKey.TRIM1_20_5, new ArmorTrim1_20_5(materialHolder, patternHolder, showInTooltip));
     }
 
-    private ArmorTrimMaterial1_20_5 readTrimMaterial(final CompoundTag tag) {
+    private ArmorTrimMaterial1_20_5 readTrimMaterial(final CompoundTag tag, final boolean restoreBackups) {
         final StringTag assetNameTag = tag.getStringTag("asset_name");
         final StringTag ingredientTag = tag.getStringTag("ingredient");
         if (assetNameTag == null || ingredientTag == null) {
             return null;
         }
 
-        final int ingredientId = StructuredDataConverter.removeItemBackupTag(tag, toMappedItemId(ingredientTag.getValue()));
+        final int ingredientId = itemIdOrBackup(tag, toMappedItemId(ingredientTag.getValue()), restoreBackups);
         if (ingredientId == -1) {
             return null;
         }
@@ -1300,13 +1302,22 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
     }
 
+    private static boolean restoreBackups(final UserConnection connection) {
+        // Backups are only written by VB for older clients
+        return connection.getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_20_5);
+    }
+
+    private static int itemIdOrBackup(final CompoundTag tag, final int unmappedId, final boolean restoreBackups) {
+        return restoreBackups ? StructuredDataConverter.removeItemBackupTag(tag, unmappedId) : unmappedId;
+    }
+
     private Item itemFromTag(final UserConnection connection, final CompoundTag item) {
         final String id = item.getString("id");
         if (id == null) {
             return StructuredItem.empty();
         }
 
-        final int itemId = StructuredDataConverter.removeItemBackupTag(item, unmappedItemId(id));
+        final int itemId = itemIdOrBackup(item, unmappedItemId(id), restoreBackups(connection));
         if (itemId == -1) {
             return StructuredItem.empty();
         }
