@@ -17,6 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
@@ -66,7 +72,6 @@ import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Limit;
-import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -541,6 +546,28 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         wrapper.write(Types.BYTE, (byte) containerId);
     }
 
+    private static boolean appendPlainText(final StringBuilder builder, final JsonElement element) {
+        if (element instanceof final JsonArray array) {
+            for (final JsonElement child : array) {
+                if (!appendPlainText(builder, child)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Anything other than plain text would be resolved by the server
+        final JsonObject object = element instanceof final JsonObject jsonObject ? jsonObject : null;
+        final JsonElement text = object != null ? object.get("text") : element;
+        if (!(text instanceof final JsonPrimitive primitive) || !primitive.isString()) {
+            return false;
+        }
+
+        builder.append(primitive.getAsString());
+        final JsonElement extra = object != null ? object.get("extra") : null;
+        return extra == null || extra.isJsonArray() && appendPlainText(builder, extra);
+    }
+
     public static void updateItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
         dataContainer.replace(StructuredDataKey.INSTRUMENT1_20_5, StructuredDataKey.INSTRUMENT1_21_2, instrument -> {
@@ -603,7 +630,13 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 return null;
             }
 
-            return new StringTag(SerializerVersion.V1_20_5.toComponent(customName.getValue()).asUnformattedString());
+            // Just read back literal text as written in updateItemData
+            try {
+                final StringBuilder builder = new StringBuilder();
+                return appendPlainText(builder, JsonParser.parseString(customName.getValue())) ? new StringTag(builder.toString()) : null;
+            } catch (final JsonParseException e) {
+                return null;
+            }
         });
         dataContainer.replace(StructuredDataKey.INSTRUMENT1_21_2, StructuredDataKey.INSTRUMENT1_20_5, instrument -> {
             if (instrument.hasId()) {
