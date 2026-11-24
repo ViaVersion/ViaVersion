@@ -25,6 +25,8 @@ import com.viaversion.viaversion.api.minecraft.codec.CodecContext;
 import com.viaversion.viaversion.api.minecraft.codec.CodecContext.RegistryAccess;
 import com.viaversion.viaversion.api.minecraft.codec.hash.Hasher;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.codec.CodecRegistryContext;
 import com.viaversion.viaversion.codec.hash.HashFunction;
 import com.viaversion.viaversion.codec.hash.HashOps;
@@ -32,42 +34,67 @@ import com.viaversion.viaversion.data.item.ItemHasherBase;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemHashStorage1_21_5 implements ItemHasher {
 
-    private final Cache<Long, StructuredData<?>> hashToStructuredData = CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(512).build();
+    // Estimated sizes from hashed data + overhead
+    private static final int HASH_CALL_SIZE = 32;
+    private static final int MAX_CACHE_SIZE = 8 * 1024 * 1024;
+    private static final int MIN_ENTRY_SIZE = MAX_CACHE_SIZE / 512;
+    private static final int MAX_ENTRY_SIZE = 1024 * 1024;
+    private static final int MAX_RESTORED_SIZE = 8 * 1024 * 1024;
+    private final Cache<Long, CachedData> hashToStructuredData = CacheBuilder.newBuilder()
+        .concurrencyLevel(1)
+        .maximumWeight(MAX_CACHE_SIZE)
+        .<Long, CachedData>weigher((key, data) -> Math.max(data.size(), MIN_ENTRY_SIZE))
+        .build();
     private final long keyMultiplier = ThreadLocalRandom.current().nextLong() | 1; // Odd to keep keys unique, random to not have predictable buckets
     private boolean processingClientboundInventoryPacket;
-    private final CodecContext context;
+    private final TrackingCodecContext context;
+    private int restoredSize;
 
     public ItemHashStorage1_21_5(final Protocol1_21_4To1_21_5 protocol, final UserConnection connection) {
         final RegistryAccess registryAccess = RegistryAccess.of(protocol, connection);
-        this.context = new CodecRegistryContext(protocol, registryAccess, true); // always using 1.21.5 items as input
+        this.context = new TrackingCodecContext(new CodecRegistryContext(protocol, registryAccess, true)); // always using 1.21.5 items as input
     }
 
     public void trackStructuredData(final StructuredData<?> structuredData) {
-        if (structuredData.isEmpty()) {
+        if (structuredData.isEmpty() || !context.isSupported(structuredData.key())) {
             return;
         }
 
-        final HashOps hasher = new HashOps(context, HashFunction.crc32c());
-        final int hash = hasher.context().isSupported(structuredData.key()) ? hash(hasher, structuredData) : ItemHasherBase.UNKNOWN_HASH;
-        if (hash == ItemHasherBase.UNKNOWN_HASH) {
+        final SizeTrackingHashFunction hashFunction = new SizeTrackingHashFunction(HashFunction.crc32c());
+        context.skippedData = false;
+        final int hash = hash(new HashOps(context, hashFunction), structuredData);
+        if (hash == ItemHasherBase.UNKNOWN_HASH || context.skippedData || hashFunction.size > MAX_ENTRY_SIZE) {
             return;
         }
 
         final long key = key(structuredData.id(), hash);
         try {
-            this.hashToStructuredData.get(key, structuredData::copy);
+            this.hashToStructuredData.get(key, () -> new CachedData(structuredData.copy(), (int) hashFunction.size));
         } catch (final ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public StructuredData<?> dataFromHash(final int dataComponentId, final int hash) {
+    public @Nullable StructuredData<?> dataFromHash(final int dataComponentId, final int hash) {
         final long key = key(dataComponentId, hash);
-        final StructuredData<?> data = this.hashToStructuredData.getIfPresent(key);
-        return data != null ? data.copy() : null;
+        final CachedData data = this.hashToStructuredData.getIfPresent(key);
+        if (data == null || this.restoredSize + data.size() > MAX_RESTORED_SIZE) {
+            return null;
+        }
+
+        this.restoredSize += data.size();
+        return data.data().copy();
+    }
+
+    /**
+     * Resets the size of data restored from hashes, to be called before handling a new packet.
+     */
+    public void resetRestoredSize() {
+        this.restoredSize = 0;
     }
 
     private long key(final int dataComponentId, final int hash) {
@@ -88,5 +115,61 @@ public class ItemHashStorage1_21_5 implements ItemHasher {
     @Override
     public void setProcessingClientboundInventoryPacket(final boolean processingClientboundInventoryPacket) {
         this.processingClientboundInventoryPacket = processingClientboundInventoryPacket;
+    }
+
+    private record CachedData(StructuredData<?> data, int size) {
+    }
+
+    private static final class SizeTrackingHashFunction implements HashFunction {
+        private final HashFunction hashFunction;
+        private long size;
+
+        private SizeTrackingHashFunction(final HashFunction hashFunction) {
+            this.hashFunction = hashFunction;
+        }
+
+        @Override
+        public int hashBytes(final byte[] data, final int length) {
+            this.size += length + HASH_CALL_SIZE;
+            return this.hashFunction.hashBytes(data, length);
+        }
+    }
+
+    private static final class TrackingCodecContext implements CodecContext {
+        private final CodecContext context;
+        private boolean skippedData;
+
+        private TrackingCodecContext(final CodecContext context) {
+            this.context = context;
+        }
+
+        @Override
+        public boolean isSupported(final StructuredDataKey<?> key) {
+            final boolean supported = this.context.isSupported(key);
+            if (!supported) {
+                this.skippedData = true;
+            }
+            return supported;
+        }
+
+        @Override
+        public RegistryAccess registryAccess() {
+            return this.context.registryAccess();
+        }
+
+        @Override
+        public boolean mapped() {
+            return this.context.mapped();
+        }
+
+        @Override
+        public UserConnection connection() {
+            return this.context.connection();
+        }
+
+        @Override
+        public Protocol<?, ?, ?, ?> protocol() {
+            return this.context.protocol();
+        }
     }
 }

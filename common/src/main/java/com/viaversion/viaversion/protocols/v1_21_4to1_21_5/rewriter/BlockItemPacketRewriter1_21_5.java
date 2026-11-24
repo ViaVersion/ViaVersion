@@ -172,6 +172,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             wrapper.passthrough(Types.VAR_INT); // Mode
 
             // Try our best to get the actual item out of it - will be wrong for some data component types that don't have their conversion implemented
+            this.<ItemHashStorage1_21_5>itemHasher(wrapper.user()).resetRestoredSize();
             final int affectedItems = Limit.max(wrapper.passthrough(Types.VAR_INT), 128);
             for (int i = 0; i < affectedItems; i++) {
                 wrapper.passthrough(Types.SHORT); // Slot
@@ -274,7 +275,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         final StructuredDataContainer dataContainer = item.dataContainer();
         updateItemDataComponentTypeIds(dataContainer, true);
         backupHiddenAttributeModifiers(item);
-        handleRewritablesToClient(connection, dataContainer, null);
+        handleRewritablesToClient(connection, dataContainer, itemHasher(connection));
 
         updateItemData(item);
 
