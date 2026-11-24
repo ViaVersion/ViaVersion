@@ -24,15 +24,17 @@ package com.viaversion.viaversion.api.minecraft.item;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StructuredItem implements Item {
-    private final StructuredDataContainer data;
+    private StructuredDataContainer data; // Init lazily, most are empty
     private int identifier;
     private int amount;
 
     public StructuredItem(final int identifier, final int amount) {
-        this(identifier, amount, new StructuredDataContainer());
+        this.identifier = identifier;
+        this.amount = amount;
     }
 
     public StructuredItem(final int identifier, final int amount, final StructuredDataContainer data) {
@@ -86,12 +88,15 @@ public class StructuredItem implements Item {
 
     @Override
     public StructuredDataContainer dataContainer() {
+        if (data == null) {
+            data = new StructuredDataContainer();
+        }
         return data;
     }
 
     @Override
     public StructuredItem copy() {
-        return new StructuredItem(identifier, amount, data.copy());
+        return data != null ? new StructuredItem(identifier, amount, data.copy()) : new StructuredItem(identifier, amount);
     }
 
     @Override
@@ -101,12 +106,12 @@ public class StructuredItem implements Item {
         final StructuredItem that = (StructuredItem) o;
         if (identifier != that.identifier) return false;
         if (amount != that.amount) return false;
-        return data.equals(that.data);
+        return Objects.equals(data, that.data);
     }
 
     @Override
     public int hashCode() {
-        int result = data.hashCode();
+        int result = Objects.hashCode(data);
         result = 31 * result + identifier;
         result = 31 * result + amount;
         return result;

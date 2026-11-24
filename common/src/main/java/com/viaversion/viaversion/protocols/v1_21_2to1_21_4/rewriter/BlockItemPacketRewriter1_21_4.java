@@ -92,6 +92,10 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
 
     @Override
     public Item handleItemToServer(final UserConnection connection, final Item item) {
+        if (item.isEmpty()) {
+            return item;
+        }
+
         super.handleItemToServer(connection, item);
 
         final StructuredDataContainer dataContainer = item.dataContainer();
