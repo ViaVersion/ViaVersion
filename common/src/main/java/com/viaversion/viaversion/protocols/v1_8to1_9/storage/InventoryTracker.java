@@ -66,9 +66,15 @@ public class InventoryTracker implements StorableObject {
         if (windowId == -1 && slot == -1) {
             // Set the cursor item
             this.itemIdInCursor = itemId;
-        } else {
+        } else if (itemId != 0) {
             // Set item in normal inventory
             this.windowItemCache.computeIfAbsent(windowId, k -> new HashMap<>()).put(slot, itemId);
+        } else {
+            // Don't track empty slots
+            final Map<Short, Integer> itemMap = this.windowItemCache.get(windowId);
+            if (itemMap != null) {
+                itemMap.remove(slot);
+            }
         }
     }
 
