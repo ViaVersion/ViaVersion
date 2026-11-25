@@ -53,8 +53,7 @@ public record LockCode(CompoundTag tag) implements Rewritable, Copyable {
             final FullMappings mappings = protocol.getMappingData().getFullItemMappings();
             final Tag itemsTag = updatedTag.get("items");
             if (itemsTag != null) {
-                final HolderSet items = HolderSet.fromTag(itemsTag, key -> mappings.id(key));
-                items.rewrite(mappings::getNewId);
+                final HolderSet items = HolderSet.fromTag(itemsTag, key -> mappings.id(key)).rewrite(mappings::getNewId);
                 updatedTag.put("items", toTag(items, mappings));
             }
         }
