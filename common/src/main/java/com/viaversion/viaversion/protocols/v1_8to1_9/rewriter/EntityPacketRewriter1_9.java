@@ -411,7 +411,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 if (dataIndex.getOldType() == EntityDataTypes1_8.INT) {
                     data.setValue(((Integer) value).byteValue());
                 }
-                if (dataIndex == EntityDataIndex1_9.ENTITY_STATUS) {
+                if (dataIndex == EntityDataIndex1_9.ENTITY_STATUS && Via.getConfig().validate1_8EntityStatusBits()) {
                     // 1.8 clients ignore bits 6 and 7, but 1.9+ clients render them as glowing/elytra flying
                     data.setValue((byte) ((Byte) value & ~0xC0));
                 }
