@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.task;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MovementTransmitterProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
 
@@ -28,6 +29,11 @@ public final class IdlePacketTask implements Runnable {
     public void run() {
         for (final UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
             if (!connection.isActive()) {
+                continue;
+            }
+
+            // These clients supply their own tick boundaries; wall-clock idle packets would add extra ticks.
+            if (connection.getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_21_2)) {
                 continue;
             }
 
