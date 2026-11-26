@@ -53,14 +53,14 @@ public class ProtocolVersionRange {
     }
 
     /**
-     * Returns a range that contains only the given version.
+     * Returns a range that contains all versions between and including the given versions.
      *
      * @param min the version
      * @param max the version
      * @return the range
      */
     public static ProtocolVersionRange of(final ProtocolVersion min, final ProtocolVersion max) {
-        return new ProtocolVersionRange(Collections.singletonList(Range.open(min, max)));
+        return new ProtocolVersionRange(Collections.singletonList(Range.closed(min, max)));
     }
 
     /**
@@ -266,7 +266,7 @@ public class ProtocolVersionRange {
             String[] rangeParts = part.split(" - ");
             ProtocolVersion min = ProtocolVersion.getClosest(rangeParts[0]);
             ProtocolVersion max = ProtocolVersion.getClosest(rangeParts[1]);
-            return Range.open(min, max);
+            return Range.closed(min, max);
         } else return Range.singleton(ProtocolVersion.getClosest(part));
     }
 
