@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
-import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
@@ -32,6 +31,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_17;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.Protocol1_16_4To1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17;
+import com.viaversion.viaversion.protocols.v1_16_4to1_17.storage.EntityTracker1_17;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.TagUtil;
 
@@ -70,13 +70,30 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
             setDirection.send(Protocol1_16_4To1_17.class);
         });
 
+        protocol.registerClientbound(ClientboundPackets1_16_2.ENTITY_EVENT, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.INT);
+            final byte eventId = wrapper.passthrough(Types.BYTE);
+            if (eventId == 3) { // Death
+                final EntityTracker1_17 tracker = wrapper.user().getEntityTracker(protocol);
+                tracker.addDyingEntity(entityId);
+            }
+        });
+
         protocol.registerClientbound(ClientboundPackets1_16_2.REMOVE_ENTITIES, null, wrapper -> {
             int[] entityIds = wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE);
             wrapper.cancel();
 
-            EntityTracker entityTracker = wrapper.user().getEntityTracker(protocol);
+            EntityTracker1_17 entityTracker = wrapper.user().getEntityTracker(protocol);
             for (int entityId : entityIds) {
                 entityTracker.removeEntity(entityId);
+
+                // The death smoke was clientside before 1.17, now the server sends it right before removing the entity
+                if (entityTracker.removeDyingEntity(entityId)) {
+                    PacketWrapper deathSmoke = wrapper.create(ClientboundPackets1_17.ENTITY_EVENT);
+                    deathSmoke.write(Types.INT, entityId);
+                    deathSmoke.write(Types.BYTE, (byte) 60);
+                    deathSmoke.send(Protocol1_16_4To1_17.class);
+                }
 
                 // Send individual remove packets
                 PacketWrapper newPacket = wrapper.create(ClientboundPackets1_17.REMOVE_ENTITY);
