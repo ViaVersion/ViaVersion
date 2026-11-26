@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
-import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ServerboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17;
@@ -38,6 +37,7 @@ import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.ComponentRewri
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.EntityPacketRewriter1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.ItemPacketRewriter1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.WorldPacketRewriter1_17;
+import com.viaversion.viaversion.protocols.v1_16_4to1_17.storage.EntityTracker1_17;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -185,7 +185,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
 
     @Override
     public void init(UserConnection user) {
-        addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_17.PLAYER));
+        addEntityTracker(user, new EntityTracker1_17(user));
     }
 
     @Override
