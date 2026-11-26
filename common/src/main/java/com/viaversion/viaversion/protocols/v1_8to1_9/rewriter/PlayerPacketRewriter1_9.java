@@ -25,6 +25,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.GameMode;
+import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
@@ -110,6 +111,17 @@ public class PlayerPacketRewriter1_9 {
                 map(Types.FLOAT); // 4 - Player Pitch
 
                 map(Types.BYTE); // 5 - Player Flags
+
+                handler(wrapper -> {
+                    final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
+                    final Vector3d position = tracker.getPlayerPosition();
+
+                    final byte flags = wrapper.get(Types.BYTE, 0);
+                    final double x = wrapper.get(Types.DOUBLE, 0) + ((flags & 0x01) != 0 ? position.x() : 0);
+                    final double y = wrapper.get(Types.DOUBLE, 1) + ((flags & 0x02) != 0 ? position.y() : 0);
+                    final double z = wrapper.get(Types.DOUBLE, 2) + ((flags & 0x04) != 0 ? position.z() : 0);
+                    tracker.setPlayerPosition(new Vector3d(x, y, z));
+                });
 
                 create(Types.VAR_INT, 0); // 6 - Teleport ID was added
             }
@@ -449,6 +461,10 @@ public class PlayerPacketRewriter1_9 {
             tracker.incrementIdlePacket();
             tracker.setGround(wrapper.get(Types.BOOLEAN, 0));
         };
+        final PacketHandler positionHandler = wrapper -> {
+            EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
+            tracker.setPlayerPosition(new Vector3d(wrapper.get(Types.DOUBLE, 0), wrapper.get(Types.DOUBLE, 1), wrapper.get(Types.DOUBLE, 2)));
+        };
         protocol.registerServerbound(ServerboundPackets1_9.MOVE_PLAYER_POS, new PacketHandlers() {
             @Override
             public void register() {
@@ -457,6 +473,7 @@ public class PlayerPacketRewriter1_9 {
                 map(Types.DOUBLE); // 2 - Z
                 map(Types.BOOLEAN); // 3 - Ground
                 handler(onGroundHandler);
+                handler(positionHandler);
             }
         });
         protocol.registerServerbound(ServerboundPackets1_9.MOVE_PLAYER_POS_ROT, new PacketHandlers() {
@@ -469,6 +486,7 @@ public class PlayerPacketRewriter1_9 {
                 map(Types.FLOAT); // 4 - Pitch
                 map(Types.BOOLEAN); // 5 - Ground
                 handler(onGroundHandler);
+                handler(positionHandler);
             }
         });
         protocol.registerServerbound(ServerboundPackets1_9.MOVE_PLAYER_ROT, new PacketHandlers() {
