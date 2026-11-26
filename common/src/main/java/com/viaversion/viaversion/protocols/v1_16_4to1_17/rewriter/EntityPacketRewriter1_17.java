@@ -77,9 +77,8 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
                 return;
             }
 
-            // they were removed before the client death animation finished
             final EntityTracker1_17 tracker = wrapper.user().getEntityTracker(protocol);
-            if (tracker.entityType(entityId) != EntityTypes1_17.PLAYER) {
+            if (tracker.entityType(entityId) != EntityTypes1_17.PLAYER) { // they were removed before the client death animation finished
                 tracker.addDyingEntity(entityId);
             }
         });
