@@ -228,7 +228,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         packetValues.addAll(readableObjects);
         readableObjects.clear();
         // If the buffer has readable bytes, copy them.
-        if (inputBuffer.isReadable()) {
+        if (inputBuffer != null && inputBuffer.isReadable()) {
             passthrough(Types.REMAINING_BYTES);
         }
     }
