@@ -244,6 +244,34 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.set(Types.VAR_INT, 0, teleportId);
 
             final ProtocolStorables1_21_2 storables = wrapper.user().storables(protocol);
+            final ClientVehicleStorage vehicleStorage = storables.clientVehicleStorage();
+            if (vehicleStorage != null) {
+                final int[] passengers = vehicleStorage.passengers();
+                final int clientEntityId = tracker(wrapper.user()).clientEntityId();
+                for (int index = 0; index < passengers.length; index++) {
+                    if (passengers[index] != clientEntityId) {
+                        continue;
+                    }
+
+                    final int[] dismountedPassengers = new int[passengers.length - 1];
+                    System.arraycopy(passengers, 0, dismountedPassengers, 0, index);
+                    System.arraycopy(passengers, index + 1, dismountedPassengers, index, dismountedPassengers.length - index);
+                    storables.setClientVehicleStorage(null);
+
+                    final EntityTracker1_21_2 entityTracker = tracker(wrapper.user());
+                    final EntityTracker1_21_2.BoatEntity boatEntity = entityTracker.trackedBoatEntity(vehicleStorage.vehicleId());
+                    if (boatEntity != null) {
+                        boatEntity.setPassengers(dismountedPassengers);
+                    }
+
+                    final PacketWrapper setPassengers = wrapper.create(ClientboundPackets1_21_2.SET_PASSENGERS);
+                    setPassengers.write(Types.VAR_INT, vehicleStorage.vehicleId());
+                    setPassengers.write(Types.VAR_INT_ARRAY_PRIMITIVE, dismountedPassengers);
+                    setPassengers.send(Protocol1_21To1_21_2.class);
+                    break;
+                }
+            }
+
             final PlayerPositionStorage positionStorage = storables.playerPositionStorage();
             if (positionStorage == null) {
                 return;
@@ -285,7 +313,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             final int clientEntityId = tracker(wrapper.user()).clientEntityId();
             for (final int passenger : passengerIds) {
                 if (passenger == clientEntityId) {
-                    storables.setClientVehicleStorage(new ClientVehicleStorage(vehicleId));
+                    storables.setClientVehicleStorage(new ClientVehicleStorage(vehicleId, passengerIds));
                     break;
                 }
             }
