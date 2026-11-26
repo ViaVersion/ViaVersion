@@ -102,6 +102,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     private boolean cancelSwingInInventory;
     private int maxErrorLength;
     private boolean use1_8HitboxMargin;
+    private boolean validate1_8EntityStatusBits;
     private boolean emulateNegativeJumpBoost;
     private boolean ignore1_20_5To1_21_4ClickItems;
     private boolean sendPlayerDetails;
@@ -181,6 +182,7 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
         fix1_21PlacementRotation = getBoolean("fix-1_21-placement-rotation", true);
         cancelSwingInInventory = getBoolean("cancel-swing-in-inventory", true);
         use1_8HitboxMargin = getBoolean("use-1_8-hitbox-margin", true);
+        validate1_8EntityStatusBits = getBoolean("validate-1_8-entity-status-bits", true);
         emulateNegativeJumpBoost = getBoolean("emulate-negative-jump-boost", true);
         ignore1_20_5To1_21_4ClickItems = getBoolean("ignore-1_20_5-1_21_4-click-items", true);
         sendPlayerDetails = getBoolean("send-player-details", true);
@@ -661,6 +663,11 @@ public class AbstractViaConfig extends Config implements ViaVersionConfig {
     @Override
     public boolean use1_8HitboxMargin() {
         return use1_8HitboxMargin;
+    }
+
+    @Override
+    public boolean validate1_8EntityStatusBits() {
+        return validate1_8EntityStatusBits;
     }
 
     @Override

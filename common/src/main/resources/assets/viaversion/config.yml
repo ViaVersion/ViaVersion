@@ -259,3 +259,5 @@ left-handed-handling: true
 cancel-block-sounds: true
 # If enabled, 1.21.11+ clients on 1.8 servers will get wider entity hitboxes when attacking with items
 use-1_8-hitbox-margin: true
+# Removes the glowing/elytra flying entity status bits sent by 1.8 servers, which are ignored by 1.8 clients but rendered by 1.9+ clients
+validate-1_8-entity-status-bits: true
