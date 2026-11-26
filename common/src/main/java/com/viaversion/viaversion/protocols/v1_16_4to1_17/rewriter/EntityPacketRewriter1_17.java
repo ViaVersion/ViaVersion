@@ -73,8 +73,13 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_16_2.ENTITY_EVENT, wrapper -> {
             final int entityId = wrapper.passthrough(Types.INT);
             final byte eventId = wrapper.passthrough(Types.BYTE);
-            if (eventId == 3) { // Death
-                final EntityTracker1_17 tracker = wrapper.user().getEntityTracker(protocol);
+            if (eventId != 3) { // Death
+                return;
+            }
+
+            // they were removed before the client death animation finished
+            final EntityTracker1_17 tracker = wrapper.user().getEntityTracker(protocol);
+            if (tracker.entityType(entityId) != EntityTypes1_17.PLAYER) {
                 tracker.addDyingEntity(entityId);
             }
         });
